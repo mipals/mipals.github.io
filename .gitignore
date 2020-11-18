@@ -1,5 +1,16 @@
-__site/
 .DS_Store
 franklin
 franklin.pub
 node_modules/
+_assets
+_css
+_layout
+404.md
+config.md
+menu1.md
+menu2.md
+menu3.md
+old_menu1.md
+old_menu2.md
+smw_id.md
+utils.jl

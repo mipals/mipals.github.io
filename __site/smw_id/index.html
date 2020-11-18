@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="stylesheet" href="/libs/katex/katex.min.css">
+     
+   <link rel="stylesheet" href="/libs/highlight/github.min.css">
+   
+  <link rel="stylesheet" href="/css/franklin.css">
+  <link rel="stylesheet" href="/css/basic.css">
+  <link rel="icon" href="/assets/favicon.png">
+   <title>Sherman-Morrison-Woodbury identity</title>  
+</head>
+<body>
+  <header>
+<div class="blog-name"><a href="">Mikkel Paltorp Schmitt</a></div>
+<nav>
+  <ul>
+    <li><a href="/">Home</a></li>
+    <li><a href="/menu1/">CompSci notes</a></li>
+    <li><a href="/menu2/">Software</a></li>
+  </ul>
+  <img src="/assets/hamburger.svg" id="menu-icon">
+</nav>
+</header>
+
+
+<!-- Content appended here -->
+<div class="franklin-content"><h1 id="sherman-morrison-woodbury_identity"><a href="#sherman-morrison-woodbury_identity">Sherman-Morrison-Woodbury identity</a></h1>
+<h2 id="a_special_case"><a href="#a_special_case">A special case</a></h2>
+<p>A special case of the Sherman-Morrison-Woodbury identity is the following</p>
+\[
+    (I + UV^T)^{-1} = I - U(I + V^TU)^{-1}V^T.
+\]
+<p>The derivation is simple. Assume the inverse have the form \(I + UZV^T\), then we have that</p>
+\[\begin{aligned}
+    I 
+    &= (I + UV^T)(I + UZV^T)\\
+    & = I + (UV^T + UZV^T + UV^TUZV^T)\\
+    &= I + U(I + Z + V^TUZ)V^T.
+\end{aligned}\]
+<p>From the fact the most right expression needs to be equal to \(I\) we must have that</p>
+\[
+    Z = (I + V^TU)^{-1}(-I) = -(I + V^TU)^{-1}.
+\]
+<p>Which confirms the identity.</p>
+<h2 id="the_full_smw_identity"><a href="#the_full_smw_identity">The full SMW identity</a></h2>
+<p>In the general case the Sherman-Morrison-Woodbury identity have the form</p>
+\[
+(A + USV^T)^{-1} = A^{-1} - A^{-1}U(S^{-1} + V^TA^{-1}U)^{-1}V^TA^{-1}.
+\]
+<p>The derivation here is to set \(B = A + USV^T\) so that \(B^{-1} = (I + A^{-1}USV^T)^{-1}A^{-1}\). Now set \(W = A^{-1}U\) and \(Z = SV\) and use the special from the previous section.  </p>
+<p>An alternatively one can a similar approach to the previous section with a guess on the inverse have the form \(A^{-1} + A^{-1}UZV^TA^{-1}\) and then compute what \(Z\) makes that the inverse.</p>
+<h2 id="code"><a href="#code">Code</a></h2>
+<pre><code class="language-julia">using SymEGRSSMatrices
+@show randn&#40;2&#41;</code></pre>
+<pre><code class="plaintext">randn(2) = [0.8465953369638003, 1.3855362113840997]
+</code></pre>
+<div class="page-foot">
+  <div class="copyright">
+    &copy; Septimia Zenobia. Last modified: November 18, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+  </div>
+</div>
+</div><!-- CONTENT ENDS HERE -->
+    
+        <script src="/libs/katex/katex.min.js"></script>
+<script src="/libs/katex/auto-render.min.js"></script>
+<script>renderMathInElement(document.body)</script>
+
+    
+    
+        <script src="/libs/highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();hljs.configure({tabReplace: '    '});</script>
+
+    
+  </body>
+</html>
