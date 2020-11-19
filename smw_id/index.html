@@ -27,13 +27,13 @@
 
 
 <!-- Content appended here -->
-<div class="franklin-content"><h1 id="the_sherman-morrison-woodbury_identity"><a href="#the_sherman-morrison-woodbury_identity">The Sherman-Morrison-Woodbury identity</a></h1>
+<div class="franklin-content"><h1 id="the_sherman-morrison-woodbury_identity"><a href="#the_sherman-morrison-woodbury_identity">The Sherman-Morrison-Woodbury Identity</a></h1>
 <p>The Sherman-Morrison-Woodbury identity is the generalization of the Sherman-Morrison identity. In short it says that the inverse of a rank-\(k\) perturbed matrix is also a rank-\(k\) perturbed matrix.</p>
 <h2 id="a_special_case"><a href="#a_special_case">A Special Case</a></h2>
-<p>A special case of the Sherman-Morrison-Woodbury identity is the following</p>
+<div class="definition"><p>A special case of the Sherman-Morrison-Woodbury identity is the following</p>
 \[
     (I + UV^T)^{-1} = I - U(I + V^TU)^{-1}V^T.
-\]
+\]</div>
 <p>The derivation is simple. Assume the inverse have the form \(I + UZV^T\), then we have that</p>
 \[\begin{aligned}
     I 
@@ -50,10 +50,10 @@
 <p><img src="/assets/visualizations/smw_special.png" alt="" /></p>
 <p>This clearly highlights how the identity can be used to reduce the problem of inverting a \(n\times n\) matrix to inverting a \(k\times k\) matrix at the expense of some matrix-vector products. If \(k \ll n\) then this reduction from \(O(n^2)\) to \(O(k^3 + kn)\) flops is a significant improvement.</p>
 <h2 id="the_general_form"><a href="#the_general_form">The General Form </a></h2>
-<p>In general the Sherman-Morrison-Woodbury identity have the form</p>
+<div class="definition"><p>In general the Sherman-Morrison-Woodbury identity have the form</p>
 \[
 (A + USV^T)^{-1} = A^{-1} - A^{-1}U(S^{-1} + V^TA^{-1}U)^{-1}V^TA^{-1}.
-\]
+\]</div>
 <p>The derivation here is to set \(B = A + USV^T\) so that \(B^{-1} = (I + A^{-1}USV^T)^{-1}A^{-1}\). Now set \(W = A^{-1}U\) and \(Z = SV\) and use the special form from the previous section.  </p>
 <p>An alternatively one can use a similar approach to the one presented in the previous section. The guess just has to be modified to the form \(A^{-1} + A^{-1}UZV^TA^{-1}\). What is then left is to multiply with \((A + USV^T)\) and isolate \(Z\).</p>
 <p>Also in this case i like to think of the formula in terms of visuals</p>
