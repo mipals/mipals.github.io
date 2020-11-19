@@ -36,15 +36,15 @@
 (I + uv^T)^{-1} = I - \frac{uv^T}{1 + v^Tu}\ = I - v(1 + v^Tu)^{-1}v^T
 
 \]
-<p>The proof is simple. Assume that the inverse of \((I + uv^T)\) have a similar form, namely \((I + \phi uv^T)\)</p>
+<p>The proof is simple. Assume that the inverse of \((I + uv^T)\) have a similar form, namely \((I + \alpha uv^T)\)</p>
 \[
 
-(I + uv^T)(I + \phi uv^T) = I + (uv^T + \phi uv^T + uv^T\phi uv^T) = I + u(1 + \phi + v^T\phi u)v^T.
+(I + uv^T)(I + \alpha uv^T) = I + (uv^T + \alpha uv^T + uv^T\alpha uv^T) = I + u(1 + \alpha + v^T\alpha u)v^T.
 
 \]
 <p>Now since needs to be equal to \(I\) for all values of \(u\) and \(v\) we must have the expression inside the parenthesis must be 0 from which we can assert that</p>
 \[
-\phi = (1 + v^Tu)^{-1}.
+\alpha = (1 + v^Tu)^{-1}.
 \]
 <p>Inserting this into our assumption the formula follows.<br/></p>
 <p>The first expression is how the formula is usually stated. However I like the last form better since it naturally extends to the Sherman-Morrison-Woodbury formula.</p>
