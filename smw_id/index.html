@@ -64,30 +64,30 @@
 <pre><code class="language-julia">using WoodburyMatrices, LinearAlgebra
 n &#61; 5000;
 k &#61; 10;
-A &#61; randn&#40;n,n&#41; &#43; I
+A &#61; randn&#40;n,n&#41; &#43; I;
 U &#61; randn&#40;n,k&#41;;
 C &#61; randn&#40;k,k&#41;
-V &#61; randn&#40;n,k&#41;;
-Woodbury_struct &#61; Woodbury&#40;A, U, C, V&#39;&#41;
-Woodbury_dense &#61; A &#43; U*C*V&#39;
-@time Woodbury_struct\ones&#40;n&#41;
-@time Woodbury_dense\ones&#40;n&#41;</code></pre>
-<pre><code class="plaintext">  0.942877 seconds (10 allocations: 190.850 MiB)
-  0.970610 seconds (8 allocations: 190.850 MiB, 3.18% gc time)
+V &#61; randn&#40;n,k&#41;; 
+Woodbury_struct &#61; Woodbury&#40;A, U, C, V&#39;&#41;;
+Woodbury_dense &#61; A &#43; U*C*V&#39;;
+@time Woodbury_struct\ones&#40;n&#41;;
+@time Woodbury_dense\ones&#40;n&#41;;</code></pre>
+<pre><code class="plaintext">  0.970577 seconds (10 allocations: 190.850 MiB)
+  0.963374 seconds (8 allocations: 190.850 MiB)
 </code></pre>
 <p>As expected we do not get a speed up as the inversion of the Sherman-Morrison-Woodbury matrix also requires us to invert a \(n\times n\) matrix. Thankfully the package supports a factorization of \(A\) instead of \(A\) directly. Using this a clear speed-up can be seen. Off course it is not a completely fair comparison as we have not included the time it takes to actually factorize \(A\).</p>
 <pre><code class="language-julia">n &#61; 5000;
 k &#61; 10;
-A &#61; randn&#40;n,n&#41; &#43; I
+A &#61; randn&#40;n,n&#41; &#43; I;
 U &#61; randn&#40;n,k&#41;;
-C &#61; randn&#40;k,k&#41;
+C &#61; randn&#40;k,k&#41;;
 V &#61; randn&#40;n,k&#41;;
-Woodbury_struct &#61; Woodbury&#40;lu&#40;A&#41;, U, C, V&#39;&#41;
-Woodbury_dense &#61; A &#43; U*C*V&#39;
-@time Woodbury_struct\ones&#40;n&#41;
-@time Woodbury_dense\ones&#40;n&#41;</code></pre>
-<pre><code class="plaintext">  0.026693 seconds (6 allocations: 78.375 KiB)
-  0.974315 seconds (8 allocations: 190.850 MiB)
+Woodbury_struct &#61; Woodbury&#40;lu&#40;A&#41;, U, C, V&#39;&#41;;
+Woodbury_dense &#61; A &#43; U*C*V&#39;;
+@time Woodbury_struct\ones&#40;n&#41;;
+@time Woodbury_dense\ones&#40;n&#41;;</code></pre>
+<pre><code class="plaintext">  0.028874 seconds (6 allocations: 78.375 KiB)
+  0.953829 seconds (8 allocations: 190.850 MiB)
 </code></pre>
 <div class="page-foot">
   <div class="copyright">
