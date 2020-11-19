@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="stylesheet" href="/libs/katex/katex.min.css">
+     
+   <link rel="stylesheet" href="/libs/highlight/github.min.css">
+   
+  <link rel="stylesheet" href="/css/franklin.css">
+  <link rel="stylesheet" href="/css/basic.css">
+  <link rel="icon" href="/assets/favicon.png">
+   <title>BFGS</title>  
+</head>
+<body>
+  <header>
+<div class="blog-name"><a href="/">Mikkel Paltorp Schmitt</a></div>
+<nav>
+  <ul>
+    <li><a href="/">About Me</a></li>
+    <li><a href="/menu1/">Notes</a></li>
+    <li><a href="/menu2/">Software</a></li>
+  </ul>
+  <img src="/assets/hamburger.svg" id="menu-icon">
+</nav>
+</header>
+
+
+<!-- Content appended here -->
+<div class="franklin-content"><h1 id="the_broydenfletchergoldfarbshanno_bfgs_algorithm"><a href="#the_broydenfletchergoldfarbshanno_bfgs_algorithm">The Broyden–Fletcher–Goldfarb–Shanno &#40;BFGS&#41; Algorithm</a></h1>
+<p>The BFGS algorithm is one of the most known Quasi-Newton algorithms. This note briefly explores why the update of the approxiation of the inverse Hessian has the form stated in most texts. I&#39;ve done so, because I&#39;ve found most explanations lackings in terms of intuition and reasoning.</p>
+<h2 id="the_secant_condition"><a href="#the_secant_condition">The Secant Condition</a></h2>
+<p>A key component of the derivation of the BFGS steps is the secant condition stating that</p>
+\[
+
+H_{k+1} s_k = y_k
+
+\]
+<p>where \(s_k = x_{k+1} - x_k\) and \(y_k = \nabla f(x_{k+1}) - \nabla f(x_k)\).</p>
+<p>Now define a quadratic approximation of \(f\) around \(x_{k+1}\) as</p>
+\[
+
+\tilde{f}(x) = f(x_{k+1}) + \nabla f(x_{k+1})^T(x-x_{k+1}) + \frac{ 1 }{ 2 } (x - x_{k+1})^TH_{k+1}(x - x_{k+1}),
+
+\]
+<p>then</p>
+<ul>
+<li><p>by construction we have that \(\nabla \tilde{f}(x_{k+1}) = \nabla f(x_{k+1})\)</p>
+</li>
+<li><p>while the secant condition ensures that also \(\nabla \tilde{f}(x_k) = \nabla f(x_k)\).</p>
+</li>
+</ul>
+<h2 id="rank-2_updates"><a href="#rank-2_updates">Rank-2 Updates</a></h2>
+<p>The main idea behind the BFGS algorithm is a simple rank-2 update of a proposed Hessian &#40;note that because \(H_k\) is a proposed Hessian it must be symmetric and positive definite&#41;. </p>
+\[\begin{aligned}
+
+H_{k + 1} 
+&= H_k + \alpha uu^T + \beta vv^T\\
+&= H_k + \begin{bmatrix} \alpha u & \beta v \end{bmatrix}\begin{bmatrix} u^T \\ v^T \end{bmatrix}
+\end{aligned}\]
+<p>Using the Sherman-Morrison-Woodbury identity it follows that the inverse of this update can be computed efficiently as</p>
+\[\begin{aligned}
+
+\left( H_{k + 1} \right)^{-1} 
+&= H_k^{-1} - H_{k}^{-1}\begin{bmatrix} \alpha u & \beta v \end{bmatrix} \left(I + \begin{bmatrix} u^T \\ v^T \end{bmatrix} H_{k}^{-1} \begin{bmatrix} \alpha u & \beta v \end{bmatrix}  \right)^{-1}\begin{bmatrix} u^T \\ v^T \end{bmatrix}H_k^{-1} .
+\end{aligned}\]
+<p>This means that we only need to compute the full inverse on the first iteration while at any other point we can settle for just updating through an inversion of a \(2\times 2\) matrix as well as a few matrix-vector products. The hard parts is now choosing suitable \(\alpha, \beta, u\) and \(v\) such that \(H_k\) is a positive definite matrix at all stages. First set \(u=y_k\),\(v=H_ks_k\) and impose the secant condition &#40;\(H_{k+1}s_k = y_k\)&#41;, then</p>
+\[\begin{aligned}
+
+H_{k+1}s_k
+&= H_ks_k + \underbrace{\alpha y_ky_k^Ts_k}_{\text{only term with $y_k$}} + \underbrace{\beta H_ks_ks_k^TH_ks_k}_{\text{only term with $H_k$}} = y_k.
+
+\end{aligned}\]
+<p>Now its clear that since the middle part has to be equal to \(y_k\) and only the \(\alpha\)-term contains \(y_k\) and only the \(\beta\)-term contains a \(H_ks_k\) we must have that</p>
+\[
+
+\alpha = \frac{1}{y_k^Ts_k}, \quad \text{and} \quad \beta = -\frac{1}{s_k^TH_ks_k}.
+
+\]
+<p>Now this update preserves postive definiteness if \(y_k^Ts_k > 0\).</p>
+<h2 id="removing_the_depdence_of_h_k_tedious_computations"><a href="#removing_the_depdence_of_h_k_tedious_computations">Removing the depdence of \(H_k\) &#40;Tedious computations... &#41;</a></h2>
+<p>Earlier we stated how the computation of the inverse could be reduced to a simple inversion of a \(2\times 2\) matrix an some matrix-vector products. However we later set \(v=H_ks_k\), meaning that we also needed to store \(H_k\) explicitly. Thankfully we can see that if we insert our chosen values of \(\alpha,\beta, u\) and \(v\) into the expression for the inversion we get something that does not explicitly depend on \(H_k\). The calculations are tedious and not nessecarily informing, however, given that these are notes I have chosen to include them anyways.</p>
+<p>First inserting the expression we find that</p>
+\[\begin{aligned}
+
+\left( H_{k + 1} \right)^{-1} 
+&= H_k^{-1} - \begin{bmatrix} \alpha H_{k}^{-1}y_k & \beta s_k \end{bmatrix} \left(I + \begin{bmatrix} y_k^T \\ s_k^TH_k \end{bmatrix}\begin{bmatrix} \alpha H_k^{-1}y_k & \beta s_k \end{bmatrix}  \right)^{-1}\begin{bmatrix} y_k^TH_k^{-1} \\ s_k^T \end{bmatrix}
+
+\end{aligned}\]
+<p>Now for the easy of notation introduce \(\gamma_k = H_k^{-1}y_k\)</p>
+\[\begin{aligned}
+\left( H_{k + 1} \right)^{-1} 
+&= H_k^{-1} - \begin{bmatrix} \alpha \gamma_k & \beta s_k \end{bmatrix} \left(I + \begin{bmatrix} \alpha y_k^T\gamma_k & \beta y_k^Ts_k\\ \alpha s_k^Ty_k & \beta s_k^TH_ks_k\end{bmatrix} \right)^{-1}\begin{bmatrix} \gamma_k^T \\ s_k^T \end{bmatrix} \\
+&= H_k^{-1} - \begin{bmatrix} \alpha \gamma_k & \beta s_k \end{bmatrix} \left(I + \begin{bmatrix} \alpha y_k^T\gamma_k & \beta \alpha^{-1}\\ 1 & -1\end{bmatrix} \right)^{-1}\begin{bmatrix} \gamma_k^T \\ s_k^T \end{bmatrix},
+
+\end{aligned}\]
+<p>where we used that \(\beta s_k^TH_ks_k = -1\). One could be be tempted to stop here, as the expression does not look to depend on \(H_k\). However one needs to remember that \(\beta\) is defined using \(H_k\). We therefore continue</p>
+\[\begin{aligned}
+\left( H_{k + 1} \right)^{-1} 
+&= H_k^{-1} - \begin{bmatrix} \alpha \gamma_k & \beta s_k \end{bmatrix} \left(\begin{bmatrix} 1 + \alpha y_k^T\gamma_k & \beta \alpha^{-1}\\ 1 & 0\end{bmatrix} \right)^{-1}\begin{bmatrix} \gamma_k^T \\ s_k^T \end{bmatrix} \\
+&= H_k^{-1} - \begin{bmatrix} \alpha \gamma_k & \beta s_k \end{bmatrix} \frac{-\alpha}{\beta}\begin{bmatrix} 0 & -\beta \alpha^{-1}\\ -1 & 1 + \alpha y_k^T\gamma_k\end{bmatrix} \begin{bmatrix} \gamma_k^T \\ s_k^T \end{bmatrix} \\
+&= H_k^{-1} + \frac{\alpha}{\beta}\begin{bmatrix} \alpha \gamma_k & \beta s_k \end{bmatrix} \begin{bmatrix} -\beta \alpha^{-1}s_k^T\\ -\gamma_k^T + s_k^T + \alpha y_k^T\gamma_ks_k^T\end{bmatrix}\\
+&= H_k^{-1} + \frac{\alpha}{\beta}\begin{bmatrix} \alpha \gamma_k & \beta s_k \end{bmatrix} \begin{bmatrix} -\beta \alpha^{-1}s_k^T\\ -\gamma_k^T + s_k^T + \alpha y_k^T\gamma_ks_k^T\end{bmatrix}\\
+&=H_k^{-1} + \frac{\alpha}{\beta}\left(
+-\beta \gamma_ks_k^T - \beta s_k\gamma_k^T + \beta s_ks_k^T + \beta\alpha s_ky_k^T\gamma_ks_k^T
+\right)\\
+&= H_k^{-1} + \left(
+-\alpha \gamma_ks_k^T - \alpha s_k\gamma_k^T + \alpha s_ks_k^T + \alpha^2 s_ky_k^T\gamma_ks_k^T
+\right)\\
+&= H_k^{-1} + (\alpha + \alpha^2y_k^T\gamma_k)s_ks_k^T - \alpha(\gamma_ks_k^T + s_k\gamma_k^T).
+\end{aligned}\]
+<p>As promised we see that the update of the inverse does not explictly rely on \(H_k\). The expression is usually stated with \(\gamma_k = H_k^{-1}y_k\) reinserted. However that is misleading given that a good implementation would have rather compute the temporary variable \(\gamma_k\). Now that from the last expression it is also clear that the update will continue to be symmetric, as \((\alpha \alpha^2y_k^T\gamma_k)\) is just a scalar and \((\gamma_ks_k^T + s_k\gamma_k^T)\) is clearly symmetric.</p>
+<div class="page-foot">
+  <div class="copyright">
+    &copy; Septimia Zenobia. Last modified: November 19, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+  </div>
+</div>
+</div><!-- CONTENT ENDS HERE -->
+    
+        <script src="/libs/katex/katex.min.js"></script>
+<script src="/libs/katex/auto-render.min.js"></script>
+<script>renderMathInElement(document.body)</script>
+
+    
+    
+        <script src="/libs/highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();hljs.configure({tabReplace: '    '});</script>
+
+    
+  </body>
+</html>

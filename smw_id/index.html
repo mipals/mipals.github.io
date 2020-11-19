@@ -48,7 +48,7 @@
 <p>which confirms the identity.</p>
 <p>I sometimes find it easier to think of this identity in terms of visuals</p>
 <p><img src="/assets/visualizations/smw_special.png" alt="" /></p>
-<p>From this we can see that the identity can be used to reduce the problem of inverting a \(n\times n\) matrix to inverting a \(k\times k\) matrix at the expense of some matrix-vector products. If \(k \ll n\) then this reduction from \(O(n^2)\) to \(O(k^3 + kn)\) flops is a really good improvement.</p>
+<p>This clearly highlights how the identity can be used to reduce the problem of inverting a \(n\times n\) matrix to inverting a \(k\times k\) matrix at the expense of some matrix-vector products. If \(k \ll n\) then this reduction from \(O(n^2)\) to \(O(k^3 + kn)\) flops is a significant improvement.</p>
 <h2 id="the_general_form"><a href="#the_general_form">The General Form </a></h2>
 <p>In general the Sherman-Morrison-Woodbury identity have the form</p>
 \[
@@ -58,7 +58,7 @@
 <p>An alternatively one can use a similar approach to the one presented in the previous section. The guess just has to be modified to the form \(A^{-1} + A^{-1}UZV^TA^{-1}\). What is then left is to multiply with \((A + USV^T)\) and isolate \(Z\).</p>
 <p>Also in this case i like to think of the formula in terms of visuals</p>
 <p><img src="/assets/visualizations/smw_general.png" alt="" /></p>
-<p>Here we only get a speed-up in computation time if \(A^{-1}\) &#40;or simply a factorization of \(A\)&#41; is already computed. </p>
+<p>From this it is clear that we only get a speedup if the inverse of \(A^{-1}\) is already known. This might not seem useful, but is actually one of the cornerstones of the Quasi-Newton method <a href="https://en.wikipedia.org/wiki/Broyden–Fletcher–Goldfarb–Shanno_algorithm">BFGS</a>. The speedup is in this case only from \(O(n^3)\) to \(O(k^3 + k(n^2 + n))\).</p>
 <h2 id="code"><a href="#code">Code</a></h2>
 <p>The Julia library <a href="https://github.com/timholy/WoodburyMatrices.jl">WoodburyMatrices.jl</a> can be used to effeciently perform computations with Woodbury matrices.</p>
 <pre><code class="language-julia">using WoodburyMatrices, LinearAlgebra

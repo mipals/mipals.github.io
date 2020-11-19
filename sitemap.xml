@@ -51,13 +51,19 @@
 </url>
 <url>
     <loc>https://tlienart.github.io/FranklinTemplates.jl/hss/index.html</loc>
-    <lastmod>2020-11-18</lastmod>
+    <lastmod>2020-11-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
     <loc>https://tlienart.github.io/FranklinTemplates.jl/old_menu2/index.html</loc>
     <lastmod>2020-11-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+<url>
+    <loc>https://tlienart.github.io/FranklinTemplates.jl/BFGS/index.html</loc>
+    <lastmod>2020-11-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
@@ -69,7 +75,7 @@
 </url>
 <url>
     <loc>https://tlienart.github.io/FranklinTemplates.jl/index.html</loc>
-    <lastmod>2020-11-18</lastmod>
+    <lastmod>2020-11-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
