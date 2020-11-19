@@ -14,10 +14,10 @@
 </head>
 <body>
   <header>
-<div class="blog-name"><a href="">Mikkel Paltorp Schmitt</a></div>
+<div class="blog-name"><a href="/">Mikkel Paltorp Schmitt</a></div>
 <nav>
   <ul>
-    <li><a href="/">About me</a></li>
+    <li><a href="/">About Me</a></li>
     <li><a href="/menu1/">Notes</a></li>
     <li><a href="/menu2/">Software</a></li>
   </ul>
@@ -27,7 +27,8 @@
 
 
 <!-- Content appended here -->
-<div class="franklin-content"><p>The following is a simple example of how the matrices found in <a href="https://github.com/mipals/SymEGRSSMatrices.jl">SymEGRSSMatrices.jl</a>, can aid in efficiently computing smoothing splines.</p>
+<div class="franklin-content"><h1 id="symmetric_generator_representable_semiseparable_matrices"><a href="#symmetric_generator_representable_semiseparable_matrices">Symmetric Generator Representable Semiseparable Matrices</a></h1>
+<p>The following is a simple example of how the matrices found in <a href="https://github.com/mipals/SymEGRSSMatrices.jl">SymEGRSSMatrices.jl</a>, can aid in efficiently computing smoothing splines.</p>
 <p>Given \(n\) noisy observations </p>
 \[(t_i,y_i), \quad i=1,\dots, n\]
 <p>where \(y_i = f(t_i) + e_i\) and \(e_i\sim \mathcal{N}(0,\sigma^2)\). We aim to find the underlying function \(f\). For the smoothing spline regressions problem the view taken is that \(f\) minimizes the following functional</p>
@@ -209,7 +210,7 @@ plot&#33;&#40;t, K*c &#43; H*d, label&#61;&quot;fit&quot;,color&#61;:red,lw&#61;
 </ol>
 <div class="page-foot">
   <div class="copyright">
-    &copy; Septimia Zenobia. Last modified: November 18, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Septimia Zenobia. Last modified: November 19, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->

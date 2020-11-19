@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="/css/franklin.css">
   <link rel="stylesheet" href="/css/basic.css">
   <link rel="icon" href="/assets/favicon.png">
-   <title>HSS</title>  
+   <title>Matrix determinant lemma</title>  
 </head>
 <body>
   <header>
@@ -27,10 +27,23 @@
 
 
 <!-- Content appended here -->
-<div class="franklin-content"><h1 id="hierarchical_semiseparable_matrices"><a href="#hierarchical_semiseparable_matrices">Hierarchical Semiseparable Matrices</a></h1>
+<div class="franklin-content"><h1 id="the_matrix_determinant_lemma"><a href="#the_matrix_determinant_lemma">The Matrix Determinant Lemma</a></h1>
+<h2 id="weinsteinaronszajn_identity"><a href="#weinsteinaronszajn_identity">Weinstein–Aronszajn identity</a></h2>
+\[
+
+\det( I_n + UV^T) = \det(I_k + V^TU)
+
+\]
+<p><img src="/assets/visualizations/weinstein.png" alt="" /></p>
+<h2 id="the_general_form"><a href="#the_general_form">The General Form</a></h2>
+\[
+
+\det(A + UV^T) = \det(I_k + V^T A^{-1} U)\det(A)
+
+\]
 <div class="page-foot">
   <div class="copyright">
-    &copy; Septimia Zenobia. Last modified: November 18, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Septimia Zenobia. Last modified: November 19, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->

@@ -5,18 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
    <link rel="stylesheet" href="/libs/katex/katex.min.css">
      
-  
+   <link rel="stylesheet" href="/libs/highlight/github.min.css">
+   
   <link rel="stylesheet" href="/css/franklin.css">
   <link rel="stylesheet" href="/css/basic.css">
   <link rel="icon" href="/assets/favicon.png">
-   <title>The Sherman-Morrison-Woodbury identity</title>  
+   <title>Sherman-Morrison-Woodbury</title>  
 </head>
 <body>
   <header>
-<div class="blog-name"><a href="">Mikkel Paltorp Schmitt</a></div>
+<div class="blog-name"><a href="/">Mikkel Paltorp Schmitt</a></div>
 <nav>
   <ul>
-    <li><a href="/">About me</a></li>
+    <li><a href="/">About Me</a></li>
     <li><a href="/menu1/">Notes</a></li>
     <li><a href="/menu2/">Software</a></li>
   </ul>
@@ -28,7 +29,7 @@
 <!-- Content appended here -->
 <div class="franklin-content"><h1 id="the_sherman-morrison-woodbury_identity"><a href="#the_sherman-morrison-woodbury_identity">The Sherman-Morrison-Woodbury identity</a></h1>
 <p>The Sherman-Morrison-Woodbury identity is the generalization of the Sherman-Morrison identity. In short it says that the inverse of a rank-\(k\) perturbed matrix is also a rank-\(k\) perturbed matrix.</p>
-<h2 id="a_special_case"><a href="#a_special_case">A special case</a></h2>
+<h2 id="a_special_case"><a href="#a_special_case">A Special Case</a></h2>
 <p>A special case of the Sherman-Morrison-Woodbury identity is the following</p>
 \[
     (I + UV^T)^{-1} = I - U(I + V^TU)^{-1}V^T.
@@ -42,19 +43,55 @@
 \end{aligned}\]
 <p>From the fact the most right expression needs to be equal to \(I\) we must have that</p>
 \[
-    Z = (I + V^TU)^{-1}(-I) = -(I + V^TU)^{-1}.
+    Z = (I + V^TU)^{-1}(-I) = -(I + V^TU)^{-1},
 \]
-<p>Which confirms the identity.</p>
-<h2 id="the_general_form_of_sherman-morrison-woodbury_identity"><a href="#the_general_form_of_sherman-morrison-woodbury_identity">The general form of Sherman-Morrison-Woodbury identity </a></h2>
+<p>which confirms the identity.</p>
+<p>I sometimes find it easier to think of this identity in terms of visuals</p>
+<p><img src="/assets/visualizations/smw_special.png" alt="" /></p>
+<p>From this we can see that the identity can be used to reduce the problem of inverting a \(n\times n\) matrix to inverting a \(k\times k\) matrix at the expense of some matrix-vector products. If \(k \ll n\) then this reduction from \(O(n^2)\) to \(O(k^3 + kn)\) flops is a really good improvement.</p>
+<h2 id="the_general_form"><a href="#the_general_form">The General Form </a></h2>
 <p>In general the Sherman-Morrison-Woodbury identity have the form</p>
 \[
 (A + USV^T)^{-1} = A^{-1} - A^{-1}U(S^{-1} + V^TA^{-1}U)^{-1}V^TA^{-1}.
 \]
 <p>The derivation here is to set \(B = A + USV^T\) so that \(B^{-1} = (I + A^{-1}USV^T)^{-1}A^{-1}\). Now set \(W = A^{-1}U\) and \(Z = SV\) and use the special form from the previous section.  </p>
 <p>An alternatively one can use a similar approach to the one presented in the previous section. The guess just has to be modified to the form \(A^{-1} + A^{-1}UZV^TA^{-1}\). What is then left is to multiply with \((A + USV^T)\) and isolate \(Z\).</p>
+<p>Also in this case i like to think of the formula in terms of visuals</p>
+<p><img src="/assets/visualizations/smw_general.png" alt="" /></p>
+<p>Here we only get a speed-up in computation time if \(A^{-1}\) &#40;or simply a factorization of \(A\)&#41; is already computed. </p>
+<h2 id="code"><a href="#code">Code</a></h2>
+<p>The Julia library <a href="https://github.com/timholy/WoodburyMatrices.jl">WoodburyMatrices.jl</a> can be used to effeciently perform computations with Woodbury matrices.</p>
+<pre><code class="language-julia">using WoodburyMatrices, LinearAlgebra
+n &#61; 5000;
+k &#61; 10;
+A &#61; randn&#40;n,n&#41; &#43; I
+U &#61; randn&#40;n,k&#41;;
+C &#61; randn&#40;k,k&#41;
+V &#61; randn&#40;n,k&#41;;
+Woodbury_struct &#61; Woodbury&#40;A, U, C, V&#39;&#41;
+Woodbury_dense &#61; A &#43; U*C*V&#39;
+@time Woodbury_struct\ones&#40;n&#41;
+@time Woodbury_dense\ones&#40;n&#41;</code></pre>
+<pre><code class="plaintext">  0.942877 seconds (10 allocations: 190.850 MiB)
+  0.970610 seconds (8 allocations: 190.850 MiB, 3.18% gc time)
+</code></pre>
+<p>As expected we do not get a speed up as the inversion of the Sherman-Morrison-Woodbury matrix also requires us to invert a \(n\times n\) matrix. Thankfully the package supports a factorization of \(A\) instead of \(A\) directly. Using this a clear speed-up can be seen. Off course it is not a completely fair comparison as we have not included the time it takes to actually factorize \(A\).</p>
+<pre><code class="language-julia">n &#61; 5000;
+k &#61; 10;
+A &#61; randn&#40;n,n&#41; &#43; I
+U &#61; randn&#40;n,k&#41;;
+C &#61; randn&#40;k,k&#41;
+V &#61; randn&#40;n,k&#41;;
+Woodbury_struct &#61; Woodbury&#40;lu&#40;A&#41;, U, C, V&#39;&#41;
+Woodbury_dense &#61; A &#43; U*C*V&#39;
+@time Woodbury_struct\ones&#40;n&#41;
+@time Woodbury_dense\ones&#40;n&#41;</code></pre>
+<pre><code class="plaintext">  0.026693 seconds (6 allocations: 78.375 KiB)
+  0.974315 seconds (8 allocations: 190.850 MiB)
+</code></pre>
 <div class="page-foot">
   <div class="copyright">
-    &copy; Septimia Zenobia. Last modified: November 18, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Septimia Zenobia. Last modified: November 19, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->
@@ -64,6 +101,10 @@
 <script>renderMathInElement(document.body)</script>
 
     
+    
+        <script src="/libs/highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();hljs.configure({tabReplace: '    '});</script>
+
     
   </body>
 </html>

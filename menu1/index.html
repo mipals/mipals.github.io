@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  
+   <link rel="stylesheet" href="/libs/katex/katex.min.css">
+     
    <link rel="stylesheet" href="/libs/highlight/github.min.css">
    
   <link rel="stylesheet" href="/css/franklin.css">
@@ -13,10 +14,10 @@
 </head>
 <body>
   <header>
-<div class="blog-name"><a href="">Mikkel Paltorp Schmitt</a></div>
+<div class="blog-name"><a href="/">Mikkel Paltorp Schmitt</a></div>
 <nav>
   <ul>
-    <li><a href="/">About me</a></li>
+    <li><a href="/">About Me</a></li>
     <li><a href="/menu1/">Notes</a></li>
     <li><a href="/menu2/">Software</a></li>
   </ul>
@@ -27,12 +28,14 @@
 
 <!-- Content appended here -->
 <div class="franklin-content"><h1 id="notes"><a href="#notes">Notes</a></h1>
-<p>Below are some links to a couple of short notes written &#40;mostly&#41; as reminders to myself of the intuition behind some &#40;in my opinion&#41; important mathematical results. As such the notes are probably filled with missing explanation and rigorousness. </p>
+<p>Below are some links to a couple of short notes on various mathematical topics that I find interesting. The notes highlight some tips and tricks and have a focus on intuition rather than rigorousness. </p>
 <h2 id="matrix_computations"><a href="#matrix_computations">Matrix Computations</a></h2>
 <ul>
 <li><p><a href="../sm_id/index.html">Sherman-Morrison identity:</a> A brief derivation and example</p>
 </li>
 <li><p><a href="../smw_id/index.html">Sherman-Morrison-Woodbury identity:</a> Two brief derivations</p>
+</li>
+<li><p><a href="../matrix_determinant_lemma/index.html">The Matrix Determinant Lemma:</a> &#91; ❗️ missing&#93;</p>
 </li>
 <li><p>Hierarchical Matrices</p>
 <ul>
@@ -45,20 +48,29 @@
 </ul>
 <h2 id="partial_differential_equations"><a href="#partial_differential_equations">Partial Differential Equations</a></h2>
 <ul>
-<li><p>The wave equation:</p>
+<li><p>The Wave Equation:</p>
 </li>
-<li><p><a href="../integral_equations/index.html">Integral equations:</a>  &#91; ❗️ missing&#93;</p>
+<li><p><a href="../integral_equations/index.html">Integral Equations:</a>  &#91; ❗️ missing&#93;</p>
 </li>
 <li><p><a href="../BEM/index.html">The Boundary Element Method:</a> &#91; ❗️ missing&#93;</p>
 </li>
 </ul>
 <h2 id="optimization"><a href="#optimization">Optimization</a></h2>
+<ul>
+<li><p><a href="../MMA/index.html">Method of Moving Asymptotes &#40;MMA&#41;</a> &#91; ❗️ missing&#93;</p>
+</li>
+</ul>
 <div class="page-foot">
   <div class="copyright">
-    &copy; Septimia Zenobia. Last modified: November 18, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Septimia Zenobia. Last modified: November 19, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->
+    
+        <script src="/libs/katex/katex.min.js"></script>
+<script src="/libs/katex/auto-render.min.js"></script>
+<script>renderMathInElement(document.body)</script>
+
     
     
         <script src="/libs/highlight/highlight.pack.js"></script>
