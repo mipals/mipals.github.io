@@ -28,19 +28,21 @@
 
 <!-- Content appended here -->
 <div class="franklin-content"><h1 id="adaptive_cross_approximation_aca"><a href="#adaptive_cross_approximation_aca">Adaptive Cross Approximation &#40;ACA&#41;</a></h1>
-<p>The low rank approximation from the Adaptive Cross Approximation &#40;ACA&#41; is very simple. In short it perfectly interpolates specified rows and columns. A visulization can be seen below</p>
-<p>where \(r\) &#40;\(c\)&#41; are the row &#40;column&#41; index sets respectively.</p>
+<p>In the computational scienes low rank approximations play a key role. It is well known that the best rank-\(k\) approximation in terms of either the spectral norm of the Frobenius norm is the truncated Singular Value Decomposition &#40;<a href="https://en.wikipedia.org/wiki/Low-rank_approximation">Eckart-Young-Mirsky Theorem</a>&#41;. However the SVD is expensive to compute, as such it is of interest to find another ways of finding a good low rank approximation.<br/></p>
+<p>The simplest of these is the Adaptive Cross Approximation &#40;ACA&#41; which simple choses a set of row and column indexes and forms a low rank approximation that perfectly interpolates the chosen rows and columns. A visulization can be seen below</p>
 <p><img src="/assets/visualizations/aca.png" alt="" />  </p>
 <p><em>This picture is taken from <sup id="fnref:1"><a href="#fndef:1" class="fnref">[1]</a></sup>. A very solid introduction to Hiearchical Low-Rank Structures.</em></p>
-<p><div class="definition">\[
+<div class="definition"><p><strong>Adaptive Cross Approximation:</strong> </p>
+\[
 
  G \approx G(:,c)(G(r,c))^{-1}G(r,:),
 
-\]</div> That the above perfectly interpolates the of rows and columns og G can without loss of generality be seen by looking at the following matrix</p>
+\]</div>
+<p>That the above expression perfectly interpolates the of rows &#40;\(r\)&#41; and columns &#40;\(c\)&#41; of G be seen by looking at the following matrix</p>
 \[
     G = \begin{bmatrix} \overline{G} & \overline{G}(:,c)\\ \overline{G}(r,:) & G(r,c)\end{bmatrix}
 \]
-<p>Now compute the approximations</p>
+<p>Now compute the approximation</p>
 \[\begin{aligned}
 
     G(:,c)G(r,c)^{-1}G(r,:)
@@ -51,6 +53,8 @@
         \begin{bmatrix}\overline{G}(:,c)G(r,c)^{-1}\overline{G}(r,:) & \overline{G}(:,c)\\ \overline{G}(r,:) & G(r,c)\end{bmatrix},
 \end{aligned}\]
 <p>from which the perfect interpolations of rows \(r\) and columns \(c\) and can be seen.</p>
+<h2 id="how_do_we_chose_the_index_sets"><a href="#how_do_we_chose_the_index_sets">How do we chose the index sets?</a></h2>
+<p>While the ACA approach is easily explained we still need a way to pick the best rows and columns. Because we want to be able to use the ACA on matrices of sizes where the SVD is not feasible we want a heuristic approach that scales close \(O(n)\).</p>
 <h2 id="references"><a href="#references">References</a></h2>
 <table class="fndef" id="fndef:1">
     <tr>
@@ -61,7 +65,7 @@
 
 <div class="page-foot">
   <div class="copyright">
-    &copy; Septimia Zenobia. Last modified: November 19, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Septimia Zenobia. Last modified: November 20, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->

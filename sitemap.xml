@@ -15,7 +15,7 @@
 </url>
 <url>
     <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/BFGS/index.html</loc>
-    <lastmod>2020-11-19</lastmod>
+    <lastmod>2020-11-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
@@ -32,8 +32,20 @@
     <priority>0.5</priority>
 </url>
 <url>
+    <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/eckart_young_mirsky/index.html</loc>
+    <lastmod>2020-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+<url>
     <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/egrss/index.html</loc>
     <lastmod>2020-11-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+<url>
+    <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/the_wave_equation/index.html</loc>
+    <lastmod>2020-11-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
@@ -63,7 +75,7 @@
 </url>
 <url>
     <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/adaptive_cross_approx/index.html</loc>
-    <lastmod>2020-11-19</lastmod>
+    <lastmod>2020-11-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
