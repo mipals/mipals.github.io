@@ -58,7 +58,7 @@
 <p>An alternatively one can use a similar approach to the one presented in the previous section. The guess just has to be modified to the form \(A^{-1} + A^{-1}UZV^TA^{-1}\). What is then left is to multiply with \((A + USV^T)\) and isolate \(Z\).</p>
 <p>Also in this case i like to think of the formula in terms of visuals</p>
 <p><img src="/assets/visualizations/smw_general.png" alt="" /></p>
-<p>From this it is clear that we only get a speedup if the inverse of \(A^{-1}\) is already known. This might not seem useful, but is actually one of the cornerstones of the Quasi-Newton method <a href="https://en.wikipedia.org/wiki/Broyden–Fletcher–Goldfarb–Shanno_algorithm">BFGS</a>. The speedup is in this case only from \(O(n^3)\) to \(O(k^3 + k(n^2 + n))\).</p>
+<p>From this it is clear that we only get a speedup if the inverse of \(A^{-1}\) is already known. This might not seem useful, but it is actually one of the cornerstones of the Quasi-Newton method <a href="../BFGS/index.html">BFGS</a>. The speedup is in this case only from \(O(n^3)\) to \(O(k^3 + k(n^2 + n))\).</p>
 <h2 id="code"><a href="#code">Code</a></h2>
 <p>The Julia library <a href="https://github.com/timholy/WoodburyMatrices.jl">WoodburyMatrices.jl</a> can be used to effeciently perform computations with Woodbury matrices.</p>
 <pre><code class="language-julia">using WoodburyMatrices, LinearAlgebra
@@ -72,8 +72,8 @@ Woodbury_struct &#61; Woodbury&#40;A, U, C, V&#39;&#41;;
 Woodbury_dense &#61; A &#43; U*C*V&#39;;
 @time Woodbury_struct\ones&#40;n&#41;;
 @time Woodbury_dense\ones&#40;n&#41;;</code></pre>
-<pre><code class="plaintext">  1.249937 seconds (10 allocations: 190.850 MiB, 3.27% gc time)
-  1.019313 seconds (8 allocations: 190.850 MiB)
+<pre><code class="plaintext">  1.048784 seconds (10 allocations: 190.850 MiB)
+  1.034900 seconds (8 allocations: 190.850 MiB)
 </code></pre>
 <p>As expected we do not get a speed up as the inversion of the Sherman-Morrison-Woodbury matrix also requires us to invert a \(n\times n\) matrix. Thankfully the package supports a factorization of \(A\) instead of \(A\) directly. Using this a clear speed-up can be seen. Off course it is not a completely fair comparison as we have not included the time it takes to actually factorize \(A\).</p>
 <pre><code class="language-julia">n &#61; 5000;
@@ -86,12 +86,12 @@ Woodbury_struct &#61; Woodbury&#40;lu&#40;A&#41;, U, C, V&#39;&#41;;
 Woodbury_dense &#61; A &#43; U*C*V&#39;;
 @time Woodbury_struct\ones&#40;n&#41;;
 @time Woodbury_dense\ones&#40;n&#41;;</code></pre>
-<pre><code class="plaintext">  0.030151 seconds (6 allocations: 78.375 KiB)
-  1.007838 seconds (8 allocations: 190.850 MiB, 6.75% gc time)
+<pre><code class="plaintext">  0.021939 seconds (6 allocations: 78.375 KiB)
+  0.938095 seconds (8 allocations: 190.850 MiB, 3.85% gc time)
 </code></pre>
 <div class="page-foot">
   <div class="copyright">
-    &copy; Septimia Zenobia. Last modified: November 19, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Septimia Zenobia. Last modified: November 20, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->
