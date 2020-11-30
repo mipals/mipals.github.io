@@ -8,20 +8,26 @@
     <priority>0.5</priority>
 </url>
 <url>
-    <loc>https://tlienart.github.io/FranklinTemplates.jl/old_menu1/index.html</loc>
-    <lastmod>2020-11-18</lastmod>
+    <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/matrix/smw_id/index.html</loc>
+    <lastmod>2020-11-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
-    <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/BFGS/index.html</loc>
-    <lastmod>2020-11-20</lastmod>
+    <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/matrix/GCA/index.html</loc>
+    <lastmod>2020-11-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
-    <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/MMA/index.html</loc>
-    <lastmod>2020-11-19</lastmod>
+    <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/matrix/eckart_young_mirsky/index.html</loc>
+    <lastmod>2020-11-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+<url>
+    <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/matrix/matrices_h2/index.html</loc>
+    <lastmod>2020-11-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
@@ -32,32 +38,38 @@
     <priority>0.5</priority>
 </url>
 <url>
-    <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/eckart_young_mirsky/index.html</loc>
-    <lastmod>2020-11-20</lastmod>
+    <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/matrix/matrix_determinant_lemma/index.html</loc>
+    <lastmod>2020-11-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
-    <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/egrss/index.html</loc>
-    <lastmod>2020-11-19</lastmod>
+    <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/optimization/adjoint/index.html</loc>
+    <lastmod>2020-11-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
-    <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/the_wave_equation/index.html</loc>
-    <lastmod>2020-11-20</lastmod>
+    <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/matrix/sm_id/index.html</loc>
+    <lastmod>2020-11-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
-    <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/smw_id/index.html</loc>
-    <lastmod>2020-11-20</lastmod>
+    <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/matrix/HCA/index.html</loc>
+    <lastmod>2020-11-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
-    <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/hss/index.html</loc>
-    <lastmod>2020-11-19</lastmod>
+    <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/pde/BEM/index.html</loc>
+    <lastmod>2020-11-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+<url>
+    <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/matrix/egrss/index.html</loc>
+    <lastmod>2020-11-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
@@ -68,32 +80,44 @@
     <priority>0.5</priority>
 </url>
 <url>
-    <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/integral_equations/index.html</loc>
-    <lastmod>2020-11-18</lastmod>
+    <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/optimization/MMA/index.html</loc>
+    <lastmod>2020-11-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
-    <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/adaptive_cross_approx/index.html</loc>
+    <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/matrix/ACA/index.html</loc>
+    <lastmod>2020-11-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+<url>
+    <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/pde/BEM_acoustics/index.html</loc>
+    <lastmod>2020-11-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+<url>
+    <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/optimization/BFGS/index.html</loc>
+    <lastmod>2020-11-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+<url>
+    <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/pde/the_wave_equation/index.html</loc>
     <lastmod>2020-11-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
-    <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/matrix_determinant_lemma/index.html</loc>
-    <lastmod>2020-11-19</lastmod>
+    <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/pde/BEM_losses/index.html</loc>
+    <lastmod>2020-11-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
-    <loc>https://tlienart.github.io/FranklinTemplates.jl/old_menu2/index.html</loc>
-    <lastmod>2020-11-18</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-</url>
-<url>
-    <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/BEM/index.html</loc>
-    <lastmod>2020-11-19</lastmod>
+    <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/pde/integral_equations/index.html</loc>
+    <lastmod>2020-11-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
@@ -104,14 +128,14 @@
     <priority>0.5</priority>
 </url>
 <url>
-    <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/sm_id/index.html</loc>
-    <lastmod>2020-11-19</lastmod>
+    <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/matrix/hss/index.html</loc>
+    <lastmod>2020-11-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
     <loc>https://tlienart.github.io/FranklinTemplates.jl/menu1/index.html</loc>
-    <lastmod>2020-11-20</lastmod>
+    <lastmod>2020-11-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>

@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="stylesheet" href="/libs/katex/katex.min.css">
+     
+   <link rel="stylesheet" href="/libs/highlight/github.min.css">
+   
+  <link rel="stylesheet" href="/css/franklin.css">
+  <link rel="stylesheet" href="/css/basic.css">
+  <link rel="icon" href="/assets/favicon.png">
+   <title>EGRSS</title>  
+</head>
+<body>
+  <header>
+<div class="blog-name"><a href="/">Mikkel Paltorp</a></div>
+<nav>
+  <ul>
+    <li><a href="/">About Me</a></li>
+    <li><a href="/menu1/">Notes</a></li>
+    <li><a href="/menu2/">Software</a></li>
+  </ul>
+  <img src="/assets/hamburger.svg" id="menu-icon">
+</nav>
+</header>
+
+
+<!-- Content appended here -->
+<div class="franklin-content"><h1 id="symmetric_extended_generator_representable_semiseparable_matrices"><a href="#symmetric_extended_generator_representable_semiseparable_matrices">Symmetric Extended Generator Representable Semiseparable Matrices</a></h1>
+<p>The following is a simple example of how the matrices found in <a href="https://github.com/mipals/SymEGRSSMatrices.jl">SymEGRSSMatrices.jl</a>, can aid in efficiently computing smoothing splines.</p>
+<p>Given \(n\) noisy observations </p>
+\[(t_i,y_i), \quad i=1,\dots, n\]
+<p>where \(y_i = f(t_i) + e_i\) and \(e_i\sim \mathcal{N}(0,\sigma^2)\). We aim to find the underlying function \(f\). For the smoothing spline regressions problem the view taken is that \(f\) minimizes the following functional</p>
+\[
+\min\ \mathcal{J}_p(f) \equiv \frac{1}{n}\sum^n_i(y_i - f(x_i))^2 + \lambda \int_a^b |f^{(p)}(x)|^2\ \mathrm{d}x,
+\]
+<p>for some \(\lambda > 0\). This minimization problem can be viewed as a tradeoff between the interpolation of the data, described by average squared residual and the smoothness, described by the square integral of the \(p\)th derivative. </p>
+<p>It can be shown that this problem is equivalent with solving the following QP</p>
+\[
+\text{minimize}\ \frac{1}{n}\|y - (\Sigma c + Hd) \|_2^2 + \lambda c^T\Sigma c
+\]
+<p>where \(H\in\mathbb{R}^{n\times p}\) with elements \(H_{i,j} = t_i^{j-1}/((j-1)!)\) and \(\Sigma \in\mathbb{R}^{n\times n}\) is a positive definite &#40;kernel&#41; matrix. As shown in &#40;Anders &amp; Chen 2020&#41; \(\Sigma\) is rank-structured and have the following form</p>
+\[
+\Sigma = \text{tril}(UV^T) + \text{triu}(VU^T,1), \quad U,V\in\mathbb{R}^{n\times p}.
+\]
+<p>As such we say that \(\Sigma\) is a extended generator representable semiseparable matrix &#40;a EGRSS matrix&#41;, giving rise to fast computations. Note that this implicit representation requires only \(O(pn)\) storage and in most cases \(p << n\) meaning that the implicit representation is a very efficient way of storing the full matrix. Furthermore it is shown in &#40;Andersen &amp; Chen 2020&#41; that the Cholesky factorization &#40;and its inverse&#41; of \(\Sigma\) is also implicit represented as</p>
+\[
+L = \text{tril}(UW^T,-1) + \text{diag}(d),\quad U,W\in\mathbb{R}^{n\times p},\ d\in\mathbb{R}^n
+\]
+\[
+L^{-1} = \text{tril}(YZ^T) + \text{diag}(d)^{-1},\quad Y,Z\in\mathbb{R}^{n\times p},\ d\in\mathbb{R}^n
+\]
+<p>and can be computed in \(O(p^2n)\) operations. </p>
+<p>Giving noisy observations we will also need to compute on a variant of EGRSS matrices as seen below</p>
+\[
+K_y = \text{tril}(UV^T) + \text{triu}(VU^T,1) + \text{diag}(d), \quad U,V\in\mathbb{R}^{n\times p},\ d\in\mathbb{R}^n.
+\]
+<p>We call this a extended generator representable quasiseparable matrix &#40;a EGRQS matrix&#41;.</p>
+<pre><code class="language-julia">using SymEGRSSMatrices, Plots, LinearAlgebra, Optim, Printf, SpecialFunctions, Interact
+import SymEGRSSMatrices: spline_kernel</code></pre>
+<pre><code class="language-julia">n &#61; 300          # number of samples
+σ &#61; 2.0          # noise standard deviation
+a,b &#61; -0.2,1.1   # interval &#91;a,b&#93;
+δ &#61; b - a
+
+t &#61; a .&#43; sort&#40;rand&#40;n&#41;&#41;*δ;
+# FORRESTER ET AL. &#40;2008&#41; FUNCTION
+f&#40;t&#41; &#61; &#40;6.0*t .- 2.0&#41;.^2 .* sin.&#40;12.0*t .- 4.0&#41;
+y &#61; f&#40;t&#41; &#43; σ*randn&#40;length&#40;t&#41;&#41;;
+
+scatter&#40;t, y, ms&#61;2, label&#61;&quot;Observations&quot;, xlims&#61;&#40;a,b&#41;, xlabel&#61;&quot;t&quot;&#41; 
+plot&#33;&#40;a:δ/n:b, f&#40;a:δ/n:b&#41;, label&#61;&quot;f&#40;t&#41;&quot;,color&#61;:black, ls&#61;:dash,lw&#61;1&#41;</code></pre>
+<p><img src="/assets/output_2_0.svg" alt="svg" /></p>
+<h2 id="efficiently_computing_smoothing_splines"><a href="#efficiently_computing_smoothing_splines">Efficiently Computing Smoothing Splines</a></h2>
+<p>The optimality coniditions of the previously mentioned QP is equivalent with solving the following system</p>
+\[
+\begin{bmatrix} \Sigma + n \lambda I & H \\ H^T & 0 \end{bmatrix}
+
+\begin{bmatrix} c \\ d \end{bmatrix}
+
+=
+
+\begin{bmatrix} y \\ 0 \end{bmatrix}.
+\]
+<p>For simplicity we set \(K_y = \Sigma + n\lambda I\). From the first equation we have that</p>
+\[
+K_y c = y - Hd.
+\]
+<p>Inserting this into the second equation we have that</p>
+\[
+H^T K_y ^{-1} (y - Hd) = 0 \quad \Rightarrow \quad H^T K_y ^{-1} H d 
+=
+H^T K_y^{-1} y.
+\]
+<p>Given that we can compute \(K_y = LL^T\) and apply \(L^{-1}\) in \(O(pn)\) operations we see that we can solve the above systems in linear time w.r.t to \(n\).</p>
+<p>Note that the above computations i equivalent with fitting a Gaussian process with its kernel matrix equal to \(\Sigma\).</p>
+<pre><code class="language-julia">p &#61; 2;
+λ &#61; 1e-4;
+Ut,Vt &#61; spline_kernel&#40;&#40;t&#39; .- a&#41;/&#40;b-a&#41;, p&#41;;
+Σ &#61; SymEGRSSMatrix&#40;Ut*δ^&#40;2p-1&#41;,Vt&#41;;
+H &#61; ones&#40;n,p&#41;
+for i &#61; 2:p
+  H&#91;:,i&#93; &#61; t.^&#40;p-1&#41;/&#40;factorial&#40;p-1&#41;&#41;
+end
+
+function smoothing_spline&#40;Σ, H, y, λ&#41;
+  n, p &#61; size&#40;H&#41;
+  L &#61; cholesky&#40;Σ, n*λ&#41;
+  v &#61; L&#39;\&#40;L\y&#41;;
+  A &#61; &#40;H&#39;*&#40;L&#39;\&#40;L\H&#41;&#41;&#41;;
+  d &#61; A\&#40;H&#39;*v&#41;;
+  c &#61; L&#39;\&#40;L\&#40;y - H*d&#41;&#41;;
+  log_gml &#61; log&#40;dot&#40;y,c&#41;&#41; &#43; 2.0*logdet&#40;L&#41;/&#40;n-p&#41; &#43; logdet&#40;A&#41;/&#40;n-p&#41;;
+  return c,d,log_gml
+end
+
+c, d, _ &#61; smoothing_spline&#40;Σ, H, y, λ&#41;
+
+scatter&#40;t, y, ms&#61;2, label&#61;&quot;Observations&quot;, xlims&#61;&#40;a,b&#41;, xlabel&#61;&quot;t&quot;,legend&#61;:topleft&#41; 
+plot&#33;&#40;a:δ/n:b, f&#40;a:δ/n:b&#41;, label&#61;&quot;f&#40;t&#41;&quot;,color&#61;:black, ls&#61;:dash,lw&#61;1&#41;
+plot&#33;&#40;t, Σ*c &#43; H*d, label&#61;&quot;fit&quot;,color&#61;:red, lw&#61;2&#41;</code></pre>
+<p><img src="/assets/output_4_0.svg" alt="svg" /></p>
+<h2 id="varying_the_rougness_penalty"><a href="#varying_the_rougness_penalty">Varying the Rougness Penalty</a></h2>
+<p>From the first stated optimization problem it is apparant that the parameter \(\lambda\) can be used to emphasize how large the total \(p\)th derivative should be. As such we expect that small values of \(\lambda\) corresponds to an almost complete interpolation of the data, while a large value of \(\lambda\) is equivalent with fitting a \(p-1\) order polynomial.</p>
+<pre><code class="language-julia">anim &#61; @animate for λ &#61; &#91;10.0 .^&#40;-10:0.1:0&#41;; 10.0 .^&#40;0:-0.1:-10&#41;&#93;
+    c, d, _ &#61; smoothing_spline&#40;Σ, H, y, λ&#41;;
+    p1 &#61; scatter&#40;t, y, ms&#61;2, label&#61;&quot;Observations&quot;, xlims&#61;&#40;a,b&#41;, xlabel&#61;&quot;t&quot;, legend&#61;false&#41;;
+    plot&#33;&#40;a:δ/n:b, f&#40;a:δ/n:b&#41;, label&#61;&quot;f&#40;t&#41;&quot;, ls&#61;:dash, color&#61;:black,lw&#61;1&#41;
+    plot&#33;&#40;t, Σ*c &#43; H*d, label&#61;&quot;fit&quot;,color&#61;:red, lw&#61;2, title&#61;&quot;λ&#61;&quot;*@sprintf&#40;&quot;&#37;.3e&quot;, λ&#41;&#41;
+end 
+gif&#40;anim, &quot;varying_rougness.gif&quot;, fps&#61;10&#41;</code></pre>
+<p><img src="/assets/varying_rougness.gif" alt="Alt Text" /></p>
+<h2 id="parameter_selection"><a href="#parameter_selection">Parameter Selection</a></h2>
+<p>Assuming that the measurement errors \(e_i\) are i.i.d Gaussian variables we can estimate the parameters \(\sigma\) and \(\lambda\) using the generalized maximum likelihood function &#40;GML&#41;. As stated in &#40;Andersen &amp; Chen 2020&#41; that the GML can be computed as</p>
+\[
+\log(GML(\lambda)) \propto \log(y^T\hat{c}) + \frac{1}{n-p}\log|K_y| + \frac{1}{n-p}\log|H^TK_y^{-1}H|.
+\]
+<p>This function can be efficiently valuated as we can efficiently compute the Cholesky factorization of \(K_y\) and \(H^TK_y^{-1}H\) is a small matrix. From the optimal \(\hat{\lambda}\) we can compute the optimal standard deviation as</p>
+\[
+\hat{\sigma}^2 = n\hat{\lambda}\frac{c^Ty}{n-p}
+\]
+<pre><code class="language-julia">K &#61; SymEGRSSMatrix&#40;Ut*δ^&#40;2p-1&#41;,Vt&#41;
+function log_gml&#40;v&#41;
+  _,_,log_gml &#61; smoothing_spline&#40;K, H, y, 10.0^v&#41;;
+  return log_gml;
+end
+res &#61; optimize&#40;log_gml, -10, 0, GoldenSection&#40;&#41;&#41;
+println&#40;res&#41;
+
+λhat &#61; 10.0^res.minimizer;
+c, d,_ &#61;  smoothing_spline&#40;K,H,y,λhat&#41;
+scatter&#40;t, y, ms&#61;2, label&#61;&quot;Observations&quot;, xlims&#61;&#40;a,b&#41;, xlabel&#61;&quot;t&quot;, legend&#61;:topleft&#41;;
+plot&#33;&#40;a:δ/n:b, f&#40;a:δ/n:b&#41;, label&#61;&quot;f&#40;t&#41;&quot;, ls&#61;:dash, color&#61;:black,lw&#61;1&#41;
+plot&#33;&#40;t, K*c &#43; H*d, label&#61;&quot;fit&quot;,color&#61;:red,lw&#61;2,title&#61;&quot;λ&#61;&quot;* @sprintf&#40;&quot;&#37;.2e&quot;, λhat&#41;&#41;</code></pre>
+<pre><code class="language-julia">Results of Optimization Algorithm
+     * Algorithm: Golden Section Search
+     * Search Interval: &#91;-10.000000, 0.000000&#93;
+     * Minimizer: -6.748273e&#43;00
+     * Minimum: 7.292673e&#43;00
+     * Iterations: 36
+     * Convergence: max&#40;|x - x_upper|, |x - x_lower|&#41; &lt;&#61; 2*&#40;1.5e-08*|x|&#43;2.2e-16&#41;: true
+     * Objective Function Calls: 37</code></pre>
+<p><img src="/assets/output_8_1.svg" alt="svg" /></p>
+<h2 id="computing_bayesian_credible_intervals"><a href="#computing_bayesian_credible_intervals">Computing Bayesian Credible Intervals</a></h2>
+<p>The standard deviation at prediction \(\hat{y}_i\) is given by</p>
+\[
+    \sigma_i^2 = \hat{\sigma}^2 e_i^TH(\hat{\lambda})e_i.
+\]
+<p>As such we need to compute the diagonal elements of the influence matrix</p>
+\[\begin{aligned}
+H(\hat{\lambda}) 
+&= I - n \lambda (K_y^{-1} - K_y^{-1} H (H^T K_y^{-1}H) H^T K_y^{-1} )\\
+&= I - n \lambda L^{-T} (I - L^{-1} H (H^T K_y^{-1} H) H^T L^{-T}) L^{-1}\\
+&= I - n \lambda L^{-T} (I - Q_1 Q_1^T ) L^{-1}\\
+&= I - n \lambda (K_y^{-1} - (L^{-T} Q_1) (L^{-T} Q_1)^T).
+\end{aligned}\]
+<p>Where we have used that</p>
+\[
+L^{-1}H = \begin{bmatrix}Q_1 & Q_2\end{bmatrix} \begin{bmatrix} R \\ 0\end{bmatrix}, \quad Q_1\in\mathbb{R}^{n\times p},\ Q_2\in\mathbb{R}^{n\times (n-p)},\ R\in\mathbb{R}^{p\times p}
+\]
+<p>The diagonal elements of \((L^{-T}Q_1)(L^{-T}Q_1)^T\) is easily calculated as the row-norms of \(L^{-T}Q_1\). The the same time the diagonal elements of \(K_y^{-1}\) can be efficiently computed using the explicit-implicit representation of \(L^{-1}\). However it should be noted that the algorithm to do so it not nessecarily numerically stable. Hence below we compute the diagonal elements as \(||L^{-1}e_i||_2^2\)</p>
+<pre><code class="language-julia">L &#61; cholesky&#40;SymEGRSSMatrix&#40;Ut*δ^&#40;2p-1&#41;,Vt&#41;, n*λhat&#41;
+B &#61; L\H;
+F &#61; qr&#40;B&#41;;
+S &#61; L&#39;\Matrix&#40;F.Q&#41;;
+
+dH &#61; zeros&#40;n&#41;
+ei &#61; zeros&#40;n&#41;;
+for i &#61; n: -1 :1
+  ei&#91;i&#93; &#61; 1.0;
+  dH&#91;i&#93; &#61; norm&#40;&#40;L\ei&#41;&#91;i:end&#93;&#41;^2
+  ei&#91;i&#93; &#61; 0.0;
+end
+
+diagH &#61; 1.0 .- n*λhat*&#40;dH - sum&#40;S.*S,dims&#61;2&#41;&#41;;</code></pre>
+<h2 id="the_complete_picture"><a href="#the_complete_picture">The Complete Picture</a></h2>
+<pre><code class="language-julia">α &#61; 0.05
+β &#61; sqrt&#40;2&#41;*erfinv&#40;1-α&#41;
+σhat &#61; sqrt&#40;n*λhat*dot&#40;y,c&#41;/&#40;n-p&#41;&#41;
+
+scatter&#40;t, y, ms&#61;2, label&#61;&quot;Observations&quot;, xlims&#61;&#40;a,b&#41;, xlabel&#61;&quot;t&quot;, legend&#61;false&#41;;
+plot&#33;&#40;a:δ/n:b, f&#40;a:δ/n:b&#41;, label&#61;&quot;f&#40;t&#41;&quot;, ls&#61;:dash,color&#61;:black,lw&#61;1, ribbon&#61;β*σhat, alpha&#61;0.8, fillalpha&#61;0.1&#41;
+plot&#33;&#40;t, K*c &#43; H*d, label&#61;&quot;fit&quot;,color&#61;:red,lw&#61;2,title&#61;&quot;λ&#61;&quot;*@sprintf&#40;&quot;&#37;.3e&quot;, λhat&#41;*&quot;, &quot;*  &quot;σ&#61;&quot;* @sprintf&#40;&quot;&#37;.3e&quot;, σhat&#41;, ribbon&#61;β*σhat*sqrt.&#40;diagH&#41;, fillalpha&#61;0.5&#41;</code></pre>
+<p><img src="/assets/output_12_0.svg" alt="svg" /></p>
+<h2 id="references"><a href="#references">References</a></h2>
+<ol>
+<li><p>M. S. Andersen and T. Chen, “Smoothing Splines and Rank Structured Matrices: Revisiting the Spline Kernel,” SIAM Journal on Matrix Analysis and Applications, 2020.</p>
+</li>
+</ol>
+<div class="page-foot">
+  <div class="copyright">
+    &copy; Mikkel Paltorp. Last modified: November 24, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+  </div>
+</div>
+</div><!-- CONTENT ENDS HERE -->
+    
+        <script src="/libs/katex/katex.min.js"></script>
+<script src="/libs/katex/auto-render.min.js"></script>
+<script>renderMathInElement(document.body)</script>
+
+    
+    
+        <script src="/libs/highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();hljs.configure({tabReplace: '    '});</script>
+
+    
+  </body>
+</html>

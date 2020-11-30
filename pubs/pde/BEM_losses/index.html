@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="stylesheet" href="/libs/katex/katex.min.css">
+     
+   <link rel="stylesheet" href="/libs/highlight/github.min.css">
+   
+  <link rel="stylesheet" href="/css/franklin.css">
+  <link rel="stylesheet" href="/css/basic.css">
+  <link rel="icon" href="/assets/favicon.png">
+   <title>The Boundary Element Method</title>  
+</head>
+<body>
+  <header>
+<div class="blog-name"><a href="/">Mikkel Paltorp</a></div>
+<nav>
+  <ul>
+    <li><a href="/">About Me</a></li>
+    <li><a href="/menu1/">Notes</a></li>
+    <li><a href="/menu2/">Software</a></li>
+  </ul>
+  <img src="/assets/hamburger.svg" id="menu-icon">
+</nav>
+</header>
+
+
+<!-- Content appended here -->
+<div class="franklin-content"><h1 id="the_boundary_element_method_bem"><a href="#the_boundary_element_method_bem">The Boundary Element Method &#40;BEM&#41;</a></h1>
+<h2 id="discretization"><a href="#discretization">Discretization</a></h2>
+\[
+\mathbf{C}\mathbf{p} = \mathbf{H}\mathbf{p} - \mathbf{B}\frac{\partial \mathbf{p}}{\partial n} + \mathbf{p}^I = 0
+\]
+\[
+\mathbf{A}\mathbf{p} - \mathbf{B}\frac{\partial \mathbf{p}}{\partial n} + \mathbf{p}^I = 0
+\]
+<h2 id="bem_with_losses"><a href="#bem_with_losses">BEM with losses</a></h2>
+\[
+\mathbf{X}\mathbf{p}_a = \mathbf{Y}_1 \mathbf{v}_{\text{boundary},n} + \mathbf{Y}_2\mathbf{v}_{\text{boundary},t} + \mathbf{Y}_3\mathbf{p}^I
+
+\]
+\[\begin{aligned}
+\mathbf{A}_a\mathbf{p}_a\frac{\partial \mathbf{p}_a}{\partial n} + \mathbf{p} &= \mathbf{0},\\
+\mathbf{A}_h\mathbf{p}_h\frac{\partial \mathbf{p}_h}{\partial n} + \mathbf{p} &= \mathbf{0},\\
+\mathbf{A}_v\mathbf{p}_v\frac{\partial \mathbf{p}_v}{\partial n} + \mathbf{p} &= \mathbf{0}, \quad \text{with} \quad \nabla\cdot \mathbf{v}_v = 0
+\end{aligned}\]
+<h2 id="references"><a href="#references">References</a></h2>
+<div class="page-foot">
+  <div class="copyright">
+    &copy; Mikkel Paltorp. Last modified: November 26, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+  </div>
+</div>
+</div><!-- CONTENT ENDS HERE -->
+    
+        <script src="/libs/katex/katex.min.js"></script>
+<script src="/libs/katex/auto-render.min.js"></script>
+<script>renderMathInElement(document.body)</script>
+
+    
+    
+        <script src="/libs/highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();hljs.configure({tabReplace: '    '});</script>
+
+    
+  </body>
+</html>

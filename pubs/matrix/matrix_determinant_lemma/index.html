@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="stylesheet" href="/libs/katex/katex.min.css">
+     
+   <link rel="stylesheet" href="/libs/highlight/github.min.css">
+   
+  <link rel="stylesheet" href="/css/franklin.css">
+  <link rel="stylesheet" href="/css/basic.css">
+  <link rel="icon" href="/assets/favicon.png">
+   <title>Matrix determinant lemma</title>  
+</head>
+<body>
+  <header>
+<div class="blog-name"><a href="/">Mikkel Paltorp</a></div>
+<nav>
+  <ul>
+    <li><a href="/">About Me</a></li>
+    <li><a href="/menu1/">Notes</a></li>
+    <li><a href="/menu2/">Software</a></li>
+  </ul>
+  <img src="/assets/hamburger.svg" id="menu-icon">
+</nav>
+</header>
+
+
+<!-- Content appended here -->
+<div class="franklin-content"><h1 id="the_matrix_determinant_lemma"><a href="#the_matrix_determinant_lemma">The Matrix Determinant Lemma</a></h1>
+<p>In this short note a connection between the determinant of a rank-\(k\) pertubated \(n\times n\) matrix and a \(k\times k\) matrix is explored. We take the approach of &#40;some larger&#41; block matrices which in general can be a good approach to tackle these kind of problems.</p>
+<h2 id="determinants_of_block_matrices"><a href="#determinants_of_block_matrices">Determinants of Block Matrices</a></h2>
+<p>We start by stating a <em>very powerful</em> formula regarding the determinat of a block-diagonal matrix. The formula is the basis of everything stated in this note. It is stated without proof as the only proofs I could find was somewhat intricate. The formula states the following relation.</p>
+<a id="eqtridiagblock" class="anchor"></a>\[
+\det\left(\begin{bmatrix}A & B \\ 0 & D\end{bmatrix}\right) = \det(A)\det(D).
+\]
+<p>Now we can further generalize into the realm deteminants of block-matrices</p>
+<a id="eqblockdet" class="anchor"></a>\[
+\det\left(\begin{bmatrix}A & B \\ C & D\end{bmatrix}\right) = \det(A)\det(D-CA^{-1}B) = \det(D)\det(A - BD^{-1}C).
+\]
+<p>While this looks rather complicated it can be viewed as a generalization of the \(2\times 2\)-determinant formula. </p>
+<p>We can easily show <span class="eqref">(<a href="#eqblockdet">2</a>)</span> can be shown using that \(\det(AB)=\det(A)\det(B)\), <span class="eqref">(<a href="#eqtridiagblock">1</a>)</span> and the following two decomposition </p>
+\[
+    \begin{bmatrix}
+    A & B \\ C & D
+    \end{bmatrix}
+    = \begin{bmatrix}
+    A & 0 \\ C & I_k
+    \end{bmatrix}\begin{bmatrix}
+    I_n & A^{-1}B\\
+    0 & D - CA^{-1}B
+    \end{bmatrix}
+\]
+\[
+   \begin{bmatrix}
+    A & B \\ C & D
+    \end{bmatrix}
+    = \begin{bmatrix}
+    I_n & B \\ 0 & D
+    \end{bmatrix}\begin{bmatrix}
+    A-BD^{-1}C & 0\\
+    D^{-1}C & I_k
+    \end{bmatrix}
+\]
+<h2 id="weinsteinaronszajn_identity"><a href="#weinsteinaronszajn_identity">Weinstein–Aronszajn identity</a></h2>
+<p>We start by a introducing a special case. Namely the Weinstein-Aronszajn Identity, which explains that the determinant of a identity plus a rank-\(k\) perturbation is equal to the determinant of a \(k\times k\) matrix.</p>
+\[
+\det( I_n + UV^T) = \det(I_k + V^TU)
+\]
+<p>The identity follows straight from <span class="eqref">(<a href="#eqblockdet">2</a>)</span></p>
+\[
+\det\left(\begin{bmatrix} I_n & U\\ V^T & I_k\end{bmatrix}\right) = \det(I_k)\det(I_n + UI_k^{-1}V^T) = \det(I_n + UV^T)
+\]
+\[
+\det\left(\begin{bmatrix} I_n & U\\ V^T & I_k\end{bmatrix}\right) = \det(I_n)\det(I_k + V^TI_n^{-1}U) = \det(I_k + V^TU)
+\]
+<p>Visually we can view the identity as <img src="/assets/visualizations/weinstein.png" alt="" /></p>
+<h2 id="the_general_form"><a href="#the_general_form">The General Form</a></h2>
+<p>The most general form can be stated as</p>
+\[
+\det(A + UV^T) = \det(I_k + V^T A^{-1} U)\det(A)
+\]
+<p>Which explains that the determinant of a \(n\times n\) matrix plus a rank-\(k\) perturbation is equal to the determinant of a \(k\times k\) matrix. This formula follows straight from <span class="eqref">(<a href="#eqblockdet">2</a>)</span> because we have that</p>
+\[
+\det\left(\begin{bmatrix} A & U\\ V^T & I_k\end{bmatrix}\right) = \det(I_k)\det(A + UI_k^{-1}V^T) = \det(A + UV^T)
+\]
+<p>and</p>
+\[
+\det\left(\begin{bmatrix} A & U\\ V^T & I_k\end{bmatrix}\right) = \det(A)\det(I_k + V^TA^{-1}U) = \det(I_k + V^TA^{-1}U).
+\]
+<div class="page-foot">
+  <div class="copyright">
+    &copy; Mikkel Paltorp. Last modified: November 30, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+  </div>
+</div>
+</div><!-- CONTENT ENDS HERE -->
+    
+        <script src="/libs/katex/katex.min.js"></script>
+<script src="/libs/katex/auto-render.min.js"></script>
+<script>renderMathInElement(document.body)</script>
+
+    
+    
+        <script src="/libs/highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();hljs.configure({tabReplace: '    '});</script>
+
+    
+  </body>
+</html>

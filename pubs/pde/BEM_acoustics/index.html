@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="stylesheet" href="/libs/katex/katex.min.css">
+     
+   <link rel="stylesheet" href="/libs/highlight/github.min.css">
+   
+  <link rel="stylesheet" href="/css/franklin.css">
+  <link rel="stylesheet" href="/css/basic.css">
+  <link rel="icon" href="/assets/favicon.png">
+   <title>BEM For Acoustics</title>  
+</head>
+<body>
+  <header>
+<div class="blog-name"><a href="/">Mikkel Paltorp</a></div>
+<nav>
+  <ul>
+    <li><a href="/">About Me</a></li>
+    <li><a href="/menu1/">Notes</a></li>
+    <li><a href="/menu2/">Software</a></li>
+  </ul>
+  <img src="/assets/hamburger.svg" id="menu-icon">
+</nav>
+</header>
+
+
+<!-- Content appended here -->
+<div class="franklin-content"><h1 id="the_boundary_element_method_bem"><a href="#the_boundary_element_method_bem">The Boundary Element Method &#40;BEM&#41;</a></h1>
+<sup id="fnref:1"><a href="#fndef:1" class="fnref">[1]</a></sup>
+\[
+\Delta \phi  + k^2\phi + Q\delta(x,x_Q) = 0, \quad \forall x\in E
+\]
+<ol>
+<li><p>Sound pressure is given:</p>
+</li>
+</ol>
+\[
+\phi = \overline{\phi}, \quad \forall x \in S
+\]
+<ol start="2">
+<li><p>Particle velocity is given:</p>
+</li>
+</ol>
+\[
+q \equiv \frac{\partial \phi}{\partial n} = \overline{q} = i\omega \rho v_n, \quad \forall x \in S
+\]
+<ol start="3">
+<li><p>Impedance of the surface is given: </p>
+</li>
+</ol>
+\[
+\phi = Z v_n, \quad \forall x\in S
+\]
+<p>Sommerfeld radiation condition:</p>
+\[
+\lim_{R\rightarrow \infty} \left[R \left|\frac{\partial \phi}{\partial R} - ik\phi\right| \right] = 0
+\]
+\[
+c(x) \phi(x) = \int_S \left[G(x,y,\omega)q(y) - F(x,y,\omega)\phi(y) \right] \mathrm{d}S_y + \phi^I(x) + QG(x,x_Q, \omega)
+\]
+\[
+c(x) = 
+\begin{cases}
+1,      \quad & \forall x \in E\\
+1/2,    \quad & \forall x \in S \text{(smooth around x)}\\
+0,      \quad & \forall x \notin E \cup S
+\end{cases}
+\]
+\[\begin{aligned}
+G(x,y,\omega) &= \frac{1}{4\pi r}e^{ikr},
+F(x,y,\omega) &\equiv \frac{\partial G(x,y,\omega)}{\partial n(y)} = \frac{1}{4\pi r^2}(ikr - 1)r_{,j}n_j(y)e^{ikr},
+\end{aligned}\]
+<h2 id="references"><a href="#references">References</a></h2>
+<table class="fndef" id="fndef:1">
+    <tr>
+        <td class="fndef-backref"><a href="#fnref:1">[1]</a></td>
+        <td class="fndef-content">Liu, Yijun. “On the BEM for Acoustic Wave Problems.” Engineering Analysis With Boundary Elements, vol. 107, 2019, pp. 53–62, doi:10.1016/j.enganabound.2019.07.002.</td>
+    </tr>
+</table>
+
+<div class="page-foot">
+  <div class="copyright">
+    &copy; Mikkel Paltorp. Last modified: November 26, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+  </div>
+</div>
+</div><!-- CONTENT ENDS HERE -->
+    
+        <script src="/libs/katex/katex.min.js"></script>
+<script src="/libs/katex/auto-render.min.js"></script>
+<script>renderMathInElement(document.body)</script>
+
+    
+    
+        <script src="/libs/highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();hljs.configure({tabReplace: '    '});</script>
+
+    
+  </body>
+</html>

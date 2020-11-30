@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="stylesheet" href="/libs/katex/katex.min.css">
+     
+   <link rel="stylesheet" href="/libs/highlight/github.min.css">
+   
+  <link rel="stylesheet" href="/css/franklin.css">
+  <link rel="stylesheet" href="/css/basic.css">
+  <link rel="icon" href="/assets/favicon.png">
+   <title>Eckart-Young-Mirsky Theorem</title>  
+</head>
+<body>
+  <header>
+<div class="blog-name"><a href="/">Mikkel Paltorp</a></div>
+<nav>
+  <ul>
+    <li><a href="/">About Me</a></li>
+    <li><a href="/menu1/">Notes</a></li>
+    <li><a href="/menu2/">Software</a></li>
+  </ul>
+  <img src="/assets/hamburger.svg" id="menu-icon">
+</nav>
+</header>
+
+
+<!-- Content appended here -->
+<div class="franklin-content"><h1 id="the_eckart-young-mirsky_theorem"><a href="#the_eckart-young-mirsky_theorem">The Eckart-Young-Mirsky Theorem</a></h1>
+<p>The result of the <em>Eckart-Young-Mirsky Theorem</em> is easily stated: It simple tells us that the solution problem of finding the best rank-\(k\) approximation to a certain \(n\times n\) matrix, w.r.t to the spectral or Frobenius norm, is the truncated SVD.</p>
+<p>As a start we note that the problem of finding the best rank-\(k\) approximation of a \(n\times n\)-matrixw.r.t to a certain norm \(\|\cdot \|\) can be viewed as the solution to the following minimization problem</p>
+\[
+\underset{B\in\mathbb{R}^{n\times n}}{\text{minimize}} \|A - B\|, \quad \text{subject to}\quad \text{rank}(B) = k.
+\]
+<p>Furthermore the equality constraint can be expressed explictly if we reformulate the minimization problem as</p>
+\[
+\underset{X,Y \in \mathbb{R}^{n\times k}}{\text{minimize}} \|A - XY^T\|.
+\]
+<p><strong>Note</strong> that a solution \((X,Y)\) to the above minimization problem will not be unique: If \((X,Y)\) is a solution then for any invertible \(R\in\mathbf{R}^{k\times k}\) also \((XR,R^{-1}Y)\) is a solution.</p>
+<h2 id="for_the_spectral_norm"><a href="#for_the_spectral_norm">For The Spectral Norm</a></h2>
+<p><div class="definition"><p>Suppose that \(A = U\Sigma V^T\) is the singular value decomposition of \(A\). Then the best rank-\(k\) approximation of the matrix \(A\) w.r.t the spectral norm, \(\|\cdot\|_2\), is given by</p>
+<a id="eqak" class="anchor"></a>\[
+A_k = \sum_{i=1}^k\sigma_iu_iv_i^T.
+\]</div> First note that if \(A_k\) is defined as in <span class="eqref">(<a href="#eqak">3</a>)</span> then</p>
+\[
+\|A - A_k\|_2 = \left\|\sum_{i=k+1}^n\sigma_iu_iv_i^T\right\|_2 = \sigma_{k+1}.
+\]
+<p>Now if this really is the best approximation then we must show that for all \(B_k = XY^T\) where \(X,Y\in\mathbb{R}^{n\times k}\) then \(\|A - A_k\|_2 = \sigma_{k+1} \leq \|A-B_k\|_2\). </p>
+<p>Since \(Y\) has \(k\) columns there must be a nontrivial linear combination of the first \(k+1\) columns of \(V\), i.e. \(w = v_1\gamma_1 + \dots + v_{k+1}\gamma_{k+1} = V_{k+1}\gamma\), such that \(Y^Tw = 0\). Without loss of generality we can scale \(w\) such that \(\|w\|_2=1\). Therefore </p>
+<a id="eqspectral" class="anchor"></a>\[
+\|A - B_k\|_2 \geq \|(A-B_k)w\|_2 = \|Aw\|_2 = \sqrt{\gamma_1^2\sigma_1^2 + \dots + \gamma_{k+1}^2\sigma_{k+1}^2} \geq \sigma_{k+1},
+\]
+<p>which shows that the truncated SVD is the best rank-\(k\) approximation of a matrix w.r.t to the spectral norm.</p>
+<p>Note that we in <span class="eqref">(<a href="#eqspectral">5</a>)</span> used that</p>
+\[
+\|A - B_k\|_2 = \sup\{\|(A - B_k)w\|_2 : w \in \mathbb{R}^n,\ \|w\|_2 = 1\} 
+\]
+<p>and </p>
+\[
+\|Aw\|_2 = \|U\Sigma V^T V_{k+1}\gamma\|_2 = \|\Sigma_k \gamma\|_2 =  \sqrt{\gamma_1^2\sigma_1^2 + \dots + \gamma_{k+1}^2\sigma_{k+1}^2}
+\]
+<h2 id="for_the_frobenius_norm"><a href="#for_the_frobenius_norm">For The Frobenius Norm</a></h2>
+<p><div class="definition"><p>Suppose that \(
+A = U\Sigma V^T
+\) is the singular value decomposition of \(A\). Then the best rank-\(k\) approximation of the matrix \(A\) w.r.t the Frobenius norm, \(\|\cdot\|_F\), is given by</p>
+\[
+A_k = \sum_{i=1}^k\sigma_iu_iv_i^T.
+\]</div> The first step is rewrite the minization problem as</p>
+\[
+\underset{X,Y \in \mathbb{R}^{n\times k}}{\text{minimize}} \|A - XY^T\| = \|\Sigma - U^TXY^TV\|_F.
+\]
+<p>where \(A = U\Sigma V^T\) is the SVD of \(A\) and we have used the orthogonal invariance of the Frobenius norm. Its easy to see that there exist no better solution to the above minization problem than \(U^TXY^TV = \text{diag}(\sigma_1,\dots, \sigma_k,0,\dots, 0)\). This solution can be achived by setting </p>
+\[
+\Sigma_k^{1/2} = \text{diag}(\sigma_1^{1/2},\dots, \sigma_k^{1/2}), \quad X = \begin{bmatrix}u_1& \dots & u_k\end{bmatrix}\Sigma_k^{1/2}, \quad Y^T = \Sigma_k^{1/2}\begin{bmatrix} v_1^T \\ \vdots \\ v_k^T\end{bmatrix}.
+\]
+<p>From this we can conclude that the best rank-\(k\) approximation w.r.t the Frobenius norm is the truncated SVD.</p>
+<div class="page-foot">
+  <div class="copyright">
+    &copy; Mikkel Paltorp. Last modified: November 25, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+  </div>
+</div>
+</div><!-- CONTENT ENDS HERE -->
+    
+        <script src="/libs/katex/katex.min.js"></script>
+<script src="/libs/katex/auto-render.min.js"></script>
+<script>renderMathInElement(document.body)</script>
+
+    
+    
+        <script src="/libs/highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();hljs.configure({tabReplace: '    '});</script>
+
+    
+  </body>
+</html>

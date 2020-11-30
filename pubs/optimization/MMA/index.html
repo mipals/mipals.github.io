@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="stylesheet" href="/libs/katex/katex.min.css">
+     
+   <link rel="stylesheet" href="/libs/highlight/github.min.css">
+   
+  <link rel="stylesheet" href="/css/franklin.css">
+  <link rel="stylesheet" href="/css/basic.css">
+  <link rel="icon" href="/assets/favicon.png">
+   <title>MMA</title>  
+</head>
+<body>
+  <header>
+<div class="blog-name"><a href="/">Mikkel Paltorp</a></div>
+<nav>
+  <ul>
+    <li><a href="/">About Me</a></li>
+    <li><a href="/menu1/">Notes</a></li>
+    <li><a href="/menu2/">Software</a></li>
+  </ul>
+  <img src="/assets/hamburger.svg" id="menu-icon">
+</nav>
+</header>
+
+
+<!-- Content appended here -->
+<div class="franklin-content"><h1 id="the_method_of_moving_asymptotes"><a href="#the_method_of_moving_asymptotes">The Method of Moving Asymptotes</a></h1>
+<p><strong>Not completed</strong><br/></p>
+<p>The Method of Moving Asympotes &#40;MMA&#41; can be used to solve inequality constrained optimization problems like the one below </p>
+\[\begin{aligned}
+    \min_{\mathbf{x} \in\mathbb{R}^n} \quad f_0(\mathbf{x})&\\
+     f_i(\mathbf{x}) \leq \hat{f}_i, 
+    \quad &\text{for } i=1,\dots, m\\
+     x_j^{l} \leq x_j \leq x_j^u, \quad &\text{for } j=1,\dots, n.
+\end{aligned}\]
+<p>The main idea behind the algorithm is to substitute all functions \(f_i\) by first order convex approximations. More specifically we approximate the functions using translations of the multiplicative inverse function. This can be done as follows:<br/></p>
+<p>Given a iteration point \(\mathbf{x}^{(k)}\), choose parameters \(L_j^{(k)}\) and \(U_j^{(k)}\) satisfying</p>
+\[
+    L_j^{(k)} < x_j^{(k)} < U_j^{(k)}, \quad j = 1,\dots n,
+\]
+<p>then calculate the convex approximation of all functions \(f_i(\mathbf{x})\) as</p>
+<a id="eqfapprox" class="anchor"></a>\[
+    f_i^{(k)}(\mathbf{x}) = r_i^{(k)} + \sum_{j=1}^n \left(\frac{p_{ij}^{(k)}}{U_j^{(k)}-x_j} + \frac{q_{ij}^{(k)}}{x_j-L_j^{(k)}} \right).
+\]
+<p>Where</p>
+\[\begin{aligned}
+    p_{ij}^{(k)} &= 
+    \begin{cases}
+    (U_j^{(k)}-x_j^{(k)})^2\frac{\partial f_i}{\partial x_j}, \qquad \hspace{-3pt} &\text{if }\frac{\partial f_i}{\partial x_j} > 0\\
+    0, & \text{if } \frac{\partial f_i}{\partial x_j} \leq 0
+    \end{cases},\\
+    q_{ij}^{(k)} &=
+    \begin{cases}
+    0, & \text{if }\frac{\partial f_i}{\partial x_j} \geq 0\\
+    -(x_j^{(k)}-L_j^{(k)})^2\frac{\partial f_i}{\partial x_j}, \quad &\text{if } \frac{\partial f_i}{\partial x_j} < 0 
+    \end{cases},\\
+    r_i^{(k)} &= f_i(\mathbf{x}^{(k)}) - \sum_{j=1}^n \left(\frac{p_{ij}^{(k)}}{U_j^{(k)}-x_j} + \frac{q_{ij}^{(k)}}{x_j-L_j^{(k)}} \right).
+\end{aligned}\]
+<p>Note that all derivatives \(\frac{\partial f_i}{\partial x_j}\) are evaluated at \(\mathbf{x} = \mathbf{x}^{(k)}\). By the above definitions of \(p_{ij}^{(k)}\) and \(q_{ij}^{(k)}\), we see that the sum in <span class="eqref">(<a href="#eqfapprox">3</a>)</span> for each \(j\) only contain either the term with \(p_{ij}^{(k)}\) or the term with \(q_{ij}^{(k)},\) hence we only have <em>one</em> asymptote for each \(f_i\). Furthermore it is easy to see that \(f_i^{(k)}(\mathbf{x})\) is a first order approximation of \(f_i(\mathbf{x})\) at \(\mathbf{x}^{(k)}\), i.e that it is satisfied that</p>
+\[
+    f_i^{(k)}(\mathbf{x}^{(k)}) = f_i(\mathbf{x}^{(k)}) \quad \text{and} \quad \frac{\partial f_i^{(k)}}{\partial x_j} = \frac{\partial f_i}{\partial x_j} \text{   at  }\mathbf{x} = \mathbf{x}^{(k)},
+\]
+<p>for \(i=0,1,\dots, m\) and \(j=1,\dots, n\).<br/></p>
+<p>The final convex subproblem \(P^{(k)}\) can now be stated simply as</p>
+\[\begin{aligned}
+    \min_{\mathbf{x} \in\mathbb{R}^n} \quad &r_0^{(k)} + \sum_{j=1}^n \left(\frac{p_{0j}^{(k)}}{U_j^{(k)}-x_j} + \frac{q_{0j}^{(k)}}{x_j-L_j^{(k)}} \right), \\
+    &r_i^{(k)} + \sum_{j=1}^n \left(\frac{p_{ij}^{(k)}}{U_j^{(k)}-x_j} + \frac{q_{ij}^{(k)}}{x_j-L_j^{(k)}} \right) \leq \hat{f}_i, 
+    \quad\ \text{for } i=1,\dots, m\\
+     &\max\{x_j^{l},\alpha_j^{(k)}\} \leq x_j \leq \min\{x_j^u, \beta_j^{(k)}\}, \quad\ \quad\ \quad \text{for } j=1,\dots, n.
+\end{aligned}\]
+<p>Here the variables \(\alpha_j^{(k)}\) and \(\beta_j^{(k)}\) is introduced to make sure that no divisibility by zero occur, hence they should be chosen such that</p>
+\[
+    L_j^{(k)} < \alpha_j^{(k)} < x_j^{(k)} < \beta_j^{(k)} < U^{(k)}_j.
+\]
+<p>In <sup id="fnref:1"><a href="#fndef:1" class="fnref">[1]</a></sup> it is proposed to set \(\alpha_j^{(k)} = 0.9L_j^{(k)} + 0.1x_j^{(k)}\) and \(\beta_j^{(k)} = 0.9U_j^{(k)}+0.1x_j^{(k)}\).</p>
+<p>A important part of the algorithm is however yet to be described, namely the part of <em>moving the asymptotes</em>. The idea is as follows. a&#41; If the algorithm oscillates, then it can be stabilized by moving the asymptotes closer to the iteration point. b&#41; If the algorithm is monotone, then it can be relaxed by moving the asymptotes further from the iteration point.</p>
+<p>There exist many implementations of the above but a proposed implementation from <span class="bibref"><b>??</b></span> is to chose \(s\in ]0,1[\) and then do the following.<br/> For \(k \leq 1\) let</p>
+<a id="eqmma_start" class="anchor"></a>\[
+    L_j^{(k)} = x_j^{(k)} - (x^u_j - x^l_j)\ \text{ and }\ U_j^{(k)} = x_j^{(k)} + (x^u_j - x^l_j). 
+\]
+<p>For \(k \geq 2\) then a&#41; If the signs of \(x_j^{(k)}-x_j^{(k-1)}\) and \(x_j^{(k)}-x_j^{(k-1)}\) differ then let</p>
+<a id="eqasymp_reduce" class="anchor"></a>\[ 
+        L_j^{(k)} = x_j^{(k)} - s(x^u_j - x^l_j)\ \text{ and }\ U_j^{(k)} = x_j^{(k)} + s(x^u_j - x^l_j). 
+    \]
+<p>b&#41; If the signs of \(x_j^{(k)}-x_j^{(k-1)}\) and \(x_j^{(k)}-x_j^{(k-1)}\) are the same then let </p>
+<a id="eqasymp_increase" class="anchor"></a>\[ 
+        L_j^{(k)} = x_j^{(k)} - (x^u_j - x^l_j)/s\ \text{ and }\ U_j^{(k)} = x_j^{(k)} + (x^u_j - x^l_j)/s. 
+    \]
+<h2 id="cones"><a href="#cones">Cones</a></h2>
+<p>Transforming the convex subproblem into a conic form, such that the convexity is given directly from the problem formulation. In order to do so the rotated quadratic cone in three dimension is used.</p>
+<a id="eqqrcone" class="anchor"></a>\[
+  \mathcal{Q}_r^3 = \{ \mathbf{x}\in\mathbb{R}^3\ |\ 2x_1x_2 \geq x_3^2\}.
+\]
+<p><img src="/assets/qr3.png" alt="" />  </p>
+<p>The idea is to introduce a rotated quadratic cone for each asymptote in the convex approximations as each asymptote will have the following epigraph form.</p>
+\[
+  s_{ij}\frac{p_{ij}}{U_j-x_j} + (1-s_{ij})\frac{q_{ij}}{x_j - L_j} \leq t_{ij}, 
+\]
+<p>where \(t_{ij}\) is an auxiliary variable and \(s_{ij}\) is a binary value describing if the upper or lower asymptotes is active or not. Abusing this notation we can rewrite the inequality as</p>
+\[
+    s_{ij}p_{ij} + (1-s_{ij})q_{ij} \leq t_{ij}\left(s_{ij}(U_j-x_j) + (1-s_{ij})(x_j - L_j) \right).
+\]
+<p>Now using the definition of the rotated quadratic cone as described in <span class="eqref">(<a href="#eqqrcone">11</a>)</span> get that</p>
+<a id="eqqrconecon" class="anchor"></a>\[
+    \begin{bmatrix}
+    %\frac{t_{ij}}{2}\\
+    t_{ij}\\
+    s_{ij}(U_j-x_j) + (1-s_{ij})(x_j - L_j)\\
+    \sqrt{2}\sqrt{p_{ij}s_{ij} + (1-s_{ij})q_{ij}}
+    \end{bmatrix}
+    \in \mathcal{Q}_r^3, \quad \text{for } i = 0,1,\dots m,\text{  and  } j=1,\dots, n.
+\]
+<p>The final optimization problem is given below.</p>
+\[\begin{aligned}
+    \min_{x\in\mathbb{R}^n, t\in \mathbb{R}^{m\cdot n}, z\in\mathbb{R}} z \qquad&\\
+    0 \leq t_{ij} \qquad \text{for } &i = 0,1,\dots m,\text{  and  } j=1,\dots, n.\\
+    \sum_{j=1}^m t_{ij} \leq z, \quad \text{ for } &i=0,1,\dots, n.\\
+    \begin{bmatrix}
+    %\frac{t_{ij}}{2}\\
+    t_{ij}\\
+    s_{ij}(U_j-x_j) + (1-s_{ij})(x_j - L_j)\\
+    \sqrt{2}\sqrt{p_{ij}s_{ij} + (1-s_{ij})q_{ij}}
+    \end{bmatrix}
+    \in \mathcal{Q}_r^3, \quad \text{for } &i = 0,1,\dots m,\text{  and  } j=1,\dots, n.\\
+    x_j^{l} \leq x_j \leq x_j^u, \quad \text{for } &j=1,\dots, n.
+\end{aligned}\]
+<h2 id="references"><a href="#references">References</a></h2>
+<table class="fndef" id="fndef:1">
+    <tr>
+        <td class="fndef-backref"><a href="#fnref:1">[1]</a></td>
+        <td class="fndef-content">Svanberg, Krister. <em>“The method of moving asymptotes - A  new method for structural optimization.”</em> International Journal for Numerical Methods in Engineering 24.2 &#40;1987&#41;: 359–373. Print.</td>
+    </tr>
+</table>
+
+<div class="page-foot">
+  <div class="copyright">
+    &copy; Mikkel Paltorp. Last modified: November 24, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+  </div>
+</div>
+</div><!-- CONTENT ENDS HERE -->
+    
+        <script src="/libs/katex/katex.min.js"></script>
+<script src="/libs/katex/auto-render.min.js"></script>
+<script>renderMathInElement(document.body)</script>
+
+    
+    
+        <script src="/libs/highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();hljs.configure({tabReplace: '    '});</script>
+
+    
+  </body>
+</html>

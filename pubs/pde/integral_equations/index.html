@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="stylesheet" href="/libs/katex/katex.min.css">
+     
+   <link rel="stylesheet" href="/libs/highlight/github.min.css">
+   
+  <link rel="stylesheet" href="/css/franklin.css">
+  <link rel="stylesheet" href="/css/basic.css">
+  <link rel="icon" href="/assets/favicon.png">
+   <title>Integral Equations</title>  
+</head>
+<body>
+  <header>
+<div class="blog-name"><a href="/">Mikkel Paltorp</a></div>
+<nav>
+  <ul>
+    <li><a href="/">About Me</a></li>
+    <li><a href="/menu1/">Notes</a></li>
+    <li><a href="/menu2/">Software</a></li>
+  </ul>
+  <img src="/assets/hamburger.svg" id="menu-icon">
+</nav>
+</header>
+
+
+<!-- Content appended here -->
+<div class="franklin-content"><h1 id="integral_equations"><a href="#integral_equations">Integral equations</a></h1>
+<a id="eqfredholmfirst" class="anchor"></a>\[
+\int_a^b K(x,y)\phi(y)\ \mathrm{d}y = f(x),\\
+\]
+<a id="eqfredholmsecond" class="anchor"></a>\[
+\phi(x) = \int_a^b K(x,y)\phi(y)\ \mathrm{d}y + g(x),
+\]
+<p>in which \(\phi\) is an unknown function, \(K(x,y)\) is a known <em>kernel</em> function, and \(f\) and \(g\) are two given functions. What we see in <span class="eqref">(<a href="#eqfredholmfirst">1</a>)</span> is a linear <em>Fredholm equation of the first kind</em> wheres <span class="eqref">(<a href="#eqfredholmsecond">2</a>)</span> is a linear <em>Fredholm equation of the second kind</em>. The kernel function \(K(x,y)\) determines the characteristics of the intergral equation. For example, if:</p>
+\[
+K(x,y) = \frac{1}{|x - y|},
+\]
+<p>then the integrals in <span class="eqref">(<a href="#eqfredholmfirst">1</a>)</span> and <span class="eqref">(<a href="#eqfredholmsecond">2</a>)</span> are singular when \(x\in [a,b]\).</p>
+<h2 id="gauss_theorem"><a href="#gauss_theorem">Gauss Theorem</a></h2>
+<h2 id="the_greens_identity"><a href="#the_greens_identity">The Green&#39;s Identity</a></h2>
+<div class="page-foot">
+  <div class="copyright">
+    &copy; Mikkel Paltorp. Last modified: November 26, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+  </div>
+</div>
+</div><!-- CONTENT ENDS HERE -->
+    
+        <script src="/libs/katex/katex.min.js"></script>
+<script src="/libs/katex/auto-render.min.js"></script>
+<script>renderMathInElement(document.body)</script>
+
+    
+    
+        <script src="/libs/highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();hljs.configure({tabReplace: '    '});</script>
+
+    
+  </body>
+</html>

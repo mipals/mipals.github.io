@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="stylesheet" href="/libs/katex/katex.min.css">
+     
+   <link rel="stylesheet" href="/libs/highlight/github.min.css">
+   
+  <link rel="stylesheet" href="/css/franklin.css">
+  <link rel="stylesheet" href="/css/basic.css">
+  <link rel="icon" href="/assets/favicon.png">
+   <title>BFGS</title>  
+</head>
+<body>
+  <header>
+<div class="blog-name"><a href="/">Mikkel Paltorp</a></div>
+<nav>
+  <ul>
+    <li><a href="/">About Me</a></li>
+    <li><a href="/menu1/">Notes</a></li>
+    <li><a href="/menu2/">Software</a></li>
+  </ul>
+  <img src="/assets/hamburger.svg" id="menu-icon">
+</nav>
+</header>
+
+
+<!-- Content appended here -->
+<div class="franklin-content"><h1 id="the_broydenfletchergoldfarbshanno_bfgs_algorithm"><a href="#the_broydenfletchergoldfarbshanno_bfgs_algorithm">The Broyden–Fletcher–Goldfarb–Shanno &#40;BFGS&#41; Algorithm</a></h1>
+<p>The BFGS algorithm is one of the most used Quasi-Newton algorithms. This note briefly explores why the update of the approximation of the inverse Hessian has the form that it has. I&#39;ve done so because I have found that most texts lacks this intuition and instead just states the update without any reasoning. </p>
+<p>In the original papers &#40;there were four seperate&#41; the approach was to looking at the following minimization problem</p>
+\[
+\underset{H_{k+1}\in\mathbb{R}^{n \times n}}{\text{minimize}} \|H_{k+1}^{-1} - H_{k}^{-1}\|_W\\
+\text{subject to } H_{k+1}^{-1}\left(\nabla f(x_{k+1} - \nabla f(x_k))\right) = \left(x_{k+1} - x_k\right)\ \text{ and }\ H_{k+1}^T = H_{k+1}
+\]
+<p>In short they looked at finding the symmetric matrix that minimized some weighted norm distance to the previous Hessian approximation while constraining it to the secant condition &#40;described in the next section&#41;. In this note we will take a different approach, namely the one of rank-2 updates.</p>
+<h2 id="the_secant_condition"><a href="#the_secant_condition">The Secant Condition</a></h2>
+<p>A key component of the derivation of the BFGS steps is the secant condition stating that</p>
+\[
+
+H_{k+1} s_k = y_k
+
+\]
+<p>where \(s_k = x_{k+1} - x_k\), \(y_k = \nabla f(x_{k+1}) - \nabla f(x_k)\) and \(H_{k+1}\) is to be determined by the condition.</p>
+<p>Now define a quadratic approximation of \(f\) around \(x_{k+1}\) as</p>
+\[
+\tilde{f}(x) = f(x_{k+1}) + \nabla f(x_{k+1})^T(x-x_{k+1}) + \frac{ 1 }{ 2 } (x - x_{k+1})^TH_{k+1}(x - x_{k+1}),
+\]
+<p>then</p>
+<ul>
+<li><p>by construction we have that \(\nabla \tilde{f}(x_{k+1}) = \nabla f(x_{k+1})\)</p>
+</li>
+<li><p>while the secant condition ensures that also \(\nabla \tilde{f}(x_k) = \nabla f(x_k)\).</p>
+</li>
+</ul>
+<p>In practical terms the secant conditions says that we <em>determine</em> a &quot;Hessian&quot; at point \(x_{k+1}\) such that the quadratic approximation of \(f\) with origin at \(x_{k+1}\) using said &quot;Hessian&quot; have a gradient equal to the gradient of \(f\) at \(x_k\). Visually we can view the secant condition as. <img src="/assets/visualizations/secant1.png" alt="" /></p>
+<h2 id="rank-2_updates"><a href="#rank-2_updates">Rank-2 Updates</a></h2>
+<p>The main idea behind the BFGS algorithm is a simple &#40;symmetric&#41; rank-2 update of a proposed Hessian &#40;note that because \(H_k\) is a proposed Hessian it must be symmetric&#41;</p>
+\[\begin{aligned}
+
+H_{k + 1} 
+&= H_k + \alpha uu^T + \beta vv^T\\
+&= H_k + \begin{bmatrix} \alpha u & \beta v \end{bmatrix}\begin{bmatrix} u^T \\ v^T \end{bmatrix}.
+\end{aligned}\]
+<p>Given that \(H_{k+1}\) is simply \(H_k\) with a rank-\(2\) update we know from the Sherman-Morrison-Woodbury identity that we efficiently compute the inverse of \(H_{k+1}\) if the inverse of \(H_{k}\) is already known</p>
+<a id="eqhk1inverse" class="anchor"></a>\[
+\left( H_{k + 1} \right)^{-1} 
+= H_k^{-1} - H_{k}^{-1}\begin{bmatrix} \alpha u & \beta v \end{bmatrix} \left(I + \begin{bmatrix} u^T \\ v^T \end{bmatrix} H_{k}^{-1} \begin{bmatrix} \alpha u & \beta v \end{bmatrix}  \right)^{-1}\begin{bmatrix} u^T \\ v^T \end{bmatrix}H_k^{-1} .
+\]
+<p>In short this means that we only need to compute the full inverse on the first iteration while at any other point we can settle for just updating it through an inversion of a \(2\times 2\) matrix and a few matrix-vector products. While the idea is simple we still need to find suitable \(\alpha, \beta, u\) and \(v\). </p>
+<p>We start by imposing the secant condition</p>
+\[\begin{aligned}
+H_{k+1}s_k =  H_ks_k + \alpha uu^T + \beta vv^T = y_k.
+\end{aligned}\]
+<p>Since the middle expression has to be equal to \(y_k\) we can assume that one of the terms \(\alpha uu^T\) or \(\beta vv^T\) should be equal to \(y_k\) while the other should be equal to \(-H_ks_k\) &#40;in order to counteract the \(+H_ks_k\) term&#41;. An obvious idea could therefore be to set \(u = y_k\) and \(v = H_ks_k\) and determine \(\alpha\) and \(\beta\) such that that the expression is equal to \(y_k\). We start by inserting the choices of \(u\) and \(v\)</p>
+\[\begin{aligned}
+H_{k+1}s_k = H_ks_k + \underbrace{\alpha y_ky_k^Ts_k}_{\text{only term with $y_k$}} + \underbrace{\beta H_ks_ks_k^TH_ks_k}_{\text{only term with $H_k$}} = y_k.
+\end{aligned}\]
+<p>From this we see that we need the \(\alpha\)-term to be equal to \(y_k\) and the \(\beta\)-term to be equal to \(-H_ks_k\) it follows that we must have</p>
+\[
+\alpha = \frac{1}{y_k^Ts_k}, \quad \text{and} \quad \beta = -\frac{1}{s_k^TH_ks_k},
+\]
+<p>in order to satisfy the secant condition.<br/></p>
+<p>From this we must have that \(H_{k+1}\) will have the following form</p>
+\[
+H_{k+1} = H_k + \frac{y_ky_k^T}{y_k^Ts_k} - \frac{H_ks_ks_k^TH_k}{s_k^TH_ks_k},
+\]
+<p>which is also how it is stated in most texts. Note, however, that in practice we will never use the above relation but instead inverting \(H_{k+1}\) directly using <span class="eqref">(<a href="#eqhk1inverse">5</a>)</span>.</p>
+<p>While this give us an updating strategy there is still something that is not particularily promising. Namely that in order to compute \(\beta\) we need to store \(H_k\). However as shown in next section we can, through some tedious computations, show that we actually do not need to compute \(\beta\) at all. </p>
+<h2 id="removing_the_depdence_of_h_k_some_tedious_computations"><a href="#removing_the_depdence_of_h_k_some_tedious_computations">Removing the depdence of \(H_k\) &#40;Some tedious computations... &#41;</a></h2>
+<p>Earlier we stated how the computation of the inverse could be reduced to a simple inversion of a \(2\times 2\) matrix and matrix-vector products. However we later set \(v=H_ks_k\), meaning that we also needed to store \(H_k\) explicitly. Thankfully we can see that if we insert our chosen values of \(\alpha,\beta, u\) and \(v\) into the expression for the inversion we get something that does not explicitly depend on \(H_k\). The calculations are tedious and not nessecarily informing, however, given that these are notes I have chosen to include them anyways.</p>
+<p>First inserting the expression we find that</p>
+\[\begin{aligned}
+
+\left( H_{k + 1} \right)^{-1} 
+&= H_k^{-1} - \begin{bmatrix} \alpha H_{k}^{-1}y_k & \beta s_k \end{bmatrix} \left(I + \begin{bmatrix} y_k^T \\ s_k^TH_k \end{bmatrix}\begin{bmatrix} \alpha H_k^{-1}y_k & \beta s_k \end{bmatrix}  \right)^{-1}\begin{bmatrix} y_k^TH_k^{-1} \\ s_k^T \end{bmatrix}
+
+\end{aligned}\]
+<p>Now for the easy of notation introduce \(\gamma_k = H_k^{-1}y_k\)</p>
+\[\begin{aligned}
+\left( H_{k + 1} \right)^{-1} 
+&= H_k^{-1} - \begin{bmatrix} \alpha \gamma_k & \beta s_k \end{bmatrix} \left(I + \begin{bmatrix} \alpha y_k^T\gamma_k & \beta y_k^Ts_k\\ \alpha s_k^Ty_k & \beta s_k^TH_ks_k\end{bmatrix} \right)^{-1}\begin{bmatrix} \gamma_k^T \\ s_k^T \end{bmatrix} \\
+&= H_k^{-1} - \begin{bmatrix} \alpha \gamma_k & \beta s_k \end{bmatrix} \left(I + \begin{bmatrix} \alpha y_k^T\gamma_k & \beta \alpha^{-1}\\ 1 & -1\end{bmatrix} \right)^{-1}\begin{bmatrix} \gamma_k^T \\ s_k^T \end{bmatrix},
+
+\end{aligned}\]
+<p>where we used that \(\alpha s_k^Ty_k = 1\) and \(\beta s_k^TH_ks_k = -1\). One could be tempted to stop here, as the expression does not look to depend on \(H_k\). However one needs to remember that \(\beta\) is defined using \(H_k\). We must therefore continue</p>
+\[\begin{aligned}
+\left( H_{k + 1} \right)^{-1} 
+&= H_k^{-1} - \begin{bmatrix} \alpha \gamma_k & \beta s_k \end{bmatrix} \left(\begin{bmatrix} 1 + \alpha y_k^T\gamma_k & \beta \alpha^{-1}\\ 1 & 0\end{bmatrix} \right)^{-1}\begin{bmatrix} \gamma_k^T \\ s_k^T \end{bmatrix} \\
+&= H_k^{-1} - \begin{bmatrix} \alpha \gamma_k & \beta s_k \end{bmatrix} \frac{-\alpha}{\beta}\begin{bmatrix} 0 & -\beta \alpha^{-1}\\ -1 & 1 + \alpha y_k^T\gamma_k\end{bmatrix} \begin{bmatrix} \gamma_k^T \\ s_k^T \end{bmatrix} \\
+&= H_k^{-1} + \frac{\alpha}{\beta}\begin{bmatrix} \alpha \gamma_k & \beta s_k \end{bmatrix} \begin{bmatrix} -\beta \alpha^{-1}s_k^T\\ -\gamma_k^T + s_k^T + \alpha y_k^T\gamma_ks_k^T\end{bmatrix}\\
+&= H_k^{-1} + \frac{\alpha}{\beta}\begin{bmatrix} \alpha \gamma_k & \beta s_k \end{bmatrix} \begin{bmatrix} -\beta \alpha^{-1}s_k^T\\ -\gamma_k^T + s_k^T + \alpha y_k^T\gamma_ks_k^T\end{bmatrix}\\
+&=H_k^{-1} + \frac{\alpha}{\beta}\left(
+-\beta \gamma_ks_k^T - \beta s_k\gamma_k^T + \beta s_ks_k^T + \beta\alpha s_ky_k^T\gamma_ks_k^T
+\right)\\
+&= H_k^{-1} + \left(
+-\alpha \gamma_ks_k^T - \alpha s_k\gamma_k^T + \alpha s_ks_k^T + \alpha^2 s_ky_k^T\gamma_ks_k^T
+\right)\\
+&= H_k^{-1} + (\alpha + \alpha^2y_k^T\gamma_k)s_ks_k^T - \alpha(\gamma_ks_k^T + s_k\gamma_k^T).
+\end{aligned}\]
+<p>As promised we see that the update of the inverse does not explictly rely on \(H_k\) &#40;but instead just \(H_k^{-1}\)&#41;. The expression is usually stated with \(\gamma_k = H_k^{-1}y_k\) reinserted. However I find that a little misleading given that a good implementation would have have a temporary variable like \(\gamma_k\) computed instead of having multiple matrix-vector products. On a last note I want to stress that here we can also clearly see that the update will continue to be symmetric if the initial matrix \(H_0\) is symmetric. The reason for this is simply that \((\alpha + \alpha^2y_k^T\gamma_k)\) is just a scalar and \((\gamma_ks_k^T + s_k\gamma_k^T)\) is the sum of a matrix and its transpose which is clearly symmetric.</p>
+<div class="page-foot">
+  <div class="copyright">
+    &copy; Mikkel Paltorp. Last modified: November 30, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+  </div>
+</div>
+</div><!-- CONTENT ENDS HERE -->
+    
+        <script src="/libs/katex/katex.min.js"></script>
+<script src="/libs/katex/auto-render.min.js"></script>
+<script>renderMathInElement(document.body)</script>
+
+    
+    
+        <script src="/libs/highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();hljs.configure({tabReplace: '    '});</script>
+
+    
+  </body>
+</html>
