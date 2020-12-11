@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="stylesheet" href="/libs/katex/katex.min.css">
+     
+   <link rel="stylesheet" href="/libs/highlight/github.min.css">
+   
+  <link rel="stylesheet" href="/css/franklin.css">
+  <link rel="stylesheet" href="/css/basic.css">
+  <link rel="icon" href="/assets/favicon.png">
+   <title>Shape Functions</title>  
+</head>
+<body>
+  <header>
+<div class="blog-name"><a href="/">Mikkel Paltorp</a></div>
+<nav>
+  <ul>
+    <li><a href="/">About Me</a></li>
+    <li><a href="/menu1/">Notes</a></li>
+    <li><a href="/menu2/">Software</a></li>
+  </ul>
+  <img src="/assets/hamburger.svg" id="menu-icon">
+</nav>
+</header>
+
+
+<!-- Content appended here -->
+<div class="franklin-content"><h1 id="shape_functions"><a href="#shape_functions">Shape Functions </a></h1>
+<p>In this note we look at shape functions as a means of interpolating between points in a given coordinatesystem. In general the interpolation will have the form</p>
+\[
+\mathbf{r}(\mathbf{\xi}) = M^TN(\mathbf{\xi}), \quad \xi \in [\mathbf{a},\mathbf{b}]
+\]
+<p>where \(M^T = \begin{bmatrix} \mathbf{m}_1 & \dots & \mathbf{m}_n\end{bmatrix}\) is a matrix containing the interpolation nodes, \(N(\mathbf{\xi})\) is a vector containing the shape functions and \(\mathbf{a},\mathbf{b}\in\mathbf{R}^m\) so that \([\mathbf{a},\mathbf{b}]\) described a rectilinear area in a \(m\)-dimensional space.</p>
+<p>The usefulness of shape functions comes from the fact that they can be used to approximate curves and surfaces so that approximations of curve- and surface integrals can be computed easily.</p>
+<h3 id="curve_integrals"><a href="#curve_integrals">Curve integrals</a></h3>
+<p>As the name suggest a curve integral is an integral over a specific curve</p>
+\[
+\int_{C_r} f\ \mathrm{d}\mu
+\]
+<p>now if we can parametrize the curve \(C_r\)</p>
+\[
+C_r = \left\{\mathbf{r}(u)\ |\ u\in[a,b]\right\}
+\]
+<p>then we can compute the ingral as</p>
+\[
+\int_{C_r} f\ \mathrm{d}\mu = \int_a^bf(\mathbf{r}(u))\text{Jacobi}_{\mathbf{r}}(u)\ \mathrm{d}u
+\]
+<p>where </p>
+\[
+\text{Jacobi}_{\mathbf{r}}(u) = \|\mathbf{r}'(u)\|_2.
+\]
+<p>Informally we can view \(\text{Jacobi}_{\mathbf{r}}(u)\) as the total distortion of lengths from the \([a,b]\) space to the curve \(C_r\) caused by the parametrization \(\mathbf{r}(u)\).</p>
+<h3 id="surface_integrals"><a href="#surface_integrals">Surface integrals</a></h3>
+<p>Similarily a surface integral is simply an integral over a surface </p>
+\[
+\int_{S_r} f\ \mathrm{d}\mu.
+\]
+<p>If a parametrization, \(\mathbf{r}(u,v)\), of the surface can be found</p>
+\[
+S_r = \left\{ \mathbf{r}(u,v), \quad u\in[a,b], v\in[c,d]\right\},
+\]
+<p>then we can compute the surface integral as follows</p>
+\[
+\int_{S_r} f\ \mathrm{d}\mu = \int_{c}^d\int_a^bf(\mathbf{r}(u,v))\text{Jacobi}_{\mathbf{r}}(u,v)\ \mathrm{d}u\mathrm{d}v
+\]
+<p>where</p>
+\[
+\text{Jacobi}_{\mathbf{r}}(u) = \|\mathbf{r}_u'(u,v)\|_2\|\mathbf{r}_v(u,v)\|_2\sin(\theta(u,v))
+\]
+<p>In parallel to the curve integrals we can view \(\text{Jacobi}_{\mathbf{r}}(u,v)\) as the total distortion of area from the \([a,b]\times [c,d]\) space to the surface \(S_r\) caused by the parametrization \(\mathbf{r}(u,v)\).</p>
+<h3 id="approximations"><a href="#approximations">Approximations</a></h3>
+<p>We now briefly show how to approximate a curve integral. The first step is the split the integral into smaller subintegrals</p>
+<a id="eqapprox" class="anchor"></a>\[
+\int_{C_r} f\ \mathrm{d}\mu = \sum_{i=1}^k\int_{\Delta C_i}f\ \mathrm{d}\mu.
+\]
+<p>Now each of the subintegrals can be computed using suitable parametrizations.</p>
+\[
+\int_{\Delta C_i}f\ \mathrm{d}\mu = \int_a^bf(\mathbf{r}_i(u))\text{Jacobi}_{\mathbf{r}}(u)\ \mathrm{d}u.
+\]
+<p>The idea is now the use a shape-function for the </p>
+\[
+\int_{\Delta C_i}f\ \mathrm{d}\mu \approx \int_a^bf(M_i^TN(u))\|M_i^TN'(u)\|_2\ \mathrm{d}u.
+\]
+<p>The integral can still, in general, be hard to compute. However it can in most cases be well approximated by using a quadrature. As such the integral becomes</p>
+\[
+\int_a^bf(M_i^TN(u))\|M_i^TN'(u)\|_2\ \mathrm{d}u \approx \sum_{j=1}^{l} w_jf(M_i^TN(u_j))\|M_i^TN'(u_j)\|_2.
+\]
+<p>Substituting this back into <span class="eqref">(<a href="#eqapprox">10</a>)</span> we find the curve integral can be approximated as</p>
+\[
+\int_{C_r} f\ \mathrm{d}\mu \approx \sum_{i=1}^k\sum_{j=1}^{l} w_jf(M_i^TN(u_j))\|M_i^TN'(u_j)\|_2.
+\]
+<h2 id="curve_shape_functions"><a href="#curve_shape_functions">Curve shape functions</a></h2>
+<p>We briefly show some shape functions for curve integrals.</p>
+<h3 id="linear_elements"><a href="#linear_elements">Linear elements</a></h3>
+<p>The simplest shape function is the linear shape function.</p>
+\[
+N_L(u) = \begin{bmatrix} 1 - u\\ u\end{bmatrix},\quad u \in [0,1]
+\]
+<p>Visually we can view the elements of \(N_L(u)\) as function that are \(1\) when the other is \(0\).</p>
+<p><img src="/assets/visualizations/2d_linear.png" alt="" /></p>
+<p>Using this shape function we can interpolate linearly between \(\mathbf{m}_1\) and \(\mathbf{m}_2\) using the parametrization</p>
+\[
+\mathbf{r}_L(u) = M^TN_L(u),
+\]
+<p>Visually this parametrization can be seen as</p>
+<p><img src="/assets/visualizations/2d_linear_interp.png" alt="" /></p>
+<p>Now the Jacobian can we found by first calculating \(N_L'(u)\)</p>
+\[
+N_L'(u) = \begin{bmatrix} -1\\ 1\end{bmatrix},\quad u \in [0,1].
+\]
+<p>Now we have that</p>
+\[
+\text{Jacobi}_L(u) = \left\| M^TN_L'(u)\right\|_2 = \|\mathbf{y}_2 - \mathbf{y}_1\|_2
+\]
+<h4 id="quadratic_elements"><a href="#quadratic_elements">Quadratic elements</a></h4>
+<p>The next simplest shape function is the quadratic elements defined by</p>
+\[
+N_Q(u) = \begin{bmatrix} \frac{1}{2}u (u - 1)\\ 
+                                   (1-u)(1+u)\\ 
+                         \frac{1}{2}u (u + 1)\end{bmatrix}, \quad u\in[-1,1].
+\]
+<p>Visually we can view each element as a seperate function begin equal to \(1\) when the other are \(0\)</p>
+<p><img src="/assets/visualizations/2d_quadratic.png" alt="" /></p>
+<p>Using the quadratic shape functions we can interpolate between \(\mathbf{m}_1\), \(\mathbf{m}_2\) and \(\mathbf{m}_3\) using a quadratic as</p>
+\[
+\mathbf{r}_Q(u) = M^TN_Q(u).
+\]
+<p>Visually this interpolation can be seen as</p>
+<p><img src="/assets/visualizations/2d_quadratic_interp.png" alt="" /></p>
+<p>Now the Jacobian can be computed similarily to the linear shape functions. Name that we first compute the tagent to the shape function vector</p>
+\[
+\mathbf{r}_Q'(u) = \begin{bmatrix} u - \frac{1}{2}\\ -2u \\ u + \frac{1}{2}\end{bmatrix}.
+\]
+<p>Using this the Jacobian can be computed as</p>
+\[
+\text{Jacobi}_Q(u) = \left\|M^TN_Q'(u)\right\|_2
+\]
+<h2 id="surface_shape_functions"><a href="#surface_shape_functions">Surface shape functions</a></h2>
+<p>The idea behind the surface shape functions are the exact same as for the  curve shape functions. The only thing is that we now need to </p>
+<h3 id="linear"><a href="#linear">Linear</a></h3>
+<p>The linear surface shape functions can be described by</p>
+\[
+N_L(u,v) = 
+\begin{bmatrix} \frac{1}{4}\left(1-u\right)\left(1-v\right)\\
+                \frac{1}{4}\left(1+u\right)\left(1-v\right)\\
+                \frac{1}{4}\left(1+u\right)\left(1+v\right)\\
+                \frac{1}{4}\left(1-u\right)\left(1+v\right)
+\end{bmatrix}.
+\]
+<p>We can visually every element of the shape function by itself as</p>
+<p><img src="/assets/visualizations/3d_linear.png" alt="" /></p>
+<h3 id="quadratic"><a href="#quadratic">Quadratic</a></h3>
+<p>The quadratic shape functions can be described by</p>
+\[
+N_Q(u,v) = 
+\begin{bmatrix} \frac{1}{4}\left(1-u\right)\left(v-1\right)\left(u+v+1\right)\\
+                \frac{1}{4}\left(1+u\right)\left(v-1\right)\left(v-u+1\right)\\
+                \frac{1}{4}\left(1+u\right)\left(1+v\right)\left(u+v-1\right)\\
+                \frac{1}{4}\left(u-1\right)\left(1+v\right)\left(u-v+1\right)\\
+                \frac{1}{2}\left(1-v\right)\left(1-u^2\right)\\
+                \frac{1}{2}\left(1+u\right)\left(1-v^2\right)\\
+                \frac{1}{2}\left(1+v\right)\left(1-u^2\right)\\
+                \frac{1}{2}\left(1-u\right)\left(1-v^2\right)
+\end{bmatrix}.
+\]
+<p>Again we can visualize every element by itself.</p>
+<p><img src="/assets/visualizations/3d_quadratic.png" alt="" /></p>
+<div class="page-foot">
+  <div class="copyright">
+    &copy; Mikkel Paltorp. Last modified: December 11, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+  </div>
+</div>
+</div><!-- CONTENT ENDS HERE -->
+    
+        <script src="/libs/katex/katex.min.js"></script>
+<script src="/libs/katex/auto-render.min.js"></script>
+<script>renderMathInElement(document.body)</script>
+
+    
+    
+        <script src="/libs/highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();hljs.configure({tabReplace: '    '});</script>
+
+    
+  </body>
+</html>
