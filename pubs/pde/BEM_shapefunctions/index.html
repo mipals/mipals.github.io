@@ -28,30 +28,30 @@
 
 <!-- Content appended here -->
 <div class="franklin-content"><h1 id="shape_functions"><a href="#shape_functions">Shape Functions </a></h1>
-<p>In this note we look at shape functions as a means of interpolating between points in a given coordinatesystem. In general the interpolation will have the form</p>
+<p>In this note we look at shape functions as a means of interpolating between nodes in a given coordinatesystem. In general the interpolation will have the form</p>
 \[
 \mathbf{r}(\mathbf{\xi}) = M^TN(\mathbf{\xi}), \quad \xi \in [\mathbf{a},\mathbf{b}]
 \]
-<p>where \(M^T = \begin{bmatrix} \mathbf{m}_1 & \dots & \mathbf{m}_n\end{bmatrix}\) is a matrix containing the interpolation nodes, \(N(\mathbf{\xi})\) is a vector containing the shape functions and \(\mathbf{a},\mathbf{b}\in\mathbf{R}^m\) so that \([\mathbf{a},\mathbf{b}]\) described a rectilinear area in a \(m\)-dimensional space.</p>
-<p>The usefulness of shape functions comes from the fact that they can be used to approximate curves and surfaces so that approximations of curve- and surface integrals can be computed easily.</p>
+<p>where \(M^T = \begin{bmatrix} \mathbf{m}_1 & \dots & \mathbf{m}_n\end{bmatrix}\) is a matrix containing the interpolation nodes, \(N(\mathbf{\xi})\) is a vector containing the shape functions and \(\mathbf{a},\mathbf{b}\in\mathbf{R}^m\) so that \([\mathbf{a},\mathbf{b}]\) describes a box in a \(m\)-dimensional space.</p>
+<p>This note only shows shape functions for curves and surfaces. The usefulness of these shape functions comes from the fact that they can be used to approximate curves and surfaces so that approximations of curve- and surface integrals can be computed easily. The reason for this focus is that only curve and surface integrals are needed for the usage of the bounary element method in two- and three-dimensional space.</p>
 <h3 id="curve_integrals"><a href="#curve_integrals">Curve integrals</a></h3>
 <p>As the name suggest a curve integral is an integral over a specific curve</p>
 \[
-\int_{C_r} f\ \mathrm{d}\mu
+\int_{C_r} f\ \mathrm{d}\mu.
 \]
-<p>now if we can parametrize the curve \(C_r\)</p>
+<p>Now if we can parametrize the curve \(C_r\)</p>
 \[
-C_r = \left\{\mathbf{r}(u)\ |\ u\in[a,b]\right\}
+C_r = \left\{\mathbf{r}(u)\ |\ u\in[a,b]\right\},
 \]
-<p>then we can compute the ingral as</p>
+<p>then we can compute the integral as</p>
 \[
-\int_{C_r} f\ \mathrm{d}\mu = \int_a^bf(\mathbf{r}(u))\text{Jacobi}_{\mathbf{r}}(u)\ \mathrm{d}u
+\int_{C_r} f\ \mathrm{d}\mu = \int_a^bf(\mathbf{r}(u))\text{Jacobi}_{\mathbf{r}}(u)\ \mathrm{d}u.
 \]
 <p>where </p>
 \[
-\text{Jacobi}_{\mathbf{r}}(u) = \|\mathbf{r}'(u)\|_2.
+\text{Jacobi}_{\mathbf{r}}(u) = \|\mathbf{r}'(u)\|_2,
 \]
-<p>Informally we can view \(\text{Jacobi}_{\mathbf{r}}(u)\) as the total distortion of lengths from the \([a,b]\) space to the curve \(C_r\) caused by the parametrization \(\mathbf{r}(u)\).</p>
+<p>is called the Jacobian. Informally we can view \(\text{Jacobi}_{\mathbf{r}}(u)\) as the pointwise length distortion from the \([a,b]\) space to the curve \(C_r\) caused by the parametrization \(\mathbf{r}(u)\).</p>
 <h3 id="surface_integrals"><a href="#surface_integrals">Surface integrals</a></h3>
 <p>Similarily a surface integral is simply an integral over a surface </p>
 \[
@@ -63,29 +63,29 @@ S_r = \left\{ \mathbf{r}(u,v), \quad u\in[a,b], v\in[c,d]\right\},
 \]
 <p>then we can compute the surface integral as follows</p>
 \[
-\int_{S_r} f\ \mathrm{d}\mu = \int_{c}^d\int_a^bf(\mathbf{r}(u,v))\text{Jacobi}_{\mathbf{r}}(u,v)\ \mathrm{d}u\mathrm{d}v
+\int_{S_r} f\ \mathrm{d}\mu = \int_{c}^d\int_a^bf(\mathbf{r}(u,v))\text{Jacobi}_{\mathbf{r}}(u,v)\ \mathrm{d}u\mathrm{d}v.
 \]
-<p>where</p>
-\[
-\text{Jacobi}_{\mathbf{r}}(u) = \|\mathbf{r}_u'(u,v)\|_2\|\mathbf{r}_v(u,v)\|_2\sin(\theta(u,v))
+<p>Here the Jacobian is computed as</p>
+<a id="eqsurfjac" class="anchor"></a>\[
+\text{Jacobi}_{\mathbf{r}}(u) = \|\mathbf{r}_u'(u,v)\|_2\|\mathbf{r}_v(u,v)\|_2\sin(\theta(u,v)).
 \]
-<p>In parallel to the curve integrals we can view \(\text{Jacobi}_{\mathbf{r}}(u,v)\) as the total distortion of area from the \([a,b]\times [c,d]\) space to the surface \(S_r\) caused by the parametrization \(\mathbf{r}(u,v)\).</p>
+<p>In parallel to the curve integrals we can view \(\text{Jacobi}_{\mathbf{r}}(u,v)\) as the pointwise area distortion from the \([a,b]\times [c,d]\) space to the surface \(S_r\) caused by the parametrization \(\mathbf{r}(u,v)\). </p>
 <h3 id="approximations"><a href="#approximations">Approximations</a></h3>
-<p>We now briefly show how to approximate a curve integral. The first step is the split the integral into smaller subintegrals</p>
+<p>We now briefly show how to approximate a curve integral using shape functions. The first step is the split the integral into smaller subintegrals</p>
 <a id="eqapprox" class="anchor"></a>\[
 \int_{C_r} f\ \mathrm{d}\mu = \sum_{i=1}^k\int_{\Delta C_i}f\ \mathrm{d}\mu.
 \]
 <p>Now each of the subintegrals can be computed using suitable parametrizations.</p>
 \[
-\int_{\Delta C_i}f\ \mathrm{d}\mu = \int_a^bf(\mathbf{r}_i(u))\text{Jacobi}_{\mathbf{r}}(u)\ \mathrm{d}u.
+\int_{\Delta C_i}f\ \mathrm{d}\mu = \int_{a_i}^{b_i}f(\mathbf{r}_i(u))\text{Jacobi}_{\mathbf{r}}(u)\ \mathrm{d}u.
 \]
 <p>The idea is now the use a shape-function for the </p>
 \[
-\int_{\Delta C_i}f\ \mathrm{d}\mu \approx \int_a^bf(M_i^TN(u))\|M_i^TN'(u)\|_2\ \mathrm{d}u.
+\int_{\Delta C_i}f\ \mathrm{d}\mu \approx \int_{a_i}^{b_i}f(M_i^TN(u))\|M_i^TN'(u)\|_2\ \mathrm{d}u.
 \]
-<p>The integral can still, in general, be hard to compute. However it can in most cases be well approximated by using a quadrature. As such the integral becomes</p>
+<p>The integral can still, in general, be hard to compute. However in most cases it can be well approximated by a quadrature scheme. As such the integral becomes</p>
 \[
-\int_a^bf(M_i^TN(u))\|M_i^TN'(u)\|_2\ \mathrm{d}u \approx \sum_{j=1}^{l} w_jf(M_i^TN(u_j))\|M_i^TN'(u_j)\|_2.
+\int_{a_i}^{b_i}f(M_i^TN(u))\|M_i^TN'(u)\|_2\ \mathrm{d}u \approx \sum_{j=1}^{l} w_jf(M_i^TN(u_j))\|M_i^TN'(u_j)\|_2.
 \]
 <p>Substituting this back into <span class="eqref">(<a href="#eqapprox">10</a>)</span> we find the curve integral can be approximated as</p>
 \[
@@ -106,22 +106,22 @@ N_L(u) = \begin{bmatrix} 1 - u\\ u\end{bmatrix},\quad u \in [0,1]
 \]
 <p>Visually this parametrization can be seen as</p>
 <p><img src="/assets/visualizations/2d_linear_interp.png" alt="" /></p>
-<p>Now the Jacobian can we found by first calculating \(N_L'(u)\)</p>
+<p>Now the Jacobian can we found by first computing \(N_L'(u)\)</p>
 \[
 N_L'(u) = \begin{bmatrix} -1\\ 1\end{bmatrix},\quad u \in [0,1].
 \]
 <p>Now we have that</p>
 \[
-\text{Jacobi}_L(u) = \left\| M^TN_L'(u)\right\|_2 = \|\mathbf{y}_2 - \mathbf{y}_1\|_2
+\text{Jacobi}_L(u) = \left\| M^TN_L'(u)\right\|_2 = \|\mathbf{m}_2 - \mathbf{m}_1\|_2
 \]
 <h4 id="quadratic_elements"><a href="#quadratic_elements">Quadratic elements</a></h4>
-<p>The next simplest shape function is the quadratic elements defined by</p>
+<p>Another simple shape function is the quadratic elements defined by</p>
 \[
 N_Q(u) = \begin{bmatrix} \frac{1}{2}u (u - 1)\\ 
                                    (1-u)(1+u)\\ 
                          \frac{1}{2}u (u + 1)\end{bmatrix}, \quad u\in[-1,1].
 \]
-<p>Visually we can view each element as a seperate function begin equal to \(1\) when the other are \(0\)</p>
+<p>Again we can view each element of \(N_Q(u)\) as a seperate function that is equal to \(1\) when the others are \(0\)</p>
 <p><img src="/assets/visualizations/2d_quadratic.png" alt="" /></p>
 <p>Using the quadratic shape functions we can interpolate between \(\mathbf{m}_1\), \(\mathbf{m}_2\) and \(\mathbf{m}_3\) using a quadratic as</p>
 \[
@@ -129,11 +129,11 @@ N_Q(u) = \begin{bmatrix} \frac{1}{2}u (u - 1)\\
 \]
 <p>Visually this interpolation can be seen as</p>
 <p><img src="/assets/visualizations/2d_quadratic_interp.png" alt="" /></p>
-<p>Now the Jacobian can be computed similarily to the linear shape functions. Name that we first compute the tagent to the shape function vector</p>
+<p>Now the Jacobian can be computed similarily to the linear shape functions. Namely that we first compute the tagent to the shape function vector</p>
 \[
-\mathbf{r}_Q'(u) = \begin{bmatrix} u - \frac{1}{2}\\ -2u \\ u + \frac{1}{2}\end{bmatrix}.
+\mathbf{r}_Q'(u) = \begin{bmatrix} u - \frac{1}{2}\\ -2u \\ u + \frac{1}{2}\end{bmatrix},
 \]
-<p>Using this the Jacobian can be computed as</p>
+<p>from which we can compute the Jacobian as</p>
 \[
 \text{Jacobi}_Q(u) = \left\|M^TN_Q'(u)\right\|_2
 \]
