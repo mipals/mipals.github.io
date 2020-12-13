@@ -30,7 +30,10 @@
 <div class="franklin-content"><h1 id="the_boundary_element_method"><a href="#the_boundary_element_method">The Boundary Element Method</a></h1>
 <p>In this note we briefly explain how to discretize the following integral equation</p>
 \[
-c(x)\phi(x) = \int_S \left[G(x,y)q(y) - F(x,y)\phi(y)\right]\ \mathrm{d}S
+c(x)\phi(x) = \int_S \left[G(x,y)q(y) - F(x,y)\phi(y)\right]\ \mathrm{d}\mu
+\]
+\[
+c(x)\phi(x) + \int_{S} F(x,y)\phi(y)\ \mathrm{d}\mu= \int_{S}G(x,y)q(y)\ \mathrm{d}\mu
 \]
 <h2 id="discretization"><a href="#discretization">Discretization</a></h2>
 <p>One can think of the domain boundary and discretization as &#40;<em>Photo from <sup id="fnref:1"><a href="#fndef:1" class="fnref">[1]</a></sup></em>&#41; <img src="/assets/visualizations/2d_domain.png" alt="" /><br/> If we assume that the function is constant on each element we get the following</p>

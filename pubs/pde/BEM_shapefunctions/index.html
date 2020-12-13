@@ -73,24 +73,25 @@ S_r = \left\{ \mathbf{r}(u,v), \quad u\in[a,b], v\in[c,d]\right\},
 <h3 id="approximations"><a href="#approximations">Approximations</a></h3>
 <p>We now briefly show how to approximate a curve integral using shape functions. The first step is the split the integral into smaller subintegrals</p>
 <a id="eqapprox" class="anchor"></a>\[
-\int_{C_r} f\ \mathrm{d}\mu = \sum_{i=1}^k\int_{\Delta C_i}f\ \mathrm{d}\mu.
+\int_{C_r} f\ \mathrm{d}\mu = \sum_{j=1}^m\int_{\Delta C_j}f\ \mathrm{d}\mu.
 \]
 <p>Now each of the subintegrals can be computed using suitable parametrizations.</p>
 \[
-\int_{\Delta C_i}f\ \mathrm{d}\mu = \int_{a_i}^{b_i}f(\mathbf{r}_i(u))\text{Jacobi}_{\mathbf{r}}(u)\ \mathrm{d}u.
+\int_{\Delta C_j}f\ \mathrm{d}\mu = \int_{a_j}^{b_j}f(\mathbf{r}_j(u))\text{Jacobi}_{\mathbf{r}}(u)\ \mathrm{d}u.
 \]
 <p>The idea is now the use a shape-function for the </p>
 \[
-\int_{\Delta C_i}f\ \mathrm{d}\mu \approx \int_{a_i}^{b_i}f(M_i^TN(u))\|M_i^TN'(u)\|_2\ \mathrm{d}u.
+\int_{\Delta C_j}f\ \mathrm{d}\mu \approx \int_{a_j}^{b_j}f(M_j^TN(u))\|M_j^TN'(u)\|_2\ \mathrm{d}u.
 \]
-<p>The integral can still, in general, be hard to compute. However in most cases it can be well approximated by a quadrature scheme. As such the integral becomes</p>
+<p>The integral can still, in general, be hard to compute. However in most cases it can be well approximated by a quadrature scheme. Below the number of quadrature points is \(l\) &#40;in practice \(l\approx 4\) should give a good estimate&#41;. As such the integral becomes</p>
 \[
-\int_{a_i}^{b_i}f(M_i^TN(u))\|M_i^TN'(u)\|_2\ \mathrm{d}u \approx \sum_{j=1}^{l} w_jf(M_i^TN(u_j))\|M_i^TN'(u_j)\|_2.
+\int_{a_j}^{b_j}f(M_j^TN(u))\|M_j^TN'(u)\|_2\ \mathrm{d}u \approx \sum_{k=1}^{l} w_kf(M_j^TN(u_k))\|M_j^TN'(u_k)\|_2.
 \]
 <p>Substituting this back into <span class="eqref">(<a href="#eqapprox">10</a>)</span> we find the curve integral can be approximated as</p>
 \[
-\int_{C_r} f\ \mathrm{d}\mu \approx \sum_{i=1}^k\sum_{j=1}^{l} w_jf(M_i^TN(u_j))\|M_i^TN'(u_j)\|_2.
+\int_{C_r} f\ \mathrm{d}\mu \approx \sum_{j=1}^m\sum_{k=1}^{l} w_kf(M_j^TN(u_k))\|M_j^TN'(u_k)\|_2.
 \]
+<p>Approximations of surface integrals follow the exact same procedure. However since the surface shape functions requires a two dimensional input the quadrature step requires a double sum resulting in \(l^2\) quadrature points.</p>
 <h2 id="curve_shape_functions"><a href="#curve_shape_functions">Curve shape functions</a></h2>
 <p>We briefly show some shape functions for curve integrals.</p>
 <h3 id="linear_elements"><a href="#linear_elements">Linear elements</a></h3>
@@ -169,7 +170,7 @@ N_Q(u,v) =
 <p><img src="/assets/visualizations/3d_quadratic.png" alt="" /></p>
 <div class="page-foot">
   <div class="copyright">
-    &copy; Mikkel Paltorp. Last modified: December 11, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Mikkel Paltorp. Last modified: December 12, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->

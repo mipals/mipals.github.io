@@ -28,8 +28,8 @@
 
 <!-- Content appended here -->
 <div class="franklin-content"><h1 id="the_eckart-young-mirsky_theorem"><a href="#the_eckart-young-mirsky_theorem">The Eckart-Young-Mirsky Theorem</a></h1>
-<p>The result of the <em>Eckart-Young-Mirsky Theorem</em> is easily stated: It simple tells us that the solution problem of finding the best rank-\(k\) approximation to a certain \(n\times n\) matrix, w.r.t to the spectral or Frobenius norm, is the truncated SVD.</p>
-<p>As a start we note that the problem of finding the best rank-\(k\) approximation of a \(n\times n\)-matrixw.r.t to a certain norm \(\|\cdot \|\) can be viewed as the solution to the following minimization problem</p>
+<p>The result of the <em>Eckart-Young-Mirsky Theorem</em> is easily stated: It simple tells us that the solution problem of finding the best rank-\(k\) approximation to a  certain \(n\times n\) matrix, w.r.t to the spectral or Frobenius norm, is the truncated SVD with \(k\)-terms.</p>
+<p>As a start we note that the problem of finding the best rank-\(k\) approximation of the \(n\times n\)-matrix \(A\) w.r.t to a certain norm \(\|\cdot \|\) can be viewed as the solution to the following minimization problem</p>
 \[
 \underset{B\in\mathbb{R}^{n\times n}}{\text{minimize}} \|A - B\|, \quad \text{subject to}\quad \text{rank}(B) = k.
 \]
@@ -37,7 +37,7 @@
 \[
 \underset{X,Y \in \mathbb{R}^{n\times k}}{\text{minimize}} \|A - XY^T\|.
 \]
-<p><strong>Note</strong> that a solution \((X,Y)\) to the above minimization problem will not be unique: If \((X,Y)\) is a solution then for any invertible \(R\in\mathbf{R}^{k\times k}\) also \((XR,R^{-1}Y)\) is a solution.</p>
+<p><strong>Note</strong> that a solution \((X,Y)\) to the above minimization problem will not be unique: If \((X,Y)\) is a solution then for any invertible \(R\in\mathbf{R}^{k\times k}\) also \((XR,YR^{-T})\) is a solution.</p>
 <h2 id="for_the_spectral_norm"><a href="#for_the_spectral_norm">For The Spectral Norm</a></h2>
 <p><div class="definition"><p>Suppose that \(A = U\Sigma V^T\) is the singular value decomposition of \(A\). Then the best rank-\(k\) approximation of the matrix \(A\) w.r.t the spectral norm, \(\|\cdot\|_2\), is given by</p>
 <a id="eqak" class="anchor"></a>\[
@@ -77,7 +77,7 @@ A_k = \sum_{i=1}^k\sigma_iu_iv_i^T.
 <p>From this we can conclude that the best rank-\(k\) approximation w.r.t the Frobenius norm is the truncated SVD.</p>
 <div class="page-foot">
   <div class="copyright">
-    &copy; Mikkel Paltorp. Last modified: November 25, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Mikkel Paltorp. Last modified: December 13, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->
