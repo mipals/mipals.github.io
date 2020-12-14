@@ -9,7 +9,7 @@
 </url>
 <url>
     <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/matrix/smw_id/index.html</loc>
-    <lastmod>2020-11-25</lastmod>
+    <lastmod>2020-12-14</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
@@ -21,7 +21,7 @@
 </url>
 <url>
     <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/matrix/eckart_young_mirsky/index.html</loc>
-    <lastmod>2020-11-25</lastmod>
+    <lastmod>2020-12-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
@@ -63,7 +63,7 @@
 </url>
 <url>
     <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/pde/BEM/index.html</loc>
-    <lastmod>2020-12-11</lastmod>
+    <lastmod>2020-12-14</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
@@ -99,19 +99,13 @@
 </url>
 <url>
     <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/optimization/BFGS/index.html</loc>
-    <lastmod>2020-11-30</lastmod>
+    <lastmod>2020-12-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
     <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/pde/BEM_shapefunctions/index.html</loc>
-    <lastmod>2020-12-11</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-</url>
-<url>
-    <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/pde/the_wave_equation/index.html</loc>
-    <lastmod>2020-11-20</lastmod>
+    <lastmod>2020-12-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
@@ -124,6 +118,12 @@
 <url>
     <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/pde/integral_equations/index.html</loc>
     <lastmod>2020-11-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+<url>
+    <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/pde/helmholtz_equation/index.html</loc>
+    <lastmod>2020-12-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
@@ -147,7 +147,7 @@
 </url>
 <url>
     <loc>https://tlienart.github.io/FranklinTemplates.jl/menu1/index.html</loc>
-    <lastmod>2020-12-11</lastmod>
+    <lastmod>2020-12-14</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>

@@ -32,7 +32,7 @@
 \[
 \mathbf{r}(\mathbf{\xi}) = M^TN(\mathbf{\xi}), \quad \xi \in [\mathbf{a},\mathbf{b}]
 \]
-<p>where \(M^T = \begin{bmatrix} \mathbf{m}_1 & \dots & \mathbf{m}_n\end{bmatrix}\) is a matrix containing the interpolation nodes, \(N(\mathbf{\xi})\) is a vector containing the shape functions and \(\mathbf{a},\mathbf{b}\in\mathbf{R}^m\) so that \([\mathbf{a},\mathbf{b}]\) describes a box in a \(m\)-dimensional space.</p>
+<p>where \(M^T = \begin{bmatrix} \mathbf{m}_1 & \dots & \mathbf{m}_n\end{bmatrix}\) is a matrix containing the interpolation nodes &#40;\(\mathbf{m}_i\)&#41;, \(N(\mathbf{\xi})\) is a vector containing the shape functions and \(\mathbf{a},\mathbf{b}\in\mathbf{R}^m\) so that \([\mathbf{a},\mathbf{b}]\) describes a hyperretangular domain in a \(m\)-dimensional space. We will in this note only consider the cases of curves &#40;\(m=1\)&#41; and surfaces &#40;\(m=2\)&#41;.</p>
 <p>This note only shows shape functions for curves and surfaces. The usefulness of these shape functions comes from the fact that they can be used to approximate curves and surfaces so that approximations of curve- and surface integrals can be computed easily. The reason for this focus is that only curve and surface integrals are needed for the usage of the bounary element method in two- and three-dimensional space.</p>
 <h3 id="curve_integrals"><a href="#curve_integrals">Curve integrals</a></h3>
 <p>As the name suggest a curve integral is an integral over a specific curve</p>
@@ -170,7 +170,7 @@ N_Q(u,v) =
 <p><img src="/assets/visualizations/3d_quadratic.png" alt="" /></p>
 <div class="page-foot">
   <div class="copyright">
-    &copy; Mikkel Paltorp. Last modified: December 12, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Mikkel Paltorp. Last modified: December 13, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->
