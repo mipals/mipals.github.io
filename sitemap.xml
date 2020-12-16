@@ -9,7 +9,7 @@
 </url>
 <url>
     <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/matrix/smw_id/index.html</loc>
-    <lastmod>2020-12-14</lastmod>
+    <lastmod>2020-12-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
@@ -87,7 +87,7 @@
 </url>
 <url>
     <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/matrix/ACA/index.html</loc>
-    <lastmod>2020-12-03</lastmod>
+    <lastmod>2020-12-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
@@ -105,7 +105,7 @@
 </url>
 <url>
     <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/pde/BEM_shapefunctions/index.html</loc>
-    <lastmod>2020-12-13</lastmod>
+    <lastmod>2020-12-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
@@ -129,7 +129,7 @@
 </url>
 <url>
     <loc>https://tlienart.github.io/FranklinTemplates.jl/index.html</loc>
-    <lastmod>2020-11-19</lastmod>
+    <lastmod>2020-12-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>

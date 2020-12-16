@@ -28,17 +28,15 @@
 
 <!-- Content appended here -->
 <div class="franklin-content"><h1 id="adaptive_cross_approximation_aca"><a href="#adaptive_cross_approximation_aca">Adaptive Cross Approximation &#40;ACA&#41;</a></h1>
-<p>In the computational scienes low rank approximations play a key role. It is well known that the best rank-\(k\) approximation in terms of either the spectral norm of the Frobenius norm is the truncated Singular Value Decomposition &#40;<a href="https://en.wikipedia.org/wiki/Low-rank_approximation#Proof_of_Eckart&#37;E2&#37;80&#37;93Young&#37;E2&#37;80&#37;93Mirsky_theorem_&#40;for_spectral_norm&#41;">Eckart-Young-Mirsky Theorem</a>&#41;. However the SVD is expensive to compute, as such it is of interest to find another ways of finding a good low rank approximation.<br/></p>
-<p>The simplest of these is the Adaptive Cross Approximation &#40;ACA&#41; which simple choses a set of row and column indexes and forms a low rank approximation that perfectly interpolates the chosen rows and columns. A visulization can be seen below</p>
+<p>In the computational scienes low rank approximations play a key role. It is well known that the best rank-\(k\) approximation in terms of either the spectral norm or the Frobenius norm is the truncated Singular Value Decomposition &#40;<a href="https://en.wikipedia.org/wiki/Low-rank_approximation#Proof_of_Eckart&#37;E2&#37;80&#37;93Young&#37;E2&#37;80&#37;93Mirsky_theorem_&#40;for_spectral_norm&#41;">Eckart-Young-Mirsky Theorem</a>&#41;. However the SVD is expensive to compute, as such it is of interest to establish other ways of computing good low rank approximations.<br/></p>
+<p>The simplest these computational methods is the Adaptive Cross Approximation &#40;ACA&#41; which in simple terms is based on exact interpolation of \(k\) rows and columns.  In the following visualization we choose rows \(r=\{2,4,7\}\) and columns \(c=\{1,3,6\}\) </p>
 <p><img src="/assets/visualizations/aca.png" alt="" />  </p>
 <p><em>This picture is taken from <sup id="fnref:1"><a href="#fndef:1" class="fnref">[1]</a></sup>. A very solid introduction to Hiearchical Low-Rank Structures.</em></p>
 <div class="definition"><p><strong>Adaptive Cross Approximation:</strong> </p>
 \[
-
  G \approx G(:,c)(G(r,c))^{-1}G(r,:),
-
 \]</div>
-<p>That the above expression perfectly interpolates the of rows &#40;\(r\)&#41; and columns &#40;\(c\)&#41; of G be seen by looking at the following matrix</p>
+<p>That the above expression perfectly interpolates the rows &#40;\(r\)&#41; and columns &#40;\(c\)&#41; of G be seen by looking at the following matrix</p>
 \[
     G = \begin{bmatrix} \overline{G} & \overline{G}(:,c)\\ \overline{G}(r,:) & G(r,c)\end{bmatrix}
 \]
@@ -54,7 +52,7 @@
 \end{aligned}\]
 <p>from which the perfect interpolations of rows \(r\) and columns \(c\) and can be seen.</p>
 <h2 id="how_do_we_choose_the_index_sets"><a href="#how_do_we_choose_the_index_sets">How do we choose the index sets?</a></h2>
-<p>While the ACA approach is easily explained we still need a way to pick the best rows and columns. Because we want to be able to use the ACA on matrices of sizes where the SVD is not feasible we want a heuristic approach that scales close \(O(n)\).</p>
+<p>While the ACA approach is easily explained we still need a way to pick the best rows and columns. Because we want to be able to use the ACA on matrices of sizes where the SVD is not feasible we want a heuristic approach that scales close to \(O(n)\).</p>
 <p>Stopping criterion</p>
 \[
 \|R_k\|_F \leq \epsilon \|A\|_F
@@ -77,7 +75,7 @@
 
 <div class="page-foot">
   <div class="copyright">
-    &copy; Mikkel Paltorp. Last modified: December 03, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Mikkel Paltorp. Last modified: December 16, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->

@@ -91,22 +91,22 @@ S_r = \left\{ \mathbf{r}(u,v), \quad u\in[a,b], v\in[c,d]\right\},
 \[
 \int_{C_r} f\ \mathrm{d}\mu \approx \sum_{j=1}^m\sum_{k=1}^{l} w_kf(M_j^TN(u_k))\|M_j^TN'(u_k)\|_2.
 \]
-<p>Approximations of surface integrals follow the exact same procedure. However since the surface shape functions requires a two dimensional input the quadrature step requires a double sum resulting in \(l^2\) quadrature points.</p>
+<p>Approximations of surface integrals follow the exact same procedure. However since the surface shape functions requires a two dimensional input the quadrature step requires a double sum resulting in \(l^2\) quadrature points. This is straight forward for the so-called quadrilateral surface shape functions but for triangular surface shape functions a trick needs to be performed.</p>
 <h2 id="curve_shape_functions"><a href="#curve_shape_functions">Curve shape functions</a></h2>
-<p>We briefly show some shape functions for curve integrals.</p>
+<p>We now introduce two types of shape functions for curve integrals. </p>
 <h3 id="linear_elements"><a href="#linear_elements">Linear elements</a></h3>
-<p>The simplest shape function is the linear shape function.</p>
+<p>The simplest shape function for curve integrals are the linear shape function.</p>
 \[
 N_L(u) = \begin{bmatrix} 1 - u\\ u\end{bmatrix},\quad u \in [0,1]
 \]
 <p>Visually we can view the elements of \(N_L(u)\) as function that are \(1\) when the other is \(0\).</p>
-<p><img src="/assets/visualizations/2d_linear.png" alt="" /></p>
+<p><img src="/assets/visualizations/shapefunctions/2d_linear.png" alt="" /></p>
 <p>Using this shape function we can interpolate linearly between \(\mathbf{m}_1\) and \(\mathbf{m}_2\) using the parametrization</p>
 \[
 \mathbf{r}_L(u) = M^TN_L(u),
 \]
 <p>Visually this parametrization can be seen as</p>
-<p><img src="/assets/visualizations/2d_linear_interp.png" alt="" /></p>
+<p><img src="/assets/visualizations/shapefunctions/2d_linear_interp.png" alt="" /></p>
 <p>Now the Jacobian can we found by first computing \(N_L'(u)\)</p>
 \[
 N_L'(u) = \begin{bmatrix} -1\\ 1\end{bmatrix},\quad u \in [0,1].
@@ -123,13 +123,13 @@ N_Q(u) = \begin{bmatrix} \frac{1}{2}u (u - 1)\\
                          \frac{1}{2}u (u + 1)\end{bmatrix}, \quad u\in[-1,1].
 \]
 <p>Again we can view each element of \(N_Q(u)\) as a seperate function that is equal to \(1\) when the others are \(0\)</p>
-<p><img src="/assets/visualizations/2d_quadratic.png" alt="" /></p>
+<p><img src="/assets/visualizations/shapefunctions/2d_quadratic.png" alt="" /></p>
 <p>Using the quadratic shape functions we can interpolate between \(\mathbf{m}_1\), \(\mathbf{m}_2\) and \(\mathbf{m}_3\) using a quadratic as</p>
 \[
 \mathbf{r}_Q(u) = M^TN_Q(u).
 \]
 <p>Visually this interpolation can be seen as</p>
-<p><img src="/assets/visualizations/2d_quadratic_interp.png" alt="" /></p>
+<p><img src="/assets/visualizations/shapefunctions/2d_quadratic_interp.png" alt="" /></p>
 <p>Now the Jacobian can be computed similarily to the linear shape functions. Namely that we first compute the tagent to the shape function vector</p>
 \[
 \mathbf{r}_Q'(u) = \begin{bmatrix} u - \frac{1}{2}\\ -2u \\ u + \frac{1}{2}\end{bmatrix},
@@ -138,9 +138,11 @@ N_Q(u) = \begin{bmatrix} \frac{1}{2}u (u - 1)\\
 \[
 \text{Jacobi}_Q(u) = \left\|M^TN_Q'(u)\right\|_2
 \]
-<h2 id="surface_shape_functions"><a href="#surface_shape_functions">Surface shape functions</a></h2>
-<p>The idea behind the surface shape functions are the exact same as for the  curve shape functions. The only thing is that we now need to </p>
-<h3 id="linear"><a href="#linear">Linear</a></h3>
+<h2 id="surface_shape_functions"><a href="#surface_shape_functions">Surface Shape Functions</a></h2>
+<p>The idea behind the surface shape functions are the exact same as for the  curve shape functions. The only thing is that our parameterization now have  a two-dimensional input.</p>
+<h3 id="quadrilateral_shape_functions"><a href="#quadrilateral_shape_functions">Quadrilateral Shape Functions </a></h3>
+<p>We start by introducing the quadrilateral surface shape functions.  The main reason to use this specific kind of shape function is because that they are easy to integrate, as they are defined on a rectangular domain.  However the downside of the quadrilateral surface shape functions is that it is  hard to efficiently create the underlying mesh.</p>
+<h4 id="linear"><a href="#linear">Linear</a></h4>
 <p>The linear surface shape functions can be described by</p>
 \[
 N_L(u,v) = 
@@ -148,11 +150,11 @@ N_L(u,v) =
                 \frac{1}{4}\left(1+u\right)\left(1-v\right)\\
                 \frac{1}{4}\left(1+u\right)\left(1+v\right)\\
                 \frac{1}{4}\left(1-u\right)\left(1+v\right)
-\end{bmatrix}.
+\end{bmatrix}, \quad u,v\in[-1,1].
 \]
 <p>We can visually every element of the shape function by itself as</p>
-<p><img src="/assets/visualizations/3d_linear.png" alt="" /></p>
-<h3 id="quadratic"><a href="#quadratic">Quadratic</a></h3>
+<p><img src="/assets/visualizations/shapefunctions/3d_linear.png" alt="" /></p>
+<h4 id="quadratic"><a href="#quadratic">Quadratic</a></h4>
 <p>The quadratic shape functions can be described by</p>
 \[
 N_Q(u,v) = 
@@ -164,13 +166,29 @@ N_Q(u,v) =
                 \frac{1}{2}\left(1+u\right)\left(1-v^2\right)\\
                 \frac{1}{2}\left(1+v\right)\left(1-u^2\right)\\
                 \frac{1}{2}\left(1-u\right)\left(1-v^2\right)
-\end{bmatrix}.
+\end{bmatrix}, \quad u,v\in[-1,1].
 \]
 <p>Again we can visualize every element by itself.</p>
-<p><img src="/assets/visualizations/3d_quadratic.png" alt="" /></p>
+<p><img src="/assets/visualizations/shapefunctions/3d_quadratic.png" alt="" /></p>
+<h3 id="triangular_shape_functions"><a href="#triangular_shape_functions">Triangular Shape Functions</a></h3>
+<p>We now briefly introduce triangular surface shape functions. In constrast to the quadrilateral surface shape functions there exist many efficient ways of computing these types of meshes. However the integration of these shape functions requires an extra step, since they  are defined on a triangular domain instead of the usual rectangular domain.</p>
+<h4 id="linear__2"><a href="#linear__2">Linear</a></h4>
+<p>The linear triangular surface shape functions are defined as follows</p>
+\[
+N_L(u,v) = \begin{bmatrix}u\\v\\1-u-v\end{bmatrix}, \quad u\in[0,1],v\in[0,1-u].
+\]
+<p>Visually we can see them as. <img src="/assets/visualizations/shapefunctions/triangularLinear45.png" alt="" /></p>
+<h4 id="quadratic__2"><a href="#quadratic__2">Quadratic</a></h4>
+<p>Now the quadratic triangular shape functions are defined as follows</p>
+\[
+N_Q(u,v) = \begin{bmatrix}(1-u-v)(1-2u-2v)\\u(2u-1)\\v(2v-1)\\4u(1-u-v)\\4uv\\4v(1-u-v)\end{bmatrix},
+\quad u\in[0,1],v\in[0,1-u].
+\]
+<p>Plotting every element for itself we see that <img src="/assets/visualizations/shapefunctions/triangularQuadratic.png" alt="" /></p>
+<h4 id="quadrature_on_triangular_shape_functions"><a href="#quadrature_on_triangular_shape_functions">Quadrature On Triangular Shape Functions</a></h4>
 <div class="page-foot">
   <div class="copyright">
-    &copy; Mikkel Paltorp. Last modified: December 13, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Mikkel Paltorp. Last modified: December 16, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->
