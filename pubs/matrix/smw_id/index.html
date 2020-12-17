@@ -85,8 +85,8 @@ Woodbury_struct &#61; Woodbury&#40;A, U, C, V&#39;&#41;;
 Woodbury_dense &#61; A &#43; U*C*V&#39;;
 @time Woodbury_struct\ones&#40;n&#41;;
 @time Woodbury_dense\ones&#40;n&#41;;</code></pre>
-<pre><code class="plaintext">  1.205501 seconds (613.63 k allocations: 222.220 MiB, 2.06% gc time)
-  1.113645 seconds (392.29 k allocations: 210.473 MiB, 1.86% gc time)
+<pre><code class="plaintext">  1.435378 seconds (613.63 k allocations: 222.221 MiB, 2.04% gc time)
+  1.315805 seconds (392.29 k allocations: 210.478 MiB, 1.67% gc time)
 </code></pre>
 <p>As expected we do not get a speed up as the inversion of the Sherman-Morrison-Woodbury matrix also requires us to invert a \(n\times n\) matrix. Thankfully the package supports a factorization of \(A\) instead of \(A\) directly. Using this a clear speed-up can be seen. Off course it is not a completely fair comparison as we have not included the time it takes to actually factorize \(A\).</p>
 <pre><code class="language-julia">n &#61; 5000;
@@ -99,8 +99,8 @@ Woodbury_struct &#61; Woodbury&#40;lu&#40;A&#41;, U, C, V&#39;&#41;;
 Woodbury_dense &#61; A &#43; U*C*V&#39;;
 @time Woodbury_struct\ones&#40;n&#41;;
 @time Woodbury_dense\ones&#40;n&#41;;</code></pre>
-<pre><code class="plaintext">  0.051955 seconds (39.03 k allocations: 2.178 MiB)
-  0.972137 seconds (8 allocations: 190.850 MiB)
+<pre><code class="plaintext">  0.051735 seconds (39.03 k allocations: 2.178 MiB)
+  1.004868 seconds (8 allocations: 190.850 MiB)
 </code></pre>
 <h2 id="a_useful_consequence"><a href="#a_useful_consequence">A Useful Consequence</a></h2>
 <p><em>This section is <strong>very</strong> noty and was mostly written because <span class="eqref">(<a href="#eqvariant">8</a>)</span> was stated in some papers with only a reference to the Sherman-Morrison-Woodbury identity.</em><br/></p>

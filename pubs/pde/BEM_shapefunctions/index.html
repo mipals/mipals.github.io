@@ -30,9 +30,9 @@
 <div class="franklin-content"><h1 id="shape_functions"><a href="#shape_functions">Shape Functions </a></h1>
 <p>In this note we look at shape functions as a means of interpolating between nodes in a given coordinatesystem. In general the interpolation will have the form</p>
 \[
-\mathbf{r}(\mathbf{\xi}) = M^TN(\mathbf{\xi}), \quad \xi \in [\mathbf{a},\mathbf{b}]
+\mathbf{r}(\mathbf{\xi}) = \mathbf{M}^T\mathbf{N}(\mathbf{\xi}), \quad \xi \in [\mathbf{a},\mathbf{b}]
 \]
-<p>where \(M^T = \begin{bmatrix} \mathbf{m}_1 & \dots & \mathbf{m}_n\end{bmatrix}\) is a matrix containing the interpolation nodes &#40;\(\mathbf{m}_i\)&#41;, \(N(\mathbf{\xi})\) is a vector containing the shape functions and \(\mathbf{a},\mathbf{b}\in\mathbf{R}^m\) so that \([\mathbf{a},\mathbf{b}]\) describes a hyperretangular domain in a \(m\)-dimensional space. We will in this note only consider the cases of curves &#40;\(m=1\)&#41; and surfaces &#40;\(m=2\)&#41;.</p>
+<p>where \(\mathbf{M}^T = \begin{bmatrix} \mathbf{m}_1 & \dots & \mathbf{m}_n\end{bmatrix}\) is a matrix containing the interpolation nodes &#40;\(\mathbf{m}_i\)&#41;, \(\mathbf{N}(\mathbf{\xi})\) is a vector containing the shape functions and \(\mathbf{a},\mathbf{b}\in\mathbf{R}^m\) so that \([\mathbf{a},\mathbf{b}]\) describes a hyperretangular domain in a \(m\)-dimensional space. We will in this note only consider the cases of curves &#40;\(m=1\)&#41; and surfaces &#40;\(m=2\)&#41;.</p>
 <p>This note only shows shape functions for curves and surfaces. The usefulness of these shape functions comes from the fact that they can be used to approximate curves and surfaces so that approximations of curve- and surface integrals can be computed easily. The reason for this focus is that only curve and surface integrals are needed for the usage of the bounary element method in two- and three-dimensional space.</p>
 <h3 id="curve_integrals"><a href="#curve_integrals">Curve integrals</a></h3>
 <p>As the name suggest a curve integral is an integral over a specific curve</p>
@@ -67,7 +67,7 @@ S_r = \left\{ \mathbf{r}(u,v), \quad u\in[a,b], v\in[c,d]\right\},
 \]
 <p>Here the Jacobian is computed as</p>
 <a id="eqsurfjac" class="anchor"></a>\[
-\text{Jacobi}_{\mathbf{r}}(u) = \|\mathbf{r}_u'(u,v)\|_2\|\mathbf{r}_v(u,v)\|_2\sin(\theta(u,v)).
+\text{Jacobi}_{\mathbf{r}}(u) = \|\mathbf{r}_u'(u,v)\|_2\|\mathbf{r}_v(u,v)\|_2\sin(\mathbf{N}(\theta(u,v)).
 \]
 <p>In parallel to the curve integrals we can view \(\text{Jacobi}_{\mathbf{r}}(u,v)\) as the pointwise area distortion from the \([a,b]\times [c,d]\) space to the surface \(S_r\) caused by the parametrization \(\mathbf{r}(u,v)\). </p>
 <h3 id="approximations"><a href="#approximations">Approximations</a></h3>
@@ -81,52 +81,79 @@ S_r = \left\{ \mathbf{r}(u,v), \quad u\in[a,b], v\in[c,d]\right\},
 \]
 <p>The idea is now the use a shape-function for the </p>
 \[
-\int_{\Delta C_j}f\ \mathrm{d}\mu \approx \int_{a_j}^{b_j}f(M_j^TN(u))\|M_j^TN'(u)\|_2\ \mathrm{d}u.
+\int_{\Delta C_j}f\ \mathrm{d}\mu \approx \int_{a_j}^{b_j}f(\mathbf{M}_j^T\mathbf{N}(u))\|\mathbf{M}_j^T\mathbf{N}'(u)\|_2\ \mathrm{d}u.
 \]
 <p>The integral can still, in general, be hard to compute. However in most cases it can be well approximated by a quadrature scheme. Below the number of quadrature points is \(l\) &#40;in practice \(l\approx 4\) should give a good estimate&#41;. As such the integral becomes</p>
 \[
-\int_{a_j}^{b_j}f(M_j^TN(u))\|M_j^TN'(u)\|_2\ \mathrm{d}u \approx \sum_{k=1}^{l} w_kf(M_j^TN(u_k))\|M_j^TN'(u_k)\|_2.
+\int_{a_j}^{b_j}f(\mathbf{M}_j^T\mathbf{N}(u))\|\mathbf{M}_j^T\mathbf{N}'(u)\|_2\ \mathrm{d}u \approx \sum_{k=1}^{l} w_kf(\mathbf{M}_j^T\mathbf{N}(u_k))\|\mathbf{M}_j^T\mathbf{N}'(u_k)\|_2.
 \]
 <p>Substituting this back into <span class="eqref">(<a href="#eqapprox">10</a>)</span> we find the curve integral can be approximated as</p>
 \[
-\int_{C_r} f\ \mathrm{d}\mu \approx \sum_{j=1}^m\sum_{k=1}^{l} w_kf(M_j^TN(u_k))\|M_j^TN'(u_k)\|_2.
+\int_{C_r} f\ \mathrm{d}\mu \approx \sum_{j=1}^m\sum_{k=1}^{l} w_kf(\mathbf{M}_j^T\mathbf{N}(u_k))\|\mathbf{M}_j^T\mathbf{N}'(u_k)\|_2.
 \]
 <p>Approximations of surface integrals follow the exact same procedure. However since the surface shape functions requires a two dimensional input the quadrature step requires a double sum resulting in \(l^2\) quadrature points. This is straight forward for the so-called quadrilateral surface shape functions but for triangular surface shape functions a trick needs to be performed.</p>
+<h4 id="boundary_element_approximations"><a href="#boundary_element_approximations">Boundary Element Approximations</a></h4>
+<p>In the context of the boundary element method one is usually after integrals <em>slightly</em> different than a standard curve/surface integral. Namely that the function \(f(\mu)\) is not completely known. Instead it is partly <em>known</em> and partly <em>unkown</em>. What we mean is that the integrals of interest have the following form</p>
+<a id="eqbemapprox" class="anchor"></a>\[
+\int_{\Delta C_j} F_i(\mu) p(\mu)\ \mathrm{d}\mu,
+\]
+<p>where \(F_i\) is known while \(p\) is unkown. The idea is now to also use an inteporlation scheme for the \(p\) function similar to the one for the element \(\Delta C_j\). Namely that we assume that the following approxmation of \(p\) holds on element \(j\)</p>
+\[
+p(\mu) \approx \mathbf{P}_j^T\mathbf{N}\left(\mathbf{r}^{-1}(\mu)\right) = \mathbf{N}\left(\mathbf{r}^{-1}(\mu)\right)^T\mathbf{P}_j,
+\]
+<p>where \(\mathbf{P}_j = \begin{bmatrix} p_{1}^{(j)} & \dots & p_{n}^{(j)}\end{bmatrix}^T\) is a vector containing the unknown nodal values \(p_{i}^{(j)}\) on element \(j\). <strong>Note</strong> that the introduction of \(\mathbf{r}^{-1}\) is purely for theoretical purposes. In practice we never need to compute it, as the computation of the integral require us to change the integration variables using \(\mathbf{r}(\mu)\) &#40;so that \(\mathbf{r}^{-1}(\mathbf{r}(\mu)) = \mu\)&#41;.  Using this we have that</p>
+\[\begin{aligned}
+\int_{\Delta C_j} F_i(\mu) \mathbf{N}\left(\mathbf{r}^{-1}(\mu)\right)\mathbf{P}_j^T\ \mathrm{d}\mu 
+&= \int_{\Delta C_j} F_i(\mu) \mathbf{N}\left(\mathbf{r}^{-1}(\mu)\right)^T\ \mathrm{d}\mu\ \mathbf{P}_j.
+\end{aligned}\]
+<p>Doing this for every element we find that it is possible to approximate the full curve/surface integral as</p>
+\[
+\int_{C_\mathbf{r}} F_i(\mu) p(\mu)\ \mathrm{d}\mu \approx \sum_{j=1}^n \int_{\Delta C_j} F_i(\mu) \mathbf{N}\left(\mathbf{r}^{-1}(\mu)\right)^T\ \mathrm{d}\mu\ \mathbf{P}_j = b_i.
+\]
+<p>Approximating further using a quadrature we have that</p>
+\[
+\int_{C_r} f\ \mathrm{d}\mu \approx \sum_{j=1}^m\sum_{k=1}^{l} w_kF_i(\mathbf{M}_j^T\mathbf{N}(u_k))\|\mathbf{M}_j^T\mathbf{N}'(u_k)\|_2\mathbf{N}(u_k)^T = b_i.
+\]
+<p><strong>Notice</strong> as we stated earlier that the term \(\mathbf{N}(u_k)^T\) is free of \(\mathbf{r}^{-1}\) &#40;and \(\mathbf{r}\) for that matter&#41;. Details on how to compute \(b_i\) is left out &#40;Just assume for the time being that it can be computed&#41;. Doing this for \(i=1,\dots, n\) a \(n\times n\) system of equations of the following form is established</p>
+\[
+\left[\mathbf{F}\right]\left\{\mathbf{P}\right\} = \left\{\mathbf{b}\right\}.
+\]
+<p>Solving this w.r.t to our unknown nodal values \(\left\{\mathbf{P}\right\}\) we get an approximation of our unkown function \(p\).</p>
 <h2 id="curve_shape_functions"><a href="#curve_shape_functions">Curve shape functions</a></h2>
 <p>We now introduce two types of shape functions for curve integrals. </p>
 <h3 id="linear_elements"><a href="#linear_elements">Linear elements</a></h3>
 <p>The simplest shape function for curve integrals are the linear shape function.</p>
 \[
-N_L(u) = \begin{bmatrix} 1 - u\\ u\end{bmatrix},\quad u \in [0,1]
+\mathbf{N}_L(u) = \begin{bmatrix} 1 - u\\ u\end{bmatrix},\quad u \in [0,1]
 \]
-<p>Visually we can view the elements of \(N_L(u)\) as function that are \(1\) when the other is \(0\).</p>
+<p>Visually we can view the elements of \(\mathbf{N}_L(u)\) as function that are \(1\) when the other is \(0\).</p>
 <p><img src="/assets/visualizations/shapefunctions/2d_linear.png" alt="" /></p>
 <p>Using this shape function we can interpolate linearly between \(\mathbf{m}_1\) and \(\mathbf{m}_2\) using the parametrization</p>
 \[
-\mathbf{r}_L(u) = M^TN_L(u),
+\mathbf{r}_L(u) = \mathbf{M}^T\mathbf{N}_L(u),
 \]
 <p>Visually this parametrization can be seen as</p>
 <p><img src="/assets/visualizations/shapefunctions/2d_linear_interp.png" alt="" /></p>
-<p>Now the Jacobian can we found by first computing \(N_L'(u)\)</p>
+<p>Now the Jacobian can we found by first computing \(\mathbf{N}_L'(u)\)</p>
 \[
-N_L'(u) = \begin{bmatrix} -1\\ 1\end{bmatrix},\quad u \in [0,1].
+\mathbf{N}_L'(u) = \begin{bmatrix} -1\\ 1\end{bmatrix},\quad u \in [0,1].
 \]
 <p>Now we have that</p>
 \[
-\text{Jacobi}_L(u) = \left\| M^TN_L'(u)\right\|_2 = \|\mathbf{m}_2 - \mathbf{m}_1\|_2
+\text{Jacobi}_L(u) = \left\| \mathbf{M}^T\mathbf{N}_L'(u)\right\|_2 = \|\mathbf{m}_2 - \mathbf{m}_1\|_2
 \]
 <h4 id="quadratic_elements"><a href="#quadratic_elements">Quadratic elements</a></h4>
 <p>Another simple shape function is the quadratic elements defined by</p>
 \[
-N_Q(u) = \begin{bmatrix} \frac{1}{2}u (u - 1)\\ 
+\mathbf{N}_Q(u) = \begin{bmatrix} \frac{1}{2}u (u - 1)\\ 
                                    (1-u)(1+u)\\ 
                          \frac{1}{2}u (u + 1)\end{bmatrix}, \quad u\in[-1,1].
 \]
-<p>Again we can view each element of \(N_Q(u)\) as a seperate function that is equal to \(1\) when the others are \(0\)</p>
+<p>Again we can view each element of \(\mathbf{N}_Q(u)\) as a seperate function that is equal to \(1\) when the others are \(0\)</p>
 <p><img src="/assets/visualizations/shapefunctions/2d_quadratic.png" alt="" /></p>
 <p>Using the quadratic shape functions we can interpolate between \(\mathbf{m}_1\), \(\mathbf{m}_2\) and \(\mathbf{m}_3\) using a quadratic as</p>
 \[
-\mathbf{r}_Q(u) = M^TN_Q(u).
+\mathbf{r}_Q(u) = \mathbf{M}^T\mathbf{N}_Q(u).
 \]
 <p>Visually this interpolation can be seen as</p>
 <p><img src="/assets/visualizations/shapefunctions/2d_quadratic_interp.png" alt="" /></p>
@@ -136,7 +163,7 @@ N_Q(u) = \begin{bmatrix} \frac{1}{2}u (u - 1)\\
 \]
 <p>from which we can compute the Jacobian as</p>
 \[
-\text{Jacobi}_Q(u) = \left\|M^TN_Q'(u)\right\|_2
+\text{Jacobi}_Q(u) = \left\|\mathbf{M}^T\mathbf{N}_Q'(u)\right\|_2
 \]
 <h2 id="surface_shape_functions"><a href="#surface_shape_functions">Surface Shape Functions</a></h2>
 <p>The idea behind the surface shape functions are the exact same as for the  curve shape functions. The only thing is that our parameterization now have  a two-dimensional input.</p>
@@ -145,7 +172,7 @@ N_Q(u) = \begin{bmatrix} \frac{1}{2}u (u - 1)\\
 <h4 id="linear"><a href="#linear">Linear</a></h4>
 <p>The linear surface shape functions can be described by</p>
 \[
-N_L(u,v) = 
+\mathbf{N}_L(u,v) = 
 \begin{bmatrix} \frac{1}{4}\left(1-u\right)\left(1-v\right)\\
                 \frac{1}{4}\left(1+u\right)\left(1-v\right)\\
                 \frac{1}{4}\left(1+u\right)\left(1+v\right)\\
@@ -157,7 +184,7 @@ N_L(u,v) =
 <h4 id="quadratic"><a href="#quadratic">Quadratic</a></h4>
 <p>The quadratic shape functions can be described by</p>
 \[
-N_Q(u,v) = 
+\mathbf{N}_Q(u,v) = 
 \begin{bmatrix} \frac{1}{4}\left(1-u\right)\left(v-1\right)\left(u+v+1\right)\\
                 \frac{1}{4}\left(1+u\right)\left(v-1\right)\left(v-u+1\right)\\
                 \frac{1}{4}\left(1+u\right)\left(1+v\right)\left(u+v-1\right)\\
@@ -171,24 +198,45 @@ N_Q(u,v) =
 <p>Again we can visualize every element by itself.</p>
 <p><img src="/assets/visualizations/shapefunctions/3d_quadratic.png" alt="" /></p>
 <h3 id="triangular_shape_functions"><a href="#triangular_shape_functions">Triangular Shape Functions</a></h3>
-<p>We now briefly introduce triangular surface shape functions. In constrast to the quadrilateral surface shape functions there exist many efficient ways of computing these types of meshes. However the integration of these shape functions requires an extra step, since they  are defined on a triangular domain instead of the usual rectangular domain.</p>
+<p>We now briefly introduce triangular surface shape functions. In constrast to the quadrilateral surface shape functions there exist many efficient ways of computing these triangular meshes. However the integration of these shape functions requires an extra step, since they are defined on a triangular domain instead of the usual rectangular domain.</p>
 <h4 id="linear__2"><a href="#linear__2">Linear</a></h4>
 <p>The linear triangular surface shape functions are defined as follows</p>
 \[
-N_L(u,v) = \begin{bmatrix}u\\v\\1-u-v\end{bmatrix}, \quad u\in[0,1],v\in[0,1-u].
+\mathbf{N}_L(u,v) = \begin{bmatrix}1-u-v\\u\\v\end{bmatrix}, \quad u\in[0,1],v\in[0,1-u].
 \]
-<p>Visually we can see them as. <img src="/assets/visualizations/shapefunctions/triangularLinear45.png" alt="" /></p>
+<p>Visually we can see them as. <img src="/assets/visualizations/shapefunctions/triangularLinear.png" alt="" /></p>
 <h4 id="quadratic__2"><a href="#quadratic__2">Quadratic</a></h4>
 <p>Now the quadratic triangular shape functions are defined as follows</p>
 \[
-N_Q(u,v) = \begin{bmatrix}(1-u-v)(1-2u-2v)\\u(2u-1)\\v(2v-1)\\4u(1-u-v)\\4uv\\4v(1-u-v)\end{bmatrix},
+\mathbf{N}_Q(u,v) = \begin{bmatrix}(1-u-v)(1-2u-2v)\\u(2u-1)\\v(2v-1)\\4u(1-u-v)\\4uv\\4v(1-u-v)\end{bmatrix},
 \quad u\in[0,1],v\in[0,1-u].
 \]
 <p>Plotting every element for itself we see that <img src="/assets/visualizations/shapefunctions/triangularQuadratic.png" alt="" /></p>
 <h4 id="quadrature_on_triangular_shape_functions"><a href="#quadrature_on_triangular_shape_functions">Quadrature On Triangular Shape Functions</a></h4>
+<p>In order for us to integrate over the triangular domains using a quadrature scheme we need to transform the coordinate into a rectangular domain. This can be done with teh following transformation</p>
+\[
+\begin{bmatrix}u \\ v\end{bmatrix} = \begin{bmatrix} \xi\\ \eta(1-\xi)\end{bmatrix}, \xi,\eta \in [0,1].
+\]
+<p>The Jacobian in this case can be computed analytically as</p>
+\[
+\text{Jacobi}_T(\xi,\eta) = \left|\det\left(\begin{bmatrix}1 & 0\\ -\eta & 1-\xi\end{bmatrix}\right)\right| = 1-\xi.
+\]
+<p>Note that since \(\xi \in [0,1]\) we can remove the absolute value. </p>
+\[\begin{aligned}
+\int_0^{1-u}\int_0^1 &f(r(u,v))\text{Jacobi}_r(u,v)\ \mathrm{d}u\mathrm{d}v = \\
+&\int_0^1\int_0^1 f(r(\xi,\eta(1-\xi))\text{Jacobi}_r(\xi,\eta(1-\xi))\text{Jacobi}_T(\xi,\eta) \ \mathrm{d}\xi\mathrm{d}\eta = \\
+&\int_0^1\int_0^1 f(r(\xi,\eta(1-\xi))\text{Jacobi}_r(\xi,\eta(1-\xi))(1 - \xi)\ \mathrm{d}\xi\mathrm{d}\eta.
+\end{aligned}\]
+<p>Given that the above integral is now defined on a rectangular domain we can approximate the integral using a suitable quadrature scheme in both the \(\xi\) and \(\eta\) direction.</p>
+<p>We therefore end up with</p>
+\[\begin{aligned}
+\int_0^{1-u}\int_0^1 &f(r(u,v))\text{Jacobi}_r(u,v)\ \mathrm{d}u\mathrm{d}v
+= \\
+&\sum_{i=1}^{l_1}\sum_{j=1}^{l_2} w_iw_jf(r(\xi_i,\eta_j(1-\xi_i))\text{Jacobi}_r(\xi_i,\eta_j(1-\xi_i))(1 - \xi_i)
+\end{aligned}\]
 <div class="page-foot">
   <div class="copyright">
-    &copy; Mikkel Paltorp. Last modified: December 16, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Mikkel Paltorp. Last modified: December 17, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->
