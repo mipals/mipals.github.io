@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="stylesheet" href="/libs/katex/katex.min.css">
+     
+   <link rel="stylesheet" href="/libs/highlight/github.min.css">
+   
+  <link rel="stylesheet" href="/css/franklin.css">
+  <link rel="stylesheet" href="/css/basic.css">
+  <link rel="icon" href="/assets/favicon.png">
+   <title>BEM Integral Approximations</title>  
+</head>
+<body>
+  <header>
+<div class="blog-name"><a href="/">Mikkel Paltorp</a></div>
+<nav>
+  <ul>
+    <li><a href="/">About Me</a></li>
+    <li><a href="/menu1/">Notes</a></li>
+    <li><a href="/menu2/">Software</a></li>
+  </ul>
+  <img src="/assets/hamburger.svg" id="menu-icon">
+</nav>
+</header>
+
+
+<!-- Content appended here -->
+<div class="franklin-content"><h1 id="numerical_integral_approximations"><a href="#numerical_integral_approximations">Numerical integral approximations</a></h1>
+<p>The main component of the boundary element is the computation of integrals over the boundary of a given domain. For two-dimensional problems these integrals are curve integrals whereas for three-dimensional problems these integrals are surface integrals. As such we give a brief recap of these concepts.</p>
+<p>The main takeaway fro this note is that in the boundary element method we approximate the curve/surface integrals in a two-stage process:</p>
+<ol>
+<li><p>Approximation of the domain &#40;boundary&#41; using so-called shape functions &#40;elements&#41;.</p>
+</li>
+<li><p>Approximation of the &#40;already approximated&#41; integral using a quadrature scheme.</p>
+</li>
+</ol>
+<h2 id="recap_of_curve_and_surface_integrals"><a href="#recap_of_curve_and_surface_integrals">Recap of curve and surface integrals</a></h2>
+<h3 id="curve_integrals"><a href="#curve_integrals">Curve integrals</a></h3>
+<p>As the name suggest a curve integral is an integral over a specific curve</p>
+\[
+\int_{C_r} f\ \mathrm{d}\mu.
+\]
+<p>Now if we can parametrize the curve \(C_r\)</p>
+\[
+C_r = \left\{\mathbf{r}(u)\ |\ u\in[a,b]\right\},
+\]
+<p>then we can compute the integral as</p>
+\[
+\int_{C_r} f\ \mathrm{d}\mu = \int_a^bf(\mathbf{r}(u))\text{Jacobi}_{\mathbf{r}}(u)\ \mathrm{d}u.
+\]
+<p>where </p>
+\[
+\text{Jacobi}_{\mathbf{r}}(u) = \|\mathbf{r}'(u)\|_2,
+\]
+<p>is called the Jacobian. Informally we can view \(\text{Jacobi}_{\mathbf{r}}(u)\) as the pointwise length distortion from the \([a,b]\) space to the curve \(C_r\) caused by the parametrization \(\mathbf{r}(u)\).</p>
+<h3 id="surface_integrals"><a href="#surface_integrals">Surface integrals</a></h3>
+<p>Similarily a surface integral is simply an integral over a surface </p>
+\[
+\int_{S_r} f\ \mathrm{d}\mu.
+\]
+<p>If a parametrization, \(\mathbf{r}(u,v)\), of the surface can be found</p>
+\[
+S_r = \left\{ \mathbf{r}(u,v), \quad u\in[a,b], v\in[c,d]\right\},
+\]
+<p>then we can compute the surface integral as follows</p>
+\[
+\int_{S_r} f\ \mathrm{d}\mu = \int_{c}^d\int_a^bf(\mathbf{r}(u,v))\text{Jacobi}_{\mathbf{r}}(u,v)\ \mathrm{d}u\mathrm{d}v.
+\]
+<p>Here the Jacobian is computed as</p>
+<a id="eqsurfjac" class="anchor"></a>\[
+\text{Jacobi}_{\mathbf{r}}(u,v) = \|\mathbf{r}_u'(u,v)\|_2\|\mathbf{r}_v(u,v)\|_2\sin(\theta(u,v)),
+\]
+<p>where \(\theta(u,v)\) is the angle between the two vectors \(\mathbf{r}_u'(u,v)\) and \(\mathbf{r}_v'(u,v)\). In parallel to the curve integrals we can view \(\text{Jacobi}_{\mathbf{r}}(u,v)\) as the pointwise area distortion from the \([a,b]\times [c,d]\) space to the surface \(S_r\) caused by the parametrization \(\mathbf{r}(u,v)\). </p>
+<h2 id="approximations"><a href="#approximations">Approximations</a></h2>
+<p>As described in &#40;<a href="/pubs/pde/BEM_shapefunctions/">Shape Functions</a>&#41; we can define the coordinate transformation from a square domain &#40;local coordinates&#41; onto the boundary &#40;global coordinates&#41; as</p>
+\[
+\mathbf{r}(\mathbf{\xi}) = \mathbf{M}^T\mathbf{N}(\mathbf{\xi}), \quad \xi \in [\mathbf{a},\mathbf{b}]
+\]
+<p>where \(\mathbf{M}^T = \begin{bmatrix} \mathbf{m}_1 & \dots & \mathbf{m}_n\end{bmatrix}\) is a matrix containing the interpolation nodes &#40;\(\mathbf{m}_i\)&#41;, \(\mathbf{N}(\mathbf{\xi})\) is a vector containing the shape functions and \(\mathbf{a},\mathbf{b}\in\mathbf{R}^m\) so that \([\mathbf{a},\mathbf{b}]\) describes a hyperretangular domain in a \(m\)-dimensional space. We will in this note only consider the cases of curves &#40;\(m=1\)&#41; and surfaces &#40;\(m=2\)&#41;.</p>
+<h3 id="step_1_approximating_domain_of_integral"><a href="#step_1_approximating_domain_of_integral">Step 1: Approximating domain of integral</a></h3>
+<p>The first step is the split the integral into smaller subintegrals</p>
+<a id="eqapprox" class="anchor"></a>\[
+\int_{C_r} f\ \mathrm{d}\mu = \sum_{j=1}^m\int_{\Delta C_j}f\ \mathrm{d}\mu.
+\]
+<p>Now each of the subintegrals can be computed using suitable parametrizations.</p>
+\[
+\int_{\Delta C_j}f\ \mathrm{d}\mu = \int_{\mathbf{a}_j}^{\mathbf{b}_j}f(\mathbf{r}_j(\mathbf{\xi}))\text{Jacobi}_{\mathbf{r}_j}\ \mathrm{d}\mathbf{\xi}.
+\]
+<p>The idea is now to &#40;approximately&#41; parametrize \(\Delta C_j\) using a shape function. </p>
+<p>For curve integrals this means that we can approximate the integrals as</p>
+<a id="eqapproxcurve" class="anchor"></a>\[
+\int_{\Delta C_j}f\ \mathrm{d}\mu \approx \int_{a_j}^{b_j}f(\mathbf{M}_j^T\mathbf{N}(u))\|\mathbf{M}_j^T\mathbf{N}'(u)\|_2\ \mathrm{d}u,
+\]
+<p>While we for surfaces the we get that</p>
+<a id="eqapproxsurface" class="anchor"></a>\[
+\int_{\Delta S_j}f\ \mathrm{d}\mu \approx \int_{a_j}^{b_j}\int_{c_j}^{d_j}f(\mathbf{M}_j^T\mathbf{N}(u,v))\|\mathbf{M}_j^T\mathbf{N}'(u,v)\|_2\ \mathrm{d}u\mathrm{d}v.
+\]
+<h3 id="step_2_approxiating_the_already_approximated_integral"><a href="#step_2_approxiating_the_already_approximated_integral">Step 2: Approxiating the &#40;already approximated&#41; integral </a></h3>
+<p>The integral can still, in general, be hard to compute. However in most cases it can be well approximated by a quadrature scheme. </p>
+<p>For curve integrals we can for example use \(l\) quadrature points &#40;in practice \(l\approx 4\) should give a good estimate&#41;. As such the integral becomes</p>
+\[
+\int_{a_j}^{b_j}f(\mathbf{M}_j^T\mathbf{N}(u))\|\mathbf{M}_j^T\mathbf{N}'(u)\|_2\ \mathrm{d}u \approx \sum_{k=1}^{l} w_kf(\mathbf{M}_j^T\mathbf{N}(u_k))\|\mathbf{M}_j^T\mathbf{N}'(u_k)\|_2.
+\]
+<p>Substituting this back into <span class="eqref">(<a href="#eqapprox">10</a>)</span> we find the curve integral can be approximated as</p>
+\[
+\int_{C_r} f\ \mathrm{d}\mu \approx \sum_{j=1}^m\sum_{k=1}^{l} w_kf(\mathbf{M}_j^T\mathbf{N}(u_k))\|\mathbf{M}_j^T\mathbf{N}'(u_k)\|_2.
+\]
+<p>From a computational aspect it is important to note that we need to compute \(N(u_k)\) and \(N'(u_k)\) for each \(k\) only once and the computations can then be reused for each element \(j\).</p>
+<p>Now approximations of surface integrals follow the exact same procedure. However since the surface shape functions requires a two dimensional input we need quadrature points in both inputs. For example take \(l_1\) quadrature points in \(u\)-direction and \(l_2\) quadreture points in \(v\)-direction, then it follows that</p>
+\[
+\int_{S_r} f\ \mathrm{d}\mu \approx \sum_{j=1}^m\sum_{k=1}^{l_1l_2} w_kf(\mathbf{M}_j^T\mathbf{N}(u_k,v_k))\|\mathbf{M}_j^T\mathbf{N}'(u_k,v_k)\|_2,
+\]
+<p>where </p>
+\[\begin{aligned}
+\mathbf{w} = \mathbf{w}_{u} \otimes \mathbf{w}_{v}, \quad 
+\mathbf{u} = \mathbf{1}_{l_2} \otimes \mathbf{u}_u, \quad
+\mathbf{v} = \mathbf{v}_v \otimes \mathbf{1}_{l_1}.
+\end{aligned}\]
+<p>Here \(\mathbf{u}_u\) and \(\mathbf{v}_v\) denotes the quadrature points in the \(u\) and \(v\) direction respectively while \(\mathbf{1}_n\) denotes a vector of ones of length \(n\).</p>
+<h2 id="boundary_element_approximations"><a href="#boundary_element_approximations">Boundary Element Approximations</a></h2>
+<p>In the context of the boundary element method one is usually after integrals <em>slightly</em> different than a standard curve/surface integral. The reason being that the function \(f(\mu)\) is not completely known. Instead it is partly <em>known</em> and partly <em>unknown</em>. What we mean is that the integrals of interest have the following form</p>
+<a id="eqbemapprox" class="anchor"></a>\[
+\int_{\Delta C_j} F_i(\mu) p(\mu)\ \mathrm{d}\mu = \int_{\Delta C_j} F_i\left(\mathbf{M}_j^T\mathbf{N}(\mathbf{\xi})\right) p\left(\mathbf{M}_j^T\mathbf{N}(\mathbf{\xi})\right)\textbf{Jacobi}_j\left(\mathbf{\xi}\right)\ \mathrm{d}\mathbf{\xi},
+\]
+<p>where \(F_i\) is a known function while \(p\) is partly &#40;or fully&#41; unknown. The idea is now to also use an inteporlation scheme for the \(p\) function similar to the one for the element \(\Delta C_j\). Namely that we assume that the following approximation of \(p\) holds on element \(j\)</p>
+\[
+p\left(\mathbf{M}_j^T\mathbf{N}(\mathbf{\xi})\right) = \mathbf{P}^T_j\mathbf{N}(\mathbf{\xi}) = \mathbf{N}(\mathbf{\xi})^T\mathbf{P}_j
+\]
+<p>where \(\mathbf{P}_j = \begin{bmatrix} p_{1}^{(j)} & \dots & p_{n}^{(j)}\end{bmatrix}^T\) is a vector containing the unknown nodal values \(p_{i}^{(j)}\) on element \(j\). Using this we have that</p>
+\[
+\int_{\Delta C_j} F_i(\mu) p(\mu)\ \mathrm{d}\mu = \int_{\Delta C_j} F_i\left(\mathbf{M}_j^T\mathbf{N}(\mathbf{\xi})\right) \textbf{Jacobi}_j\left(\mathbf{\xi}\right) \mathbf{N}(\mathbf{\xi})^T\ \mathrm{d}\mathbf{\xi}\ \mathbf{P}_j
+\]
+<p>Doing this for every element we find that it is possible to approximate the full curve/surface integral as</p>
+\[
+\int_{C_\mathbf{r}} F_i(\mu) p(\mu)\ \mathrm{d}\mu \approx \sum_{j=1}^n \int_{\Delta C_j} F_i\left(\mathbf{M}_j^T\mathbf{N}(\mathbf{\xi})\right) \textbf{Jacobi}_j\left(\mathbf{\xi}\right) \mathbf{N}(\mathbf{\xi})^T\ \mathrm{d}\mathbf{\xi}\ \mathbf{P}_j.
+\]
+<p>Using a quadrature scheme we see that the above for curves simplifies as</p>
+\[
+\int_{C_r} f\ \mathrm{d}\mu \approx \sum_{j=1}^m\left[\left(\sum_{k=1}^{l} w_kF_i(\mathbf{M}_j^T\mathbf{N}(u_k))\|\mathbf{M}_j^T\mathbf{N}'(u_k)\|_2\mathbf{N}(u_k)^T\right)\mathbf{P}_j\right] .
+\]
+<p>Notice that \(w_k\), \(F_i(\mathbf{M}_j^T\mathbf{N}(u_k))\) and \(\|\mathbf{M}_j^T\mathbf{N}'(u_k)\|_2\) are all scalars. Hence the inner-loop can be vectorized as</p>
+<a id="eqbemapprox" class="anchor"></a>\[
+\int_{C_r} f\ \mathrm{d}\mu \approx \sum_{j=1}^m\mathbf{N}(\mathbf{u})^T\left(\mathbf{F}_{ij}\circ \mathbf{w}\circ\text{\textbf{Jacobi}}_j\right)\mathbf{P}_j,
+\]
+<p>where \(\mathbf{u}=\begin{bmatrix}u_1 & u_2 & \cdots & u_n\end{bmatrix}\). </p>
+<p>Note that <span class="eqref">(<a href="#eqbemapprox">23</a>)</span> with simple modifications also holds for surfaces.</p>
+<p>The last step required in the boundary element method is to realize that there is a relation between <span class="eqref">(<a href="#eqbemapprox">23</a>)</span> and something else that we can compute. For the moment call that value \(b_i\). Details on how to compute \(b_i\) is left out &#40;Just assume for the time being that it can be computed&#41;. Then we can setup an equation using <span class="eqref">(<a href="#eqbemapprox">23</a>)</span> for \(i=1,\dots, n\) resulting in a \(n\times n\) system of equations of the following form</p>
+\[
+\left[\mathbf{A}\right]\left\{\mathbf{P}\right\} = \left\{\mathbf{b}\right\}.
+\]
+<p>Solving this w.r.t to our unknown nodal values \(\left\{\mathbf{P}\right\}\) we get an approximation of the unkown function \(p\).</p>
+<div class="page-foot">
+  <div class="copyright">
+    &copy; Mikkel Paltorp. Last modified: February 15, 2021. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+  </div>
+</div>
+</div><!-- CONTENT ENDS HERE -->
+    
+        <script src="/libs/katex/katex.min.js"></script>
+<script src="/libs/katex/auto-render.min.js"></script>
+<script>renderMathInElement(document.body)</script>
+
+    
+    
+        <script src="/libs/highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();hljs.configure({tabReplace: '    '});</script>
+
+    
+  </body>
+</html>
