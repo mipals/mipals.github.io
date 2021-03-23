@@ -27,7 +27,7 @@
 
 
 <!-- Content appended here -->
-<div class="franklin-content"><h1 id="the_boundary_element_method"><a href="#the_boundary_element_method">The Boundary Element Method</a></h1>
+<div class="franklin-content"><h1 id="the_boundary_element_method"><a href="#the_boundary_element_method" class="header-anchor">The Boundary Element Method</a></h1>
 <p>In this note we briefly explain how to discretize the following integral equation</p>
 \[
 c(x)\phi(x) = \int_S \left[G(x,y)q(y) - F(x,y)\phi(y)\right]\ \mathrm{d}\mu
@@ -35,7 +35,7 @@ c(x)\phi(x) = \int_S \left[G(x,y)q(y) - F(x,y)\phi(y)\right]\ \mathrm{d}\mu
 \[
 c(x)\phi(x) + \int_{S} F(x,y)\phi(y)\ \mathrm{d}\mu= \int_{S}G(x,y)q(y)\ \mathrm{d}\mu
 \]
-<h2 id="discretization"><a href="#discretization">Discretization</a></h2>
+<h2 id="discretization"><a href="#discretization" class="header-anchor">Discretization</a></h2>
 <p>One can think of the domain boundary and discretization as &#40;<em>Photo from <sup id="fnref:1"><a href="#fndef:1" class="fnref">[1]</a></sup></em>&#41; <img src="/assets/visualizations/2d_domain.png" alt="" /><br/> If we assume that the function is constant on each element we get the following</p>
 \[
 \phi(y) = \phi_j, \quad q(y) = q_j, \quad  y \in \Delta S_j
@@ -83,7 +83,7 @@ a_{N1} & a_{N2} & \dots  & a_{NN}
 \begin{Bmatrix} b_1 \\ b_2 \\ \vdots \\ b_N \end{Bmatrix}.
 \]
 <p>This off course requires some bookkeeping as we from this need to extract if \(\lamba_i\) is either a \(\phi\)-value or a \(q\)-value.</p>
-<h2 id="references"><a href="#references">References</a></h2>
+<h2 id="references"><a href="#references" class="header-anchor">References</a></h2>
 <table class="fndef" id="fndef:1">
     <tr>
         <td class="fndef-backref"><a href="#fnref:1">[1]</a></td>

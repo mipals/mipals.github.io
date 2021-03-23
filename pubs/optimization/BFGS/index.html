@@ -27,7 +27,7 @@
 
 
 <!-- Content appended here -->
-<div class="franklin-content"><h1 id="the_broydenfletchergoldfarbshanno_bfgs_algorithm"><a href="#the_broydenfletchergoldfarbshanno_bfgs_algorithm">The Broyden–Fletcher–Goldfarb–Shanno &#40;BFGS&#41; Algorithm</a></h1>
+<div class="franklin-content"><h1 id="the_broydenfletchergoldfarbshanno_bfgs_algorithm"><a href="#the_broydenfletchergoldfarbshanno_bfgs_algorithm" class="header-anchor">The Broyden–Fletcher–Goldfarb–Shanno &#40;BFGS&#41; Algorithm</a></h1>
 <p>The BFGS algorithm is one of the most used Quasi-Newton algorithms. This note briefly explores why the update of the approximation of the inverse Hessian has the form that it has. I&#39;ve done so because I have found that most texts lacks this intuition and instead just states the update without any reasoning. </p>
 <p>In the original papers &#40;there were four seperate&#41; the approach was to looking at the following minimization problem</p>
 \[
@@ -35,7 +35,7 @@
 \text{subject to } H_{k+1}^{-1}\left(\nabla f(x_{k+1} - \nabla f(x_k))\right) = \left(x_{k+1} - x_k\right)\ \text{ and }\ H_{k+1}^T = H_{k+1}
 \]
 <p>In short they looked at finding the symmetric matrix that minimized some weighted norm distance to the previous Hessian approximation while constraining it to the secant condition &#40;described in the next section&#41;. In this note we will take a different approach, namely the one of rank-2 updates.</p>
-<h2 id="the_secant_condition"><a href="#the_secant_condition">The Secant Condition</a></h2>
+<h2 id="the_secant_condition"><a href="#the_secant_condition" class="header-anchor">The Secant Condition</a></h2>
 <p>A key component of the derivation of the BFGS steps is the secant condition stating that</p>
 \[
 
@@ -56,7 +56,7 @@ H_{k+1} s_k = y_k
 </ul>
 <p>In practical terms the secant conditions states how to <em>construct</em> a &quot;Hessian&quot; at point \(x_{k+1}\) such that the quadratic approximation of \(f\) with origin at \(x_{k+1}\) using said &quot;Hessian&quot; have a gradient equal to the gradient of \(f\) at \(x_k\) &#40;and \(x_{k+1}\) by construction&#41;. Visually we can view the secant condition as.</p>
 <p><img src="/assets/visualizations/secant1.png" alt="" /></p>
-<h2 id="rank-2_updates"><a href="#rank-2_updates">Rank-2 Updates</a></h2>
+<h2 id="rank-2_updates"><a href="#rank-2_updates" class="header-anchor">Rank-2 Updates</a></h2>
 <p>The main idea behind the BFGS algorithm is a simple &#40;symmetric&#41; rank-2 update of a proposed Hessian &#40;note that because \(H_k\) is a proposed Hessian it must be symmetric&#41;</p>
 \[\begin{aligned}
 
@@ -89,7 +89,7 @@ H_{k+1} = H_k + \frac{y_ky_k^T}{y_k^Ts_k} - \frac{H_ks_ks_k^TH_k}{s_k^TH_ks_k},
 \]
 <p>which is also how it is stated in most texts. Note, however, that in practice we will never use the above relation but instead invert \(H_{k+1}\) directly using <span class="eqref">(<a href="#eqhk1inverse">5</a>)</span> so that we spare the memory cost of actually storing \(H_k\) and \(H_{k+1}\).</p>
 <p>While this is easily stated it is not completely obvious how this can be achieved, since we need \(H_k\) when computinbg \(\beta\). However in the following section we will show, through some tedious computations, that we actually do not need to directly compute \(\beta\) at all in order for us to use the update described in <span class="eqref">(<a href="#equpdatehk">9</a>)</span>. </p>
-<h2 id="removing_the_dependence_of_h_k_some_tedious_computations"><a href="#removing_the_dependence_of_h_k_some_tedious_computations">Removing the dependence of \(H_k\) &#40;Some tedious computations... &#41;</a></h2>
+<h2 id="removing_the_dependence_of_h_k_some_tedious_computations"><a href="#removing_the_dependence_of_h_k_some_tedious_computations" class="header-anchor">Removing the dependence of \(H_k\) &#40;Some tedious computations... &#41;</a></h2>
 <p>Earlier we stated how the computation of the inverse could be reduced to a simple inversion of a \(2\times 2\) matrix and matrix-vector products. However we later set \(v=H_ks_k\), meaning that we also needed to store \(H_k\) explicitly. Thankfully we can see that if we insert our chosen values of \(\alpha,\beta, u\) and \(v\) into the expression for the inversion we get something that does not explicitly depend on \(H_k\). The calculations are tedious and not nessecarily informing, however, given that these are notes I have chosen to include them anyways.</p>
 <p>First inserting the expression we find that</p>
 \[\begin{aligned}

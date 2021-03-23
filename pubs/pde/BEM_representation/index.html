@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="stylesheet" href="/libs/katex/katex.min.css">
+     
+   <link rel="stylesheet" href="/libs/highlight/github.min.css">
+   
+  <link rel="stylesheet" href="/css/franklin.css">
+  <link rel="stylesheet" href="/css/basic.css">
+  <link rel="icon" href="/assets/favicon.png">
+   <title>Representation Formulas</title>  
+</head>
+<body>
+  <header>
+<div class="blog-name"><a href="/">Mikkel Paltorp</a></div>
+<nav>
+  <ul>
+    <li><a href="/">About Me</a></li>
+    <li><a href="/menu1/">Notes</a></li>
+    <li><a href="/menu2/">Software</a></li>
+  </ul>
+  <img src="/assets/hamburger.svg" id="menu-icon">
+</nav>
+</header>
+
+
+<!-- Content appended here -->
+<div class="franklin-content"><h1 id="integral_formulations_of_the_helmholtz_equation"><a href="#integral_formulations_of_the_helmholtz_equation" class="header-anchor">Integral Formulations of the Helmholtz Equation</a></h1>
+<p>In this note we briefly explore the integral equations of problems associated with the Helmholtz equation. Theese integral equations form the basis of the Boundary Element Method &#40;BEM&#41;.</p>
+<h2 id="interior_and_exterior_problems"><a href="#interior_and_exterior_problems" class="header-anchor">Interior and Exterior Problems</a></h2>
+<p>In acoustics it is standard to distinguish between two types of problems: Namely interior and exterior problems. As the names suggest the first deals with problems inside bounded domains &#40;objects&#41; while the latter deals with problems on unbounded domains with objects possibly placed in them.</p>
+<h2 id="direct_integral_formulation_of_the_interior_problem"><a href="#direct_integral_formulation_of_the_interior_problem" class="header-anchor">Direct Integral Formulation of the Interior Problem</a></h2>
+<p>Visually we can view an interior problem as follows <img src="/assets/visualizations/2d_domain2.png" alt="" /></p>
+<p>&#40;Andersen, Peter Risby. <em>Modelling of Acoustic Viscothermal Losses Using the Boundary Element Method: From Method to Optimization.</em> Technical University of Denmark, 2018&#41;</p>
+<p>It is standard to denote the domain by \(\Omega\) and the boundary of the domain as \(\partial\Omega\). Furthermore the outward normal of the domain is denoted by \(n\). Note, however, that for non-smooth domains i.e. domains with e.g. sharp corners, the normal is not nessecarily uniquely defined. </p>
+<p>The solution to the Helmholtz equation on the interior domain will be described as surface integral over the boundary</p>
+\[
+C^{-}(x)p(x) = \int_{\partial\Omega}\left[G(x,y)\frac{\partial p}{\partial n_y} - 
+p(y)\frac{\partial G(x,y)}{\partial n_y} \right]\ \mathrm{d}S_y,
+\]
+<p>where</p>
+\[
+C^{-}(x) = 
+\begin{cases}
+1\ \quad &\text{if } x \text{ inside}   \Omega\\
+0\ \quad &\text{if } x \text{ outside } \Omega\\
+-\int_{\partial \Omega}\frac{\partial G_0(x,y)}{\partial n_y}\ \mathrm{d}S_y, \quad &\text{if }x\in\partial\Omega
+\end{cases}.
+\]
+<p>Discritzing the boundary as well as approximating the resulting integrals using a quadrature scheme, ones ends up with the following linear algebraic equations</p>
+\[
+    \text{diag}(\mathbf{c})\mathbf{p} = \mathbf{G}\mathbf{v} - \mathbf{F}\mathbf{p}.
+\]
+<p>Depending on the boundarty conditions this system can be solved in various ways.</p>
+<h2 id="direct_integral_formulation_of_the_exterior_problem"><a href="#direct_integral_formulation_of_the_exterior_problem" class="header-anchor">Direct Integral Formulation of the Exterior Problem</a></h2>
+<p>If one still accepts a normal vector that points outwards from the interior problem when handling the exterior problem one ends with the following integral description of the solution to the Helmholtz equation.</p>
+\[
+C^{+}(x)p(x) = \int_{\partial\Omega}\left[ p(y)\frac{\partial G(x,y)}{\partial n_y} - 
+G(x,y)\frac{\partial p}{\partial n_y}\right]\ \mathrm{d}S_y,
+\]
+<p>where</p>
+\[
+C^{+}(x) = 
+\begin{cases}
+0\ \quad &\text{if } x \text{ inside}   \Omega\\
+1\ \quad &\text{if } x \text{ outside } \Omega\\
+1+\int_{\partial \Omega}\frac{\partial G_0(x,y)}{\partial n_y}\ \mathrm{d}S_y, \quad &\text{if }x\in\partial\Omega
+\end{cases}.
+\]
+<p>Similarily to the interior problem the end result here is </p>
+\[
+    \text{diag}(\mathbf{c})\mathbf{p} = \mathbf{F}\mathbf{p} - \mathbf{G}\mathbf{v},
+\]
+<p>for which a solution also depends on the boundary conditions.</p>
+<div class="page-foot">
+  <div class="copyright">
+    &copy; Mikkel Paltorp. Last modified: March 23, 2021. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+  </div>
+</div>
+</div><!-- CONTENT ENDS HERE -->
+    
+        <script src="/libs/katex/katex.min.js"></script>
+<script src="/libs/katex/auto-render.min.js"></script>
+<script>renderMathInElement(document.body)</script>
+
+    
+    
+        <script src="/libs/highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();hljs.configure({tabReplace: '    '});</script>
+
+    
+  </body>
+</html>

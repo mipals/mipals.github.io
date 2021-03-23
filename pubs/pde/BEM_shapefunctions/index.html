@@ -27,16 +27,16 @@
 
 
 <!-- Content appended here -->
-<div class="franklin-content"><h1 id="shape_functions"><a href="#shape_functions">Shape Functions </a></h1>
+<div class="franklin-content"><h1 id="shape_functions"><a href="#shape_functions" class="header-anchor">Shape Functions </a></h1>
 <p>In this note we look at shape functions as a means of interpolating between nodes in a given coordinatesystem. In general the interpolation will have the form</p>
 \[
 \mathbf{r}(\mathbf{\xi}) = \mathbf{M}^T\mathbf{N}(\mathbf{\xi}), \quad \xi \in [\mathbf{a},\mathbf{b}]
 \]
 <p>where \(\mathbf{M}^T = \begin{bmatrix} \mathbf{m}_1 & \dots & \mathbf{m}_n\end{bmatrix}\) is a matrix containing the interpolation nodes &#40;\(\mathbf{m}_i\)&#41;, \(\mathbf{N}(\mathbf{\xi})\) is a vector containing the shape functions and \(\mathbf{a},\mathbf{b}\in\mathbf{R}^m\) so that \([\mathbf{a},\mathbf{b}]\) describes a hyperretangular domain in a \(m\)-dimensional space. We will in this note only consider the cases of curves &#40;\(m=1\)&#41; and surfaces &#40;\(m=2\)&#41;.</p>
 <p>Furthermore we will restrict ourselves to only talk about shape functions for curves and surfaces. The usefulness of these shape functions comes from the fact that they can be used to approximate curves and surfaces so that approximations of curve- and surface integrals can be computed easily. The reason for this focus is that only curve and surface integrals are needed for the usage of the bounary element method in two- and three-dimensional space.</p>
-<h2 id="curve_shape_functions"><a href="#curve_shape_functions">Curve shape functions</a></h2>
+<h2 id="curve_shape_functions"><a href="#curve_shape_functions" class="header-anchor">Curve shape functions</a></h2>
 <p>We now introduce two types of shape functions for curve integrals. </p>
-<h3 id="linear_elements"><a href="#linear_elements">Linear elements</a></h3>
+<h3 id="linear_elements"><a href="#linear_elements" class="header-anchor">Linear elements</a></h3>
 <p>The simplest shape function for curve integrals are the linear shape function.</p>
 \[
 \mathbf{N}_L(u) = \begin{bmatrix} 1 - u\\ u\end{bmatrix},\quad u \in [0,1]
@@ -57,7 +57,7 @@
 \[
 \text{Jacobi}_L(u) = \left\| \mathbf{M}^T\mathbf{N}_L'(u)\right\|_2 = \|\mathbf{m}_2 - \mathbf{m}_1\|_2
 \]
-<h4 id="quadratic_elements"><a href="#quadratic_elements">Quadratic elements</a></h4>
+<h4 id="quadratic_elements"><a href="#quadratic_elements" class="header-anchor">Quadratic elements</a></h4>
 <p>Another simple shape function is the quadratic elements defined by</p>
 \[
 \mathbf{N}_Q(u) = \begin{bmatrix} \frac{1}{2}u (u - 1)\\ 
@@ -80,11 +80,11 @@
 \[
 \text{Jacobi}_Q(u) = \left\|\mathbf{M}^T\mathbf{N}_Q'(u)\right\|_2
 \]
-<h2 id="surface_shape_functions"><a href="#surface_shape_functions">Surface Shape Functions</a></h2>
+<h2 id="surface_shape_functions"><a href="#surface_shape_functions" class="header-anchor">Surface Shape Functions</a></h2>
 <p>The idea behind the surface shape functions are the exact same as for the  curve shape functions. The only thing is that our parameterization now have  a two-dimensional input.</p>
-<h3 id="quadrilateral_shape_functions"><a href="#quadrilateral_shape_functions">Quadrilateral Shape Functions </a></h3>
+<h3 id="quadrilateral_shape_functions"><a href="#quadrilateral_shape_functions" class="header-anchor">Quadrilateral Shape Functions </a></h3>
 <p>We start by introducing the quadrilateral surface shape functions.  The main reason to use this specific kind of shape function is because that they are easy to integrate, as they are defined on a rectangular domain.  However the downside of the quadrilateral surface shape functions is that it is  hard to efficiently create the underlying mesh.</p>
-<h4 id="linear"><a href="#linear">Linear</a></h4>
+<h4 id="linear"><a href="#linear" class="header-anchor">Linear</a></h4>
 <p>The linear surface shape functions can be described by</p>
 \[
 \mathbf{N}_L(u,v) = 
@@ -97,7 +97,7 @@
 <p>We can visually every element of the shape function by itself as</p>
 <p><img src="/assets/visualizations/shapefunctions/3d_linear.png" alt="" /></p>
 <p>Using the shape functions it is possible to interpolate between 4 points in the \((x,y,z)\) space as. An example can be seen below. <img src="/assets/visualizations/shapefunctions/3d_linear_interp.png" alt="" /></p>
-<h4 id="quadratic"><a href="#quadratic">Quadratic</a></h4>
+<h4 id="quadratic"><a href="#quadratic" class="header-anchor">Quadratic</a></h4>
 <p>The quadratic shape functions can be described by</p>
 \[
 \mathbf{N}_Q(u,v) = 
@@ -114,22 +114,22 @@
 <p>Again we can visualize every element by itself.</p>
 <p><img src="/assets/visualizations/shapefunctions/3d_quadratic.png" alt="" /></p>
 <p>Using the shape functions it is possible to interpolate between 8 points in the \((x,y,z)\) space as. An example can be seen below. <img src="/assets/visualizations/shapefunctions/3d_quad_interp.png" alt="" /></p>
-<h3 id="triangular_shape_functions"><a href="#triangular_shape_functions">Triangular Shape Functions</a></h3>
+<h3 id="triangular_shape_functions"><a href="#triangular_shape_functions" class="header-anchor">Triangular Shape Functions</a></h3>
 <p>We now briefly introduce triangular surface shape functions. In constrast to the quadrilateral surface shape functions there exist many efficient ways of computing these triangular meshes. However the integration of these shape functions requires an extra step, since they are defined on a triangular domain instead of the usual rectangular domain.</p>
-<h4 id="linear__2"><a href="#linear__2">Linear</a></h4>
+<h4 id="linear__2"><a href="#linear__2" class="header-anchor">Linear</a></h4>
 <p>The linear triangular surface shape functions are defined as follows</p>
 \[
 \mathbf{N}_L(u,v) = \begin{bmatrix}1-u-v\\u\\v\end{bmatrix}, \quad u\in[0,1],v\in[0,1-u].
 \]
 <p>Visually we can see them as. <img src="/assets/visualizations/shapefunctions/triangularLinear.png" alt="" /></p>
-<h4 id="quadratic__2"><a href="#quadratic__2">Quadratic</a></h4>
+<h4 id="quadratic__2"><a href="#quadratic__2" class="header-anchor">Quadratic</a></h4>
 <p>Now the quadratic triangular shape functions are defined as follows</p>
 \[
 \mathbf{N}_Q(u,v) = \begin{bmatrix}(1-u-v)(1-2u-2v)\\u(2u-1)\\v(2v-1)\\4u(1-u-v)\\4uv\\4v(1-u-v)\end{bmatrix},
 \quad u\in[0,1],v\in[0,1-u].
 \]
 <p>Plotting every element for itself we see that <img src="/assets/visualizations/shapefunctions/triangularQuadratic.png" alt="" /></p>
-<h4 id="quadrature_on_triangular_shape_functions"><a href="#quadrature_on_triangular_shape_functions">Quadrature On Triangular Shape Functions</a></h4>
+<h4 id="quadrature_on_triangular_shape_functions"><a href="#quadrature_on_triangular_shape_functions" class="header-anchor">Quadrature On Triangular Shape Functions</a></h4>
 <p>In order for us to integrate over the triangular domains using a quadrature scheme we need to transform the coordinate into a rectangular domain. This can be done using the following transformation </p>
 \[
 \begin{bmatrix}u \\ v\end{bmatrix} = \begin{bmatrix} \xi\\ \eta(1-\xi)\end{bmatrix}, \xi,\eta \in [0,1].

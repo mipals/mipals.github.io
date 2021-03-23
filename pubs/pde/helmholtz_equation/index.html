@@ -27,13 +27,13 @@
 
 
 <!-- Content appended here -->
-<div class="franklin-content"><h1 id="the_helmholtz_equation"><a href="#the_helmholtz_equation">The Helmholtz Equation</a></h1>
+<div class="franklin-content"><h1 id="the_helmholtz_equation"><a href="#the_helmholtz_equation" class="header-anchor">The Helmholtz Equation</a></h1>
 <p>The Helmholtz equation can in short be viewed as the eigenvalue problem for the Laplace oeprator. It corresponds to the linear partial differential equation</p>
 \[
 \Delta p + k^2p = 0,
 \]
 <p>where \(\Delta\) is the Laplace operator, \(k^2\) the eigenvalue and \(p\) the corresponding eigenfunction. When applied to waves the number \(k\) is known as the wave number. </p>
-<h2 id="the_fundamental_solution_greens_function"><a href="#the_fundamental_solution_greens_function">The fundamental solution &#40;Green&#39;s function&#41;</a></h2>
+<h2 id="the_fundamental_solution_greens_function"><a href="#the_fundamental_solution_greens_function" class="header-anchor">The fundamental solution &#40;Green&#39;s function&#41;</a></h2>
 <p>The inhomogeneous Helmholtz equation have the following form</p>
 \[
 \Delta p(x) + k^2p(x) = -f(x), \quad x\in\mathbb{R}^n,
@@ -53,12 +53,12 @@ p(x) = \left(G * f\right)(x) = \int_{R^n}G(x-y)f(y)\ \mathrm{d}y.
 \Delta G(x) + k^2G(x) + \delta(x) = 0,
 \]
 <p>where \(\delta(x)\) is the Dirac delta function.</p>
-<h2 id="greens_function_in_two_dimensions"><a href="#greens_function_in_two_dimensions">Green&#39;s function in two dimensions</a></h2>
+<h2 id="greens_function_in_two_dimensions"><a href="#greens_function_in_two_dimensions" class="header-anchor">Green&#39;s function in two dimensions</a></h2>
 <p>In two dimensions the Green&#39;s function is a scaled zeroth order Hankel function of the first second</p>
 \[
 G_2(x) = \frac{i}{4}H_0^{(1)}(k\|x\|_2).
 \]
-<h3 id="gradient_of_the_greens_function"><a href="#gradient_of_the_greens_function">Gradient of the Green&#39;s function</a></h3>
+<h3 id="gradient_of_the_greens_function"><a href="#gradient_of_the_greens_function" class="header-anchor">Gradient of the Green&#39;s function</a></h3>
 <p>In the context of the boundary element method the directional derivative of the Green&#39;s function is commonly used. Therefore we briefly derive a simple expression for the gradient. We remind the reader of the following identity</p>
 <a id="eqidentity" class="anchor"></a>\[
 \nabla(f \circ g) = (f' \circ g)\nabla g
@@ -75,12 +75,12 @@ G_2(x) = \frac{i}{4}H_0^{(1)}(k\|x\|_2).
 \[
 \frac{\partial G(x)}{\partial n} = \frac{-ikH_1^{(1)}(k\|x\|_2)}{4\|x\|_2}x^Tn.
 \]
-<h2 id="greens_function_in_three_dimensions"><a href="#greens_function_in_three_dimensions">Green&#39;s function in three dimensions</a></h2>
+<h2 id="greens_function_in_three_dimensions"><a href="#greens_function_in_three_dimensions" class="header-anchor">Green&#39;s function in three dimensions</a></h2>
 <p>In three dimensions the Green&#39;s function is</p>
 \[
 G_3(x) = \frac{\mathrm{e}^{ik\|x\|_2}}{4\pi\|x\|_2}.
 \]
-<h3 id="gradient_of_the_greens_function__2"><a href="#gradient_of_the_greens_function__2">Gradient of the Green&#39;s function</a></h3>
+<h3 id="gradient_of_the_greens_function__2"><a href="#gradient_of_the_greens_function__2" class="header-anchor">Gradient of the Green&#39;s function</a></h3>
 <p>The computation of the Gradient is again based on the application of <span class="eqref">(<a href="#eqidentity">7</a>)</span> together with the standard product rule</p>
 \[\begin{aligned}
 \nabla G_3(x) 

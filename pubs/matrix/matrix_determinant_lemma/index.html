@@ -27,9 +27,9 @@
 
 
 <!-- Content appended here -->
-<div class="franklin-content"><h1 id="the_matrix_determinant_lemma"><a href="#the_matrix_determinant_lemma">The Matrix Determinant Lemma</a></h1>
+<div class="franklin-content"><h1 id="the_matrix_determinant_lemma"><a href="#the_matrix_determinant_lemma" class="header-anchor">The Matrix Determinant Lemma</a></h1>
 <p>In this short note a connection between the determinant of a rank-\(k\) pertubated \(n\times n\) matrix and a \(k\times k\) matrix is explored. We take the approach of &#40;some larger&#41; block matrices which in general can be a good approach to tackle these kind of problems.</p>
-<h2 id="determinants_of_block_matrices"><a href="#determinants_of_block_matrices">Determinants of Block Matrices</a></h2>
+<h2 id="determinants_of_block_matrices"><a href="#determinants_of_block_matrices" class="header-anchor">Determinants of Block Matrices</a></h2>
 <p>We start by stating a <em>very powerful</em> formula regarding the determinat of a block-diagonal matrix. The formula is the basis of everything stated in this note. It is stated without proof as the only proofs I could find was somewhat intricate. </p>
 <a id="eqtridiagblock" class="anchor"></a>\[
 \det\left(\begin{bmatrix}A & B \\ 0 & D\end{bmatrix}\right) = \det(A)\det(D).
@@ -61,7 +61,7 @@
     D^{-1}C & I_k
     \end{bmatrix}
 \]
-<h2 id="weinsteinaronszajn_identity"><a href="#weinsteinaronszajn_identity">Weinstein–Aronszajn identity</a></h2>
+<h2 id="weinsteinaronszajn_identity"><a href="#weinsteinaronszajn_identity" class="header-anchor">Weinstein–Aronszajn identity</a></h2>
 <p>We start by a introducing a special case. Namely the Weinstein-Aronszajn Identity, which explains that the determinant of a identity plus a rank-\(k\) perturbation is equal to the determinant of a \(k\times k\) matrix.</p>
 \[
 \det( I_n + UV^T) = \det(I_k + V^TU)
@@ -74,7 +74,7 @@
 \det\left(\begin{bmatrix} I_n & U\\ V^T & I_k\end{bmatrix}\right) = \det(I_k)\det(I_n + UI_k^{-1}V^T) = \det(I_n + UV^T)
 \]
 <p>Visually we can view the identity as <img src="/assets/visualizations/weinstein.png" alt="" /></p>
-<h2 id="the_general_form"><a href="#the_general_form">The General Form</a></h2>
+<h2 id="the_general_form"><a href="#the_general_form" class="header-anchor">The General Form</a></h2>
 <p>The most general form can be stated as</p>
 \[
 \det(A + UV^T) = \det(I_k + V^T A^{-1} U)\det(A)

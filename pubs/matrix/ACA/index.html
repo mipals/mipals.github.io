@@ -27,7 +27,7 @@
 
 
 <!-- Content appended here -->
-<div class="franklin-content"><h1 id="adaptive_cross_approximation_aca"><a href="#adaptive_cross_approximation_aca">Adaptive Cross Approximation &#40;ACA&#41;</a></h1>
+<div class="franklin-content"><h1 id="adaptive_cross_approximation_aca"><a href="#adaptive_cross_approximation_aca" class="header-anchor">Adaptive Cross Approximation &#40;ACA&#41;</a></h1>
 <p>In the computational scienes low rank approximations play a key role. It is well known that the best rank-\(k\) approximation in terms of either the spectral norm or the Frobenius norm is the truncated Singular Value Decomposition &#40;<a href="https://en.wikipedia.org/wiki/Low-rank_approximation#Proof_of_Eckart&#37;E2&#37;80&#37;93Young&#37;E2&#37;80&#37;93Mirsky_theorem_&#40;for_spectral_norm&#41;">Eckart-Young-Mirsky Theorem</a>&#41;. However the SVD is expensive to compute, as such it is of interest to establish other ways of computing good low rank approximations.<br/></p>
 <p>The simplest these computational methods is the Adaptive Cross Approximation &#40;ACA&#41; which in simple terms is based on exact interpolation of \(k\) rows and columns.  In the following visualization we choose rows \(r=\{2,4,7\}\) and columns \(c=\{1,3,6\}\) </p>
 <p><img src="/assets/visualizations/aca.png" alt="" />  </p>
@@ -51,7 +51,7 @@
         \begin{bmatrix}\overline{G}(:,c)G(r,c)^{-1}\overline{G}(r,:) & \overline{G}(:,c)\\ \overline{G}(r,:) & G(r,c)\end{bmatrix},
 \end{aligned}\]
 <p>from which the perfect interpolations of rows \(r\) and columns \(c\) and can be seen.</p>
-<h2 id="how_do_we_choose_the_index_sets"><a href="#how_do_we_choose_the_index_sets">How do we choose the index sets?</a></h2>
+<h2 id="how_do_we_choose_the_index_sets"><a href="#how_do_we_choose_the_index_sets" class="header-anchor">How do we choose the index sets?</a></h2>
 <p>While the ACA approach is easily explained we still need a way to pick the best rows and columns. Because we want to be able to use the ACA on matrices of sizes where the SVD is not feasible we want a heuristic approach that scales close to \(O(n)\).</p>
 <p>Stopping criterion</p>
 \[
@@ -65,7 +65,7 @@
 \[
 \|u_k\|_2\|v_k\| \leq \epsilon \|A_k\|_F
 \]
-<h2 id="references"><a href="#references">References</a></h2>
+<h2 id="references"><a href="#references" class="header-anchor">References</a></h2>
 <table class="fndef" id="fndef:1">
     <tr>
         <td class="fndef-backref"><a href="#fnref:1">[1]</a></td>

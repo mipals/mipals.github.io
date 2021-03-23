@@ -27,16 +27,33 @@
 
 
 <!-- Content appended here -->
-<div class="franklin-content"><h1 id="gaussian_quadrature"><a href="#gaussian_quadrature">Gaussian quadrature</a></h1>
+<div class="franklin-content"><h1 id="gaussian_quadrature"><a href="#gaussian_quadrature" class="header-anchor">Gaussian quadrature</a></h1>
 \[
 \int_{-1}^1 f(x)\ \mathrm{d}x \approx \sum_{i=1}^n w_if(x_i)
 \]
 \[
 \int_a^b f(x)\ \mathrm{d}x = \frac{b-a}{2}\int_{-1}^1 f\left(\frac{b-a}{2}\xi + \frac{a+b}{2}\right)\ \mathrm{d}\xi
 \]
+<h1 id="singular"><a href="#singular" class="header-anchor">Singular </a></h1>
+\[
+\int_{\partial\Omega} f(x,y)\ \mathrm{d}S_y = \int_{\partial\Omega} k(x,y)/(r^\beta(x,y))\ \mathrm{d}S_y
+\]
+<ol>
+<li><p>\(\beta = 0\): Regular</p>
+</li>
+<li><p>\(0 < \beta < 2\): Weakly singular</p>
+</li>
+<li><p>\(\beta = 2\): Strongly singular</p>
+</li>
+<li><p>\(2 < \beta \leq 3\): Hyper singular</p>
+</li>
+<li><p>\(3 < \beta \): Super-singular</p>
+</li>
+</ol>
+<p>Regular and weakly singular boundary integrals are finite for a finite region problem.  Strongly, hyper-singular, and super-singular boundary integrals are finite only if \(k(x,y)\) satisfies certain conditions.</p>
 <div class="page-foot">
   <div class="copyright">
-    &copy; Mikkel Paltorp. Last modified: December 10, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Mikkel Paltorp. Last modified: March 20, 2021. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->

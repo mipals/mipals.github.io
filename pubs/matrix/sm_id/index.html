@@ -27,9 +27,9 @@
 
 
 <!-- Content appended here -->
-<div class="franklin-content"><h1 id="the_sherman-morrison_identity"><a href="#the_sherman-morrison_identity">The Sherman-Morrison Identity</a></h1>
+<div class="franklin-content"><h1 id="the_sherman-morrison_identity"><a href="#the_sherman-morrison_identity" class="header-anchor">The Sherman-Morrison Identity</a></h1>
 <p>The Sherman-Morrison identity deals with the inversion of a rank-\(1\) perturbed matrix. In short it states that its inverse is also a rank-\(1\) perturbed matrix. Most notably it can be used to significanly speed up the computations of the inverse of the total matrix if the inverse of rank-1 perturbed matrix is already know.</p>
-<h2 id="a_special_case"><a href="#a_special_case">A Special Case</a></h2>
+<h2 id="a_special_case"><a href="#a_special_case" class="header-anchor">A Special Case</a></h2>
 <p><div class="definition"><p>The special case of the Sherman-Morrison stated  that the inversion of a rank-\(1\) perturbed identity matrix is also a rank-\(1\) perturbed identity matrix.</p>
 \[
 
@@ -47,7 +47,7 @@
 \]
 <p>Inserting this into our assumption the formula follows.<br/></p>
 <p>The first expression is how the formula is usually stated. However I like the last form better since it naturally extends to the Sherman-Morrison-Woodbury formula.</p>
-<h2 id="the_general_form"><a href="#the_general_form">The General Form</a></h2>
+<h2 id="the_general_form"><a href="#the_general_form" class="header-anchor">The General Form</a></h2>
 <p><div class="definition"><p>We can generalize the formula to a perturbation of a general &#40;invertible&#41; matrix </p>
 \[
 (A + uv^T)^{-1} = A^{-1} - \frac{A^{-1}uv^TA^{-1}}{1 + v^TA^{-1}u} = A^{-1} - A^{-1}u\left(1 + v^TA^{-1}v^T\right)^{-1}v^TA^{-1}.

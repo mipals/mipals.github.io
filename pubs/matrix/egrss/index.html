@@ -27,7 +27,7 @@
 
 
 <!-- Content appended here -->
-<div class="franklin-content"><h1 id="symmetric_extended_generator_representable_semiseparable_matrices"><a href="#symmetric_extended_generator_representable_semiseparable_matrices">Symmetric Extended Generator Representable Semiseparable Matrices</a></h1>
+<div class="franklin-content"><h1 id="symmetric_extended_generator_representable_semiseparable_matrices"><a href="#symmetric_extended_generator_representable_semiseparable_matrices" class="header-anchor">Symmetric Extended Generator Representable Semiseparable Matrices</a></h1>
 <p>The following is a simple example of how the matrices found in <a href="https://github.com/mipals/SymEGRSSMatrices.jl">SymEGRSSMatrices.jl</a>, can aid in efficiently computing smoothing splines.</p>
 <p>Given \(n\) noisy observations </p>
 \[(t_i,y_i), \quad i=1,\dots, n\]
@@ -72,7 +72,7 @@ y &#61; f&#40;t&#41; &#43; σ*randn&#40;length&#40;t&#41;&#41;;
 scatter&#40;t, y, ms&#61;2, label&#61;&quot;Observations&quot;, xlims&#61;&#40;a,b&#41;, xlabel&#61;&quot;t&quot;&#41; 
 plot&#33;&#40;a:δ/n:b, f&#40;a:δ/n:b&#41;, label&#61;&quot;f&#40;t&#41;&quot;,color&#61;:black, ls&#61;:dash,lw&#61;1&#41;</code></pre>
 <p><img src="/assets/output_2_0.svg" alt="svg" /></p>
-<h2 id="efficiently_computing_smoothing_splines"><a href="#efficiently_computing_smoothing_splines">Efficiently Computing Smoothing Splines</a></h2>
+<h2 id="efficiently_computing_smoothing_splines"><a href="#efficiently_computing_smoothing_splines" class="header-anchor">Efficiently Computing Smoothing Splines</a></h2>
 <p>The optimality coniditions of the previously mentioned QP is equivalent with solving the following system</p>
 \[
 \begin{bmatrix} \Sigma + n \lambda I & H \\ H^T & 0 \end{bmatrix}
@@ -121,7 +121,7 @@ scatter&#40;t, y, ms&#61;2, label&#61;&quot;Observations&quot;, xlims&#61;&#40;a
 plot&#33;&#40;a:δ/n:b, f&#40;a:δ/n:b&#41;, label&#61;&quot;f&#40;t&#41;&quot;,color&#61;:black, ls&#61;:dash,lw&#61;1&#41;
 plot&#33;&#40;t, Σ*c &#43; H*d, label&#61;&quot;fit&quot;,color&#61;:red, lw&#61;2&#41;</code></pre>
 <p><img src="/assets/output_4_0.svg" alt="svg" /></p>
-<h2 id="varying_the_rougness_penalty"><a href="#varying_the_rougness_penalty">Varying the Rougness Penalty</a></h2>
+<h2 id="varying_the_rougness_penalty"><a href="#varying_the_rougness_penalty" class="header-anchor">Varying the Rougness Penalty</a></h2>
 <p>From the first stated optimization problem it is apparant that the parameter \(\lambda\) can be used to emphasize how large the total \(p\)th derivative should be. As such we expect that small values of \(\lambda\) corresponds to an almost complete interpolation of the data, while a large value of \(\lambda\) is equivalent with fitting a \(p-1\) order polynomial.</p>
 <pre><code class="language-julia">anim &#61; @animate for λ &#61; &#91;10.0 .^&#40;-10:0.1:0&#41;; 10.0 .^&#40;0:-0.1:-10&#41;&#93;
     c, d, _ &#61; smoothing_spline&#40;Σ, H, y, λ&#41;;
@@ -131,7 +131,7 @@ plot&#33;&#40;t, Σ*c &#43; H*d, label&#61;&quot;fit&quot;,color&#61;:red, lw&#6
 end 
 gif&#40;anim, &quot;varying_rougness.gif&quot;, fps&#61;10&#41;</code></pre>
 <p><img src="/assets/varying_rougness.gif" alt="Alt Text" /></p>
-<h2 id="parameter_selection"><a href="#parameter_selection">Parameter Selection</a></h2>
+<h2 id="parameter_selection"><a href="#parameter_selection" class="header-anchor">Parameter Selection</a></h2>
 <p>Assuming that the measurement errors \(e_i\) are i.i.d Gaussian variables we can estimate the parameters \(\sigma\) and \(\lambda\) using the generalized maximum likelihood function &#40;GML&#41;. As stated in &#40;Andersen &amp; Chen 2020&#41; that the GML can be computed as</p>
 \[
 \log(GML(\lambda)) \propto \log(y^T\hat{c}) + \frac{1}{n-p}\log|K_y| + \frac{1}{n-p}\log|H^TK_y^{-1}H|.
@@ -162,7 +162,7 @@ plot&#33;&#40;t, K*c &#43; H*d, label&#61;&quot;fit&quot;,color&#61;:red,lw&#61;
      * Convergence: max&#40;|x - x_upper|, |x - x_lower|&#41; &lt;&#61; 2*&#40;1.5e-08*|x|&#43;2.2e-16&#41;: true
      * Objective Function Calls: 37</code></pre>
 <p><img src="/assets/output_8_1.svg" alt="svg" /></p>
-<h2 id="computing_bayesian_credible_intervals"><a href="#computing_bayesian_credible_intervals">Computing Bayesian Credible Intervals</a></h2>
+<h2 id="computing_bayesian_credible_intervals"><a href="#computing_bayesian_credible_intervals" class="header-anchor">Computing Bayesian Credible Intervals</a></h2>
 <p>The standard deviation at prediction \(\hat{y}_i\) is given by</p>
 \[
     \sigma_i^2 = \hat{\sigma}^2 e_i^TH(\hat{\lambda})e_i.
@@ -194,7 +194,7 @@ for i &#61; n: -1 :1
 end
 
 diagH &#61; 1.0 .- n*λhat*&#40;dH - sum&#40;S.*S,dims&#61;2&#41;&#41;;</code></pre>
-<h2 id="the_complete_picture"><a href="#the_complete_picture">The Complete Picture</a></h2>
+<h2 id="the_complete_picture"><a href="#the_complete_picture" class="header-anchor">The Complete Picture</a></h2>
 <pre><code class="language-julia">α &#61; 0.05
 β &#61; sqrt&#40;2&#41;*erfinv&#40;1-α&#41;
 σhat &#61; sqrt&#40;n*λhat*dot&#40;y,c&#41;/&#40;n-p&#41;&#41;
@@ -203,7 +203,7 @@ scatter&#40;t, y, ms&#61;2, label&#61;&quot;Observations&quot;, xlims&#61;&#40;a
 plot&#33;&#40;a:δ/n:b, f&#40;a:δ/n:b&#41;, label&#61;&quot;f&#40;t&#41;&quot;, ls&#61;:dash,color&#61;:black,lw&#61;1, ribbon&#61;β*σhat, alpha&#61;0.8, fillalpha&#61;0.1&#41;
 plot&#33;&#40;t, K*c &#43; H*d, label&#61;&quot;fit&quot;,color&#61;:red,lw&#61;2,title&#61;&quot;λ&#61;&quot;*@sprintf&#40;&quot;&#37;.3e&quot;, λhat&#41;*&quot;, &quot;*  &quot;σ&#61;&quot;* @sprintf&#40;&quot;&#37;.3e&quot;, σhat&#41;, ribbon&#61;β*σhat*sqrt.&#40;diagH&#41;, fillalpha&#61;0.5&#41;</code></pre>
 <p><img src="/assets/output_12_0.svg" alt="svg" /></p>
-<h2 id="references"><a href="#references">References</a></h2>
+<h2 id="references"><a href="#references" class="header-anchor">References</a></h2>
 <ol>
 <li><p>M. S. Andersen and T. Chen, “Smoothing Splines and Rank Structured Matrices: Revisiting the Spline Kernel,” SIAM Journal on Matrix Analysis and Applications, 2020.</p>
 </li>

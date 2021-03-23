@@ -27,9 +27,9 @@
 
 
 <!-- Content appended here -->
-<div class="franklin-content"><h1 id="the_sherman-morrison-woodbury_identity"><a href="#the_sherman-morrison-woodbury_identity">The Sherman-Morrison-Woodbury Identity</a></h1>
+<div class="franklin-content"><h1 id="the_sherman-morrison-woodbury_identity"><a href="#the_sherman-morrison-woodbury_identity" class="header-anchor">The Sherman-Morrison-Woodbury Identity</a></h1>
 <p>The Sherman-Morrison-Woodbury identity is the generalization of the Sherman-Morrison identity. In short it says that the inverse of a rank-\(k\) perturbed matrix is also a rank-\(k\) perturbed matrix. Most notably it can be used to significanly speed up the computations of the inverse of the total matrix if the inverse of rank-\(k\) perturbed matrix is already know. This speedup is the main workhorse behind the efficiency of the <a href="../../optimization/BFGS/">BFGS</a> algorithm.</p>
-<h2 id="a_special_case"><a href="#a_special_case">A Special Case</a></h2>
+<h2 id="a_special_case"><a href="#a_special_case" class="header-anchor">A Special Case</a></h2>
 <div class="definition"><p>A special case of the Sherman-Morrison-Woodbury identity is the following</p>
 \[
     (I + UV^T)^{-1} = I - U(I + V^TU)^{-1}V^T.
@@ -52,7 +52,7 @@ I + Z + V^TUZ = 0.
 <p>I sometimes find it easier to think of this identity in terms of visuals</p>
 <p><img src="/assets/visualizations/smw_special.png" alt="" /></p>
 <p>This clearly highlights how the identity can be used to reduce the problem of inverting a \(n\times n\) matrix to inverting a \(k\times k\) matrix at the expense of some matrix-vector products. If \(k \ll n\) then this reduction from \(O(n^2)\) to \(O(k^3 + kn)\) flops is a significant improvement.</p>
-<h2 id="the_general_form"><a href="#the_general_form">The General Form </a></h2>
+<h2 id="the_general_form"><a href="#the_general_form" class="header-anchor">The General Form </a></h2>
 <div class="definition"><p>In general the Sherman-Morrison-Woodbury identity have the form</p>
 <a id="eqref" class="anchor"></a>\[
 (A + USV^T)^{-1} = A^{-1} - A^{-1}U(S^{-1} + V^TA^{-1}U)^{-1}V^TA^{-1}.
@@ -72,7 +72,7 @@ B^{-1}
 <p>Also in this case i like to think of the formula in terms of visuals</p>
 <p><img src="/assets/visualizations/smw_general.png" alt="" /></p>
 <p>From this it is clear that we only get a speedup if the inverse of \(A^{-1}\) is already known. This might not seem useful, but it is actually one of the cornerstones of the Quasi-Newton method <a href="../BFGS/index.html">BFGS</a>. The speedup is in this case only from \(O(n^3)\) to \(O(k^3 + k(n^2 + n))\).</p>
-<h2 id="code"><a href="#code">Code</a></h2>
+<h2 id="code"><a href="#code" class="header-anchor">Code</a></h2>
 <p>The Julia library <a href="https://github.com/timholy/WoodburyMatrices.jl">WoodburyMatrices.jl</a> can be used to effeciently perform computations with Woodbury matrices.</p>
 <pre><code class="language-julia">using WoodburyMatrices, LinearAlgebra
 n &#61; 5000;
@@ -102,7 +102,7 @@ Woodbury_dense &#61; A &#43; U*C*V&#39;;
 <pre><code class="plaintext">  0.051735 seconds (39.03 k allocations: 2.178 MiB)
   1.004868 seconds (8 allocations: 190.850 MiB)
 </code></pre>
-<h2 id="a_useful_consequence"><a href="#a_useful_consequence">A Useful Consequence</a></h2>
+<h2 id="a_useful_consequence"><a href="#a_useful_consequence" class="header-anchor">A Useful Consequence</a></h2>
 <p><em>This section is <strong>very</strong> noty and was mostly written because <span class="eqref">(<a href="#eqvariant">8</a>)</span> was stated in some papers with only a reference to the Sherman-Morrison-Woodbury identity.</em><br/></p>
 <p>In the area of fast direct solvers a variation of the Sherman-Morrison-Woodbury formula is sometimes used. The motivation for this variant can be found in the fact that we need to invert \(S\) in the formula <span class="eqref">(<a href="#eqref">5</a>)</span> which makes an immidiate hierarchical &#40;recursive&#41; computation of the inverse impossible. However the following variant takes care of this problem. <div class="definition"><p>Assume we have the inverse as stated in <span class="eqref">(<a href="#eqref">5</a>)</span>, then set \(D = (V^TA^{-1}U)^{-1}\) resulting in</p>
 <a id="eqvariant" class="anchor"></a>\[ 
