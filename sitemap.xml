@@ -9,7 +9,7 @@
 </url>
 <url>
     <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/matrix/smw_id/index.html</loc>
-    <lastmod>2020-12-15</lastmod>
+    <lastmod>2021-06-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
@@ -33,7 +33,7 @@
 </url>
 <url>
     <loc>https://tlienart.github.io/FranklinTemplates.jl/menu2/index.html</loc>
-    <lastmod>2021-01-31</lastmod>
+    <lastmod>2021-03-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
@@ -51,7 +51,7 @@
 </url>
 <url>
     <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/matrix/sm_id/index.html</loc>
-    <lastmod>2020-12-10</lastmod>
+    <lastmod>2021-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
@@ -86,6 +86,12 @@
     <priority>0.5</priority>
 </url>
 <url>
+    <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/pde/BEM_shapefuncderiv/index.html</loc>
+    <lastmod>2021-07-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+<url>
     <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/matrix/ACA/index.html</loc>
     <lastmod>2020-12-16</lastmod>
     <changefreq>monthly</changefreq>
@@ -93,7 +99,7 @@
 </url>
 <url>
     <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/pde/BEM_representation/index.html</loc>
-    <lastmod>2021-03-20</lastmod>
+    <lastmod>2021-03-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
@@ -117,7 +123,7 @@
 </url>
 <url>
     <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/pde/BEM_losses/index.html</loc>
-    <lastmod>2020-11-26</lastmod>
+    <lastmod>2021-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
@@ -129,13 +135,13 @@
 </url>
 <url>
     <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/pde/helmholtz_equation/index.html</loc>
-    <lastmod>2020-12-13</lastmod>
+    <lastmod>2021-06-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
     <loc>https://tlienart.github.io/FranklinTemplates.jl/index.html</loc>
-    <lastmod>2020-12-15</lastmod>
+    <lastmod>2021-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
@@ -153,13 +159,13 @@
 </url>
 <url>
     <loc>https://tlienart.github.io/FranklinTemplates.jl/pubs/pde/BEM_integrals/index.html</loc>
-    <lastmod>2021-02-15</lastmod>
+    <lastmod>2021-05-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
     <loc>https://tlienart.github.io/FranklinTemplates.jl/menu1/index.html</loc>
-    <lastmod>2021-03-20</lastmod>
+    <lastmod>2021-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>

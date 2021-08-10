@@ -51,7 +51,7 @@ I + Z + V^TUZ = 0.
 <p>As such we must have that \(Z\) is equal to the above in order for \(I + UZV^T\) to be the actual inverse, which confirms the identity.</p>
 <p>I sometimes find it easier to think of this identity in terms of visuals</p>
 <p><img src="/assets/visualizations/smw_special.png" alt="" /></p>
-<p>This clearly highlights how the identity can be used to reduce the problem of inverting a \(n\times n\) matrix to inverting a \(k\times k\) matrix at the expense of some matrix-vector products. If \(k \ll n\) then this reduction from \(O(n^2)\) to \(O(k^3 + kn)\) flops is a significant improvement.</p>
+<p>This clearly highlights how the identity can be used to reduce the problem of inverting a \(n\times n\) matrix to inverting a \(k\times k\) matrix at the expense of some matrix-vector products. If \(k \ll n\) then this reduction from \(O(n^3)\) to \(O(k^3 + kn)\) flops is a significant improvement.</p>
 <h2 id="the_general_form"><a href="#the_general_form" class="header-anchor">The General Form </a></h2>
 <div class="definition"><p>In general the Sherman-Morrison-Woodbury identity have the form</p>
 <a id="eqref" class="anchor"></a>\[
@@ -71,7 +71,7 @@ B^{-1}
 <p>An alternatively one can use a similar approach to the one presented in the previous section. The guess just has to be modified to the form \(A^{-1} + A^{-1}UZV^TA^{-1}\). What is then left is to multiply with \((A + USV^T)\), set the expression equal to \(I\) &#40;because we assume that its an inverse&#41; and isolate \(Z\).</p>
 <p>Also in this case i like to think of the formula in terms of visuals</p>
 <p><img src="/assets/visualizations/smw_general.png" alt="" /></p>
-<p>From this it is clear that we only get a speedup if the inverse of \(A^{-1}\) is already known. This might not seem useful, but it is actually one of the cornerstones of the Quasi-Newton method <a href="../BFGS/index.html">BFGS</a>. The speedup is in this case only from \(O(n^3)\) to \(O(k^3 + k(n^2 + n))\).</p>
+<p>From this it is clear that we only get a speedup if the inverse of \(A^{-1}\) is already known. This might not seem useful, but it is actually the cornerstones of the <a href="../BFGS/index.html">Broyden–Fletcher–Goldfarb–Shanno algorithm</a>. The speedup is in this case only from \(O(n^3)\) to \(O(k^3 + k(n^2 + n))\).</p>
 <h2 id="code"><a href="#code" class="header-anchor">Code</a></h2>
 <p>The Julia library <a href="https://github.com/timholy/WoodburyMatrices.jl">WoodburyMatrices.jl</a> can be used to effeciently perform computations with Woodbury matrices.</p>
 <pre><code class="language-julia">using WoodburyMatrices, LinearAlgebra
@@ -85,7 +85,7 @@ Woodbury_struct &#61; Woodbury&#40;A, U, C, V&#39;&#41;;
 Woodbury_dense &#61; A &#43; U*C*V&#39;;
 @time Woodbury_struct\ones&#40;n&#41;;
 @time Woodbury_dense\ones&#40;n&#41;;</code></pre>
-<pre><code class="plaintext">  1.435378 seconds (613.63 k allocations: 222.221 MiB, 2.04% gc time)
+<pre><code class="plaintext code-output">  1.435378 seconds (613.63 k allocations: 222.221 MiB, 2.04% gc time)
   1.315805 seconds (392.29 k allocations: 210.478 MiB, 1.67% gc time)
 </code></pre>
 <p>As expected we do not get a speed up as the inversion of the Sherman-Morrison-Woodbury matrix also requires us to invert a \(n\times n\) matrix. Thankfully the package supports a factorization of \(A\) instead of \(A\) directly. Using this a clear speed-up can be seen. Off course it is not a completely fair comparison as we have not included the time it takes to actually factorize \(A\).</p>
@@ -99,7 +99,7 @@ Woodbury_struct &#61; Woodbury&#40;lu&#40;A&#41;, U, C, V&#39;&#41;;
 Woodbury_dense &#61; A &#43; U*C*V&#39;;
 @time Woodbury_struct\ones&#40;n&#41;;
 @time Woodbury_dense\ones&#40;n&#41;;</code></pre>
-<pre><code class="plaintext">  0.051735 seconds (39.03 k allocations: 2.178 MiB)
+<pre><code class="plaintext code-output">  0.051735 seconds (39.03 k allocations: 2.178 MiB)
   1.004868 seconds (8 allocations: 190.850 MiB)
 </code></pre>
 <h2 id="a_useful_consequence"><a href="#a_useful_consequence" class="header-anchor">A Useful Consequence</a></h2>
@@ -129,7 +129,7 @@ Woodbury_dense &#61; A &#43; U*C*V&#39;;
 <p>now setting \(E = A^{-1}UD\), \(F=(DV^TA^{-1})^T\) and \(G = A^{-1} - A^{-1}UDV^TA^{-1}\) the variation of the Sherman-Morrison-Woodbury formula becomes apparant. </p>
 <div class="page-foot">
   <div class="copyright">
-    &copy; Mikkel Paltorp. Last modified: December 15, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Mikkel Paltorp. Last modified: June 23, 2021. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->

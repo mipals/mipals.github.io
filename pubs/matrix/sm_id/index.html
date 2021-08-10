@@ -33,7 +33,7 @@
 <p><div class="definition"><p>The special case of the Sherman-Morrison stated  that the inversion of a rank-\(1\) perturbed identity matrix is also a rank-\(1\) perturbed identity matrix.</p>
 \[
 
-(I + uv^T)^{-1} = I - \frac{uv^T}{1 + v^Tu}\ = I - v(1 + v^Tu)^{-1}v^T
+(I + uv^T)^{-1} = I - \frac{uv^T}{1 + v^Tu}\ = I - u(1 + v^Tu)^{-1}v^T
 
 \]</div> The proof is simple. Assume that the inverse of \((I + uv^T)\) have a similar form, namely \((I + \alpha uv^T)\)</p>
 \[
@@ -50,12 +50,12 @@
 <h2 id="the_general_form"><a href="#the_general_form" class="header-anchor">The General Form</a></h2>
 <p><div class="definition"><p>We can generalize the formula to a perturbation of a general &#40;invertible&#41; matrix </p>
 \[
-(A + uv^T)^{-1} = A^{-1} - \frac{A^{-1}uv^TA^{-1}}{1 + v^TA^{-1}u} = A^{-1} - A^{-1}u\left(1 + v^TA^{-1}v^T\right)^{-1}v^TA^{-1}.
+(A + uv^T)^{-1} = A^{-1} - \frac{A^{-1}uv^TA^{-1}}{1 + v^TA^{-1}u} = A^{-1} - A^{-1}u\left(1 + v^TA^{-1}u\right)^{-1}v^TA^{-1}.
 \]</div> The intuition behind this is as follows: Set \(B = A + uv^T\) such that \(B^{-1} = (I + A^{-1}uv^T)^{-1}A^{-1}\). Then setting \(w = A^{-1}u\) and using the special case it follows.</p>
 <p>Again the first expression is how the formula usually is stated, while the second is how I personally like to think of it.</p>
 <div class="page-foot">
   <div class="copyright">
-    &copy; Mikkel Paltorp. Last modified: December 10, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Mikkel Paltorp. Last modified: June 22, 2021. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->

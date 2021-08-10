@@ -50,53 +50,50 @@ p(x) = \left(G * f\right)(x) = \int_{R^n}G(x-y)f(y)\ \mathrm{d}y.
 \]
 <p>Note that the integral is only over a finite region as we have assumed that \(f\) has compact support. The function \(G(x)\) is the so-called Green&#39;s function of the Helmholtz equation. In short this means that \(G(x)\) solves the following equation</p>
 \[
-\Delta G(x) + k^2G(x) + \delta(x) = 0,
+\Delta G(x,y) + k^2G(x,y) + \delta(x-y) = 0,
 \]
-<p>where \(\delta(x)\) is the Dirac delta function.</p>
-<h2 id="greens_function_in_two_dimensions"><a href="#greens_function_in_two_dimensions" class="header-anchor">Green&#39;s function in two dimensions</a></h2>
-<p>In two dimensions the Green&#39;s function is a scaled zeroth order Hankel function of the first second</p>
-\[
-G_2(x) = \frac{i}{4}H_0^{(1)}(k\|x\|_2).
-\]
-<h3 id="gradient_of_the_greens_function"><a href="#gradient_of_the_greens_function" class="header-anchor">Gradient of the Green&#39;s function</a></h3>
-<p>In the context of the boundary element method the directional derivative of the Green&#39;s function is commonly used. Therefore we briefly derive a simple expression for the gradient. We remind the reader of the following identity</p>
-<a id="eqidentity" class="anchor"></a>\[
-\nabla(f \circ g) = (f' \circ g)\nabla g
-\]
-<p>Using this the gradient computation comes easily</p>
-\[\begin{aligned}
-\nabla G_2(x) 
- &= \frac{i}{4}\left(H_0^{(1)}(k\|x\|_2)\right)'\left(\nabla k\|x\|_2\right)\\
- &= \frac{-ik}{4}H_1^{(1)}(k\|x\|_2)\begin{bmatrix}x_1\\ x_2\end{bmatrix}/\|x\|_2\\
- &= \frac{-ikH_1^{(1)}(k\|x\|_2)}{4\|x\|_2}\begin{bmatrix}x_1\\ x_2\end{bmatrix},
-\end{aligned}\]
-<p>where we used that \(\frac{\mathrm{d}}{\mathrm{d}z}H_n^{(1)}(z) = \frac{nH_n^{(1)}(z)}{z} - H_{n+1}^{(1)}(z)\).</p>
-<p>Using the expression of the gradient we see that we can easily compute the directional derivative as</p>
-\[
-\frac{\partial G(x)}{\partial n} = \frac{-ikH_1^{(1)}(k\|x\|_2)}{4\|x\|_2}x^Tn.
-\]
+<p>where \(\delta(x - y)\) is the Dirac delta function.</p>
 <h2 id="greens_function_in_three_dimensions"><a href="#greens_function_in_three_dimensions" class="header-anchor">Green&#39;s function in three dimensions</a></h2>
 <p>In three dimensions the Green&#39;s function is</p>
 \[
-G_3(x) = \frac{\mathrm{e}^{ik\|x\|_2}}{4\pi\|x\|_2}.
+G_3(x,y) = \frac{\mathrm{e}^{-ik\|x-y\|_2}}{4\pi\|x-y\|_2}.
 \]
-<h3 id="gradient_of_the_greens_function__2"><a href="#gradient_of_the_greens_function__2" class="header-anchor">Gradient of the Green&#39;s function</a></h3>
-<p>The computation of the Gradient is again based on the application of <span class="eqref">(<a href="#eqidentity">7</a>)</span> together with the standard product rule</p>
+<h3 id="gradient_of_the_greens_function"><a href="#gradient_of_the_greens_function" class="header-anchor">Gradient of the Green&#39;s function</a></h3>
+<p>The computation of the Gradient is again based on the application of the identity</p>
+<a id="eqidentity" class="anchor"></a>\[
+\nabla(f \circ g) = (f' \circ g)\nabla g,
+\]
+<p>together with the standard product rule. We start be simply looking at when \(y=0\) resulting in</p>
 \[\begin{aligned}
-\nabla G_3(x) 
-&= \frac{\mathrm{e}^{ik\|x\|_2}}{4\pi}\left[\nabla\left( (x^Tx)^{-1/2}\right)\right] + \frac{1}{4\pi\|x\|_2}\left[\nabla\left(\mathrm{e}^{ik\|x\|_2}\right) \right]\\
-&= \frac{\mathrm{e}^{ik\|x\|_2}}{4\pi}\left[-\frac{1}{2}\left(x^Tx\right)^{-3/2}\nabla(x^Tx)\right] + \frac{1}{4\pi\|x\|_2}\left[ik\mathrm{e}^{ik\|x\|_2}\nabla\left(\|x\|_2\right)\right]\\
-&= -\frac{\mathrm{e}^{ik\|x\|_2}}{4\pi\|x\|_2^{3}}x + \frac{ik\mathrm{e}^{ik\|x\|_2}}{4\pi\|x\|_2^{2}}x\\
-&= \frac{\mathrm{e}^{ik\|x\|_2}\left(ik\|x\|_2 - 1\right)}{4\pi \|x\|_2^3}\begin{bmatrix}x_1\\x_2\\x_3\end{bmatrix}.
+\nabla_x G_3(x) 
+&= \frac{\mathrm{e}^{-ik\|x\|_2}}{4\pi}\left[\nabla\left((x^Tx)^{-1/2}\right)\right] + \frac{1}{4\pi\|x\|_2}\left[\nabla\left(\mathrm{e}^{-ik\|x\|_2}\right) \right]\\
+&= \frac{\mathrm{e}^{-ik\|x\|_2}}{4\pi}\left[-\frac{1}{2}\left(x^Tx\right)^{-3/2}\nabla(x^Tx)\right] + \frac{1}{4\pi\|x\|_2}\left[-ik\mathrm{e}^{-ik\|x\|_2}\nabla\left(\|x\|_2\right)\right]\\
+&= -\frac{\mathrm{e}^{-ik\|x\|_2}}{4\pi\|x\|_2^{3}}x + \frac{-ik\mathrm{e}^{-ik\|x\|_2}}{4\pi\|x\|_2^{2}}x\\
+&= -\frac{\mathrm{e}^{-ik\|x\|_2}\left(ik\|x\|_2 + 1\right)}{4\pi \|x\|_2^3}\begin{bmatrix}x_1\\x_2\\x_3\end{bmatrix}.
+\end{aligned}\]
+<p>Now if we want the derivative with respect to \(y\neq 0\) then it follows that</p>
+\[\begin{aligned}
+\nabla_y G_3(x,y) 
+&= -\frac{\mathrm{e}^{-ik\|x - y\|_2}\left(ik\|x - y\|_2 + 1\right)}{4\pi \|x\|_2^3}\begin{bmatrix}y_1 - x_1\\y_2 - x_2\\y_3 - x_3\end{bmatrix}.
 \end{aligned}\]
 <p>Which result in the following directional derivative</p>
 \[\begin{aligned}
-\frac{\partial G(x)}{\partial n} 
-&= \frac{\mathrm{e}^{ik\|x\|_2}\left(ik\|x\|_2 - 1\right)}{4\pi \|x\|_2^3}x^Tn.
+\frac{\partial G(x,y)}{\partial n_y} 
+&= \frac{-\mathrm{e}^{-ik\|x\|_2}\left(ik\|x\|_2 + 1\right)}{4\pi \|x\|_2^3}(y - x)^Tn.
 \end{aligned}\]
+<h3 id="further_notes"><a href="#further_notes" class="header-anchor">Further notes</a></h3>
+<p>If \(k=0\) then the Helmholtz equation reduces to the Lapalce&#39;s equation</p>
+\[
+\Delta_y G(x,y) = -\delta (x - y).
+\]
+<p>The solution to this is called the <em>elementary</em> solution as is equal to</p>
+\[
+G_0(x,y) = \frac{1}{4\pi\|x - y\|_2}.
+\]
+<p>While seemlingly not relevant to the above problem it is used when computing the so-called integral free term in the boundary element method.</p>
 <div class="page-foot">
   <div class="copyright">
-    &copy; Mikkel Paltorp. Last modified: December 13, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Mikkel Paltorp. Last modified: June 21, 2021. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->

@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="/css/franklin.css">
   <link rel="stylesheet" href="/css/basic.css">
   <link rel="icon" href="/assets/favicon.png">
-   <title>The Boundary Element Method</title>  
+   <title>Viscothermal losses and The Boundary Element Method</title>  
 </head>
 <body>
   <header>
@@ -27,28 +27,85 @@
 
 
 <!-- Content appended here -->
-<div class="franklin-content"><h1 id="the_boundary_element_method_bem"><a href="#the_boundary_element_method_bem" class="header-anchor">The Boundary Element Method &#40;BEM&#41;</a></h1>
-<h2 id="discretization"><a href="#discretization" class="header-anchor">Discretization</a></h2>
+<div class="franklin-content"><h1 id="viscothermal_losses_and_kirchoffs_decomposition"><a href="#viscothermal_losses_and_kirchoffs_decomposition" class="header-anchor">Viscothermal Losses and Kirchoff&#39;s Decomposition</a></h1>
+<p>In this note the intution behind viscothermal losses for acoustics is explained. Afterwards an overview of how the Kirchoff&#39;s decomposition can be used to solve viscothermal acoustical problems using the boundary element.</p>
+<h2 id="losses"><a href="#losses" class="header-anchor">Losses</a></h2>
+<p>In many models of the real world losses are not included as they tend to make the model more complex while not actually making the model more correct. Sometimes, however, one can not omit losses as they would significantly change the results of the computations. An example of where losses can not be omitted is when modelling acoustics in small enclosures such as e.g. hearing aids and microphones. The losses most prevalent in this model is viscous and thermal losses. As such the intution behind these losses is given below.</p>
+<h3 id="viscous_losses"><a href="#viscous_losses" class="header-anchor">Viscous losses</a></h3>
+<p>The main intution behind viscous losses is the fact that air tends to stick to the surface of objects. The reason for this is e.g. frictional forces however they are not the sole explanation. This &quot;stickyness&quot; can be modelled as follows. Assume we have some velocity in the bulk &#40;\(\mathbf{v}\)&#41;, then close to the surface this velocity must go towards zero when approaching the boundary. This can be visualized as </p>
+<p><img src="/assets/losses/viscous.png" alt="" /> <sup id="fnref:1"><a href="#fndef:1" class="fnref">[1]</a></sup></p>
+<p>The layer close to the surface where the velocity approaches is called the called the boundary layer and is the in the case of viscous losses usually denoted \(\delta_v\). The thickness of the boundary layer can in the case of air be approximated as</p>
 \[
-\mathbf{C}\mathbf{p} = \mathbf{H}\mathbf{p} - \mathbf{B}\frac{\partial \mathbf{p}}{\partial n} + \mathbf{p}^I = 0
+\delta_v \approx 2.1\frac{1}{\sqrt{f}} \text{ mm}.
 \]
+<h3 id="thermal_losses"><a href="#thermal_losses" class="header-anchor">Thermal Losses</a></h3>
+<p>When it comes to thermal losses the main intuition is that the boundary does not change it temperature due to the acoustics inside the bulk. The reasoning is simply that the heat capacity of air is negligible compared to the heat capacity of any solid materal. The transitional phase where we go from allowing temperature changes to not allowing them is called the thermal boundary layer. Visually we can view this model as. </p>
+<p><img src="/assets/losses/thermal.png" alt="" /> <sup id="fnref:1"><a href="#fndef:1" class="fnref">[1]</a></sup></p>
+<p>Assuming that the medium is air we can approximate the thermal boundary layer thickness as</p>
 \[
-\mathbf{A}\mathbf{p} - \mathbf{B}\frac{\partial \mathbf{p}}{\partial n} + \mathbf{p}^I = 0
+\delta_h \approx 2.5\frac{1}{\sqrt{f}} \text{ mm}.
 \]
-<h2 id="bem_with_losses"><a href="#bem_with_losses" class="header-anchor">BEM with losses</a></h2>
+<p>From we can see that the viscous boundary layer thickness &#40;\(\delta_v\)&#41; and the thermal boundary layer thickness &#40;\(\delta_h\)&#41; is on the same of order of magnitude and hence are usually present at the same time. </p>
+<h2 id="kirchoff_decomposition"><a href="#kirchoff_decomposition" class="header-anchor">Kirchoff Decomposition</a></h2>
+<p>There have been put significant effort into including viscothermal losses into the model. Most methods are based on some restrictive assumptions &#40;non-overlapping boundary layers, constant cross sections, etc.&#41;. While restrictive in their assumptions the resulting computational time are impressive. However, in cases where the assumptions are not satisfied one needs to solve the Fully-Linearized Navier-Stokes equation in their entirety. This can be done directly using your favourite FEM solver or instead solving the equivalent system of equation</p>
+<ul>
+<li><p>Acoustic Mode: \((\Delta + k_a^2)p_a = 0\),</p>
+</li>
+<li><p>Thermal Mode: \((\Delta + k_h^2)p_h = 0\),</p>
+</li>
+<li><p>Viscous Mode: \((\Delta + k_v^2)\mathbf{v_v} = \mathbf{0},\quad \nabla\cdot \mathbf{v}_v = 0\),</p>
+</li>
+</ul>
+<p>called the Kirchoff Decomposition <sup id="fnref:1"><a href="#fndef:1" class="fnref">[1]</a></sup>. The three modes corresponds to a total of 5 Helmholtz type equations &#40;since the viscous mode has three components&#41; as well a divergence constraint. Given the simple nature of the Helmholtz equation they can be solved using the Boundary Element Method. The question now becomes: How do we couple the three modes?</p>
+<h3 id="coupling_the_acoustic_thermal_and_viscous_modes"><a href="#coupling_the_acoustic_thermal_and_viscous_modes" class="header-anchor">Coupling the Acoustic, Thermal and Viscous Modes</a></h3>
+<p>The coupling of the three modes are in fact quite simple are based on the intution behind the thermal and viscous losses. The first being that the we have no change of temperature on the boundary resulting in the condition</p>
 \[
-\mathbf{X}\mathbf{p}_a = \mathbf{Y}_1 \mathbf{v}_{\text{boundary},n} + \mathbf{Y}_2\mathbf{v}_{\text{boundary},t} + \mathbf{Y}_3\mathbf{p}^I
-
+T(\mathbf{x}) = \tau_ap_a(\mathbf{x}) + \tau_hp_h(\mathbf{x}) = 0, \quad \mathbf{x} \in \Gamma.
 \]
-\[\begin{aligned}
-\mathbf{A}_a\mathbf{p}_a\frac{\partial \mathbf{p}_a}{\partial n} + \mathbf{p} &= \mathbf{0},\\
-\mathbf{A}_h\mathbf{p}_h\frac{\partial \mathbf{p}_h}{\partial n} + \mathbf{p} &= \mathbf{0},\\
-\mathbf{A}_v\mathbf{p}_v\frac{\partial \mathbf{p}_v}{\partial n} + \mathbf{p} &= \mathbf{0}, \quad \text{with} \quad \nabla\cdot \mathbf{v}_v = 0
-\end{aligned}\]
+<p>Now the viscous coupling simply states that the boundary velocity should be equal to zero &#40;or simply a described velocity if you want that as a boundary condition&#41;. The resulting equation becomes simply</p>
+\[
+\mathbf{v}_{\text{boundary}}(\mathbf{x}) = \mathbf{v}_a(\mathbf{x}) + \mathbf{v}_h(\mathbf{x}) + \mathbf{v}_v(\mathbf{x}) = \phi_a\nabla p_a(\mathbf{x}) + \phi_h\nabla p_h (\mathbf{x}) + \mathbf{v}_v(\mathbf{x}), \quad \mathbf{x} \in \Gamma.
+\]
+<p>In practice it is not completely straightforward to get \(\nabla p_a\) and \(\nabla p_h\). Initially people tried using e.g. an finite difference scheme, which was found to be numerically unstable for certain problems. Now the preferred way is to use the so-called  &#40;<a href="/pubs/pde/BEM_shapefuncderiv/">shape function derivative approach</a> <sup id="fnref:2"><a href="#fndef:2" class="fnref">[2]</a></sup>. This approach essentially takes use of the fact that the Boundary Element discritzation actually gives a direct description of the two functions \(p_a(\mathbf{x})\) and \(p_h(\mathbf{x})\) as a sum of basis elements/functions. This description can then be explictly differentiated, resulting in two gradients being functions of \(p_a(\mathbf{x})\) and \(p_h(\mathbf{x})\) resepectively. The same approach can be used to set-up the null-divergence constraint where the derivatives of \(\mathbf{v}_v\) becomes function fo \(\mathbf{v}_v\).</p>
+<h3 id="putting_things_together"><a href="#putting_things_together" class="header-anchor">Putting Things Together</a></h3>
+<p>Now adding the 5 Helmholtz systems, 4 coupling terms &#40;1 thermal and 3 velocity directions&#41; as well as 1 divergence constraint, we end up with the following system of equations</p>
+<p><img src="/assets/losses/lossy_matrix1.png" alt="" /></p>
+<p>If one naively implemented the above system of equation one will see that the above system grow very quickly in size. This is namely due to the fact that there are 10 DOFs per node on the mesh. This means that for a simple mesh of 10,000 nodes the above requires the storage of a \(100,000\times 100,000\) matrix of complex numbers, which would require around 160 GB of memory to be stored. In the following we will explain the inherent structure of the matrix, that makes is able to solve the system effieciently.</p>
+<h3 id="saved_by_the_zeros"><a href="#saved_by_the_zeros" class="header-anchor">Saved by the Zeros</a></h3>
+<p>The main reason we can do things efficiently is that the above matrix contains <strong>a lot</strong> of zeros. This is due to a couple of things</p>
+<ul>
+<li><p>The original 5 Helmholtz equation are completely decoupled.</p>
+</li>
+<li><p>The viscous and thermal matrices are very sparse. The intuition there is that they describe local effects.</p>
+</li>
+<li><p>The thermal and viscous coupling are completely local.</p>
+</li>
+<li><p>The null-divergence constraint can be computed very simply using the so-called shape function derivative approach.</p>
+</li>
+</ul>
+<p>We introduce the following visualization of the structure blocks.</p>
+<p><img src="/assets/losses/block_description.png" alt="" /></p>
+<p>Using the above we can visualize the resulting system of equations simply as</p>
+<p><img src="/assets/losses/lossy_matrix3.png" alt="" /></p>
+<p>The main takeaway is that the resulting system of equations is extremely sparse. It actually turns out that in most cases the total storage of the sparse and diagonal is less than the storage of just storing a single dense block. In practice this means that if one has enough memory to store the purely acoustical system one should be able to store the full system including viscothermal losses. Revisiting the mesh with 10,000 nodes from the previous section the sparse matrix would require less that 5 GB which is about 32 times less than the large system. </p>
+<p>Computationally, however, this is not necessarily true, since one also needs to assemble the thermal and viscous matrices.</p>
 <h2 id="references"><a href="#references" class="header-anchor">References</a></h2>
+<p><table class="fndef" id="fndef:1">
+    <tr>
+        <td class="fndef-backref"><a href="#fnref:1">[1]</a></td>
+        <td class="fndef-content">Andersen, Peter Risby. <a href="https://orbit.dtu.dk/en/publications/modelling-of-acoustic-viscothermal-losses-using-the-boundary-elem">&quot;Modelling of Acoustic Viscothermal Losses Using the Boundary Element Method: From Method to Optimization&quot;</a>. Technical University of Denmark, 2018.</td>
+    </tr>
+</table>
+<table class="fndef" id="fndef:2">
+    <tr>
+        <td class="fndef-backref"><a href="#fnref:2">[2]</a></td>
+        <td class="fndef-content">Cutanda Henriquez, Vicente, and Peter Risby Andersen. <a href="https://orbit.dtu.dk/en/publications/a-three-dimensional-acoustic-boundary-element-method-formulation-">“A Three-Dimensional Acoustic Boundary Element Method Formulation with Viscous and Thermal Losses Based on Shape Function Derivatives.”</a> Journal of Computational Acoustics, vol. 26, no. 3, World Scientific Publishing Co. Pte Ltd, 2018, p. 1850039, doi:10.1142/S2591728518500391.</td>
+    </tr>
+</table>
+</p>
 <div class="page-foot">
   <div class="copyright">
-    &copy; Mikkel Paltorp. Last modified: November 26, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Mikkel Paltorp. Last modified: August 09, 2021. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->
