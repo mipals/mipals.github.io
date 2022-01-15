@@ -66,7 +66,7 @@ T(\mathbf{x}) = \tau_ap_a(\mathbf{x}) + \tau_hp_h(\mathbf{x}) = 0, \quad \mathbf
 \[
 \mathbf{v}_{\text{boundary}}(\mathbf{x}) = \mathbf{v}_a(\mathbf{x}) + \mathbf{v}_h(\mathbf{x}) + \mathbf{v}_v(\mathbf{x}) = \phi_a\nabla p_a(\mathbf{x}) + \phi_h\nabla p_h (\mathbf{x}) + \mathbf{v}_v(\mathbf{x}), \quad \mathbf{x} \in \Gamma.
 \]
-<p>In practice it is not completely straightforward to get \(\nabla p_a\) and \(\nabla p_h\). Initially people tried using e.g. an finite difference scheme, which was found to be numerically unstable for certain problems. Now the preferred way is to use the so-called  &#40;<a href="/pubs/pde/BEM_shapefuncderiv/">shape function derivative approach</a> <sup id="fnref:2"><a href="#fndef:2" class="fnref">[2]</a></sup>. This approach essentially takes use of the fact that the Boundary Element discritzation actually gives a direct description of the two functions \(p_a(\mathbf{x})\) and \(p_h(\mathbf{x})\) as a sum of basis elements/functions. This description can then be explictly differentiated, resulting in two gradients being functions of \(p_a(\mathbf{x})\) and \(p_h(\mathbf{x})\) resepectively. The same approach can be used to set-up the null-divergence constraint where the derivatives of \(\mathbf{v}_v\) becomes function fo \(\mathbf{v}_v\).</p>
+<p>In practice it is not completely straightforward to get \(\nabla p_a\) and \(\nabla p_h\). Initially people tried using e.g. an finite difference scheme, which was found to be numerically unstable for certain problems. Now the preferred way is to use the so-called  &#40;<a href="/pubs/pde/BEM_shapefuncderiv/">shape function derivative approach</a> <sup id="fnref:2"><a href="#fndef:2" class="fnref">[2]</a></sup>&#41;. This approach essentially takes use of the fact that the Boundary Element discritzation actually gives a direct description of the two functions \(p_a(\mathbf{x})\) and \(p_h(\mathbf{x})\) as a sum of basis elements/functions. This description can then be explictly differentiated, resulting in two gradients being functions of \(p_a(\mathbf{x})\) and \(p_h(\mathbf{x})\) resepectively. The same approach can be used to set-up the null-divergence constraint where the derivatives of \(\mathbf{v}_v\) becomes function fo \(\mathbf{v}_v\).</p>
 <h3 id="putting_things_together"><a href="#putting_things_together" class="header-anchor">Putting Things Together</a></h3>
 <p>Now adding the 5 Helmholtz systems, 4 coupling terms &#40;1 thermal and 3 velocity directions&#41; as well as 1 divergence constraint, we end up with the following system of equations</p>
 <p><img src="/assets/losses/lossy_matrix1.png" alt="" /></p>
@@ -105,7 +105,7 @@ T(\mathbf{x}) = \tau_ap_a(\mathbf{x}) + \tau_hp_h(\mathbf{x}) = 0, \quad \mathbf
 </p>
 <div class="page-foot">
   <div class="copyright">
-    &copy; Mikkel Paltorp. Last modified: August 09, 2021. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Mikkel Paltorp. Last modified: January 13, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->

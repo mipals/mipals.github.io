@@ -27,33 +27,44 @@
 
 
 <!-- Content appended here -->
-<div class="franklin-content"><h1 id="gaussian_quadrature"><a href="#gaussian_quadrature" class="header-anchor">Gaussian quadrature</a></h1>
+<div class="franklin-content"><h1 id="quadrature_for_one-dimensional_integrals"><a href="#quadrature_for_one-dimensional_integrals" class="header-anchor">Quadrature for one-dimensional integrals</a></h1>
+<p>The basic idea behind quadrature schemes is to approximate integrals as follows</p>
 \[
-\int_{-1}^1 f(x)\ \mathrm{d}x \approx \sum_{i=1}^n w_if(x_i)
+\int_{-1}^1 f(x)\ \mathrm{d}x \approx \sum_{i=1}^n w_if(x_i),
+\]
+<p>where \(w_i\) is called weights and \(x_i\) the gauss ponts. Note that the sum of the weights \(w_i\) is equal to length of integral length &#40;\(\sum_i^nw_i = 1-(-1)=2\)&#41;.</p>
+<p>Now in many cases one are not interested in the integral from \(-1\) to \(1\) but instead a more general \(a\) to \(b\). This can be done by a simple change of variables</p>
+\[
+\int_a^b f(x)\ \mathrm{d}x = \frac{b-a}{2}\int_{-1}^1 f\left(\frac{b-a}{2}\xi + \frac{a+b}{2}\right)\ \mathrm{d}\xi.
+\]
+<p>Written differently one could see the above as simply modifying the weights, \(w_i\), and the gauss nodes, \(x_i\), as </p>
+\[
+\overline{w}_i = \frac{b-a}{2}w_i, \quad \overline{x}_i = \frac{b-a}{2}x_i + \frac{a+b}{2},
+\]
+<p>such that</p>
+\[
+\int_a^b f(x)\ \mathrm{d}x \approx \sum_{i=1}^n\overline{w}_if(\overline{x}_i).
+\]
+<h1 id="quadrature_for_two-dimensional_integrals"><a href="#quadrature_for_two-dimensional_integrals" class="header-anchor">Quadrature for two-dimensional integrals</a></h1>
+<p>For two-dimensional integrals the basic idea is integrals of the form</p>
+\[
+\int_{-1}^1\int_{-1}^1 f(x,y)\ \mathrm{d}x\mathrm{d}y \approx \sum_{i=1}^n w_if(x_i,y_i).
+\]
+<p>In this case we have that the sum of the weights is equal to the area of domain of the integral &#40;\(\sum_{i=1}^nw_i = (1-(-1))(1-(-1))=4\)&#41;.</p>
+<p>In general we are again more interested in integrals of the form</p>
+\[
+\int_{c}^d\int_a^b f(x)\ \mathrm{d}x = \frac{b-a}{2}\frac{d-c}{2}\int_{-1}^1 f\left(\frac{b-a}{2}\xi + \frac{a+b}{2}, \frac{d-c}{2}\eta + \frac{d+c}{2}\right)\ \mathrm{d}\xi\mathrm{d}\eta.
 \]
 \[
-\int_a^b f(x)\ \mathrm{d}x = \frac{b-a}{2}\int_{-1}^1 f\left(\frac{b-a}{2}\xi + \frac{a+b}{2}\right)\ \mathrm{d}\xi
+\overline{w}_i = \frac{b-a}{2}\frac{d-c}{2}w_i, \quad \overline{x}_i = \frac{b-a}{2}x_i + \frac{a+b}{2}, \quad \overline{y}_i = \frac{d-c}{2}y_i + \frac{d+c}{2},
 \]
-<h1 id="singular"><a href="#singular" class="header-anchor">Singular </a></h1>
+<p>such that</p>
 \[
-\int_{\partial\Omega} f(x,y)\ \mathrm{d}S_y = \int_{\partial\Omega} k(x,y)/(r^\beta(x,y))\ \mathrm{d}S_y
+\int_{c}^d\int_a^b f(x)\ \mathrm{d}x \approx \sum_{i=1}^nw_if(x_i, y_i).
 \]
-<ol>
-<li><p>\(\beta = 0\): Regular</p>
-</li>
-<li><p>\(0 < \beta < 2\): Weakly singular</p>
-</li>
-<li><p>\(\beta = 2\): Strongly singular</p>
-</li>
-<li><p>\(2 < \beta \leq 3\): Hyper singular</p>
-</li>
-<li><p>\(3 < \beta \): Super-singular</p>
-</li>
-</ol>
-<p>Regular and weakly singular boundary integrals are finite for a finite region problem.  Strongly, hyper-singular, and super-singular boundary integrals are finite only if \(k(x,y)\) satisfies certain conditions.</p>
 <div class="page-foot">
   <div class="copyright">
-    &copy; Mikkel Paltorp. Last modified: March 20, 2021. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Mikkel Paltorp. Last modified: January 13, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->

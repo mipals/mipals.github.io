@@ -85,8 +85,9 @@ Woodbury_struct &#61; Woodbury&#40;A, U, C, V&#39;&#41;;
 Woodbury_dense &#61; A &#43; U*C*V&#39;;
 @time Woodbury_struct\ones&#40;n&#41;;
 @time Woodbury_dense\ones&#40;n&#41;;</code></pre>
-<pre><code class="plaintext code-output">  1.435378 seconds (613.63 k allocations: 222.221 MiB, 2.04% gc time)
-  1.315805 seconds (392.29 k allocations: 210.478 MiB, 1.67% gc time)
+<pre><code class="plaintext code-output">ArgumentError: Package WoodburyMatrices not found in current path:
+- Run `import Pkg; Pkg.add("WoodburyMatrices")` to install the WoodburyMatrices package.
+
 </code></pre>
 <p>As expected we do not get a speed up as the inversion of the Sherman-Morrison-Woodbury matrix also requires us to invert a \(n\times n\) matrix. Thankfully the package supports a factorization of \(A\) instead of \(A\) directly. Using this a clear speed-up can be seen. Off course it is not a completely fair comparison as we have not included the time it takes to actually factorize \(A\).</p>
 <pre><code class="language-julia">n &#61; 5000;
@@ -99,8 +100,7 @@ Woodbury_struct &#61; Woodbury&#40;lu&#40;A&#41;, U, C, V&#39;&#41;;
 Woodbury_dense &#61; A &#43; U*C*V&#39;;
 @time Woodbury_struct\ones&#40;n&#41;;
 @time Woodbury_dense\ones&#40;n&#41;;</code></pre>
-<pre><code class="plaintext code-output">  0.051735 seconds (39.03 k allocations: 2.178 MiB)
-  1.004868 seconds (8 allocations: 190.850 MiB)
+<pre><code class="plaintext code-output">UndefVarError: I not defined
 </code></pre>
 <h2 id="a_useful_consequence"><a href="#a_useful_consequence" class="header-anchor">A Useful Consequence</a></h2>
 <p><em>This section is <strong>very</strong> noty and was mostly written because <span class="eqref">(<a href="#eqvariant">8</a>)</span> was stated in some papers with only a reference to the Sherman-Morrison-Woodbury identity.</em><br/></p>
@@ -129,7 +129,7 @@ Woodbury_dense &#61; A &#43; U*C*V&#39;;
 <p>now setting \(E = A^{-1}UD\), \(F=(DV^TA^{-1})^T\) and \(G = A^{-1} - A^{-1}UDV^TA^{-1}\) the variation of the Sherman-Morrison-Woodbury formula becomes apparant. </p>
 <div class="page-foot">
   <div class="copyright">
-    &copy; Mikkel Paltorp. Last modified: June 23, 2021. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Mikkel Paltorp. Last modified: January 13, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->

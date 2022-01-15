@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="stylesheet" href="/libs/katex/katex.min.css">
+     
+   <link rel="stylesheet" href="/libs/highlight/github.min.css">
+   
+  <link rel="stylesheet" href="/css/franklin.css">
+  <link rel="stylesheet" href="/css/basic.css">
+  <link rel="icon" href="/assets/favicon.png">
+   <title>Boundary Layer Impedance</title>  
+</head>
+<body>
+  <header>
+<div class="blog-name"><a href="/">Mikkel Paltorp</a></div>
+<nav>
+  <ul>
+    <li><a href="/">About Me</a></li>
+    <li><a href="/menu1/">Notes</a></li>
+    <li><a href="/menu2/">Software</a></li>
+  </ul>
+  <img src="/assets/hamburger.svg" id="menu-icon">
+</nav>
+</header>
+
+
+<!-- Content appended here -->
+<div class="franklin-content"><h1 id="boundary_layer_impedance"><a href="#boundary_layer_impedance" class="header-anchor">Boundary Layer Impedance</a></h1>
+<p>It has been suggested by Berggren et al. <sup id="fnref:1"><a href="#fndef:1" class="fnref">[1]</a></sup>, that viscothermal effects can be approximated by asserting a Wentzell boundary condition on the Helmholtz equation. In short the takeaway from the paper is that the viscothermal effects can be approximated by solving</p>
+\[\begin{aligned}
+    \Delta p + k^2p &= 0, \qquad y \in \Omega\\
+    \delta\frac{i-1}{2}\Delta_tp - \delta_Tk^2\frac{(i-1)(\gamma-1))}{2}p &= \frac{\partial p}{\partial n}, \quad y \in \partial\Omega.
+\end{aligned}\]
+<p>An equivalent formulation of the boundary condition is in terms of an admittance <sup id="fnref:2"><a href="#fndef:2" class="fnref">[2]</a></sup></p>
+\[
+    \frac{\partial p}{\partial n} = ikY_{\text{BLI}}p, \quad \text{where} \quad Y_{\text{BLI}} = \left(\frac{1}{k_h} - \frac{\Delta_t}{k_vk} \right).
+\]
+<p>Simply inserting this into the representation formula we get the following</p>
+\[\begin{aligned}
+    C(P)p(P) 
+    &= \int_\Gamma \frac{\partial G(R)}{\partial n}p(Q)\ \mathrm{d}\Gamma 
+    - \int_\Gamma G(R)\frac{\partial p(Q)}{\partial n}\ \mathrm{d}\Gamma\\
+    &= \int_\Gamma \frac{\partial G(R)}{\partial n}p(Q)\ \mathrm{d}\Gamma 
+    - ik\int_\Gamma G(R)\left(\frac{1}{k_h} - \frac{\Delta_t}{k_vk} \right)p(Q)\ \mathrm{d}\Gamma.
+\end{aligned}\]
+<p>Now applying integration by parts on the tangential Laplacian, \(\Delta_tp\), it follows that</p>
+\[
+    C(P)p(P) = \int_\Gamma \frac{\partial G(R)}{\partial n}p(Q)\ \mathrm{d}\Gamma 
+    - \frac{ik}{k_h}\int_\Gamma G(R)p(Q)\ \mathrm{d}\Gamma
+    + \frac{i}{k_v}\int_\Gamma \nabla_t G(R)\nabla_t p(Q)\ \mathrm{d}\Gamma
+\]
+<p>where it was assumed that</p>
+\[
+    \int_{\Lambda} G(R)\nabla_tp(Q)\ \mathrm{d}\Lambda = 0,
+\]
+<p>and \(\Lambda\) represents the boundary of \(\Gamma\). Given that all of the intergrals are over the full boundary we can rewrite the representation formulas as follows</p>
+\[\begin{aligned}
+    C(P)p(P) = \int_\Gamma \left(\frac{\partial G(R)}{\partial n} - \frac{ik}{k_h}G(R) + \frac{i}{k_v} \nabla_t G(R)\nabla_t\right)p(Q)\ \mathrm{d}\Gamma.
+\end{aligned}\]
+<p>Defining the expression inside of the parentheses as \(K(R)\) we can further simplify things to</p>
+\[
+    C(P)p(P) = \int_\Gamma K(R)p(Q)\ \mathrm{d}\Gamma.
+\]
+<p>While the above seems easily implemented there is one part of \(K(R)\) which is not easily computed, namely that of numerically intestimating the tangential derivative \(\nabla_t\). In 2D this could be done by a simple finite difference, however things are different in 3D, specially if the interpolation grids are unstructured. A method of computing this derivative is explained in the note on <a href=""><em>Shape Function Derivatives</em></a>, however, if one would naively implement this one would see that this requires a inversion of a 3x3-matrix for every gaussian interpolation node. As such this would be a very time consuming computation.   <strong>Do we have a solution for this yet?</strong></p>
+<h2 id="references"><a href="#references" class="header-anchor">References</a></h2>
+<p><table class="fndef" id="fndef:1">
+    <tr>
+        <td class="fndef-backref"><a href="#fnref:1">[1]</a></td>
+        <td class="fndef-content">Berggren, Martin, et al. “Acoustic Boundary Layers as Boundary Conditions.” Journal of Computational Physics, vol. 371, Academic Press Inc., 2018, pp. 633–50, doi:10.1016/j.jcp.2018.06.005.</td>
+    </tr>
+</table>
+<table class="fndef" id="fndef:2">
+    <tr>
+        <td class="fndef-backref"><a href="#fnref:2">[2]</a></td>
+        <td class="fndef-content">Risby Andersen, Peter, Cutanda Henriquez, Vicente &amp; Aage, Niels. &quot;On the validity of numerical models for viscothermal losses in structural optimization for micro-acoustics&quot;</td>
+    </tr>
+</table>
+</p>
+<div class="page-foot">
+  <div class="copyright">
+    &copy; Mikkel Paltorp. Last modified: January 13, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+  </div>
+</div>
+</div><!-- CONTENT ENDS HERE -->
+    
+        <script src="/libs/katex/katex.min.js"></script>
+<script src="/libs/katex/auto-render.min.js"></script>
+<script>renderMathInElement(document.body)</script>
+
+    
+    
+        <script src="/libs/highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();hljs.configure({tabReplace: '    '});</script>
+
+    
+  </body>
+</html>

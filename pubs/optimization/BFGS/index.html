@@ -123,7 +123,7 @@ H_{k+1} = H_k + \frac{y_ky_k^T}{y_k^Ts_k} - \frac{H_ks_ks_k^TH_k}{s_k^TH_ks_k},
 <p>As promised we see that the update of the inverse does not explictly rely on \(H_k\) &#40;but instead just \(H_k^{-1}\)&#41;. The expression is usually stated with \(\gamma_k = H_k^{-1}y_k\) reinserted. However I find that a little misleading given that a good implementation would have have a temporary variable like \(\gamma_k\) computed instead of having multiple matrix-vector products. On a last note I want to stress that here we can also clearly see that the update will continue to be symmetric if the initial matrix \(H_0\) is symmetric. The reason for this is simply that \((\alpha + \alpha^2y_k^T\gamma_k)\) is just a scalar and \((\gamma_ks_k^T + s_k\gamma_k^T)\) is the sum of a matrix and its transpose which is clearly symmetric.</p>
 <div class="page-foot">
   <div class="copyright">
-    &copy; Mikkel Paltorp. Last modified: December 16, 2020. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Mikkel Paltorp. Last modified: January 11, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->

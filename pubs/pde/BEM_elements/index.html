@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="stylesheet" href="/libs/katex/katex.min.css">
+     
+   <link rel="stylesheet" href="/libs/highlight/github.min.css">
+   
+  <link rel="stylesheet" href="/css/franklin.css">
+  <link rel="stylesheet" href="/css/basic.css">
+  <link rel="icon" href="/assets/favicon.png">
+   <title>Elements</title>  
+</head>
+<body>
+  <header>
+<div class="blog-name"><a href="/">Mikkel Paltorp</a></div>
+<nav>
+  <ul>
+    <li><a href="/">About Me</a></li>
+    <li><a href="/menu1/">Notes</a></li>
+    <li><a href="/menu2/">Software</a></li>
+  </ul>
+  <img src="/assets/hamburger.svg" id="menu-icon">
+</nav>
+</header>
+
+
+<!-- Content appended here -->
+<div class="franklin-content"><h1 id="continuous_elements"><a href="#continuous_elements" class="header-anchor">Continuous Elements</a></h1>
+<p><img src="/assets/visualizations/shapefunctions/fem_1d_domain.png" alt="" /> <img src="/assets/visualizations/shapefunctions/fem_1d_global.png" alt="" /> <img src="/assets/visualizations/shapefunctions/fem_1d_global2.png" alt="" /></p>
+\[
+\text{topology} = 
+\begin{bmatrix}
+1 & 2 & \dots & n-2 & n-1 \\
+2 & 3 & \dots & n-1 & n
+\end{bmatrix}
+\]
+\[
+\text{topology} = 
+\begin{bmatrix}
+1 & 3 & \dots & n-4 & n-2 \\
+2 & 4 & \dots & n-3 & n-1 \\ 
+3 & 5 & \dots & n-2 & n
+\end{bmatrix}
+\]
+<h1 id="discontinuous_elements"><a href="#discontinuous_elements" class="header-anchor">Discontinuous Elements</a></h1>
+\[
+\text{topology} = 
+\begin{bmatrix}
+1 & 2 & 3 & \dots & n-1 & n 
+\end{bmatrix}
+\]
+\[
+\text{topology} = 
+\begin{bmatrix}
+1 & 3 & 5 & \dots & n-3 & n-1 \\
+2 & 4 & 6 & \dots & n-2 & n 
+\end{bmatrix}
+\]
+\[
+\text{topology} = 
+\begin{bmatrix}
+1 & 4 & 7 & \dots & n-5 & n-2 \\
+2 & 5 & 8 & \dots & n-4 & n-1 \\
+3 & 6 & 9 & \dots & n-3 & n 
+\end{bmatrix}
+\]
+<div class="page-foot">
+  <div class="copyright">
+    &copy; Mikkel Paltorp. Last modified: January 14, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+  </div>
+</div>
+</div><!-- CONTENT ENDS HERE -->
+    
+        <script src="/libs/katex/katex.min.js"></script>
+<script src="/libs/katex/auto-render.min.js"></script>
+<script>renderMathInElement(document.body)</script>
+
+    
+    
+        <script src="/libs/highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();hljs.configure({tabReplace: '    '});</script>
+
+    
+  </body>
+</html>
