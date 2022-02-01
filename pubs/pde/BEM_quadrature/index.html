@@ -32,8 +32,7 @@
 \[
 \int_{-1}^1 f(x)\ \mathrm{d}x \approx \sum_{i=1}^n w_if(x_i),
 \]
-<p>where \(w_i\) is called weights and \(x_i\) the gauss ponts. Note that the sum of the weights \(w_i\) is equal to length of integral length &#40;\(\sum_i^nw_i = 1-(-1)=2\)&#41;.</p>
-<p>Now in many cases one are not interested in the integral from \(-1\) to \(1\) but instead a more general \(a\) to \(b\). This can be done by a simple change of variables</p>
+<p>where \(w_i\) is called weights and \(x_i\) the gauss ponts. Note that the sum of the weights \(w_i\) is equal to length of integral length &#40;\(\sum_i^nw_i = 1-(-1)=2\)&#41;. One could argue that looking at the interval \(-1\) to \(1\) is not interesting, but it turns out that that is all you need since through a simple change of variables one can can rewrite an intergral on the domain from \(a\) to \(b\) as</p>
 \[
 \int_a^b f(x)\ \mathrm{d}x = \frac{b-a}{2}\int_{-1}^1 f\left(\frac{b-a}{2}\xi + \frac{a+b}{2}\right)\ \mathrm{d}\xi.
 \]
@@ -45,26 +44,43 @@
 \[
 \int_a^b f(x)\ \mathrm{d}x \approx \sum_{i=1}^n\overline{w}_if(\overline{x}_i).
 \]
+<div class="example"><p><strong>Example</strong>: &#40;<em>Quadrature in 1D</em>&#41;    As an example we look at the following integral</p>
+\[
+\int_0^{2\pi}|\sin(x)|\ \mathrm{d}x = 2(-\cos(\pi)+\cos(0)) = 4,
+\]
+<p>In Julia this integral can be estimated using the following code</p>
+<pre><code class="language-julia">using GaussQuadrature, LinearAlgebra, Plots
+N &#61; 50
+a &#61; 0 
+b &#61; 2*pi
+xi,wi &#61; legendre&#40;N&#41;
+f&#40;x&#41; &#61; abs.&#40;sin.&#40;x&#41;&#41;
+xbar &#61; 0.5*&#40;b-a&#41;*xi .&#43; 0.5*&#40;b&#43;a&#41;
+wbar &#61; 0.5*&#40;b-a&#41;*wi
+wbar&#39;*f&#40;xbar&#41;</code></pre>
+<pre><code class="plaintext code-output">4.003187673366941
+</code></pre>
+<img src="/assets/pubs/pde/BEM_quadrature/code/output/f_func.svg" alt=""></div>
 <h1 id="quadrature_for_two-dimensional_integrals"><a href="#quadrature_for_two-dimensional_integrals" class="header-anchor">Quadrature for two-dimensional integrals</a></h1>
 <p>For two-dimensional integrals the basic idea is integrals of the form</p>
 \[
 \int_{-1}^1\int_{-1}^1 f(x,y)\ \mathrm{d}x\mathrm{d}y \approx \sum_{i=1}^n w_if(x_i,y_i).
 \]
-<p>In this case we have that the sum of the weights is equal to the area of domain of the integral &#40;\(\sum_{i=1}^nw_i = (1-(-1))(1-(-1))=4\)&#41;.</p>
-<p>In general we are again more interested in integrals of the form</p>
+<p>In this case we have that the sum of the weights is equal to the area of domain of the integral &#40;\(\sum_{i=1}^nw_i = (1-(-1))(1-(-1))=4\)&#41;. Again using change of variables &#40;in both \(x\) and \(y\)&#41; one find that</p>
 \[
 \int_{c}^d\int_a^b f(x)\ \mathrm{d}x = \frac{b-a}{2}\frac{d-c}{2}\int_{-1}^1 f\left(\frac{b-a}{2}\xi + \frac{a+b}{2}, \frac{d-c}{2}\eta + \frac{d+c}{2}\right)\ \mathrm{d}\xi\mathrm{d}\eta.
 \]
+<p>This again means that</p>
 \[
-\overline{w}_i = \frac{b-a}{2}\frac{d-c}{2}w_i, \quad \overline{x}_i = \frac{b-a}{2}x_i + \frac{a+b}{2}, \quad \overline{y}_i = \frac{d-c}{2}y_i + \frac{d+c}{2},
+\int_{c}^d\int_a^b f(x)\ \mathrm{d}x \approx \sum_{i=1}^n\overline{w}_if(\overline{x}_i, \overline{y}_i),
 \]
-<p>such that</p>
+<p>where</p>
 \[
-\int_{c}^d\int_a^b f(x)\ \mathrm{d}x \approx \sum_{i=1}^nw_if(x_i, y_i).
+\overline{w}_i = \frac{b-a}{2}\frac{d-c}{2}w_i, \quad \overline{x}_i = \frac{b-a}{2}x_i + \frac{a+b}{2}, \quad \overline{y}_i = \frac{d-c}{2}y_i + \frac{d+c}{2}.
 \]
 <div class="page-foot">
   <div class="copyright">
-    &copy; Mikkel Paltorp. Last modified: January 13, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Mikkel Paltorp. Last modified: January 17, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->

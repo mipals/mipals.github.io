@@ -66,8 +66,8 @@ G_3(x,y) = \frac{\mathrm{e}^{-ik\|x-y\|_2}}{4\pi\|x-y\|_2}.
 <p>together with the standard product rule. We start be simply looking at when \(y=0\) resulting in</p>
 \[\begin{aligned}
 \nabla_x G_3(x) 
-&= \frac{\mathrm{e}^{-ik\|x\|_2}}{4\pi}\left[\nabla\left((x^Tx)^{-1/2}\right)\right] + \frac{1}{4\pi\|x\|_2}\left[\nabla\left(\mathrm{e}^{-ik\|x\|_2}\right) \right]\\
-&= \frac{\mathrm{e}^{-ik\|x\|_2}}{4\pi}\left[-\frac{1}{2}\left(x^Tx\right)^{-3/2}\nabla(x^Tx)\right] + \frac{1}{4\pi\|x\|_2}\left[-ik\mathrm{e}^{-ik\|x\|_2}\nabla\left(\|x\|_2\right)\right]\\
+&= \frac{\mathrm{e}^{-ik\|x\|_2}}{4\pi}\left[\nabla\left((x^\top x)^{-1/2}\right)\right] + \frac{1}{4\pi\|x\|_2}\left[\nabla\left(\mathrm{e}^{-ik\|x\|_2}\right) \right]\\
+&= \frac{\mathrm{e}^{-ik\|x\|_2}}{4\pi}\left[-\frac{1}{2}\left(x^\top x\right)^{-3/2}\nabla(x^\top x)\right] + \frac{1}{4\pi\|x\|_2}\left[-ik\mathrm{e}^{-ik\|x\|_2}\nabla\left(\|x\|_2\right)\right]\\
 &= -\frac{\mathrm{e}^{-ik\|x\|_2}}{4\pi\|x\|_2^{3}}x + \frac{-ik\mathrm{e}^{-ik\|x\|_2}}{4\pi\|x\|_2^{2}}x\\
 &= -\frac{\mathrm{e}^{-ik\|x\|_2}\left(ik\|x\|_2 + 1\right)}{4\pi \|x\|_2^3}\begin{bmatrix}x_1\\x_2\\x_3\end{bmatrix}.
 \end{aligned}\]
@@ -79,7 +79,7 @@ G_3(x,y) = \frac{\mathrm{e}^{-ik\|x-y\|_2}}{4\pi\|x-y\|_2}.
 <p>Which result in the following directional derivative</p>
 \[\begin{aligned}
 \frac{\partial G(x,y)}{\partial n_y} 
-&= \frac{-\mathrm{e}^{-ik\|x\|_2}\left(ik\|x\|_2 + 1\right)}{4\pi \|x\|_2^3}(y - x)^Tn.
+&= \frac{-\mathrm{e}^{-ik\|x\|_2}\left(ik\|x\|_2 + 1\right)}{4\pi \|x\|_2^3}(y - x)^\top n.
 \end{aligned}\]
 <h3 id="further_notes"><a href="#further_notes" class="header-anchor">Further notes</a></h3>
 <p>If \(k=0\) then the Helmholtz equation reduces to the Lapalce&#39;s equation</p>
@@ -93,7 +93,7 @@ G_0(x,y) = \frac{1}{4\pi\|x - y\|_2}.
 <p>While seemlingly not relevant to the above problem it is used when computing the so-called integral free term in the boundary element method.</p>
 <div class="page-foot">
   <div class="copyright">
-    &copy; Mikkel Paltorp. Last modified: January 13, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Mikkel Paltorp. Last modified: February 01, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->

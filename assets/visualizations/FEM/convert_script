@@ -1,0 +1,26 @@
+#!/bin/bash
+ 
+# Declare a string array with type
+declare -a StringArray=("fem_linear_domain" 
+                        "fem_linear_basis" 
+                        "fem_linear_element" 
+                        "fem_linear_interp" 
+                        "fem_interp_comparison" 
+                        "fem_quadratic_domain" 
+                        "fem_quadratic_basis"
+                        "fem_quadratic_element"
+                        "fem_quadratic_interp"
+                        "fem_constant_interp"
+                        "fem_discconstant_domain"
+                        "fem_discconstant_basis"
+                        "fem_discconstant_interp"
+                        "fem_disclinear_domain"
+                        "fem_disclinear_basis"
+                        "fem_disclinear_interp"
+                        "fem_discquadratic_domain"
+                        "fem_discquadratic_basis"
+                        "fem_discquadratic_interp"  )
+
+for val in "${StringArray[@]}"; do
+  convert -density 400 "${val}.pdf" "${val}.png"
+done

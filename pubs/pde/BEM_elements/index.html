@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="/css/franklin.css">
   <link rel="stylesheet" href="/css/basic.css">
   <link rel="icon" href="/assets/favicon.png">
-   <title>Elements</title>  
+   <title>Line Elements</title>  
 </head>
 <body>
   <header>
@@ -27,8 +27,55 @@
 
 
 <!-- Content appended here -->
-<div class="franklin-content"><h1 id="continuous_elements"><a href="#continuous_elements" class="header-anchor">Continuous Elements</a></h1>
-<p><img src="/assets/visualizations/shapefunctions/fem_1d_domain.png" alt="" /> <img src="/assets/visualizations/shapefunctions/fem_1d_global.png" alt="" /> <img src="/assets/visualizations/shapefunctions/fem_1d_global2.png" alt="" /></p>
+<div class="franklin-content"><h1 id="line_elements"><a href="#line_elements" class="header-anchor">Line Elements</a></h1>
+<p>In this not we look into so-called line elements which are used for the one-dimensional Finite Element Method &#40;FEM&#41; and two-dimensional Boundary Element Method &#40;BEM&#41;. In both cases there are two discretizations happening: </p>
+<ol>
+<li><p>Discretization of the geoemetry</p>
+<p>The reason for this is simply that parametrization of curves in general can be difficult. The job of this discretization is to split the curve of interest into smaller subcurves &#40;elements&#41; which can be described using simple functions such as polynomials. In fact in this small node we only focus on polynomial elements. <em>This is mostly a problem for the BEM</em></p>
+</li>
+<li><p>Discretization of the physics</p>
+<p>The reason for this is that we aim to parametrize a family of functions for which we hope to find a solution to our PDE. This can be done in various ways but in this note we only look at polynomial parametrization. Firstly we look at so-called continuous schemes of which the physics follows the geometric nodes and discontinuous schemes where the physics follow the elements.</p>
+</li>
+</ol>
+<p>In practice the discretization of the geometry is done by introducing a matrix \(\mathbf{X}\) which has columns equal to the points that we want the curve to connect &#40;note that some implementations have the points as rows&#41;</p>
+\[
+\mathbf{X} = 
+\begin{bmatrix}
+\mathbf{x}_1 & \mathbf{x}_2 & \dots & \mathbf{x}_n
+\end{bmatrix}.
+\]
+<p>The idea is that we can now parametrize the curve of interest as</p>
+\[
+\mathbf{x}(u) = \mathbf{T}_\mathbf{x}(u)\mathbf{X}^\top,
+\]
+<p>where \(\mathbf{T}(u)\) is a vector function which represents the interpolation between each node \(\mathbf{x}_i\). In practice, however, it is usally more easy to introduce the so-called topology matrix &#40;also sometimes called a connectivity matrix&#41; as</p>
+\[
+\left.
+\text{topology} = 
+\begin{bmatrix}
+1 & 2 & \dots & n-2 & n-1 \\
+2 & 3 & \dots & n-1 & n
+\end{bmatrix}
+\right\}\text{Connectivity matrix of coordinates},
+\]
+<p>where each column represents an <em>element</em>. What this means is that the values in a column represents node-numbers which is interpolated between on said element.</p>
+<p>The discetization of the physics is similar, namely that we introduce the following vector \(\mathbf{P}\) which contains the nodal values \(p_i\) as</p>
+<a id="eqphysicsinterp" class="anchor"></a>\[
+\mathbf{P} = 
+\begin{bmatrix}
+p_1 \\ p_2 \\ \vdots \\ p_n.
+\end{bmatrix}
+\]
+<p>Using these nodal values we can create an interpolation of them in the same way as for the geometrical nodes</p>
+\[
+p(x) = \mathbf{T}_p(x)\mathbf{P}.
+\]
+<p>Note that in many cases it has been chosen to set \(\mathbf{T}_\mathbf{x} = \mathbf{T}_p\) since it simplifies the implementation. A key insight into element methods is that <span class="eqref">(<a href="#eqphysicsinterp">4</a>)</span> serves a <em>parametrization</em> of possible solutions to the PDE of interest. Both FEM and BEM are then based on setting up a linear system of equation in order to find \(\mathbf{P}\) such that <span class="eqref">(<a href="#eqphysicsinterp">4</a>)</span> is the best possible approximation of solution with respect to some chosen error measure.</p>
+<h2 id="continuous"><a href="#continuous" class="header-anchor">Continuous</a></h2>
+<p>In the following we only visualize 1-dimensional problems, but its important to note that everything discussed is directly translatable into n-dimensional curves. The only difference here being that the number of rows in \(\mathbf{X}\) is equal to the dimension of interest.  </p>
+<h3 id="linear"><a href="#linear" class="header-anchor">Linear</a></h3>
+<p>We start by dividing the domain \(\Omega = [0,L]\) into elements as <img src="/assets/visualizations/FEM/fem_linear_domain.png" alt="" /></p>
+<p>Here \(x_i\) are called nodes &#40;also called points&#41;, \(e_i\) represents element \(i\) and \(h_i = x_{i+1} - x_i\) is the element length. The connectivity of these elements can be described by the following <em>topology</em> matrix</p>
 \[
 \text{topology} = 
 \begin{bmatrix}
@@ -36,21 +83,102 @@
 2 & 3 & \dots & n-1 & n
 \end{bmatrix}
 \]
+<p>Now we want to find the basis functions &#40;also denoted interpolation functions or shape functions&#41; on element \(i\) such that the interpolation between \(x_i\) and \(x_{i+1}\) is linear. Firstly the lineariry mean that</p>
+\[
+T_i(x)x_i + T_{i+1}(x)x_{i+1} = ax + b, \quad x\in [x_i, x_{i+1}].
+\]
+<p>Now since we want this to interpolate between \(x_i\) and \(x_{i+1}\) we must have that</p>
+\[
+\begin{aligned}
+T_i(x_i)x_i + T_{i+1}(x_i)x_{i+1} = ax_i + b &= x_i,\\
+T_i(x_{i+1})x_i + T_{i+1}(x_{i+1})x_{i+1} = ax_{i+1}+ b &= x_{i+1}.
+\end{aligned}
+\]
+<p>Since we have two equation and two unkowns &#40;\(a,b\)&#41; we can solve for the unkowns and rearrange such that</p>
+\[
+\begin{aligned}
+T_i(x)x_i + T_{i+1}(x)x_{i+1} = x_i\left(\frac{x_{i+1}-x}{h_i}\right) + x_{i+1}\left(\frac{x-x_i}{h_i}\right).
+\end{aligned}
+\]
+<p>Now a crucial comment is that the above is only true when have \(x\in[x_i,x_{i+1}]\) &#40;i.e. when \(x\) is on element \(i\)&#41; it is there custom to instead write </p>
+\[
+N_i^1(x)x_i + N_i^2(x)x_{i+1},
+\]
+<p>where \(N_i^1(x)=N_i^2(x) = 0\) when \(x\notin [x_i, x_{i+1}]\).  <img src="/assets/visualizations/FEM/fem_linear_element.png" alt="" /></p>
+<p>Now given the topology of the elements it is easy to extend the above results to the following  <img src="/assets/visualizations/FEM/fem_linear_basis.png" alt="" /></p>
+<p>Utilizing the same basis functions for the interpolation scheme for the physics we have that</p>
+\[
+p(x) = \mathbf{T}_p(x)\mathbf{P}.
+\]
+<p>For some given values of \(p_i\) one see that the interpolation is linear on each element</p>
+<p><img src="/assets/visualizations/FEM/fem_linear_interp.png" alt="" /></p>
+<h3 id="quadratic"><a href="#quadratic" class="header-anchor">Quadratic</a></h3>
+<p>We know continue to the concept of quadratic elements. Also here we split the domain \(\Omega = [0,L]\) into elements</p>
+<p><img src="/assets/visualizations/FEM/fem_quadratic_domain.png" alt="" /></p>
+<p>The topology in this case is</p>
 \[
 \text{topology} = 
 \begin{bmatrix}
 1 & 3 & \dots & n-4 & n-2 \\
 2 & 4 & \dots & n-3 & n-1 \\ 
 3 & 5 & \dots & n-2 & n
-\end{bmatrix}
+\end{bmatrix}.
 \]
-<h1 id="discontinuous_elements"><a href="#discontinuous_elements" class="header-anchor">Discontinuous Elements</a></h1>
+<p>Note that for this case each element contains three nodes. This can be rationalized since we want quadratic elements, we must have three equations in order to find the arbitrary constants of </p>
+\[
+T_{i-1}(x)x_{i-1} + T_{i}(x)x_{i} = T_{i+1}(x)x_{i+1} = ax^2 + bx + c, \quad x\in[x_{i-1}, x_{i+1}]
+\]
+<p>Now we can set up three equations</p>
+\[
+\begin{aligned}
+x_{i-1} &= ax_{i-1}^2 + bx_{i-1} + c\\
+x_i     &= ax_i^2     + bx_i     + c\\
+x_{i+1} &= ax_{i+1}^2 + bx_{i+1} + c.
+\end{aligned}
+\]
+<p>Solving these equations one find that</p>
+\[
+\begin{aligned}
+T_{i-1}(x)  &= 2\left(\frac{x_{i}-x}{h_i}\right)\left(\frac{x_{i+1}-x}{h_i}\right)\\
+T_{i}(x)    &= 4\left(\frac{x-x_{i-1}}{h_i}\right)\left(\frac{x_{i+1}-x}{h_i}\right), \quad x\in[x_{i-1},x_{i+1}]\\
+T_{i+1}(x)  &= 2\left(\frac{x-x_{i-1}}{h_i}\right)\left(\frac{x-x_i}{h_i}\right)
+\end{aligned}
+\]
+<p>Similar to the linear functions the above is only true when \(x\in[x_{i-1},x_{i+1}]\). We therfore usually denote the element interpolation as</p>
+<p><img src="/assets/visualizations/FEM/fem_quadratic_element.png" alt="" /></p>
+<p>Where \(N_i^1(x)=N_i^2(x)=N_i^3(x)=0\) when \(x\notin[x_{i-1},x_{i+1}]\). However, we can again easily generalize the definitions to hold for all \(x\) as</p>
+<p><img src="/assets/visualizations/FEM/fem_quadratic_basis.png" alt="" /></p>
+<p>We can again compute the quadratic interpolation as</p>
+\[
+p(x) = \mathbf{T}_p(x)\mathbf{P}.
+\]
+<p>Now chosing the same values of \(\mathbf{P}\) as for the linear interpolation we find that <img src="/assets/visualizations/FEM/fem_quadratic_interp.png" alt="" /></p>
+<h4 id="linear_vs_quadratic_interpolation"><a href="#linear_vs_quadratic_interpolation" class="header-anchor">Linear vs. Quadratic interpolation</a></h4>
+<p>Using the same values for \(\mathbf{P}\) we can compare the results of the linear and quadratic interpolation as </p>
+<p><img src="/assets/visualizations/FEM/fem_interp_comparison.png" alt="" /></p>
+<h2 id="discontinuous_elements"><a href="#discontinuous_elements" class="header-anchor">Discontinuous Elements</a></h2>
+<p>The main idea behind discontinuous elements is to seperate the interpolation of the physics from the interpolation of the geometry. This essentially means that the interpolation nodes of the physics &#40;\(t_i\)&#41; will not be the same as the interpolation nodes of the geometry &#40;\(x_i\)&#41;. What we do instead here is to introduce </p>
+<h3 id="constant"><a href="#constant" class="header-anchor">Constant</a></h3>
+<p>The domain decomposition for constant elements look similar to that of linear continuous elements <img src="/assets/visualizations/FEM/fem_discconstant_domain.png" alt="" /></p>
+<p>However, the difference is now that the interpolation of the physics happens only at \(t_i\) for element \(i\). This means that the topology for the physics in the case is easily written as</p>
 \[
 \text{topology} = 
 \begin{bmatrix}
 1 & 2 & 3 & \dots & n-1 & n 
 \end{bmatrix}
 \]
+<p>As the name suggest the is constant, this simply means that </p>
+\[
+N_i^1(x) = \begin{cases} 1, \quad x\in[x_i,x_{x_i}]\\0, \quad \text{otherwise}\end{cases},
+\]
+<p>which can be visualized as follows</p>
+<p><img src="/assets/visualizations/FEM/fem_discconstant_basis.png" alt="" /></p>
+<p>The resulting interpolation of the physics will therefore be piecewise constant as shown below</p>
+<p><img src="/assets/visualizations/FEM/fem_discconstant_interp.png" alt="" /></p>
+<h3 id="linear__2"><a href="#linear__2" class="header-anchor">Linear</a></h3>
+<p>The domain decomposition for discontinuous linear elements is equivalent of that of continuous linear elements, with the difference only being the chosen interpolation nodes of the physics &#40;\(t_i\) and \(t_{i+1}\)&#41;</p>
+<p><img src="/assets/visualizations/FEM/fem_disclinear_domain.png" alt="" /></p>
+<p>The corresponding topology of the physics is then</p>
 \[
 \text{topology} = 
 \begin{bmatrix}
@@ -58,6 +186,19 @@
 2 & 4 & 6 & \dots & n-2 & n 
 \end{bmatrix}
 \]
+<p>The corresponding basis functions are simply just the continuous linear basis functions translated with a constant, \(\beta\), which looks as follows</p>
+\[
+\begin{aligned}
+T_i^{\beta}(x)      &= \left(\frac{x_{i+1} - x   + \beta}{h_i}\right) \\
+T_{i+1}^{\beta}(x)  &= \left(\frac{x       - x_i + \beta}{h_i}\right)
+\end{aligned}
+\]
+<p>These basis functions looks as follows <img src="/assets/visualizations/FEM/fem_disclinear_basis.png" alt="" /></p>
+<p>Similarily the interpolation looks as <img src="/assets/visualizations/FEM/fem_disclinear_interp.png" alt="" /></p>
+<h3 id="quadratic__2"><a href="#quadratic__2" class="header-anchor">Quadratic</a></h3>
+<p>For discontinuous quadratic elements the deomain decomposition is also equivalent to continuous quadratic elements.</p>
+<p><img src="/assets/visualizations/FEM/fem_discquadratic_domain.png" alt="" /></p>
+<p>with the only difference being the interpolation nodes \(t_{i-1}\) and \(t_{i+1}\) being located inside the element. The corresponding topology matrix of the physics is </p>
 \[
 \text{topology} = 
 \begin{bmatrix}
@@ -66,9 +207,19 @@
 3 & 6 & 9 & \dots & n-3 & n 
 \end{bmatrix}
 \]
+<p>The basis functions are also simply the continuous functions translated into the domain of the geometric element</p>
+\[
+\begin{aligned}
+T_{i-1}^\beta(x)  &= 2\left(\frac{x_{i}-x+\beta}{h_i}\right)\left(\frac{x_{i+1}-x+\beta}{h_i}\right)\\
+T_{i}^\beta(x)    &= 4\left(\frac{x-\beta-x_{i-1}}{h_i}\right)\left(\frac{x_{i+1}-x+\beta}{h_i}\right)\\
+T_{i+1}^\beta(x)  &= 2\left(\frac{x-\beta-x_{i-1}}{h_i}\right)\left(\frac{x-\beta-x_i}{h_i}\right)
+\end{aligned}
+\]
+<p>which looks as <img src="/assets/visualizations/FEM/fem_discquadratic_basis.png" alt="" /></p>
+<p>Again we can plot the interpolation as <img src="/assets/visualizations/FEM/fem_discquadratic_interp.png" alt="" /></p>
 <div class="page-foot">
   <div class="copyright">
-    &copy; Mikkel Paltorp. Last modified: January 14, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Mikkel Paltorp. Last modified: January 21, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->
