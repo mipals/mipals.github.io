@@ -1,3 +1,2 @@
-ArgumentError: Package WoodburyMatrices not found in current path:
-- Run `import Pkg; Pkg.add("WoodburyMatrices")` to install the WoodburyMatrices package.
-
+  0.771381 seconds (575.97 k allocations: 221.748 MiB, 1.27% gc time, 15.15% compilation time)
+  0.722515 seconds (454.65 k allocations: 214.635 MiB, 0.85% gc time, 10.20% compilation time)

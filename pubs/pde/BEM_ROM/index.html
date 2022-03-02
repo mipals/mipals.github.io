@@ -29,15 +29,66 @@
 <!-- Content appended here -->
 <div class="franklin-content"><h1 id="a_reduced_order_model_for_the_boundary_element_method"><a href="#a_reduced_order_model_for_the_boundary_element_method" class="header-anchor">A Reduced Order Model for the Boundary Element Method</a></h1>
 \[
+\begin{aligned}
+    \text{diag}(\mathbf{c})\mathbf{p} = \left(\sum_{m=0}^{\infty}\frac{(k-k_0)^m}{m!}\mathbf{G}_m\right)\frac{\partial\mathbf{p}}{\partial\mathbf{n}} -  &\left(\sum_{m=0}^{\infty}\frac{(k-k_0)^m}{m!}\mathbf{F}_m\right)\mathbf{p}
+\end{aligned}
+\]
+<a id="eqtalorinf" class="anchor"></a>\[
+    \left(\sum_{m=0}^\infty \frac{(k-k_0)^m}{m!}\mathbf{A}_m\right)\mathbf{z} = \sum_{m=0}^\infty\frac{(k-k_0)^m}{m!}\mathbf{b}_m.
+\]
+\[
     G(\mathbf{x}, \mathbf{y}) = \sum_{m=0}^\infty\frac{(k - k_0)^m}{m!}G^{(m)}(\mathbf{x}, \mathbf{y}, k_0)
 \]
 \[
     \int_\Gamma G(\mathbf{x},\mathbf{y})\frac{\partial p(\mathbf{y})}{\partial\mathbf{n}_\mathbf{y}}\ \mathrm{d}S_\mathbf{y} = \sum_{m=0}^\infty \frac{(k - k_0)^m}{m!} \int_\Gamma G^{(m)}
     (\mathbf{x}, \mathbf{y}, k_0)\frac{\partial p(\mathbf{y})}{\partial\mathbf{n}_\mathbf{y}}\ \mathrm{d}S_\mathbf{y}
 \]
+<h2 id="computing_a_suitable_projection_basisa_idsecprojection_classanchor"><a href="#computing_a_suitable_projection_basisa_idsecprojection_classanchor" class="header-anchor">Computing a Suitable Projection Basis<a id="secprojection" class="anchor"></a></a></h2>
+<p>An essential consideration when utilizing the SEBEM is the large amount of memory required if applied directly. Specifically the memory scale with \(\mathcal{O}(N^2M)\) meaning that even for reasonably large problems the memory requirement will be a bottleneck of this approach. From a computational point of view the method should also only be applied when the number of frequencies of interests &#40;\(N_f\)&#41; are above the number of included Taylor terms &#40;\(M\)&#41; i.e. when \(M \leq N_f\). To combat the memory issue of the SEBEM the Galerkin projection method was suggested in <sup id="fnref:1"><a href="#fndef:1" class="fnref">[1]</a></sup>. Utilizing the approach the memory required to store the desired Taylor expansion is \(\mathcal{O}(\ell^2M)\), which is a significant improvement in the case of \(\ell \ll N\). </p>
+<h3 id="galerkin_projection"><a href="#galerkin_projection" class="header-anchor">Galerkin Projection</a></h3>
+<p>The main assumption behind the projection method is that the solution as well as the right-hand side of <span class="eqref">(<a href="#eqtalorinf">2</a>)</span> for a certain frequency range can be spanned by a lower dimensional subspace, meaning that</p>
+<a id="eqlowerdimsubspace" class="anchor"></a>\[
+    \mathbf{z} \approx \mathbf{U}_\ell\mathbf{z}_\ell, \quad \mathbf{b}_m \approx \mathbf{W}_\ell \mathbf{b}_{\ell m}, \quad \ \mathbf{U}_\ell, \mathbf{W}_\ell \in \mathbb{C}^{N\times\ell}
+\]
+<p>will be a good approximations within this frequency range. An initial question should be why one would expect that the solution should be spanned by a lower dimensional subspace. The answer lies in the fact that Boundary Element matrices, in general, are well-conditioned. In short this means that iterative solvers such as the Generalized Minimal Residual Method &#40;GMRES&#41; usually converges quickly, even without preconditioning. A consequence of this is that the solution is well approximated by the Krylov space</p>
+\[
+    \mathcal{K}_q\left(\mathbf{A}, \mathbf{b}\right) = \text{span}\left\{\mathbf{b},\ \mathbf{A}\mathbf{b},\ \mathbf{A}^2\mathbf{b},\ \dots,\ \mathbf{A}^{q-1}\mathbf{b} \right\},
+\]
+<p>for a reasonably small value of \(q\). As such by setting the columns of \(\mathbf{U}_\ell\) equal to these Krylov vectors would results in <span class="eqref">(<a href="#eqlowerdimsubspace">5</a>)</span> being a good approximation - at least for a single frequency. In order for the approximation to be good for multiple frequencies the approach taken here is to set \(\mathbf{U}_\ell\) equal to a combination of the first \(q\) Krylov vectors for some predefined frequencies within the frequency range of interest. Adding on the assumption that the solutions changes smoothly when varying the frequency means that computing \(\mathbf{U}_\ell\) this way should result in <span class="eqref">(<a href="#eqlowerdimsubspace">5</a>)</span> being a good approximation at all points within the desired frequency range.</p>
+<p>The choice for \(\mathbf{W}_\ell\) is not as straight forward as the choice for \(\mathbf{U}_\ell\). It turns out that utilizing a Galerkin projection, i.e. setting \(\mathbf{W}_\ell = \mathbf{U}_\ell\), result in good approximations. Furthermore if one chooses \(\mathbf{U}_\ell\) to be orthogonal one find that</p>
+<a id="eqrhsprojection" class="anchor"></a>\[
+    \mathbf{b}_{\ell m} \approx \mathbf{U}_\ell^{\mathsf{H}} \mathbf{b}_m.
+\]
+<p>Applying the two projections to the Taylor expansion it follows that</p>
+\[
+    \left(\sum_{m=0}^{M-1} \frac{(k-k_0)^m}{m!}\mathbf{A}_m\right)\mathbf{U}_\ell\mathbf{z}_\ell = \sum_{m=0}^{M-1}\frac{(k-k_0)^m}{m!}\mathbf{U}_\ell\mathbf{b}_{ \ell m}.
+\]
+<p>Now multiplying with \(\mathbf{U}_\ell^{\mathsf{H}}\) from the left followed by moving \(\mathbf{U}_\ell\) &#40;and \(\mathbf{U}_\ell^{\mathsf{H}}\)&#41; inside the sum the above simplifies to</p>
+<a id="eqromtaylor" class="anchor"></a>\[
+    \left(\sum_{m=0}^{M-1} \frac{(k-k_0)^m}{m!}\mathbf{A}_{\ell m}\right)\mathbf{z}_\ell = \sum_{m=0}^{M-1}\frac{(k-k_0)^m}{m!}\mathbf{b}_{\ell m},
+\]
+<p>where \(\mathbf{A}_{\ell m} \in \mathbb{C}^{\ell \times \ell}\) and \(\mathbf{b}_{\ell m} \in \mathbb{C}^{\ell}\). In order this approach to be reasonable we must have that \(\ell \ll N\), such that even storing all of the \(\mathbf{A}_{\ell m}\) would be less than storing just a single of the original \(\mathbf{A}_m\in\mathbb{C}^{N\times N}\) matrices.</p>
+<h3 id="visual_representation"><a href="#visual_representation" class="header-anchor">Visual representation</a></h3>
+<p>In regular BEM computations we solve the linear system 
+<img src="/assets/visualizations/ROM/BEM.png" alt="BEM" style="width:150px;", class="center"/>
+</p>
+<p>The Series Expansion BEM utilizes the Taylor series to relieve the pain of recomputing new BEM matrices for each frequency of interest. Visually this can be seen as <img src="/assets/visualizations/ROM/SEBEM.png" alt="" /></p>
+<p>A significant drawback is that the above requires storing a lot of &#40;possibly&#41; large matrices. To combat this issue we assume that the solution is can be spanned by a lower dimensional subspace. Visually this means that 
+<img src="/assets/visualizations/ROM/BASIS.png" alt="BEM" style="width:100px;", class="center"/>
+</p>
+<p>Utilizing this projection it follows that <img src="/assets/visualizations/ROM/BEM_BASIS.png" alt="" /></p>
+<p>Using the linearity of the sums we end up with the following system <img src="/assets/visualizations/ROM/ROM_BEM.png" alt="" /></p>
+<h2 id="references"><a href="#references" class="header-anchor">References</a></h2>
+<table class="fndef" id="fndef:1">
+    <tr>
+        <td class="fndef-backref"><a href="#fnref:1">[1]</a></td>
+        <td class="fndef-content">Panagiotopoulos, Dionysios, et al. “Krylov Subspaces Recycling Based Model Order Reduction for Acoustic BEM Systems and an Error Estimator.” Computer Methods in Applied Mechanics and Engineering, vol. 359, Elsevier B.V., 2020, p. 112755, doi:10.1016/j.cma.2019.112755.</td>
+    </tr>
+</table>
+
 <div class="page-foot">
   <div class="copyright">
-    &copy; Mikkel Paltorp. Last modified: January 31, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Mikkel Paltorp. Last modified: February 02, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->

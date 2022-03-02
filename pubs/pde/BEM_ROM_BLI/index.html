@@ -29,12 +29,18 @@
 <!-- Content appended here -->
 <div class="franklin-content"><h1 id="a_reduced_order_model_for_the_boundary_layer_impedance_boundary_conditions"><a href="#a_reduced_order_model_for_the_boundary_layer_impedance_boundary_conditions" class="header-anchor">A Reduced Order Model for the Boundary Layer Impedance boundary conditions</a></h1>
 \[
+\begin{aligned}
+    \text{diag}(\mathbf{c})\mathbf{p} = \left(\sum_{m=0}^{\infty}\frac{(k-k_0)^m}{m!}\mathbf{G}_m\right)\frac{\partial\mathbf{p}}{\partial\mathbf{n}} -  &\left(\sum_{m=0}^{\infty}\frac{(k-k_0)^m}{m!}\mathbf{F}_m\right)\mathbf{p} \\
+     + \frac{(\gamma - 1)ik^2}{k_h}&\left(\sum_{m=0}^{\infty}\frac{(k-k_0)^m}{m!}\mathbf{H}_m\right)\mathbf{p} + \frac{i}{k_v}\left(\sum_{m=0}^{\infty}\frac{(k-k_0)^m}{m!}\mathbf{T}_m\right)\mathbf{p}.
+\end{aligned}
+\]
+\[
 \left(\nabla G - \frac{\partial G}{\partial \mathbf{n}}\mathbf{n}\right) 
     = \sum_{m=0}^\infty\frac{(k - k_0)^m}{m!}\frac{\text{exp}\left(-ik_0r\right)(-ik_0r)^m(ik_0r + 1 - m)\left(\mathbf{I} - \text{diag}(\mathbf{n})(\mathbf{1}\mathbf{n}^\top)\right)}{4\pi r^3}\left(\mathbf{x} - \mathbf{y}\right)
 \]
 <div class="page-foot">
   <div class="copyright">
-    &copy; Mikkel Paltorp. Last modified: January 31, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Mikkel Paltorp. Last modified: February 01, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->
