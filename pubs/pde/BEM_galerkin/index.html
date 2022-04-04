@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="stylesheet" href="/libs/katex/katex.min.css">
+     
+   <link rel="stylesheet" href="/libs/highlight/github.min.css">
+   
+  <link rel="stylesheet" href="/css/franklin.css">
+  <link rel="stylesheet" href="/css/basic.css">
+  <link rel="icon" href="/assets/favicon.png">
+   <title>Galerkin BEM</title>  
+</head>
+<body>
+  <header>
+<div class="blog-name"><a href="/">Mikkel Paltorp</a></div>
+<nav>
+  <ul>
+    <li><a href="/">About Me</a></li>
+    <li><a href="/menu1/">Notes</a></li>
+    <li><a href="/menu2/">Software</a></li>
+  </ul>
+  <img src="/assets/hamburger.svg" id="menu-icon">
+</nav>
+</header>
+
+
+<!-- Content appended here -->
+<div class="franklin-content"><h1 id="the_galerkin_boundary_element_approach"><a href="#the_galerkin_boundary_element_approach" class="header-anchor">The Galerkin Boundary Element Approach</a></h1>
+<p>As an alternative to the collocation approach stands the Galerkin approach. To derive the underlying equation we start at the standard integral formulation from <sup id="fnref:1"><a href="#fndef:1" class="fnref">[1]</a></sup></p>
+\[
+c(\mathbf{y})p(\mathbf{y}) + \int_\Gamma\left[\frac{\partial G(\mathbf{x}, \mathbf{y})}{\partial\mathbf{n}_\mathbf{x}} - skG(\mathbf{x}, \mathbf{y})Y(\mathbf{x})\right]p(\mathbf{x})\ \mathrm{d}\Gamma_\mathbf{x} = sk\int_\Gamma G(\mathbf{x},\mathbf{y})v_s(\mathbf{x})\ \mathrm{d}\Gamma_\mathbf{x}.
+\]
+<p>Multiplying the above with a test function, \(\delta(\mathbf{y})\) and integrating over the domain \(\Gamma_\mathbf{y}\) it follows that</p>
+\[
+\begin{aligned}
+\int_\Gamma \delta(\mathbf{y}) c(\mathbf{y})p(\mathbf{y})\ \mathrm{d}\Gamma_\mathbf{y} + &\int_\Gamma \delta(\mathbf{y})\int_\Gamma\left[\frac{\partial G(\mathbf{x}, \mathbf{y})}{\partial\mathbf{n}_\mathbf{x}} - skG(\mathbf{x}, \mathbf{y})Y(\mathbf{x})\right]p(\mathbf{x})\ \mathrm{d}\Gamma_\mathbf{x}\mathrm{d}\Gamma_\mathbf{y}\\ =
+sk&\int_\Gamma \delta(\mathbf{y})\int_\Gamma G(\mathbf{x},\mathbf{y})v_s(\mathbf{x})\ \mathrm{d}\Gamma_\mathbf{x}\mathrm{d}\Gamma_\mathbf{y}.
+\end{aligned}
+\]
+<p>The idea is now to parametrize the test function similar to the &#40;normal derivative of&#41; the pressure </p>
+<ul>
+<li><p>\(p(\mathbf{x})    = \mathbf{T}(\mathbf{x})\mathbf{p}\),</p>
+</li>
+<li><p>\(v_s(\mathbf{x})  = \mathbf{T}(\mathbf{x})\mathbf{v_s}\),</p>
+</li>
+<li><p>\(\mathbf{\delta}(\mathbf{x}) = \mathbf{T}(\mathbf{x})\mathbf{\delta} = \mathbf{\delta}^\top\mathbf{T}(\mathbf{x})^\top\).</p>
+</li>
+</ul>
+<p>Inserting this into the above it follows that</p>
+\[
+\begin{aligned}
+\int_\Gamma \mathbf{\delta}^\top\mathbf{T}(\mathbf{y})^\top c(\mathbf{y})\mathbf{T}(\mathbf{y})\mathbf{p}\ \mathrm{d}\Gamma_\mathbf{y} + &\int_\Gamma \mathbf{\delta}^\top\mathbf{T}(\mathbf{y})^\top\int_\Gamma\left[\frac{\partial G(\mathbf{x}, \mathbf{y})}{\partial\mathbf{n}_\mathbf{x}} - skG(\mathbf{x}, \mathbf{y})Y(\mathbf{x})\right]\mathbf{T}(\mathbf{x})\mathbf{p}\ \mathrm{d}\Gamma_\mathbf{x}\mathrm{d}\Gamma_\mathbf{y}\\ =
+sk&\int_\Gamma \mathbf{\delta}^\top\mathbf{T}(\mathbf{y})^\top\int_\Gamma G(\mathbf{x},\mathbf{y})\mathbf{T}(\mathbf{x})\mathbf{v_s}\ \mathrm{d}\Gamma_\mathbf{x}\mathrm{d}\Gamma_\mathbf{y}.
+\end{aligned}
+\]
+<p>Now setting \(\mathbf{\delta}\) outside of parentheses </p>
+\[
+\begin{aligned}
+\mathbf{\delta}^\top\left(\int_\Gamma \mathbf{T}(\mathbf{y})^\top c(\mathbf{y})\mathbf{T}(\mathbf{y})\ \mathrm{d}\Gamma_\mathbf{y} + \int_\Gamma \mathbf{T}(\mathbf{y})^\top\int_\Gamma\left[\frac{\partial G(\mathbf{x}, \mathbf{y})}{\partial\mathbf{n}_\mathbf{x}} - skG(\mathbf{x}, \mathbf{y})Y(\mathbf{x})\right]\mathbf{T}(\mathbf{x})\ \mathrm{d}\Gamma_\mathbf{x}\mathrm{d}\Gamma_\mathbf{y}\right)&\mathbf{p}\\
+=\mathbf{\delta}^\top sk\left(\int_\Gamma \mathbf{T}(\mathbf{y})^\top\int_\Gamma G(\mathbf{x},\mathbf{y})\mathbf{T}(\mathbf{x})\ \mathrm{d}\Gamma_\mathbf{x}\mathrm{d}\Gamma_\mathbf{y}\right)&\mathbf{v_s}.
+\end{aligned}
+\]
+<p>The next &#40;and final&#41; step is to realize that the above has to hold for <strong>all</strong> \(\mathbf{\delta}\in\mathbb{C}^n\) &#40;i.e. all arbitrary test functions&#41;. This implies that</p>
+\[
+\begin{aligned}
+\left(\int_\Gamma \mathbf{T}(\mathbf{y})^\top c(\mathbf{y})\mathbf{T}(\mathbf{y})\ \mathrm{d}\Gamma_\mathbf{y} + \int_\Gamma \mathbf{T}(\mathbf{y})^\top\int_\Gamma\left[\frac{\partial G(\mathbf{x}, \mathbf{y})}{\partial\mathbf{n}_\mathbf{x}} - skG(\mathbf{x}, \mathbf{y})Y(\mathbf{x})\right]\mathbf{T}(\mathbf{x})\ \mathrm{d}\Gamma_\mathbf{x}\mathrm{d}\Gamma_\mathbf{y}\right)&\mathbf{p}\\ =
+ sk\left(\int_\Gamma \mathbf{T}(\mathbf{y})^\top\int_\Gamma G(\mathbf{x},\mathbf{y})\mathbf{T}(\mathbf{x})\ \mathrm{d}\Gamma_\mathbf{x}\mathrm{d}\Gamma_\mathbf{y}\right)&\mathbf{v_s},
+\end{aligned}
+\]
+<p>which is the final system of equations that one needs to assemble and solve in the Galerkin approach to BEM. It is worth noting that if one simply chose \(\delta(\mathbf{y})\) to be delta functions, then the above reduces to the <a href="/pubs/pde/Element_methods/">collocation approach</a>.</p>
+<h3 id="references"><a href="#references" class="header-anchor">References</a></h3>
+<table class="fndef" id="fndef:1">
+    <tr>
+        <td class="fndef-backref"><a href="#fnref:1">[1]</a></td>
+        <td class="fndef-content">Marburg, Steffen. “Boundary Element Method for Time-Harmonic Acoustic Problems.” Cism International Centre for Mechanical Sciences, Courses and Lectures, edited by Manfred Kaltenbacher, vol. 579, Springer International Publishing, 2018, pp. 69–158, <a href="https://link.springer.com/chapter/10.1007/978-3-319-59038-7_3">doi:10.1007/978-3-319-59038-7_3</a>.</td>
+    </tr>
+</table>
+
+<div class="page-foot">
+  <div class="copyright">
+    &copy; Mikkel Paltorp. Last modified: April 04, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+  </div>
+</div>
+</div><!-- CONTENT ENDS HERE -->
+    
+        <script src="/libs/katex/katex.min.js"></script>
+<script src="/libs/katex/auto-render.min.js"></script>
+<script>renderMathInElement(document.body)</script>
+
+    
+    
+        <script src="/libs/highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();hljs.configure({tabReplace: '    '});</script>
+
+    
+  </body>
+</html>

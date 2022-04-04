@@ -28,7 +28,7 @@
 
 <!-- Content appended here -->
 <div class="franklin-content"><h1 id="an_introduction_to_the_boundary_element_method_bem"><a href="#an_introduction_to_the_boundary_element_method_bem" class="header-anchor">An Introduction to the Boundary Element Method &#40;BEM&#41;</a></h1>
-<p>In simple terms the Boundary Element Method &#40;BEM&#41; works  by solving integral equations through a discretization of both the physics &#40;unknown function&#41; and the domain &#40;geometry&#41;. In this note we only touch upon the discretization of the physics and how that can be used to reduce the problem into solving a linear system of equations using the so-called collocation approach. In the world of exterior acoustical problems the integral equation that we aim to solve is the following</p>
+<p>In simple terms the Boundary Element Method &#40;BEM&#41; works  by solving integral equations through a discretization of both the physics &#40;unknown function&#41; and the domain &#40;geometry&#41;. In this note we only touch upon the discretization of the physics and how that can be used to reduce the problem into solving a linear system of equations using the so-called collocation approach &#40;if you&#39;re interested in the Galerkin approach look <a href="/pubs/pde/BEM_galerkin/">here</a>&#41;. In the world of exterior acoustical problems the integral equation that we aim to solve is the following</p>
 \[
 C^{+}(\mathbf{x})p(\mathbf{x}) = \int_{\partial\Omega}\left[ \frac{\partial G(\mathbf{x},\mathbf{y})}{\partial \mathbf{n}_\mathbf{y}}p(\mathbf{y}) - 
 G(\mathbf{x},\mathbf{y})\frac{\partial p}{\partial \mathbf{n}_\mathbf{y}}(\mathbf{y})\right]\ \mathrm{d}S_\mathbf{y},
@@ -102,7 +102,7 @@ G(\mathbf{x}_n,\mathbf{y})\mathbf{T}\left(y\right)\ \mathrm{d}S_\mathbf{y}
 </ol>
 <div class="page-foot">
   <div class="copyright">
-    &copy; Mikkel Paltorp. Last modified: January 31, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Mikkel Paltorp. Last modified: April 04, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->

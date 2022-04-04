@@ -57,9 +57,9 @@
 \[
 \|R_k\|_F \leq \epsilon \|A\|_F
 \]
-<p>\(\|A\|_F\) can not be computed. Instead use that \( A_k = UV^T = \sum_{i=1}^k u_iv_i^T \). So that</p>
+<p>\(\|A\|_F\) can not be computed. Instead use that \( A_k = UV^\top  = \sum_{i=1}^k u_iv_i^\top  \). So that</p>
 \[
-\|A_k\|_F^2 = \|A_{k-1}\|_F^2 + \|u_k\|_2^2\|v_k\|_2^2 \sum_{i=1}^{k-1}u_k^Tu_iv_i^Tv_k.
+\|A_k\|_F^2 = \|A_{k-1}\|_F^2 + \|u_k\|_2^2\|v_k\|_2^2 \sum_{i=1}^{k-1}u_k^\top u_iv_i^\top v_k.
 \]
 <p>Final stoppping criterion</p>
 \[
@@ -75,7 +75,7 @@
 
 <div class="page-foot">
   <div class="copyright">
-    &copy; Mikkel Paltorp. Last modified: January 17, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Mikkel Paltorp. Last modified: April 04, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->

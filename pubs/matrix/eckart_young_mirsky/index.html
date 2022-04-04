@@ -35,19 +35,19 @@
 \]
 <p>Furthermore the equality constraint can be expressed explictly if we reformulate the minimization problem as</p>
 \[
-\underset{X,Y \in \mathbb{R}^{n\times k}}{\text{minimize}} \|A - XY^T\|.
+\underset{X,Y \in \mathbb{R}^{n\times k}}{\text{minimize}} \|A - XY^\top \|.
 \]
 <p><strong>Note</strong> that a solution \((X,Y)\) to the above minimization problem will not be unique: If \((X,Y)\) is a solution then for any invertible \(R\in\mathbf{R}^{k\times k}\) also \((XR,YR^{-T})\) is a solution.</p>
 <h2 id="for_the_spectral_norm"><a href="#for_the_spectral_norm" class="header-anchor">For The Spectral Norm</a></h2>
-<p><div class="definition"><p>Suppose that \(A = U\Sigma V^T\) is the singular value decomposition of \(A\). Then the best rank-\(k\) approximation of the matrix \(A\) w.r.t the spectral norm, \(\|\cdot\|_2\), is given by</p>
+<p><div class="definition"><p>Suppose that \(A = U\Sigma V^\top \) is the singular value decomposition of \(A\). Then the best rank-\(k\) approximation of the matrix \(A\) w.r.t the spectral norm, \(\|\cdot\|_2\), is given by</p>
 <a id="eqak" class="anchor"></a>\[
-A_k = \sum_{i=1}^k\sigma_iu_iv_i^T.
+A_k = \sum_{i=1}^k\sigma_iu_iv_i^\top .
 \]</div> First note that if \(A_k\) is defined as in <span class="eqref">(<a href="#eqak">3</a>)</span> then</p>
 \[
-\|A - A_k\|_2 = \left\|\sum_{i=k+1}^n\sigma_iu_iv_i^T\right\|_2 = \sigma_{k+1}.
+\|A - A_k\|_2 = \left\|\sum_{i=k+1}^n\sigma_iu_iv_i^\top \right\|_2 = \sigma_{k+1}.
 \]
-<p>Now if this really is the best approximation then we must show that for all \(B_k = XY^T\) where \(X,Y\in\mathbb{R}^{n\times k}\) then \(\|A - A_k\|_2 = \sigma_{k+1} \leq \|A-B_k\|_2\). </p>
-<p>Since \(Y\) has \(k\) columns there must be a nontrivial linear combination of the first \(k+1\) columns of \(V\), i.e. \(w = v_1\gamma_1 + \dots + v_{k+1}\gamma_{k+1} = V_{k+1}\gamma\), such that \(Y^Tw = 0\). Without loss of generality we can scale \(w\) such that \(\|w\|_2=1\). Therefore </p>
+<p>Now if this really is the best approximation then we must show that for all \(B_k = XY^\top \) where \(X,Y\in\mathbb{R}^{n\times k}\) then \(\|A - A_k\|_2 = \sigma_{k+1} \leq \|A-B_k\|_2\). </p>
+<p>Since \(Y\) has \(k\) columns there must be a nontrivial linear combination of the first \(k+1\) columns of \(V\), i.e. \(w = v_1\gamma_1 + \dots + v_{k+1}\gamma_{k+1} = V_{k+1}\gamma\), such that \(Y^\top w = 0\). Without loss of generality we can scale \(w\) such that \(\|w\|_2=1\). Therefore </p>
 <a id="eqspectral" class="anchor"></a>\[
 \|A - B_k\|_2 \geq \|(A-B_k)w\|_2 = \|Aw\|_2 = \sqrt{\gamma_1^2\sigma_1^2 + \dots + \gamma_{k+1}^2\sigma_{k+1}^2} \geq \sigma_{k+1},
 \]
@@ -58,26 +58,26 @@ A_k = \sum_{i=1}^k\sigma_iu_iv_i^T.
 \]
 <p>and </p>
 \[
-\|Aw\|_2 = \|U\Sigma V^T V_{k+1}\gamma\|_2 = \|\Sigma_k \gamma\|_2 =  \sqrt{\gamma_1^2\sigma_1^2 + \dots + \gamma_{k+1}^2\sigma_{k+1}^2}
+\|Aw\|_2 = \|U\Sigma V^\top  V_{k+1}\gamma\|_2 = \|\Sigma_k \gamma\|_2 =  \sqrt{\gamma_1^2\sigma_1^2 + \dots + \gamma_{k+1}^2\sigma_{k+1}^2}
 \]
 <h2 id="for_the_frobenius_norm"><a href="#for_the_frobenius_norm" class="header-anchor">For The Frobenius Norm</a></h2>
 <p><div class="definition"><p>Suppose that \(
-A = U\Sigma V^T
+A = U\Sigma V^\top 
 \) is the singular value decomposition of \(A\). Then the best rank-\(k\) approximation of the matrix \(A\) w.r.t the Frobenius norm, \(\|\cdot\|_F\), is given by</p>
 \[
-A_k = \sum_{i=1}^k\sigma_iu_iv_i^T.
+A_k = \sum_{i=1}^k\sigma_iu_iv_i^\top .
 \]</div> The first step is rewrite the minization problem as</p>
 \[
-\underset{X,Y \in \mathbb{R}^{n\times k}}{\text{minimize}} \|A - XY^T\| = \|\Sigma - U^TXY^TV\|_F.
+\underset{X,Y \in \mathbb{R}^{n\times k}}{\text{minimize}} \|A - XY^\top \| = \|\Sigma - U^\top XY^\top V\|_F.
 \]
-<p>where \(A = U\Sigma V^T\) is the SVD of \(A\) and we have used the orthogonal invariance of the Frobenius norm. Its easy to see that there exist no better solution to the above minization problem than \(U^TXY^TV = \text{diag}(\sigma_1,\dots, \sigma_k,0,\dots, 0)\). This solution can be achived by setting </p>
+<p>where \(A = U\Sigma V^\top \) is the SVD of \(A\) and we have used the orthogonal invariance of the Frobenius norm. Its easy to see that there exist no better solution to the above minization problem than \(U^\top XY^\top V = \text{diag}(\sigma_1,\dots, \sigma_k,0,\dots, 0)\). This solution can be achived by setting </p>
 \[
-\Sigma_k^{1/2} = \text{diag}(\sigma_1^{1/2},\dots, \sigma_k^{1/2}), \quad X = \begin{bmatrix}u_1& \dots & u_k\end{bmatrix}\Sigma_k^{1/2}, \quad Y^T = \Sigma_k^{1/2}\begin{bmatrix} v_1^T \\ \vdots \\ v_k^T\end{bmatrix}.
+\Sigma_k^{1/2} = \text{diag}(\sigma_1^{1/2},\dots, \sigma_k^{1/2}), \quad X = \begin{bmatrix}u_1& \dots & u_k\end{bmatrix}\Sigma_k^{1/2}, \quad Y^\top  = \Sigma_k^{1/2}\begin{bmatrix} v_1^\top  \\ \vdots \\ v_k^\top \end{bmatrix}.
 \]
 <p>From this we can conclude that the best rank-\(k\) approximation w.r.t the Frobenius norm is the truncated SVD.</p>
 <div class="page-foot">
   <div class="copyright">
-    &copy; Mikkel Paltorp. Last modified: January 11, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Mikkel Paltorp. Last modified: April 04, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->

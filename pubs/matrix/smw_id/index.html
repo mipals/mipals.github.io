@@ -32,43 +32,43 @@
 <h2 id="a_special_case"><a href="#a_special_case" class="header-anchor">A Special Case</a></h2>
 <div class="definition"><p>A special case of the Sherman-Morrison-Woodbury identity is the following</p>
 \[
-    (I + UV^T)^{-1} = I - U(I + V^TU)^{-1}V^T.
+    (I + UV^\top )^{-1} = I - U(I + V^\top U)^{-1}V^\top .
 \]</div>
-<p>The derivation is simple. Assume the inverse have the form \(I + UZV^T\), then we have that</p>
+<p>The derivation is simple. Assume the inverse have the form \(I + UZV^\top \), then we have that</p>
 \[\begin{aligned}
-    (I + UV^T)(I + UZV^T)
-    & = I + (UV^T + UZV^T + UV^TUZV^T)\\
-    &= I + U(I + Z + V^TUZ)V^T.
+    (I + UV^\top )(I + UZV^\top )
+    & = I + (UV^\top  + UZV^\top  + UV^\top UZV^\top )\\
+    &= I + U(I + Z + V^\top UZ)V^\top .
 \end{aligned}\]
-<p>Since \(I + UZV^T\) is assumed to be the inverse the above expression must be equal to \(I\). As a result we must have that</p>
+<p>Since \(I + UZV^\top \) is assumed to be the inverse the above expression must be equal to \(I\). As a result we must have that</p>
 \[
-I + Z + V^TUZ = 0.
+I + Z + V^\top UZ = 0.
 \]
 <p>From this it follows that </p>
 \[
-    Z = (I + V^TU)^{-1}(-I) = -(I + V^TU)^{-1}.
+    Z = (I + V^\top U)^{-1}(-I) = -(I + V^\top U)^{-1}.
 \]
-<p>As such we must have that \(Z\) is equal to the above in order for \(I + UZV^T\) to be the actual inverse, which confirms the identity.</p>
+<p>As such we must have that \(Z\) is equal to the above in order for \(I + UZV^\top \) to be the actual inverse, which confirms the identity.</p>
 <p>I sometimes find it easier to think of this identity in terms of visuals</p>
 <p><img src="/assets/visualizations/smw_special.png" alt="" /></p>
 <p>This clearly highlights how the identity can be used to reduce the problem of inverting a \(n\times n\) matrix to inverting a \(k\times k\) matrix at the expense of some matrix-vector products. If \(k \ll n\) then this reduction from \(O(n^3)\) to \(O(k^3 + kn)\) flops is a significant improvement.</p>
 <h2 id="the_general_form"><a href="#the_general_form" class="header-anchor">The General Form </a></h2>
 <div class="definition"><p>In general the Sherman-Morrison-Woodbury identity have the form</p>
 <a id="eqref" class="anchor"></a>\[
-(A + USV^T)^{-1} = A^{-1} - A^{-1}U(S^{-1} + V^TA^{-1}U)^{-1}V^TA^{-1}.
+(A + USV^\top )^{-1} = A^{-1} - A^{-1}U(S^{-1} + V^\top A^{-1}U)^{-1}V^\top A^{-1}.
 \]</div>
-<p>There exist several ways of showing this identity. The easiest is probably to set \(B = A + USV^T\) so that \(B^{-1} = (I + A^{-1}USV^T)^{-1}A^{-1}\). Now set \(W = A^{-1}U\) and \(Z^T = SV^T\) such that </p>
+<p>There exist several ways of showing this identity. The easiest is probably to set \(B = A + USV^\top \) so that \(B^{-1} = (I + A^{-1}USV^\top )^{-1}A^{-1}\). Now set \(W = A^{-1}U\) and \(Z^\top  = SV^\top \) such that </p>
 \[
-B^{-1} = \left(I + WZ^T\right)^{-1}A^{-1}.
+B^{-1} = \left(I + WZ^\top \right)^{-1}A^{-1}.
 \]
 <p>Now using the special case from the previous section we have that </p>
 \[\begin{aligned}
 B^{-1} 
-&= \left(I - W(I+Z^TW)^{-1}Z^T\right)A^{-1}\\
-&= \left(I - A^{-1}U(I+SV^TA^{-1}U)^{-1}SV^T\right)A^{-1}\\
-&= A^{-1} - A^{-1}U(S^{-1}+V^TA^{-1}U)^{-1}V^TA^{-1}.
+&= \left(I - W(I+Z^\top W)^{-1}Z^\top \right)A^{-1}\\
+&= \left(I - A^{-1}U(I+SV^\top A^{-1}U)^{-1}SV^\top \right)A^{-1}\\
+&= A^{-1} - A^{-1}U(S^{-1}+V^\top A^{-1}U)^{-1}V^\top A^{-1}.
 \end{aligned}\]
-<p>An alternatively one can use a similar approach to the one presented in the previous section. The guess just has to be modified to the form \(A^{-1} + A^{-1}UZV^TA^{-1}\). What is then left is to multiply with \((A + USV^T)\), set the expression equal to \(I\) &#40;because we assume that its an inverse&#41; and isolate \(Z\).</p>
+<p>An alternatively one can use a similar approach to the one presented in the previous section. The guess just has to be modified to the form \(A^{-1} + A^{-1}UZV^\top A^{-1}\). What is then left is to multiply with \((A + USV^\top )\), set the expression equal to \(I\) &#40;because we assume that its an inverse&#41; and isolate \(Z\).</p>
 <p>Also in this case i like to think of the formula in terms of visuals</p>
 <p><img src="/assets/visualizations/smw_general.png" alt="" /></p>
 <p>From this it is clear that we only get a speedup if the inverse of \(A^{-1}\) is already known. This might not seem useful, but it is actually the cornerstones of the <a href="../BFGS/index.html">Broyden–Fletcher–Goldfarb–Shanno algorithm</a>. The speedup is in this case only from \(O(n^3)\) to \(O(k^3 + k(n^2 + n))\).</p>
@@ -104,12 +104,12 @@ Woodbury_dense &#61; A &#43; U*C*V&#39;
 </code></pre>
 <h2 id="a_useful_consequence"><a href="#a_useful_consequence" class="header-anchor">A Useful Consequence</a></h2>
 <p><em>This section is <strong>very</strong> noty and was mostly written because <span class="eqref">(<a href="#eqvariant">8</a>)</span> was stated in some papers with only a reference to the Sherman-Morrison-Woodbury identity.</em><br/></p>
-<p>In the area of fast direct solvers a variation of the Sherman-Morrison-Woodbury formula is sometimes used. The motivation for this variant can be found in the fact that we need to invert \(S\) in the formula <span class="eqref">(<a href="#eqref">5</a>)</span> which makes an immidiate hierarchical &#40;recursive&#41; computation of the inverse impossible. However the following variant takes care of this problem. <div class="definition"><p>Assume we have the inverse as stated in <span class="eqref">(<a href="#eqref">5</a>)</span>, then set \(D = (V^TA^{-1}U)^{-1}\) resulting in</p>
+<p>In the area of fast direct solvers a variation of the Sherman-Morrison-Woodbury formula is sometimes used. The motivation for this variant can be found in the fact that we need to invert \(S\) in the formula <span class="eqref">(<a href="#eqref">5</a>)</span> which makes an immidiate hierarchical &#40;recursive&#41; computation of the inverse impossible. However the following variant takes care of this problem. <div class="definition"><p>Assume we have the inverse as stated in <span class="eqref">(<a href="#eqref">5</a>)</span>, then set \(D = (V^\top A^{-1}U)^{-1}\) resulting in</p>
 <a id="eqvariant" class="anchor"></a>\[ 
-(A + USV^T)^{-1} = G + E(S + D)^{-1}F^T,
+(A + USV^\top )^{-1} = G + E(S + D)^{-1}F^\top ,
 \]
-<p>where \(E = A^{-1}UD\), \(F=(DV^TA^{-1})^T\) and \(G = A^{-1} - A^{-1}UDV^TA^{-1}\).<br/></p>
-<p>The key to this formula is that if \(A,U\) and \(V\) are block diagonal then also \(D\) is block diagonal and \(S + D\) will as a result have the exact same form as \(A + USV^T\): It is a off-diagonal block plus a block diagonal matrix. </p></div> This variation can be derived by seeing that</p>
+<p>where \(E = A^{-1}UD\), \(F=(DV^\top A^{-1})^\top \) and \(G = A^{-1} - A^{-1}UDV^\top A^{-1}\).<br/></p>
+<p>The key to this formula is that if \(A,U\) and \(V\) are block diagonal then also \(D\) is block diagonal and \(S + D\) will as a result have the exact same form as \(A + USV^\top \): It is a off-diagonal block plus a block diagonal matrix. </p></div> This variation can be derived by seeing that</p>
 \[
 (S^{-1} + D^{-1})^{-1} = \left(D^{-1}(DS^{-1}D + D)D^{-1}\right)^{-1} = D(DS^{-1}D + D)^{-1}D.
 \]
@@ -121,15 +121,15 @@ Woodbury_dense &#61; A &#43; U*C*V&#39;
 \end{aligned}\]
 <p>Now inserting into <span class="eqref">(<a href="#eqref">5</a>)</span> it follows that</p>
 \[\begin{aligned}
-(A + USV^T)^{-1} 
-&= A^{-1} - A^{-1}U(S^{-1} + D^{-1})^{-1}V^TA^{-1}\\
-&= A^{-1} - A^{-1}UD\left(D^{-1} - \left(S + D\right)^{-1}\right)DV^TA^{-1}\\
-&= \left(A^{-1} - A^{-1}UDV^TA^{-1}\right) + A^{-1}UD\left(S + D\right)^{-1}DV^TA^{-1}
+(A + USV^\top )^{-1} 
+&= A^{-1} - A^{-1}U(S^{-1} + D^{-1})^{-1}V^\top A^{-1}\\
+&= A^{-1} - A^{-1}UD\left(D^{-1} - \left(S + D\right)^{-1}\right)DV^\top A^{-1}\\
+&= \left(A^{-1} - A^{-1}UDV^\top A^{-1}\right) + A^{-1}UD\left(S + D\right)^{-1}DV^\top A^{-1}
 \end{aligned}\]
-<p>now setting \(E = A^{-1}UD\), \(F=(DV^TA^{-1})^T\) and \(G = A^{-1} - A^{-1}UDV^TA^{-1}\) the variation of the Sherman-Morrison-Woodbury formula becomes apparant. </p>
+<p>now setting \(E = A^{-1}UD\), \(F=(DV^\top A^{-1})^\top \) and \(G = A^{-1} - A^{-1}UDV^\top A^{-1}\) the variation of the Sherman-Morrison-Woodbury formula becomes apparant. </p>
 <div class="page-foot">
   <div class="copyright">
-    &copy; Mikkel Paltorp. Last modified: March 02, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Mikkel Paltorp. Last modified: April 04, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->

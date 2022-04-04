@@ -129,7 +129,7 @@
 </url>
 <url>
     <loc>https://github.com/mipals/pubs/pde/Element_methods/index.html</loc>
-    <lastmod>2022-01-31</lastmod>
+    <lastmod>2022-04-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
@@ -159,7 +159,13 @@
 </url>
 <url>
     <loc>https://github.com/mipals/pubs/pde/BEM_losses/index.html</loc>
-    <lastmod>2022-01-31</lastmod>
+    <lastmod>2022-04-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+<url>
+    <loc>https://github.com/mipals/pubs/pde/BEM_galerkin/index.html</loc>
+    <lastmod>2022-04-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
@@ -219,7 +225,7 @@
 </url>
 <url>
     <loc>https://github.com/mipals/menu1/index.html</loc>
-    <lastmod>2022-03-09</lastmod>
+    <lastmod>2022-04-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>

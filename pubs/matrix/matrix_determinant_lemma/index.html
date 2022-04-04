@@ -64,33 +64,33 @@
 <h2 id="weinsteinaronszajn_identity"><a href="#weinsteinaronszajn_identity" class="header-anchor">Weinstein–Aronszajn identity</a></h2>
 <p>We start by a introducing a special case. Namely the Weinstein-Aronszajn Identity, which explains that the determinant of a identity plus a rank-\(k\) perturbation is equal to the determinant of a \(k\times k\) matrix.</p>
 \[
-\det( I_n + UV^T) = \det(I_k + V^TU)
+\det( I_n + UV^\top ) = \det(I_k + V^\top U)
 \]
 <p>The identity follows straight from <span class="eqref">(<a href="#eqblockdet">2</a>)</span></p>
 \[
-\det\left(\begin{bmatrix} I_n & U\\ V^T & I_k\end{bmatrix}\right) = \det(I_n)\det(I_k + V^TI_n^{-1}U) = \det(I_k + V^TU)
+\det\left(\begin{bmatrix} I_n & U\\ V^\top  & I_k\end{bmatrix}\right) = \det(I_n)\det(I_k + V^\top I_n^{-1}U) = \det(I_k + V^\top U)
 \]
 \[
-\det\left(\begin{bmatrix} I_n & U\\ V^T & I_k\end{bmatrix}\right) = \det(I_k)\det(I_n + UI_k^{-1}V^T) = \det(I_n + UV^T)
+\det\left(\begin{bmatrix} I_n & U\\ V^\top  & I_k\end{bmatrix}\right) = \det(I_k)\det(I_n + UI_k^{-1}V^\top ) = \det(I_n + UV^\top )
 \]
 <p>Visually we can view the identity as <img src="/assets/visualizations/weinstein.png" alt="" /></p>
 <h2 id="the_general_form"><a href="#the_general_form" class="header-anchor">The General Form</a></h2>
 <p>The most general form can be stated as</p>
 \[
-\det(A + UV^T) = \det(I_k + V^T A^{-1} U)\det(A)
+\det(A + UV^\top ) = \det(I_k + V^\top  A^{-1} U)\det(A)
 \]
 <p>Which explains that the determinant of a \(n\times n\) matrix plus a rank-\(k\) perturbation is equal to the determinant of a \(k\times k\) matrix. This formula follows straight from <span class="eqref">(<a href="#eqblockdet">2</a>)</span> because we have that</p>
 \[
-\det\left(\begin{bmatrix} A & U\\ V^T & I_k\end{bmatrix}\right) = \det(I_k)\det(A + UI_k^{-1}V^T) = \det(A + UV^T)
+\det\left(\begin{bmatrix} A & U\\ V^\top  & I_k\end{bmatrix}\right) = \det(I_k)\det(A + UI_k^{-1}V^\top ) = \det(A + UV^\top )
 \]
 <p>and</p>
 \[
-\det\left(\begin{bmatrix} A & U\\ V^T & I_k\end{bmatrix}\right) = \det(A)\det(I_k + V^TA^{-1}U) = \det(I_k + V^TA^{-1}U).
+\det\left(\begin{bmatrix} A & U\\ V^\top  & I_k\end{bmatrix}\right) = \det(A)\det(I_k + V^\top A^{-1}U) = \det(I_k + V^\top A^{-1}U).
 \]
 <p>Again we can visually view this as <img src="/assets/visualizations/matrix_determinant_lemma2.png" alt="" /></p>
 <div class="page-foot">
   <div class="copyright">
-    &copy; Mikkel Paltorp. Last modified: January 11, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Mikkel Paltorp. Last modified: April 04, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->

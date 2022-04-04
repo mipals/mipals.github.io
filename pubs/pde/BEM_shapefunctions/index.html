@@ -30,9 +30,9 @@
 <div class="franklin-content"><h1 id="shape_functions"><a href="#shape_functions" class="header-anchor">Shape Functions </a></h1>
 <p>In this note we look at shape functions as a means of interpolating between nodes in a given coordinatesystem. In general the interpolation will have the form</p>
 \[
-\mathbf{r}(\mathbf{\xi}) = \mathbf{M}^T\mathbf{N}(\mathbf{\xi}), \quad \xi \in [\mathbf{a},\mathbf{b}]
+\mathbf{r}(\mathbf{\xi}) = \mathbf{M}^\top\mathbf{N}(\mathbf{\xi}), \quad \xi \in [\mathbf{a},\mathbf{b}]
 \]
-<p>where \(\mathbf{M}^T = \begin{bmatrix} \mathbf{m}_1 & \dots & \mathbf{m}_n\end{bmatrix}\) is a matrix containing the interpolation nodes &#40;\(\mathbf{m}_i\)&#41;, \(\mathbf{N}(\mathbf{\xi})\) is a vector containing the shape functions and \(\mathbf{a},\mathbf{b}\in\mathbf{R}^m\) so that \([\mathbf{a},\mathbf{b}]\) describes a hyperretangular domain in a \(m\)-dimensional space. We will in this note only consider the cases of curves &#40;\(m=1\)&#41; and surfaces &#40;\(m=2\)&#41;.</p>
+<p>where \(\mathbf{M}^\top = \begin{bmatrix} \mathbf{m}_1 & \dots & \mathbf{m}_n\end{bmatrix}\) is a matrix containing the interpolation nodes &#40;\(\mathbf{m}_i\)&#41;, \(\mathbf{N}(\mathbf{\xi})\) is a vector containing the shape functions and \(\mathbf{a},\mathbf{b}\in\mathbf{R}^m\) so that \([\mathbf{a},\mathbf{b}]\) describes a hyperretangular domain in a \(m\)-dimensional space. We will in this note only consider the cases of curves &#40;\(m=1\)&#41; and surfaces &#40;\(m=2\)&#41;.</p>
 <p>Furthermore we will restrict ourselves to only talk about shape functions for curves and surfaces. The usefulness of these shape functions comes from the fact that they can be used to approximate curves and surfaces so that approximations of curve- and surface integrals can be computed easily. The reason for this focus is that only curve and surface integrals are needed for the usage of the bounary element method in two- and three-dimensional space.</p>
 <h2 id="curve_shape_functions"><a href="#curve_shape_functions" class="header-anchor">Curve shape functions</a></h2>
 <p>We now introduce two types of shape functions for curve integrals. </p>
@@ -45,7 +45,7 @@
 <p><img src="/assets/visualizations/shapefunctions/2d_linear.png" alt="" /></p>
 <p>Using this shape function we can interpolate linearly between \(\mathbf{m}_1\) and \(\mathbf{m}_2\) using the parametrization</p>
 \[
-\mathbf{r}_L(u) = \mathbf{M}^T\mathbf{N}_L(u),
+\mathbf{r}_L(u) = \mathbf{M}^\top\mathbf{N}_L(u),
 \]
 <p>Visually this parametrization can be seen as</p>
 <p><img src="/assets/visualizations/shapefunctions/2d_linear_interp.png" alt="" /></p>
@@ -55,7 +55,7 @@
 \]
 <p>Now we have that</p>
 \[
-\text{Jacobi}_L(u) = \left\| \mathbf{M}^T\mathbf{N}_L'(u)\right\|_2 = \|\mathbf{m}_2 - \mathbf{m}_1\|_2
+\text{Jacobi}_L(u) = \left\| \mathbf{M}^\top\mathbf{N}_L'(u)\right\|_2 = \|\mathbf{m}_2 - \mathbf{m}_1\|_2
 \]
 <h4 id="quadratic_elements"><a href="#quadratic_elements" class="header-anchor">Quadratic elements</a></h4>
 <p>Another simple shape function is the quadratic elements defined by</p>
@@ -68,7 +68,7 @@
 <p><img src="/assets/visualizations/shapefunctions/2d_quadratic.png" alt="" /></p>
 <p>Using the quadratic shape functions we can interpolate between \(\mathbf{m}_1\), \(\mathbf{m}_2\) and \(\mathbf{m}_3\) using a quadratic as</p>
 \[
-\mathbf{r}_Q(u) = \mathbf{M}^T\mathbf{N}_Q(u).
+\mathbf{r}_Q(u) = \mathbf{M}^\top\mathbf{N}_Q(u).
 \]
 <p>Visually this interpolation can be seen as</p>
 <p><img src="/assets/visualizations/shapefunctions/2d_quadratic_interp.png" alt="" /></p>
@@ -78,7 +78,7 @@
 \]
 <p>from which we can compute the Jacobian as</p>
 \[
-\text{Jacobi}_Q(u) = \left\|\mathbf{M}^T\mathbf{N}_Q'(u)\right\|_2
+\text{Jacobi}_Q(u) = \left\|\mathbf{M}^\top\mathbf{N}_Q'(u)\right\|_2
 \]
 <h2 id="surface_shape_functions"><a href="#surface_shape_functions" class="header-anchor">Surface Shape Functions</a></h2>
 <p>The idea behind the surface shape functions are the exact same as for the  curve shape functions. The only thing is that our parameterization now have  a two-dimensional input.</p>
@@ -153,7 +153,7 @@
 \end{aligned}\]
 <div class="page-foot">
   <div class="copyright">
-    &copy; Mikkel Paltorp. Last modified: January 11, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Mikkel Paltorp. Last modified: April 04, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->
