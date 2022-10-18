@@ -27,73 +27,74 @@
 
 
 <!-- Content appended here -->
-<div class="franklin-content"><h1 id="the_helmholtz_equation"><a href="#the_helmholtz_equation" class="header-anchor">The Helmholtz Equation</a></h1>
-<p>The Helmholtz equation can in short be viewed as the eigenvalue problem for the Laplace oeprator. It corresponds to the linear partial differential equation</p>
+<div class="franklin-content"><h1 id="from_the_wave_equation_to_the_helmholtz_equation"><a href="#from_the_wave_equation_to_the_helmholtz_equation" class="header-anchor">From the Wave Equation to the Helmholtz Equation</a></h1>
+<p>The wave equation</p>
 \[
-\Delta p + k^2p = 0,
+\Delta p(\mathbf{x}, t) = \frac{1}{c^2}\frac{\partial^2p(\mathbf{x}, t)}{\partial t^2}, \quad \mathbf{x} \in \Omega \subset \mathbb{R}^3,
 \]
-<p>where \(\Delta\) is the Laplace operator, \(k^2\) the eigenvalue and \(p\) the corresponding eigenfunction. When applied to waves the number \(k\) is known as the wave number. </p>
-<h2 id="the_fundamental_solution_greens_function"><a href="#the_fundamental_solution_greens_function" class="header-anchor">The fundamental solution &#40;Green&#39;s function&#41;</a></h2>
-<p>The inhomogeneous Helmholtz equation have the following form</p>
+<p>describes wave phenomena such as the ones encountered in linear acoustical problems. In the above \(p\) is the sound pressure, \(c\) is the wave propagation speed and \(\mathbf{x}\) and \(t\) the position and time respectively. For time-harmonic problems it is standard to introduce a time dependency as follows</p>
 \[
-\Delta p(x) + k^2p(x) = -f(x), \quad x\in\mathbb{R}^n,
+p(\mathbf{x}, t) = \text{Re}\left\{p(\mathbf{x})\mathrm{e}^{\alpha \mathrm{i} \omega t}\right\},
 \]
-<p>where \(f:\mathbb{R}^n \rightarrow \mathbb{C}\) has compact support and \(n=1,2,3\).</p>
-<p>For uniqueness purposes we need to specify boundary conditions at infinity. Typically the Sommerfeld radition condition is imposed </p>
+<p>where \(\alpha = \pm 1\). The fact that the time dependency can be chosen with \(\alpha\) being either \(1\) or \(-1\) is a constant cause of confusing when reading papers within the field of acoustics. Now inserting the time-harmonic solution into the wave equation the Helmholtz equation appears</p>
 \[
-\lim_{r\rightarrow \infty} r^{\frac{n-1}{2}}\left[\frac{\partial}{\partial r} - ik\right]p(r\tilde{x}) = 0,
+\Delta p(\mathbf{x}) + k^2p(\mathbf{x}) = 0, \quad \mathbf{x} \in \omega.
 \]
-<p>uniformly in \(\tilde{x}\) with \(\|\tilde{x}\|_2 = 1\).</p>
-<p>With this condition the solution to the Helmholtz equation is given by a convolution</p>
+<p>Note that the above is independent of the choice of \(\alpha\) &#40;thereby the confusing&#41;. However, the relation between the normal derivative of the sound pressure and the normal velocity does depend on the chosen time dependency,</p>
 \[
-p(x) = \left(G * f\right)(x) = \int_{R^n}G(x-y)f(y)\ \mathrm{d}y.
+\frac{\partial p(\mathbf{x})}{\partial n(\mathbf{x})} = s(\alpha)kv_n(\mathbf{x}), \quad \mathbf{x} \in \Gamma.
 \]
-<p>Note that the integral is only over a finite region as we have assumed that \(f\) has compact support. The function \(G(x)\) is the so-called Green&#39;s function of the Helmholtz equation. In short this means that \(G(x)\) solves the following equation</p>
+<p>Where it was chosen to introduce </p>
 \[
-\Delta G(x,y) + k^2G(x,y) + \delta(x-y) = 0,
+s(\alpha) = -\alpha\mathrm{i} \rho_0 c,
 \]
-<p>where \(\delta(x - y)\) is the Dirac delta function.</p>
-<h2 id="greens_function_in_three_dimensions"><a href="#greens_function_in_three_dimensions" class="header-anchor">Green&#39;s function in three dimensions</a></h2>
-<p>In three dimensions the Green&#39;s function is</p>
+<p>with \(\rho_0\) being the ambient density of the fluid. </p>
+<h2 id="from_the_helmholtz_equation_to_an_integral_equation"><a href="#from_the_helmholtz_equation_to_an_integral_equation" class="header-anchor">From the Helmholtz Equation to an Integral Equation</a></h2>
+<p>Multiplying the Helmholtz equation with a test function &#40;\(q\)&#41; and integrating over the domain of interest we get that</p>
 \[
-G_3(x,y) = \frac{\mathrm{e}^{-ik\|x-y\|_2}}{4\pi\|x-y\|_2}.
+\int_\Omega q(\mathbf{x})\left[\Delta p(\mathbf{x}) + k^2 p(\mathbf{x})\right]\ \mathrm{d}\Omega_\mathbf{x} = 0.
 \]
-<h3 id="gradient_of_the_greens_function"><a href="#gradient_of_the_greens_function" class="header-anchor">Gradient of the Green&#39;s function</a></h3>
-<p>The computation of the Gradient is again based on the application of the identity</p>
-<a id="eqidentity" class="anchor"></a>\[
-\nabla(f \circ g) = (f' \circ g)\nabla g,
+<p>Integrating by parts twice it follows that</p>
+<a id="eqweakformulation" class="anchor"></a>\[
+\begin{aligned}
+\int_\Omega q(\mathbf{x})\left[\Delta p(\mathbf{x}) + k^2 p(\mathbf{x})\right]\ \mathrm{d}\Omega_\mathbf{x} = s(\alpha)k&\int_\Gamma q(\mathbf{x})v_n(\mathbf{x})\ \mathrm{d}\Gamma_\mathbf{x} - \int_\Gamma\frac{\partial q(\mathbf{x})}{\partial n(\mathbf{x})}p(\mathbf{x})\ \mathrm{d}\Gamma_\mathbf{x}\\
++&\int_\Omega p(\mathbf{x})\left[\Delta q(\mathbf{x}) + k^2q(\mathbf{x})\right]\ \mathrm{d}\Omega_\mathbf{x} = 0.
+\end{aligned}
 \]
-<p>together with the standard product rule. We start be simply looking at when \(y=0\) resulting in</p>
-\[\begin{aligned}
-\nabla_x G_3(x) 
-&= \frac{\mathrm{e}^{-ik\|x\|_2}}{4\pi}\left[\nabla\left((x^\top x)^{-1/2}\right)\right] + \frac{1}{4\pi\|x\|_2}\left[\nabla\left(\mathrm{e}^{-ik\|x\|_2}\right) \right]\\
-&= \frac{\mathrm{e}^{-ik\|x\|_2}}{4\pi}\left[-\frac{1}{2}\left(x^\top x\right)^{-3/2}\nabla(x^\top x)\right] + \frac{1}{4\pi\|x\|_2}\left[-ik\mathrm{e}^{-ik\|x\|_2}\nabla\left(\|x\|_2\right)\right]\\
-&= -\frac{\mathrm{e}^{-ik\|x\|_2}}{4\pi\|x\|_2^{3}}x + \frac{-ik\mathrm{e}^{-ik\|x\|_2}}{4\pi\|x\|_2^{2}}x\\
-&= -\frac{\mathrm{e}^{-ik\|x\|_2}\left(ik\|x\|_2 + 1\right)}{4\pi \|x\|_2^3}\begin{bmatrix}x_1\\x_2\\x_3\end{bmatrix}.
-\end{aligned}\]
-<p>Now if we want the derivative with respect to \(y\neq 0\) then it follows that</p>
-\[\begin{aligned}
-\nabla_y G_3(x,y) 
-&= -\frac{\mathrm{e}^{-ik\|x - y\|_2}\left(ik\|x - y\|_2 + 1\right)}{4\pi \|x\|_2^3}\begin{bmatrix}y_1 - x_1\\y_2 - x_2\\y_3 - x_3\end{bmatrix}.
-\end{aligned}\]
-<p>Which result in the following directional derivative</p>
-\[\begin{aligned}
-\frac{\partial G(x,y)}{\partial n_y} 
-&= \frac{-\mathrm{e}^{-ik\|x\|_2}\left(ik\|x\|_2 + 1\right)}{4\pi \|x\|_2^3}(y - x)^\top n.
-\end{aligned}\]
-<h3 id="further_notes"><a href="#further_notes" class="header-anchor">Further notes</a></h3>
-<p>If \(k=0\) then the Helmholtz equation reduces to the Lapalce&#39;s equation</p>
+<p>We now introduce the Green&#39;s function </p>
 \[
-\Delta_y G(x,y) = -\delta (x - y).
+G(\beta, \alpha, \mathbf{x}, \mathbf{y}) = \alpha\beta \frac{\mathrm{e}^{-\alpha\mathrm{i} k \|\mathbf{x} - \mathbf{y}\|_2 }}{4\pi\|\mathbf{x} - \mathbf{y}\|_2}, \quad \mathbf{x}, \mathbf{y} \in \mathbb{R}^3,
 \]
-<p>The solution to this is called the <em>elementary</em> solution as is equal to</p>
+<p>as the solution to the modified Helmholtz equation</p>
 \[
-G_0(x,y) = \frac{1}{4\pi\|x - y\|_2}.
+\Delta G(\alpha, \mathbf{x}, \mathbf{y}) + k^2G(\alpha, \mathbf{x}, \mathbf{y}) = \beta\delta(\mathbf{x}, \mathbf{y}).
 \]
-<p>While seemlingly not relevant to the above problem it is used when computing the so-called integral free term in the boundary element method.</p>
+<p>Simply inserting \(q(\mathbf{x}) = G(\beta, \alpha, \mathbf{x}, \mathbf{y})\) into <span class="eqref">(<a href="#eqweakformulation">7</a>)</span></p>
+<a id="eqintegralequation" class="anchor"></a>\[
+ \beta c(\mathbf{y})p(\mathbf{y}) - \int_\Gamma\frac{\partial G(\alpha,\beta,\mathbf{x},\mathbf{y})}{\partial n(\mathbf{x})}p(\mathbf{x})\ \mathrm{d}\Gamma_\mathbf{x} + s(\alpha)k\int_\Gamma G(\alpha,\beta,\mathbf{x},\mathbf{y})v_n(\mathbf{x})\ \mathrm{d}\Gamma_\mathbf{x} = 0.
+\]
+<p>It turns out that while there is freedom in choosing either \(\alpha\) or \(\beta\) they both can not be varied at the same time. In fact it must be true that \(\alpha\beta=1\), meaning that the chosen time depedency defines the resulting Green&#39;s function. </p>
+<h3 id="cause_of_confusing"><a href="#cause_of_confusing" class="header-anchor">Cause of Confusing</a></h3>
+<p>What can cause confusing is that the integral equation can be written as</p>
+<a id="eqintegralequation2" class="anchor"></a>\[
+ \beta \left(c(\mathbf{y})p(\mathbf{y}) - \int_\Gamma\frac{\partial G(\alpha,\mathbf{x},\mathbf{y})}{\partial n(\mathbf{x})}p(\mathbf{x})\ \mathrm{d}\Gamma_\mathbf{x} + s(\alpha)k\int_\Gamma G(\alpha,\mathbf{x},\mathbf{y})v_n(\mathbf{x})\ \mathrm{d}\Gamma_\mathbf{x}\right) = 0,
+\]
+<p>where</p>
+\[
+G(\beta, \alpha, \mathbf{x}, \mathbf{y}) = \beta G(\alpha, \mathbf{x}, \mathbf{y}).
+\]
+<p>Now <span class="eqref">(<a href="#eqintegralequation2">11</a>)</span> implies that</p>
+<a id="eqintegralequation3" class="anchor"></a>\[
+ c(\mathbf{y})p(\mathbf{y}) - \int_\Gamma\frac{\partial G(\alpha, \mathbf{x}, \mathbf{y})}{\partial n(\mathbf{x})}p(\mathbf{x})\ \mathrm{d}\Gamma_\mathbf{x} - s(\alpha)k\int_\Gamma G(\alpha,\mathbf{x},\mathbf{y})v_n(\mathbf{x})\ \mathrm{d}\Gamma_\mathbf{x} = 0.
+\]
+<p>This can cause confusion since possible sign are hidden within \(G(\alpha, \mathbf{x}, \mathbf{y})\). What makes things worse is that the Green&#39;s function in litterature is usually presented as</p>
+\[
+    G(\mathbf{x},\mathbf{y}) = \frac{\mathrm{e}^{-\alpha\mathrm{i} k \|\mathbf{x} - \mathbf{y}\|_2 }}{4\pi\|\mathbf{x} - \mathbf{y}\|_2}, \quad \mathbf{x}, \mathbf{y} \in \mathbb{R}^3,
+\]
+<p>meaning that various signs of the integral in <span class="eqref">(<a href="#eqintegralequation3">13</a>)</span> can be found. To make things worse there is also various definitions of the directions of the normal vectors, which result in even more confusion in relation to the signs of the integrals. </p>
 <div class="page-foot">
   <div class="copyright">
-    &copy; Mikkel Paltorp. Last modified: February 01, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Mikkel Paltorp. Last modified: April 12, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->

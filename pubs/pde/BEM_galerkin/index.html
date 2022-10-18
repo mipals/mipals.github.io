@@ -32,11 +32,11 @@
 \[
 c(\mathbf{y})p(\mathbf{y}) + \int_\Gamma\left[\frac{\partial G(\mathbf{x}, \mathbf{y})}{\partial\mathbf{n}_\mathbf{x}} - skG(\mathbf{x}, \mathbf{y})Y(\mathbf{x})\right]p(\mathbf{x})\ \mathrm{d}\Gamma_\mathbf{x} = sk\int_\Gamma G(\mathbf{x},\mathbf{y})v_s(\mathbf{x})\ \mathrm{d}\Gamma_\mathbf{x}.
 \]
-<p>Multiplying the above with a test function, \(\delta(\mathbf{y})\) and integrating over the domain \(\Gamma_\mathbf{y}\) it follows that</p>
+<p>Multiplying the above with a test function, \( q(\mathbf{y})\) and integrating over the domain \(\Gamma_\mathbf{y}\) it follows that</p>
 \[
 \begin{aligned}
-\int_\Gamma \delta(\mathbf{y}) c(\mathbf{y})p(\mathbf{y})\ \mathrm{d}\Gamma_\mathbf{y} + &\int_\Gamma \delta(\mathbf{y})\int_\Gamma\left[\frac{\partial G(\mathbf{x}, \mathbf{y})}{\partial\mathbf{n}_\mathbf{x}} - skG(\mathbf{x}, \mathbf{y})Y(\mathbf{x})\right]p(\mathbf{x})\ \mathrm{d}\Gamma_\mathbf{x}\mathrm{d}\Gamma_\mathbf{y}\\ =
-sk&\int_\Gamma \delta(\mathbf{y})\int_\Gamma G(\mathbf{x},\mathbf{y})v_s(\mathbf{x})\ \mathrm{d}\Gamma_\mathbf{x}\mathrm{d}\Gamma_\mathbf{y}.
+\int_\Gamma  q(\mathbf{y}) c(\mathbf{y})p(\mathbf{y})\ \mathrm{d}\Gamma_\mathbf{y} + &\int_\Gamma  q(\mathbf{y})\int_\Gamma\left[\frac{\partial G(\mathbf{x}, \mathbf{y})}{\partial\mathbf{n}_\mathbf{x}} - skG(\mathbf{x}, \mathbf{y})Y(\mathbf{x})\right]p(\mathbf{x})\ \mathrm{d}\Gamma_\mathbf{x}\mathrm{d}\Gamma_\mathbf{y}\\ =
+sk&\int_\Gamma  q(\mathbf{y})\int_\Gamma G(\mathbf{x},\mathbf{y})v_s(\mathbf{x})\ \mathrm{d}\Gamma_\mathbf{x}\mathrm{d}\Gamma_\mathbf{y}.
 \end{aligned}
 \]
 <p>The idea is now to parametrize the test function similar to the &#40;normal derivative of&#41; the pressure </p>
@@ -45,31 +45,31 @@ sk&\int_\Gamma \delta(\mathbf{y})\int_\Gamma G(\mathbf{x},\mathbf{y})v_s(\mathbf
 </li>
 <li><p>\(v_s(\mathbf{x})  = \mathbf{T}(\mathbf{x})\mathbf{v_s}\),</p>
 </li>
-<li><p>\(\mathbf{\delta}(\mathbf{x}) = \mathbf{T}(\mathbf{x})\mathbf{\delta} = \mathbf{\delta}^\top\mathbf{T}(\mathbf{x})^\top\).</p>
+<li><p>\(q(\mathbf{x}) = \mathbf{T}(\mathbf{x})\mathbf{q} = \mathbf{q}^\top\mathbf{T}(\mathbf{x})^\top\).</p>
 </li>
 </ul>
 <p>Inserting this into the above it follows that</p>
 \[
 \begin{aligned}
-\int_\Gamma \mathbf{\delta}^\top\mathbf{T}(\mathbf{y})^\top c(\mathbf{y})\mathbf{T}(\mathbf{y})\mathbf{p}\ \mathrm{d}\Gamma_\mathbf{y} + &\int_\Gamma \mathbf{\delta}^\top\mathbf{T}(\mathbf{y})^\top\int_\Gamma\left[\frac{\partial G(\mathbf{x}, \mathbf{y})}{\partial\mathbf{n}_\mathbf{x}} - skG(\mathbf{x}, \mathbf{y})Y(\mathbf{x})\right]\mathbf{T}(\mathbf{x})\mathbf{p}\ \mathrm{d}\Gamma_\mathbf{x}\mathrm{d}\Gamma_\mathbf{y}\\ =
-sk&\int_\Gamma \mathbf{\delta}^\top\mathbf{T}(\mathbf{y})^\top\int_\Gamma G(\mathbf{x},\mathbf{y})\mathbf{T}(\mathbf{x})\mathbf{v_s}\ \mathrm{d}\Gamma_\mathbf{x}\mathrm{d}\Gamma_\mathbf{y}.
+\int_\Gamma \mathbf{q}^\top\mathbf{T}(\mathbf{y})^\top c(\mathbf{y})\mathbf{T}(\mathbf{y})\mathbf{p}\ \mathrm{d}\Gamma_\mathbf{y} + &\int_\Gamma \mathbf{q}^\top\mathbf{T}(\mathbf{y})^\top\int_\Gamma\left[\frac{\partial G(\mathbf{x}, \mathbf{y})}{\partial\mathbf{n}_\mathbf{x}} - skG(\mathbf{x}, \mathbf{y})Y(\mathbf{x})\right]\mathbf{T}(\mathbf{x})\mathbf{p}\ \mathrm{d}\Gamma_\mathbf{x}\mathrm{d}\Gamma_\mathbf{y}\\ =
+sk&\int_\Gamma \mathbf{q}^\top\mathbf{T}(\mathbf{y})^\top\int_\Gamma G(\mathbf{x},\mathbf{y})\mathbf{T}(\mathbf{x})\mathbf{v_s}\ \mathrm{d}\Gamma_\mathbf{x}\mathrm{d}\Gamma_\mathbf{y}.
 \end{aligned}
 \]
-<p>Now setting \(\mathbf{\delta}\) outside of parentheses </p>
+<p>Now setting \(\mathbf{q}\) outside of parentheses </p>
 \[
 \begin{aligned}
-\mathbf{\delta}^\top\left(\int_\Gamma \mathbf{T}(\mathbf{y})^\top c(\mathbf{y})\mathbf{T}(\mathbf{y})\ \mathrm{d}\Gamma_\mathbf{y} + \int_\Gamma \mathbf{T}(\mathbf{y})^\top\int_\Gamma\left[\frac{\partial G(\mathbf{x}, \mathbf{y})}{\partial\mathbf{n}_\mathbf{x}} - skG(\mathbf{x}, \mathbf{y})Y(\mathbf{x})\right]\mathbf{T}(\mathbf{x})\ \mathrm{d}\Gamma_\mathbf{x}\mathrm{d}\Gamma_\mathbf{y}\right)&\mathbf{p}\\
-=\mathbf{\delta}^\top sk\left(\int_\Gamma \mathbf{T}(\mathbf{y})^\top\int_\Gamma G(\mathbf{x},\mathbf{y})\mathbf{T}(\mathbf{x})\ \mathrm{d}\Gamma_\mathbf{x}\mathrm{d}\Gamma_\mathbf{y}\right)&\mathbf{v_s}.
+\mathbf{q}^\top\left(\int_\Gamma \mathbf{T}(\mathbf{y})^\top c(\mathbf{y})\mathbf{T}(\mathbf{y})\ \mathrm{d}\Gamma_\mathbf{y} + \int_\Gamma \mathbf{T}(\mathbf{y})^\top\int_\Gamma\left[\frac{\partial G(\mathbf{x}, \mathbf{y})}{\partial\mathbf{n}_\mathbf{x}} - skG(\mathbf{x}, \mathbf{y})Y(\mathbf{x})\right]\mathbf{T}(\mathbf{x})\ \mathrm{d}\Gamma_\mathbf{x}\mathrm{d}\Gamma_\mathbf{y}\right)&\mathbf{p}\\
+=\mathbf{q}^\top sk\left(\int_\Gamma \mathbf{T}(\mathbf{y})^\top\int_\Gamma G(\mathbf{x},\mathbf{y})\mathbf{T}(\mathbf{x})\ \mathrm{d}\Gamma_\mathbf{x}\mathrm{d}\Gamma_\mathbf{y}\right)&\mathbf{v_s}.
 \end{aligned}
 \]
-<p>The next &#40;and final&#41; step is to realize that the above has to hold for <strong>all</strong> \(\mathbf{\delta}\in\mathbb{C}^n\) &#40;i.e. all arbitrary test functions&#41;. This implies that</p>
+<p>The next &#40;and final&#41; step is to realize that the above has to hold for <strong>all</strong> \(\mathbf{q}\in\mathbb{C}^n\) &#40;i.e. all arbitrary test functions&#41;. This implies that</p>
 \[
 \begin{aligned}
 \left(\int_\Gamma \mathbf{T}(\mathbf{y})^\top c(\mathbf{y})\mathbf{T}(\mathbf{y})\ \mathrm{d}\Gamma_\mathbf{y} + \int_\Gamma \mathbf{T}(\mathbf{y})^\top\int_\Gamma\left[\frac{\partial G(\mathbf{x}, \mathbf{y})}{\partial\mathbf{n}_\mathbf{x}} - skG(\mathbf{x}, \mathbf{y})Y(\mathbf{x})\right]\mathbf{T}(\mathbf{x})\ \mathrm{d}\Gamma_\mathbf{x}\mathrm{d}\Gamma_\mathbf{y}\right)&\mathbf{p}\\ =
  sk\left(\int_\Gamma \mathbf{T}(\mathbf{y})^\top\int_\Gamma G(\mathbf{x},\mathbf{y})\mathbf{T}(\mathbf{x})\ \mathrm{d}\Gamma_\mathbf{x}\mathrm{d}\Gamma_\mathbf{y}\right)&\mathbf{v_s},
 \end{aligned}
 \]
-<p>which is the final system of equations that one needs to assemble and solve in the Galerkin approach to BEM. It is worth noting that if one simply chose \(\delta(\mathbf{y})\) to be delta functions, then the above reduces to the <a href="/pubs/pde/Element_methods/">collocation approach</a>.</p>
+<p>which is the final system of equations that one needs to assemble and solve in the Galerkin approach to BEM. It is worth noting that if one simply chose \( q(\mathbf{y})\) to be delta functions, then the above reduces to the <a href="/pubs/pde/Element_methods/">collocation approach</a>.</p>
 <h3 id="references"><a href="#references" class="header-anchor">References</a></h3>
 <table class="fndef" id="fndef:1">
     <tr>
@@ -80,7 +80,7 @@ sk&\int_\Gamma \mathbf{\delta}^\top\mathbf{T}(\mathbf{y})^\top\int_\Gamma G(\mat
 
 <div class="page-foot">
   <div class="copyright">
-    &copy; Mikkel Paltorp. Last modified: April 04, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Mikkel Paltorp. Last modified: April 12, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->

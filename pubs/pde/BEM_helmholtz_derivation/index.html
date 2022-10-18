@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="stylesheet" href="/libs/katex/katex.min.css">
+     
+   <link rel="stylesheet" href="/libs/highlight/github.min.css">
+   
+  <link rel="stylesheet" href="/css/franklin.css">
+  <link rel="stylesheet" href="/css/basic.css">
+  <link rel="icon" href="/assets/favicon.png">
+   <title>Helmholtz Equation</title>  
+</head>
+<body>
+  <header>
+<div class="blog-name"><a href="/">Mikkel Paltorp</a></div>
+<nav>
+  <ul>
+    <li><a href="/">About Me</a></li>
+    <li><a href="/menu1/">Notes</a></li>
+    <li><a href="/menu2/">Software</a></li>
+  </ul>
+  <img src="/assets/hamburger.svg" id="menu-icon">
+</nav>
+</header>
+
+
+<!-- Content appended here -->
+<div class="franklin-content"><h1 id="greens_function_in_three_dimensions"><a href="#greens_function_in_three_dimensions" class="header-anchor">Green&#39;s function in three dimensions</a></h1>
+<p>In general the Green&#39;s function for the Helmholz equation in three-dimensional space have the form</p>
+\[
+G_3(x,y) = \frac{\mathrm{e}^{-\alpha \mathrm{i} k\|x-y\|_2}}{4\pi\|x-y\|_2},
+\]
+<p>where \(\alpha \in \{-1,1\}\) is the sign of the chosen time harmonic dependency &#40;\(\mathrm{e}^{\alpha \mathrm{i}\omega t}\)&#41;.</p>
+<h2 id="gradient_of_the_greens_function"><a href="#gradient_of_the_greens_function" class="header-anchor">Gradient of the Green&#39;s function</a></h2>
+<p>The computation of the Gradient is again based on the application of the identity</p>
+<a id="eqidentity" class="anchor"></a>\[
+\nabla(f \circ g) = (f' \circ g)\nabla g,
+\]
+<p>together with the standard product rule. We start be simply looking at when \(y=0\) resulting in</p>
+\[\begin{aligned}
+\nabla_x G_3(x) 
+&= \frac{\mathrm{e}^{-\alpha\mathrm{i} k\|x\|_2}}{4\pi}\left[\nabla\left((x^\top x)^{-1/2}\right)\right] + \frac{1}{4\pi\|x\|_2}\left[\nabla\left(\mathrm{e}^{-\alpha\mathrm{i} k\|x\|_2}\right) \right]\\
+&= \frac{\mathrm{e}^{-\mathrm{i} k\|x\|_2}}{4\pi}\left[-\frac{1}{2}\left(x^\top x\right)^{-3/2}\nabla(x^\top x)\right] + \frac{1}{4\pi\|x\|_2}\left[-\alpha \mathrm{i} k\mathrm{e}^{-\mathrm{i} k\|x\|_2}\nabla\left(\|x\|_2\right)\right]\\
+&= -\frac{\mathrm{e}^{-\alpha\mathrm{i} k\|x\|_2}}{4\pi\|x\|_2^{3}}x + \frac{-\alpha \mathrm{i} k\mathrm{e}^{-\mathrm{i} k\|x\|_2}}{4\pi\|x\|_2^{2}}x\\
+&= -\frac{\mathrm{e}^{-\alpha\mathrm{i} k\|x\|_2}\left(\alpha \mathrm{i} k\|x\|_2 + 1\right)}{4\pi \|x\|_2^3}\begin{bmatrix}x_1\\x_2\\x_3\end{bmatrix}.
+\end{aligned}\]
+<p>Now if we want the derivative with respect to \(y\neq 0\) then it follows that</p>
+\[\begin{aligned}
+\nabla_x G_3(x,y) 
+&= -\frac{\mathrm{e}^{-\alpha\mathrm{i} k\|x - y\|_2}\left(\alpha\mathrm{i} k\|x - y\|_2 + 1\right)}{4\pi \|x\|_2^3}\begin{bmatrix}y_1 - x_1\\y_2 - x_2\\y_3 - x_3\end{bmatrix}.
+\end{aligned}\]
+<h1 id="further_notes"><a href="#further_notes" class="header-anchor">Further notes</a></h1>
+<div class="page-foot">
+  <div class="copyright">
+    &copy; Mikkel Paltorp. Last modified: April 30, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+  </div>
+</div>
+</div><!-- CONTENT ENDS HERE -->
+    
+        <script src="/libs/katex/katex.min.js"></script>
+<script src="/libs/katex/auto-render.min.js"></script>
+<script>renderMathInElement(document.body)</script>
+
+    
+    
+        <script src="/libs/highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();hljs.configure({tabReplace: '    '});</script>
+
+    
+  </body>
+</html>

@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="stylesheet" href="/libs/katex/katex.min.css">
+     
+   <link rel="stylesheet" href="/libs/highlight/github.min.css">
+   
+  <link rel="stylesheet" href="/css/franklin.css">
+  <link rel="stylesheet" href="/css/basic.css">
+  <link rel="icon" href="/assets/favicon.png">
+   <title>The Fast Multipole Method for BEM</title>  
+</head>
+<body>
+  <header>
+<div class="blog-name"><a href="/">Mikkel Paltorp</a></div>
+<nav>
+  <ul>
+    <li><a href="/">About Me</a></li>
+    <li><a href="/menu1/">Notes</a></li>
+    <li><a href="/menu2/">Software</a></li>
+  </ul>
+  <img src="/assets/hamburger.svg" id="menu-icon">
+</nav>
+</header>
+
+
+<!-- Content appended here -->
+<div class="franklin-content"><h1 id="the_fast_multipole_method_for_boundary_elements"><a href="#the_fast_multipole_method_for_boundary_elements" class="header-anchor">The Fast Multipole Method for Boundary Elements</a></h1>
+<p>I often find that texts regarding the Boundary Element Method mentions how the Fast Multipole Method can be utilized to get rid of the \(\mathcal{O}(n^2)\) memory and computational scalings of the BEM. While there exist many good introductory text to the Fast Multipole Method &#40;FMM&#41; such as for example Lexing Yings <em>A pedstrian introduction to fast multipole methods</em> <sup id="fnref:1"><a href="#fndef:1" class="fnref">[1]</a></sup>, no such text can be found for their application to the BEM. As such this note serves as a brief description of how to apply the FMM to speed up BEM computations. </p>
+<p>The specifics of the implementation will depend on the underlying FMM library used. In this note I will stick to the approach taken in the Flatiron Institute Fast Multipole Libraries<sup id="fnref:2"><a href="#fndef:2" class="fnref">[2]</a></sup>, where the representational formula has the following form</p>
+<a id="eqrepresentation" class="anchor"></a>\[
+u(\mathbf{x}) = \sum_{j=1}^M\left[c_j\frac{\mathrm{e}^{\mathrm{i} k\|\mathbf{x} - \mathbf{x}_j\|}}{\|\mathbf{x} - \mathbf{x}_j\|} - \mathbf{v}_j\cdot\nabla\left(\frac{\mathrm{e}^{\mathrm{i} k\|\mathbf{x} - \mathbf{x}_j\|}}{\|\mathbf{x} - \mathbf{x}_j\|}\right)\right],
+\]
+<p>where when \(\mathbf{x} = \mathbf{x}_j\) the \(j\)th term is excluded from the sum. Note that in both terms are missing the standard \((4\pi)^{-1}\), meaning that from an implementation point of view this constant needs to be added to the values of \(c_j\) and \(\mathbf{v}_j\). </p>
+<h2 id="implementation_overview"><a href="#implementation_overview" class="header-anchor">Implementation overview</a></h2>
+<p>Depending on the chosen Boundary Element scheme the specifics of how to apply the Fast Multipole Method to speed up the computations changes. However, they are all based on the same principles of splitting the BE matrix, \(\mathbf{A}\), into parts which are either sparse or can be approximated using the FMM. For the three main types of BE discretizations the splitting looks as follows</p>
+<ol>
+<li><p>Nyström</p>
+</li>
+</ol>
+\[
+\mathbf{A} = \mathbf{G} - \mathbf{C} + \mathbf{S}, \quad \mathbf{A}\in\mathbb{C}^{N\times N}
+\]
+<ol start="2">
+<li><p>Collocation</p>
+</li>
+</ol>
+\[
+\mathbf{A} = (\mathbf{G} -\mathbf{C})\mathbf{F} +\mathbf{S} = \mathbf{G}\mathbf{F} - \widetilde{\mathbf{C}} + \mathbf{S}, \quad \mathbf{G}, \mathbf{C}\in\mathbb{C}^{N\times M},\ \mathbf{F}\in\mathbb{C}^{M\times N}, \mathbf{S}\in\mathbb{C}^{N\times N}
+\]
+<ol start="3">
+<li><p>Galerkin</p>
+</li>
+</ol>
+\[
+\mathbf{A} = \mathbf{F}^\top(\mathbf{G} - \mathbf{C})\mathbf{F} + \mathbf{S} = \mathbf{F}^\top \mathbf{G} \mathbf{F} - \widetilde{\mathbf{C}} + \mathbf{S}, \quad \mathbf{G}, \mathbf{C}\in\mathbb{C}^{M\times M},\ \mathbf{F}\in\mathbb{C}^{M\times N}, \mathbf{S}\in\mathbb{C}^{N\times N}
+\]
+<p>In the above the matrix \(\mathbf{G}\) is the one approximated using e.g. FMM or an \(\mathcal{H}\)-matrix, we then subtract \(\mathbf{C}\) which represents the numerical inaccuracies from close-to-singular points included in \(\mathbf{G}\) while \(\mathbf{S}\) corresponds to the correct singular integration of the same close-singular-points. This means that the combination \(-\widetilde{\mathbf{C}} + \mathbf{S}\) can be viewed as representing the correction of the nearfield interactions. Lastly the matrix \(\mathbf{F}\) acts as a map from the nodal values to the gaussian points used in the approximation schemes. In all cases \(\mathbf{C}, \mathbf{S}\) and \(\mathbf{F}\) are highly sparse matrices, meaning that both assembly and multiplication with these should scale \(\mathcal{O}(n\tau)\) where \(\tau \ll n\). This means that using an approximate scheme for \(\mathbf{G}\) with a multiplication that scales linear in time and memory we have a representation of \(\mathbf{A}\) that also scale linear in time and memory.</p>
+<h2 id="handling_singular_integration"><a href="#handling_singular_integration" class="header-anchor">Handling Singular Integration</a></h2>
+<p>As mentioned previously \(-\widetilde{\mathbf{C}} + \mathbf{S}\) serves as a correction of the nearfield computations. In the case of collocation this correction step requires the recomputation of the part of the integrals that corresponds to the surrounding elements. For a corner and edge node these elements can be seen below &#40;where the red dots represents the corner and edge node respetively&#41;.  <img src="/assets/visualizations/singular_elements.png" alt="" /></p>
+<h2 id="how_to_use_the_representation_formula"><a href="#how_to_use_the_representation_formula" class="header-anchor">How to use the representation formula</a></h2>
+<p>When solving BEM we are interested in integrals of the form</p>
+\[
+\int_\Gamma G(\mathbf{x},\mathbf{y})\mathbf{N}(\mathbf{x})^\top \frac{\partial \mathbf{p}}{\partial\mathbf{n} }\ \mathrm{d}\Gamma_\mathbf{x} = \sum_{j=1}^{N_{elements}}\int_{\Gamma_j} G(\mathbf{x},\mathbf{y})\mathbf{N}(\mathbf{x})^\top \frac{\partial \mathbf{p}}{\partial\mathbf{n} }\ \mathrm{d}\Gamma_\mathbf{x},
+\]
+\[
+\int_\Gamma \mathbf{n} \cdot \left[\nabla G(\mathbf{x},\mathbf{y})\right]\mathbf{N}(\mathbf{x})^\top \mathbf{p}\ \mathrm{d}\Gamma_\mathbf{x} = \sum_{j=1}^{N_{elements}}\int_{\Gamma_j} \mathbf{n} \cdot \left[\nabla G(\mathbf{x},\mathbf{y})\right]\mathbf{N}(\mathbf{x})^\top \mathbf{p}\ \mathrm{d}\Gamma_\mathbf{x}.
+\]
+<p>The standard way of approximating these integrals is using so-called <a href="/pubs/pde/BEM_quadrature/">gaussian quadrature</a>, meaning that the above can be further written as</p>
+\[
+\sum_{j=1}^{N_{elements}}\int_{\Gamma_j} G(\mathbf{x},\mathbf{y})\mathbf{N}(\mathbf{x})^\top \frac{\partial \mathbf{p}}{\partial\mathbf{n} }\ \mathrm{d}\Gamma_\mathbf{x} \approx \sum_{j=1}^{N_{elements}}\sum_{\ell=1}^{n_{gauss}} G(\mathbf{x}_\ell,\mathbf{y})\mathbf{N}(\mathbf{x}_\ell)^\top \frac{\partial \mathbf{p}}{\partial\mathbf{n} }, 
+\]
+\[
+\sum_{j=1}^{N_{elements}}\int_{\Gamma_j} \mathbf{n} \cdot \left[\nabla G(\mathbf{x},\mathbf{y})\right]\mathbf{N}(\mathbf{x})^\top \mathbf{p}\ \mathrm{d}\Gamma_\mathbf{x} \approx \sum_{j=1}^{N_{elements}}\sum_{\ell=1}^{n_{gauss}} \mathbf{n}_\ell \cdot \left[\nabla G(\mathbf{x}_\ell,\mathbf{y})\right]\mathbf{N}(\mathbf{x}_\ell)^\top \mathbf{p}\ \mathrm{d}\Gamma_\mathbf{x}
+\]
+<h2 id="references"><a href="#references" class="header-anchor">References</a></h2>
+<p><table class="fndef" id="fndef:1">
+    <tr>
+        <td class="fndef-backref"><a href="#fnref:1">[1]</a></td>
+        <td class="fndef-content">Ying, L. &#40;2012&#41;. A pedestrian introduction to fast multipole methods. <a href="https://link.springer.com/article/10.1007/s11425-012-4392-0">doi: 10.1007/s11425-012-4392-0</a></td>
+    </tr>
+</table>
+<table class="fndef" id="fndef:2">
+    <tr>
+        <td class="fndef-backref"><a href="#fnref:2">[2]</a></td>
+        <td class="fndef-content"><a href="https://fmm3d.readthedocs.io/en/latest/julia.html#helm-jul">Flatiron Institute Fast Multipole Libraries</a>.</td>
+    </tr>
+</table>
+</p>
+<div class="page-foot">
+  <div class="copyright">
+    &copy; Mikkel Paltorp. Last modified: July 13, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+  </div>
+</div>
+</div><!-- CONTENT ENDS HERE -->
+    
+        <script src="/libs/katex/katex.min.js"></script>
+<script src="/libs/katex/auto-render.min.js"></script>
+<script>renderMathInElement(document.body)</script>
+
+    
+    
+        <script src="/libs/highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();hljs.configure({tabReplace: '    '});</script>
+
+    
+  </body>
+</html>

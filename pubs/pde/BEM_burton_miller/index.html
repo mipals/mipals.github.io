@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="stylesheet" href="/libs/katex/katex.min.css">
+     
+   <link rel="stylesheet" href="/libs/highlight/github.min.css">
+   
+  <link rel="stylesheet" href="/css/franklin.css">
+  <link rel="stylesheet" href="/css/basic.css">
+  <link rel="icon" href="/assets/favicon.png">
+   <title>The Burton-Miller Method</title>  
+</head>
+<body>
+  <header>
+<div class="blog-name"><a href="/">Mikkel Paltorp</a></div>
+<nav>
+  <ul>
+    <li><a href="/">About Me</a></li>
+    <li><a href="/menu1/">Notes</a></li>
+    <li><a href="/menu2/">Software</a></li>
+  </ul>
+  <img src="/assets/hamburger.svg" id="menu-icon">
+</nav>
+</header>
+
+
+<!-- Content appended here -->
+<div class="franklin-content"><h1 id="the_burton-miller_method"><a href="#the_burton-miller_method" class="header-anchor">The Burton-Miller Method</a></h1>
+<p>The main idea behind the Burton-Miler method is regularize the standard integral equation &#40;which for exterior problems might suffer from so-called irregular frequencies&#41;. The first step is to take the normal derivative with respect to the position of the original integral equation</p>
+\[
+\frac{\partial}{\partial n(\mathbf{y})}\left( \beta c(\mathbf{y})p(\mathbf{y}) - \int_\Gamma\frac{\partial G(\alpha,\beta,\mathbf{x},\mathbf{y})}{\partial n(\mathbf{x})}p(\mathbf{x})\ \mathrm{d}\Gamma_\mathbf{x} + s(\alpha)k\int_\Gamma G(\alpha,\beta,\mathbf{x},\mathbf{y})v_n(\mathbf{x})\ \mathrm{d}\Gamma_\mathbf{x}\right) = 0.
+\]
+<p>However, one needs to think of when this operation is valid. First of all the pressure must be differentialable at the position \(\mathbf{y}\). In practice this means that only discontinuous elements can be applied. As a result of the discontinuity the value of \(c(\mathbf{y})\) is constant with respect to the position \(\mathbf{y}\). Therefore the above reduces to the equation</p>
+\[
+\beta c(\mathbf{y})\frac{\partial p(\mathbf{y})}{\partial n(\mathbf{y})} - \int_\Gamma\frac{\partial G(\alpha,\beta,\mathbf{x},\mathbf{y})}{\partial n(\mathbf{y})\partial n(\mathbf{x})}p(\mathbf{x})\ \mathrm{d}\Gamma_\mathbf{x} + s(\alpha)k\int_\Gamma \frac{\partial G(\alpha,\beta,\mathbf{x},\mathbf{y})}{\partial n(\mathbf{y})}v_n(\mathbf{x})\ \mathrm{d}\Gamma_\mathbf{x} = 0.
+\]
+<p>In order to ease notation it is common to define</p>
+\[
+\begin{aligned}
+I_1(\alpha,\beta,\mathbf{y}) &= \frac{\partial}{\partial n(\mathbf{y})}\left( \beta c(\mathbf{y})p(\mathbf{y}) - \int_\Gamma\frac{\partial G(\alpha,\beta,\mathbf{x},\mathbf{y})}{\partial n(\mathbf{x})}p(\mathbf{x})\ \mathrm{d}\Gamma_\mathbf{x} + s(\alpha)k\int_\Gamma G(\alpha,\beta,\mathbf{x},\mathbf{y})v_n(\mathbf{x})\ \mathrm{d}\Gamma_\mathbf{x}\right),\\
+I_2(\alpha,\beta,\mathbf{y}) &= \beta c(\mathbf{y})\frac{\partial p(\mathbf{y})}{\partial n(\mathbf{y})} - \int_\Gamma\frac{\partial G(\alpha,\beta,\mathbf{x},\mathbf{y})}{\partial n(\mathbf{y})\partial n(\mathbf{x})}p(\mathbf{x})\ \mathrm{d}\Gamma_\mathbf{x} + s(\alpha)k\int_\Gamma \frac{\partial G(\alpha,\beta,\mathbf{x},\mathbf{y})}{\partial n(\mathbf{y})}v_n(\mathbf{x})\ \mathrm{d}\Gamma_\mathbf{x}.
+\end{aligned}
+\]
+<p>The Burton-Miller method then couples the two by</p>
+\[
+I_1(\alpha,\beta,\mathbf{y}) + \eta I_2(\alpha,\beta,\mathbf{y}) = 0,
+\]
+<p>where \(\eta\) is the so-called coupling parameter. In matrix form the above can be written as</p>
+\[
+\left[\mathbf{H} + \eta\mathbf{E}\right]\mathbf{p}  +\left[\mathbf{G} + \eta\mathbf{F}\right]\mathbf{v}_n = \mathbf{0}.
+\]
+<p>It has been shown<sup id="fnref:1"><a href="#fndef:1" class="fnref">[1]</a></sup> that the above system of matrices will have a minimum condition number when \(\eta = \frac{\mathrm{i}}{k}\).</p>
+<h3 id="references"><a href="#references" class="header-anchor">References</a></h3>
+<table class="fndef" id="fndef:1">
+    <tr>
+        <td class="fndef-backref"><a href="#fnref:1">[1]</a></td>
+        <td class="fndef-content">Marburg, Steffen. “The Burton and Miller Method: Unlocking Another Mystery of Its Coupling Parameter.” Journal of Computational Acoustics, vol. 24, no. 1, World Scientific Publishing Co. Pte Ltd, 2016, p. 1550016, <a href="https://www.worldscientific.com/doi/pdf/10.1142/S0218396X15500162">doi:10.1142/S0218396X15500162</a>.</td>
+    </tr>
+</table>
+
+<div class="page-foot">
+  <div class="copyright">
+    &copy; Mikkel Paltorp. Last modified: April 30, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+  </div>
+</div>
+</div><!-- CONTENT ENDS HERE -->
+    
+        <script src="/libs/katex/katex.min.js"></script>
+<script src="/libs/katex/auto-render.min.js"></script>
+<script>renderMathInElement(document.body)</script>
+
+    
+    
+        <script src="/libs/highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();hljs.configure({tabReplace: '    '});</script>
+
+    
+  </body>
+</html>

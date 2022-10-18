@@ -30,16 +30,16 @@
 <div class="franklin-content"><h1 id="boundary_layer_impedance"><a href="#boundary_layer_impedance" class="header-anchor">Boundary Layer Impedance</a></h1>
 <p>The inclusion of viscothermal losses in acoustical computations can be approximated using the so-called Boundary Layer Impedance &#40;BLI&#41; approach described by <sup id="fnref:1"><a href="#fndef:1" class="fnref">[1]</a></sup>. Here the viscothermal effects are approximated by applying a Wentzell &#40;Venttsel&#39;&#41; type boundary condition. Using the description from <sup id="fnref:2"><a href="#fndef:2" class="fnref">[2]</a></sup> the boundary condition have the following form</p>
 \[
-    \frac{\partial p}{\partial \mathbf{n}} = \left[(\gamma - 1)\frac{ik^2}{k_h} -\frac{i\Delta_{\text{T}}}{k_v}\right]p,
+    \frac{\partial p}{\partial \mathbf{n}} = \left[(\gamma - 1)\frac{\mathrm{i} k^2}{k_h} -\frac{\mathrm{i}\Delta_{\text{T}}}{k_v}\right]p,
 \]
 <p>where \(\gamma\) is the heat capacity ratio and \(k, k_v, k_h\) are the respectively the standard, viscous and thermal wavenumbers. Splitting up the double-layer potential into a part with a standard velocity condition &#40;\(\Gamma_\text{io}\) in the figure&#41; and a part with a BLI condition &#40;\(\Gamma_\text{BLI}\) in the figure&#41; we find that</p>
 <a id="eqinitialbli" class="anchor"></a>\[
     \begin{aligned}
     c(\mathbf{x})p(\mathbf{x}) =  \int_{\Gamma_{\text{io}}} G(\mathbf{x},\mathbf{y})\frac{\partial p(\mathbf{y})}{\partial \mathbf{n}_\mathbf{y}}\ \mathrm{d}S_\mathbf{y} - \int_\Gamma\frac{\partial G(\mathbf{x},\mathbf{y})}{\partial \mathbf{n}_\mathbf{y}}&p(\mathbf{y})\ \mathrm{d}S_\mathbf{y} \\
-    +\int_{\Gamma_{\text{BLI}}} G(\mathbf{x},\mathbf{y})\left[ \frac{(\gamma - 1)ik^2}{k_h} -\frac{i\Delta_{\text{T}} }{k_v}\right]&p(\mathbf{y})\ \mathrm{d}S_\mathbf{y}.
+    +\int_{\Gamma_{\text{BLI}}} G(\mathbf{x},\mathbf{y})\left[ \frac{(\gamma - 1)\mathrm{i} k^2}{k_h} -\frac{\mathrm{i}\Delta_{\text{T}} }{k_v}\right]&p(\mathbf{y})\ \mathrm{d}S_\mathbf{y}.
     \end{aligned}  
     % c(\mathbf{x})p(\mathbf{x}) =  \int_{\Gamma_{\text{io}}} G(\mathbf{x},\mathbf{y})\frac{\partial p(\mathbf{y})}{\partial \mathbf{n}_\mathbf{y}}\ \mathrm{d}S_\mathbf{y} - \int_\Gamma\frac{\partial G(\mathbf{x},\mathbf{y})}{\partial \mathbf{n}_\mathbf{y}}p(\mathbf{y})\ \mathrm{d}S_\mathbf{y}
-    % +\int_{\Gamma_{\text{BLI}}} G(\mathbf{x},\mathbf{y})\left[ \frac{(\gamma - 1)ik^2}{k_h} -\frac{i\Delta_{\text{T}} }{k_v}\right]p(\mathbf{y})\ \mathrm{d}S_\mathbf{y}.
+    % +\int_{\Gamma_{\text{BLI}}} G(\mathbf{x},\mathbf{y})\left[ \frac{(\gamma - 1)\mathrm{i} k^2}{k_h} -\frac{\mathrm{i}\Delta_{\text{T}} }{k_v}\right]p(\mathbf{y})\ \mathrm{d}S_\mathbf{y}.
 \]
 <p><img src="/assets/domain.png" alt="" /></p>
 <p>Applying integration by parts to the term including \(\Delta_\text{T}\) in <span class="eqref">(<a href="#eqinitialbli">2</a>)</span> while assuming that </p>
@@ -50,7 +50,7 @@
 <a id="eqbliinitial" class="anchor"></a>\[
   \begin{aligned}
   c(\mathbf{x})p(\mathbf{x}) = \int_{\Gamma_{\text{io}}} G(\mathbf{x},\mathbf{y})\frac{\partial p(\mathbf{y})}{\partial \mathbf{n}_\mathbf{y}}\ \mathrm{d}S_\mathbf{y} - \int_\Gamma\frac{\partial G(\mathbf{x},\mathbf{y})}{\partial \mathbf{n}_\mathbf{y}}&p(\mathbf{y})\ \mathrm{d}S_\mathbf{y}\\
-  + \frac{(\gamma - 1)ik^2}{k_h}\int_{\Gamma_{\text{BLI}}}G(\mathbf{x},\mathbf{y})&p(\mathbf{y})\ \mathrm{d}S_\mathbf{y} + \frac{i}{k_v}\int_{\Gamma_{\text{BLI}}} \nabla_{\text{T}} G(\mathbf{x},\mathbf{y})\cdot \nabla_{\text{T}} p(\mathbf{y})\ \mathrm{d}S_\mathbf{y}.
+  + \frac{(\gamma - 1)\mathrm{i} k^2}{k_h}\int_{\Gamma_{\text{BLI}}}G(\mathbf{x},\mathbf{y})&p(\mathbf{y})\ \mathrm{d}S_\mathbf{y} + \frac{\mathrm{i}}{k_v}\int_{\Gamma_{\text{BLI}}} \nabla_{\text{T}} G(\mathbf{x},\mathbf{y})\cdot \nabla_{\text{T}} p(\mathbf{y})\ \mathrm{d}S_\mathbf{y}.
   \end{aligned}  
 \]
 <p>Note that the assumption of <span class="eqref">(<a href="#eqbliassumption">3</a>)</span> is described in detail in section 4 of <sup id="fnref:1"><a href="#fndef:1" class="fnref">[1]</a></sup>.  According to the definition of the tangential &#40;surface&#41; gradient it further reduces that</p>
@@ -63,12 +63,12 @@
 <a id="eqblifinal" class="anchor"></a>\[
     \begin{aligned}
         c(\mathbf{x})p(\mathbf{x}) &= \int_{\Gamma_{\text{io}}} G(\mathbf{x},\mathbf{y})\frac{\partial p(\mathbf{y})}{\partial \mathbf{n}_\mathbf{y}}\ \mathrm{d}S_\mathbf{y} -  \int_\Gamma\frac{\partial G(\mathbf{x},\mathbf{y})}{\partial \mathbf{n}_\mathbf{y}}p(\mathbf{y})\ \mathrm{d}S_\mathbf{y}\\
-        &+\frac{(\gamma - 1)ik^2}{k_h}\int_{\Gamma_{\text{BLI}}}G(\mathbf{x},\mathbf{y})p(\mathbf{y})\ \mathrm{d}S_\mathbf{y} + \frac{i}{k_v}\int_{\Gamma_{\text{BLI}}} \left(\nabla_\mathbf{y} G(\mathbf{x},\mathbf{y}) - \frac{\partial G}{\partial\mathbf{n}_\mathbf{y}}\mathbf{n_\mathbf{y}}\right)^\top\nabla p(\mathbf{y})\ \mathrm{d}S_\mathbf{y}.
+        &+\frac{(\gamma - 1)\mathrm{i} k^2}{k_h}\int_{\Gamma_{\text{BLI}}}G(\mathbf{x},\mathbf{y})p(\mathbf{y})\ \mathrm{d}S_\mathbf{y} + \frac{\mathrm{i}}{k_v}\int_{\Gamma_{\text{BLI}}} \left(\nabla_\mathbf{y} G(\mathbf{x},\mathbf{y}) - \frac{\partial G}{\partial\mathbf{n}_\mathbf{y}}\mathbf{n_\mathbf{y}}\right)^\top\nabla p(\mathbf{y})\ \mathrm{d}S_\mathbf{y}.
     \end{aligned}  
 \]
 <p>Following the discretization procedure described in the previous section one finds that the above can be represented as the following linear system of equations</p>
 <a id="eqblidisc" class="anchor"></a>\[
-    \text{diag}(\mathbf{c})\mathbf{p} = \mathbf{G}_{\Gamma_{\text{io}}}\frac{\partial\mathbf{p}}{\partial \mathbf{n}} - \mathbf{F}\mathbf{p} + \frac{(\gamma - 1)ik^2}{k_h}\mathbf{H}_{\Gamma_{\text{BLI}}}\mathbf{p} + \frac{i}{k_v}\mathbf{T}_{\Gamma_\text{BLI}}\mathbf{p}.
+    \text{diag}(\mathbf{c})\mathbf{p} = \mathbf{G}_{\Gamma_{\text{io}}}\frac{\partial\mathbf{p}}{\partial \mathbf{n}} - \mathbf{F}\mathbf{p} + \frac{(\gamma - 1)\mathrm{i} k^2}{k_h}\mathbf{H}_{\Gamma_{\text{BLI}}}\mathbf{p} + \frac{\mathrm{i}}{k_v}\mathbf{T}_{\Gamma_\text{BLI}}\mathbf{p}.
 \]
 <p>Again applying boundary conditions will result in a linear system of equations</p>
 <a id="eqdiscbound" class="anchor"></a>\[
@@ -91,7 +91,7 @@
 </p>
 <div class="page-foot">
   <div class="copyright">
-    &copy; Mikkel Paltorp. Last modified: February 01, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Mikkel Paltorp. Last modified: April 30, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->
