@@ -72,7 +72,7 @@ T(\mathbf{x}) = \tau_ap_a(\mathbf{x}) + \tau_hp_h(\mathbf{x}) = 0, \quad \mathbf
 <p><img src="/assets/losses/lossy_matrix1.png" alt="" /></p>
 <p>If one naively implemented the above system of equation one will see that the above system grow very quickly in size. This is namely due to the fact that there are 10 DOFs per node on the mesh. This means that for a simple mesh of 10,000 nodes the above requires the storage of a \(100,000\times 100,000\) matrix of complex numbers, which would require around 160 GB of memory to be stored. In the following we will explain the inherent structure of the matrix, that makes is able to solve the system effieciently.</p>
 <h3 id="saved_by_the_zeros"><a href="#saved_by_the_zeros" class="header-anchor">Saved by the Zeros</a></h3>
-<p>The main reason we can do things efficiently is that the above matrix contains <strong>a lot</strong> of zeros. This is due to a couple of things</p>
+<p>The main reason we can do things efficiently is that the above matrix does not contain a lot of information &#40;it contains <strong>a lot</strong> of zeros&#41;. This is due to a couple of things</p>
 <ul>
 <li><p>The original 5 Helmholtz equation are completely decoupled.</p>
 </li>
@@ -86,7 +86,7 @@ T(\mathbf{x}) = \tau_ap_a(\mathbf{x}) + \tau_hp_h(\mathbf{x}) = 0, \quad \mathbf
 <p>We introduce the following visualization of the structure blocks.</p>
 <p><img src="/assets/losses/block_description.png" alt="" /></p>
 <p>Using the above we can visualize the resulting system of equations simply as</p>
-<p><img src="/assets/losses/lossy_matrix3.png" alt="" /></p>
+<p><img src="/assets/losses/lossy_matrix_new.png" alt="" /></p>
 <p>The main takeaway is that the resulting system of equations is extremely sparse. It actually turns out that in most cases the total storage of the sparse and diagonal blocks is less than the storage of just storing a single dense block. In practice this means that if one has enough memory to store the purely acoustical system one should be able to store the full system including viscothermal losses. Revisiting the mesh with 10,000 nodes from the previous section the sparse matrix would require less that 5 GB which is about 32 times less than the large system. </p>
 <h2 id="references"><a href="#references" class="header-anchor">References</a></h2>
 <p><table class="fndef" id="fndef:1">
@@ -104,7 +104,7 @@ T(\mathbf{x}) = \tau_ap_a(\mathbf{x}) + \tau_hp_h(\mathbf{x}) = 0, \quad \mathbf
 </p>
 <div class="page-foot">
   <div class="copyright">
-    &copy; Mikkel Paltorp. Last modified: May 07, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Mikkel Paltorp. Last modified: December 20, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->

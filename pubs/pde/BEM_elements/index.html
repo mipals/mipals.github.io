@@ -48,7 +48,7 @@
 \[
 \mathbf{x}(u) = \mathbf{T}_\mathbf{x}(u)\mathbf{X}^\top,
 \]
-<p>where \(\mathbf{T}(u)\) is a vector function which represents the interpolation between each node \(\mathbf{x}_i\). In practice, however, it is usally more easy to introduce the so-called topology matrix &#40;also sometimes called a connectivity matrix&#41; as</p>
+<p>where \(\mathbf{T}(u)\) is a vector function which represents the interpolation between each node \(\mathbf{x}_i\). In practice, however, it is usually more easy to introduce the so-called topology matrix &#40;also sometimes called a connectivity matrix&#41; as</p>
 \[
 \left.
 \text{topology} = 
@@ -59,18 +59,18 @@
 \right\}\text{Connectivity matrix of coordinates},
 \]
 <p>where each column represents an <em>element</em>. What this means is that the values in a column represents node-numbers which is interpolated between on said element.</p>
-<p>The discetization of the physics is similar, namely that we introduce the following vector \(\mathbf{P}\) which contains the nodal values \(p_i\) as</p>
-<a id="eqphysicsinterp" class="anchor"></a>\[
-\mathbf{P} = 
+<p>The discetization of the physics is similar, namely that we introduce the following vector \(\mathbf{p}\) which contains the nodal values \(p_i\) as</p>
+\[
+\mathbf{p} = 
 \begin{bmatrix}
 p_1 \\ p_2 \\ \vdots \\ p_n.
 \end{bmatrix}
 \]
 <p>Using these nodal values we can create an interpolation of them in the same way as for the geometrical nodes</p>
-\[
-p(x) = \mathbf{T}_p(x)\mathbf{P}.
+<a id="eqphysicsinterp" class="anchor"></a>\[
+p(x) = \mathbf{T}_p(x)\mathbf{p}.
 \]
-<p>Note that in many cases it has been chosen to set \(\mathbf{T}_\mathbf{x} = \mathbf{T}_p\) since it simplifies the implementation. A key insight into element methods is that <span class="eqref">(<a href="#eqphysicsinterp">4</a>)</span> serves a <em>parametrization</em> of possible solutions to the PDE of interest. Both FEM and BEM are then based on setting up a linear system of equation in order to find \(\mathbf{P}\) such that <span class="eqref">(<a href="#eqphysicsinterp">4</a>)</span> is the best possible approximation of solution with respect to some chosen error measure.</p>
+<p>Note that in many cases it has been chosen to set \(\mathbf{T}_\mathbf{x} = \mathbf{T}_p\) since it simplifies the implementation. A key insight into element methods is that <span class="eqref">(<a href="#eqphysicsinterp">5</a>)</span> serves a <em>parametrization</em> of possible solutions to the PDE of interest. Both FEM and BEM are then based on setting up a linear system of equation in order to find \(\mathbf{p}\) such that <span class="eqref">(<a href="#eqphysicsinterp">5</a>)</span> is the best possible approximation of solution with respect to some chosen error measure.</p>
 <h2 id="continuous"><a href="#continuous" class="header-anchor">Continuous</a></h2>
 <p>In the following we only visualize 1-dimensional problems, but its important to note that everything discussed is directly translatable into n-dimensional curves. The only difference here being that the number of rows in \(\mathbf{X}\) is equal to the dimension of interest.  </p>
 <h3 id="linear"><a href="#linear" class="header-anchor">Linear</a></h3>
@@ -108,7 +108,7 @@ N_i^1(x)x_i + N_i^2(x)x_{i+1},
 <p>Now given the topology of the elements it is easy to extend the above results to the following  <img src="/assets/visualizations/FEM/fem_linear_basis.png" alt="" /></p>
 <p>Utilizing the same basis functions for the interpolation scheme for the physics we have that</p>
 \[
-p(x) = \mathbf{T}_p(x)\mathbf{P}.
+p(x) = \mathbf{T}_p(x)\mathbf{p}.
 \]
 <p>For some given values of \(p_i\) one see that the interpolation is linear on each element</p>
 <p><img src="/assets/visualizations/FEM/fem_linear_interp.png" alt="" /></p>
@@ -150,11 +150,11 @@ T_{i+1}(x)  &= 2\left(\frac{x-x_{i-1}}{h_i}\right)\left(\frac{x-x_i}{h_i}\right)
 <p><img src="/assets/visualizations/FEM/fem_quadratic_basis.png" alt="" /></p>
 <p>We can again compute the quadratic interpolation as</p>
 \[
-p(x) = \mathbf{T}_p(x)\mathbf{P}.
+p(x) = \mathbf{T}_p(x)\mathbf{p}.
 \]
-<p>Now chosing the same values of \(\mathbf{P}\) as for the linear interpolation we find that <img src="/assets/visualizations/FEM/fem_quadratic_interp.png" alt="" /></p>
+<p>Now chosing the same values of \(\mathbf{p}\) as for the linear interpolation we find that <img src="/assets/visualizations/FEM/fem_quadratic_interp.png" alt="" /></p>
 <h4 id="linear_vs_quadratic_interpolation"><a href="#linear_vs_quadratic_interpolation" class="header-anchor">Linear vs. Quadratic interpolation</a></h4>
-<p>Using the same values for \(\mathbf{P}\) we can compare the results of the linear and quadratic interpolation as </p>
+<p>Using the same values for \(\mathbf{p}\) we can compare the results of the linear and quadratic interpolation as </p>
 <p><img src="/assets/visualizations/FEM/fem_interp_comparison.png" alt="" /></p>
 <h2 id="discontinuous_elements"><a href="#discontinuous_elements" class="header-anchor">Discontinuous Elements</a></h2>
 <p>The main idea behind discontinuous elements is to seperate the interpolation of the physics from the interpolation of the geometry. This essentially means that the interpolation nodes of the physics &#40;\(t_i\)&#41; will not be the same as the interpolation nodes of the geometry &#40;\(x_i\)&#41;. What we do instead here is to introduce </p>
@@ -219,7 +219,7 @@ T_{i+1}^\beta(x)  &= 2\left(\frac{x-\beta-x_{i-1}}{h_i}\right)\left(\frac{x-\bet
 <p>Again we can plot the interpolation as <img src="/assets/visualizations/FEM/fem_discquadratic_interp.png" alt="" /></p>
 <div class="page-foot">
   <div class="copyright">
-    &copy; Mikkel Paltorp. Last modified: January 21, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Mikkel Paltorp. Last modified: November 08, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->

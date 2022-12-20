@@ -28,7 +28,7 @@
 
 <!-- Content appended here -->
 <div class="franklin-content"><h1 id="symmetric_extended_generator_representable_semiseparable_matrices"><a href="#symmetric_extended_generator_representable_semiseparable_matrices" class="header-anchor">Symmetric Extended Generator Representable Semiseparable Matrices</a></h1>
-<p>The following is a simple example of how the matrices found in <a href="https://github.com/mipals/SymEGRSSMatrices.jl">SymEGRSSMatrices.jl</a>, can aid in efficiently computing smoothing splines.</p>
+<p>The following is a simple example of how the matrices found in <a href="https://github.com/mipals/SymSemiseparableMatrices.jl">SymSemiseparableMatrices.jl</a>, can aid in efficiently computing smoothing splines.</p>
 <p>Given \(n\) noisy observations </p>
 \[(t_i,y_i), \quad i=1,\dots, n\]
 <p>where \(y_i = f(t_i) + e_i\) and \(e_i\sim \mathcal{N}(0,\sigma^2)\). We aim to find the underlying function \(f\). For the smoothing spline regressions problem the view taken is that \(f\) minimizes the following functional</p>
@@ -38,23 +38,23 @@
 <p>for some \(\lambda > 0\). This minimization problem can be viewed as a tradeoff between the interpolation of the data, described by average squared residual and the smoothness, described by the square integral of the \(p\)th derivative. </p>
 <p>It can be shown that this problem is equivalent with solving the following QP</p>
 \[
-\text{minimize}\ \frac{1}{n}\|y - (\Sigma c + Hd) \|_2^2 + \lambda c^T\Sigma c
+\text{minimize}\ \frac{1}{n}\|y - (\Sigma c + Hd) \|_2^2 + \lambda c^\top\Sigma c
 \]
 <p>where \(H\in\mathbb{R}^{n\times p}\) with elements \(H_{i,j} = t_i^{j-1}/((j-1)!)\) and \(\Sigma \in\mathbb{R}^{n\times n}\) is a positive definite &#40;kernel&#41; matrix. As shown in &#40;Anders &amp; Chen 2020&#41; \(\Sigma\) is rank-structured and have the following form</p>
 \[
-\Sigma = \text{tril}(UV^T) + \text{triu}(VU^T,1), \quad U,V\in\mathbb{R}^{n\times p}.
+\Sigma = \text{tril}(UV^\top) + \text{triu}(VU^\top,1), \quad U,V\in\mathbb{R}^{n\times p}.
 \]
 <p>As such we say that \(\Sigma\) is a extended generator representable semiseparable matrix &#40;a EGRSS matrix&#41;, giving rise to fast computations. Note that this implicit representation requires only \(O(pn)\) storage and in most cases \(p << n\) meaning that the implicit representation is a very efficient way of storing the full matrix. Furthermore it is shown in &#40;Andersen &amp; Chen 2020&#41; that the Cholesky factorization &#40;and its inverse&#41; of \(\Sigma\) is also implicit represented as</p>
 \[
-L = \text{tril}(UW^T,-1) + \text{diag}(d),\quad U,W\in\mathbb{R}^{n\times p},\ d\in\mathbb{R}^n
+L = \text{tril}(UW^\top,-1) + \text{diag}(d),\quad U,W\in\mathbb{R}^{n\times p},\ d\in\mathbb{R}^n
 \]
 \[
-L^{-1} = \text{tril}(YZ^T) + \text{diag}(d)^{-1},\quad Y,Z\in\mathbb{R}^{n\times p},\ d\in\mathbb{R}^n
+L^{-1} = \text{tril}(YZ^\top) + \text{diag}(d)^{-1},\quad Y,Z\in\mathbb{R}^{n\times p},\ d\in\mathbb{R}^n
 \]
 <p>and can be computed in \(O(p^2n)\) operations. </p>
 <p>Giving noisy observations we will also need to compute on a variant of EGRSS matrices as seen below</p>
 \[
-K_y = \text{tril}(UV^T) + \text{triu}(VU^T,1) + \text{diag}(d), \quad U,V\in\mathbb{R}^{n\times p},\ d\in\mathbb{R}^n.
+K_y = \text{tril}(UV^\top) + \text{triu}(VU^\top,1) + \text{diag}(d), \quad U,V\in\mathbb{R}^{n\times p},\ d\in\mathbb{R}^n.
 \]
 <p>We call this a extended generator representable quasiseparable matrix &#40;a EGRQS matrix&#41;.</p>
 <pre><code class="language-julia">using SymEGRSSMatrices, Plots, LinearAlgebra, Optim, Printf, SpecialFunctions, Interact
@@ -75,7 +75,7 @@ plot&#33;&#40;a:δ/n:b, f&#40;a:δ/n:b&#41;, label&#61;&quot;f&#40;t&#41;&quot;,
 <h2 id="efficiently_computing_smoothing_splines"><a href="#efficiently_computing_smoothing_splines" class="header-anchor">Efficiently Computing Smoothing Splines</a></h2>
 <p>The optimality coniditions of the previously mentioned QP is equivalent with solving the following system</p>
 \[
-\begin{bmatrix} \Sigma + n \lambda I & H \\ H^T & 0 \end{bmatrix}
+\begin{bmatrix} \Sigma + n \lambda I & H \\ H^\top & 0 \end{bmatrix}
 
 \begin{bmatrix} c \\ d \end{bmatrix}
 
@@ -89,11 +89,11 @@ K_y c = y - Hd.
 \]
 <p>Inserting this into the second equation we have that</p>
 \[
-H^T K_y ^{-1} (y - Hd) = 0 \quad \Rightarrow \quad H^T K_y ^{-1} H d 
+H^\top K_y ^{-1} (y - Hd) = 0 \quad \Rightarrow \quad H^\top K_y ^{-1} H d 
 =
-H^T K_y^{-1} y.
+H^\top K_y^{-1} y.
 \]
-<p>Given that we can compute \(K_y = LL^T\) and apply \(L^{-1}\) in \(O(pn)\) operations we see that we can solve the above systems in linear time w.r.t to \(n\).</p>
+<p>Given that we can compute \(K_y = LL^\top\) and apply \(L^{-1}\) in \(O(pn)\) operations we see that we can solve the above systems in linear time w.r.t to \(n\).</p>
 <p>Note that the above computations i equivalent with fitting a Gaussian process with its kernel matrix equal to \(\Sigma\).</p>
 <pre><code class="language-julia">p &#61; 2;
 λ &#61; 1e-4;
@@ -134,11 +134,11 @@ gif&#40;anim, &quot;varying_rougness.gif&quot;, fps&#61;10&#41;</code></pre>
 <h2 id="parameter_selection"><a href="#parameter_selection" class="header-anchor">Parameter Selection</a></h2>
 <p>Assuming that the measurement errors \(e_i\) are i.i.d Gaussian variables we can estimate the parameters \(\sigma\) and \(\lambda\) using the generalized maximum likelihood function &#40;GML&#41;. As stated in &#40;Andersen &amp; Chen 2020&#41; that the GML can be computed as</p>
 \[
-\log(GML(\lambda)) \propto \log(y^T\hat{c}) + \frac{1}{n-p}\log|K_y| + \frac{1}{n-p}\log|H^TK_y^{-1}H|.
+\log(GML(\lambda)) \propto \log(y^\top\hat{c}) + \frac{1}{n-p}\log|K_y| + \frac{1}{n-p}\log|H^\topK_y^{-1}H|.
 \]
-<p>This function can be efficiently valuated as we can efficiently compute the Cholesky factorization of \(K_y\) and \(H^TK_y^{-1}H\) is a small matrix. From the optimal \(\hat{\lambda}\) we can compute the optimal standard deviation as</p>
+<p>This function can be efficiently valuated as we can efficiently compute the Cholesky factorization of \(K_y\) and \(H^\topK_y^{-1}H\) is a small matrix. From the optimal \(\hat{\lambda}\) we can compute the optimal standard deviation as</p>
 \[
-\hat{\sigma}^2 = n\hat{\lambda}\frac{c^Ty}{n-p}
+\hat{\sigma}^2 = n\hat{\lambda}\frac{c^\topy}{n-p}
 \]
 <pre><code class="language-julia">K &#61; SymEGRSSMatrix&#40;Ut*δ^&#40;2p-1&#41;,Vt&#41;
 function log_gml&#40;v&#41;
@@ -165,21 +165,21 @@ plot&#33;&#40;t, K*c &#43; H*d, label&#61;&quot;fit&quot;,color&#61;:red,lw&#61;
 <h2 id="computing_bayesian_credible_intervals"><a href="#computing_bayesian_credible_intervals" class="header-anchor">Computing Bayesian Credible Intervals</a></h2>
 <p>The standard deviation at prediction \(\hat{y}_i\) is given by</p>
 \[
-    \sigma_i^2 = \hat{\sigma}^2 e_i^TH(\hat{\lambda})e_i.
+    \sigma_i^2 = \hat{\sigma}^2 e_i^\topH(\hat{\lambda})e_i.
 \]
 <p>As such we need to compute the diagonal elements of the influence matrix</p>
 \[\begin{aligned}
 H(\hat{\lambda}) 
-&= I - n \lambda (K_y^{-1} - K_y^{-1} H (H^T K_y^{-1}H) H^T K_y^{-1} )\\
-&= I - n \lambda L^{-T} (I - L^{-1} H (H^T K_y^{-1} H) H^T L^{-T}) L^{-1}\\
-&= I - n \lambda L^{-T} (I - Q_1 Q_1^T ) L^{-1}\\
-&= I - n \lambda (K_y^{-1} - (L^{-T} Q_1) (L^{-T} Q_1)^T).
+&= I - n \lambda (K_y^{-1} - K_y^{-1} H (H^\top K_y^{-1}H) H^\top K_y^{-1} )\\
+&= I - n \lambda L^{-T} (I - L^{-1} H (H^\top K_y^{-1} H) H^\top L^{-T}) L^{-1}\\
+&= I - n \lambda L^{-T} (I - Q_1 Q_1^\top ) L^{-1}\\
+&= I - n \lambda (K_y^{-1} - (L^{-T} Q_1) (L^{-T} Q_1)^\top).
 \end{aligned}\]
 <p>Where we have used that</p>
 \[
 L^{-1}H = \begin{bmatrix}Q_1 & Q_2\end{bmatrix} \begin{bmatrix} R \\ 0\end{bmatrix}, \quad Q_1\in\mathbb{R}^{n\times p},\ Q_2\in\mathbb{R}^{n\times (n-p)},\ R\in\mathbb{R}^{p\times p}
 \]
-<p>The diagonal elements of \((L^{-T}Q_1)(L^{-T}Q_1)^T\) is easily calculated as the row-norms of \(L^{-T}Q_1\). The the same time the diagonal elements of \(K_y^{-1}\) can be efficiently computed using the explicit-implicit representation of \(L^{-1}\). However it should be noted that the algorithm to do so it not nessecarily numerically stable. Hence below we compute the diagonal elements as \(||L^{-1}e_i||_2^2\)</p>
+<p>The diagonal elements of \((L^{-T}Q_1)(L^{-T}Q_1)^\top\) is easily calculated as the row-norms of \(L^{-T}Q_1\). The the same time the diagonal elements of \(K_y^{-1}\) can be efficiently computed using the explicit-implicit representation of \(L^{-1}\). However it should be noted that the algorithm to do so it not nessecarily numerically stable. Hence below we compute the diagonal elements as \(||L^{-1}e_i||_2^2\)</p>
 <pre><code class="language-julia">L &#61; cholesky&#40;SymEGRSSMatrix&#40;Ut*δ^&#40;2p-1&#41;,Vt&#41;, n*λhat&#41;
 B &#61; L\H;
 F &#61; qr&#40;B&#41;;
@@ -210,7 +210,7 @@ plot&#33;&#40;t, K*c &#43; H*d, label&#61;&quot;fit&quot;,color&#61;:red,lw&#61;
 </ol>
 <div class="page-foot">
   <div class="copyright">
-    &copy; Mikkel Paltorp. Last modified: January 11, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Mikkel Paltorp. Last modified: December 20, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->
