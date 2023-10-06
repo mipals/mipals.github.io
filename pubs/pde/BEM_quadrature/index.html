@@ -49,18 +49,20 @@
 \int_0^{2\pi}|\sin(x)|\ \mathrm{d}x = 2(-\cos(\pi)+\cos(0)) = 4,
 \]
 <p>In Julia this integral can be estimated using the following code</p>
-<pre><code class="language-julia">using GaussQuadrature, LinearAlgebra, Plots
+<pre><code class="language-julia">using FastGaussQuadrature, LinearAlgebra, Plots
 N &#61; 50
 a &#61; 0 
 b &#61; 2*pi
-xi,wi &#61; legendre&#40;N&#41;
+xi,wi &#61; gausslegendre&#40;N&#41;
 f&#40;x&#41; &#61; abs.&#40;sin.&#40;x&#41;&#41;
 xbar &#61; 0.5*&#40;b-a&#41;*xi .&#43; 0.5*&#40;b&#43;a&#41;
 wbar &#61; 0.5*&#40;b-a&#41;*wi
 wbar&#39;*f&#40;xbar&#41;</code></pre>
 <pre><code class="plaintext code-output">4.003187673366941
+LoadError: UndefVarError: `@L_str` not defined
+in expression starting at none:1
 </code></pre>
-<img src="/assets/pubs/pde/BEM_quadrature/code/output/f_func.svg" alt=""></div>
+<p><span style="color:red;">// Image matching '/assets/pubs/pde/BEM_quadrature/code/f_func' not found. //</span></p></div>
 <h1 id="quadrature_for_two-dimensional_integrals"><a href="#quadrature_for_two-dimensional_integrals" class="header-anchor">Quadrature for two-dimensional integrals</a></h1>
 <p>For two-dimensional integrals the basic idea is integrals of the form</p>
 \[
@@ -80,7 +82,7 @@ wbar&#39;*f&#40;xbar&#41;</code></pre>
 \]
 <div class="page-foot">
   <div class="copyright">
-    &copy; Mikkel Paltorp. Last modified: January 17, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Mikkel Paltorp. Last modified: October 04, 2023. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->

@@ -1,9 +1,9 @@
 # This file was generated, do not modify it. # hide
-using GaussQuadrature, LinearAlgebra, Plots
+using FastGaussQuadrature, LinearAlgebra, Plots
 N = 50
 a = 0 
 b = 2*pi
-xi,wi = legendre(N)
+xi,wi = gausslegendre(N)
 f(x) = abs.(sin.(x))
 xbar = 0.5*(b-a)*xi .+ 0.5*(b+a)
 wbar = 0.5*(b-a)*wi

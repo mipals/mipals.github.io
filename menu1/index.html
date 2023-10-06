@@ -29,6 +29,39 @@
 <!-- Content appended here -->
 <div class="franklin-content"><h1 id="notes"><a href="#notes" class="header-anchor">Notes</a></h1>
 <p>Below are a few links to some short notes on various mathematical tricks and topics that I find interesting. </p>
+<h2 id="the_boundary_element_method"><a href="#the_boundary_element_method" class="header-anchor">The Boundary Element Method</a></h2>
+<ul>
+<li><p><a href="/pubs/pde/BEM_introduction/">Introduction to the Boundary Element Method:</a> Introduction to collocation BEM.</p>
+<ul>
+<li><p><a href="/pubs/pde/BEM_introduction/#the_fast_multipole_method_and_bem">The Fast Multipole Method for BEM:</a> How to apply the Fast Multipole Method to speed up the BEM computations.</p>
+</li>
+<li><p><a href="/pubs/pde/BEM_introduction/#mathcalh-matrices">Hierarchical Matrices for BEM:</a> How to apply Hierarchical matrices to speed up the BEM computations.</p>
+</li>
+<li><p><a href="/pubs/pde/BEM_elements/">Line Elements:</a> Description of continuous and discontinuous line elements. </p>
+</li>
+<li><p><a href="https://github.com/mipals/BEM200">BEM200:</a> A simple implementation of the 2D BEM in less than 200 lines of code.</p>
+</li>
+<li><p><a href="/pubs/pde/BEM_shapefunctions/">Shape Functions:</a> Old note on local descriptions of line and surface elements.</p>
+</li>
+</ul>
+</li>
+<li><p><a href="/pubs/pde/BEM_ROM">Reduced Order Series Expansion Boundary Element Method:</a> How to speed-up multifrequency problems</p>
+</li>
+<li><p><a href="/pubs/pde/BEM_losses2/">Acoustical BEM with Visco-thermal losses:</a> Some intuition behind viscous and thermal losses. Includes a short introduction to the Kirchoff&#39;s decomposition and the sparsity patterns of the resulting system of equations.</p>
+</li>
+<li><p><a href="/pubs/pde/BEM_bli/">Boundary Layer Impedance:</a> A quick description of the BLI approximation of losses.</p>
+</li>
+<li><p><a href="/pubs/pde/BEM_shape_opt/">Shape optimization</a> Shape optimization using BEM in 2D &#91; ❗️ under construction 👷 &#93;</p>
+</li>
+<li><p><a href="/pubs/pde/BEM_burton_miller/">The Burton-Miller Method:</a> Removing irregular frequencies using Burton-Miller regularization.</p>
+</li>
+<li><p><a href="/pubs/pde/helmholtz_equation/">From the Wave Equation to an Integral Equation:</a> A description harmonic time dependency and its influence on the Integral Equation.</p>
+<ul>
+<li><p><a href="/pubs/pde/BEM_helmholtz_derivation/">Green&#39;s function derivative:</a> A short derivation of derivative of the Green&#39;s function.</p>
+</li>
+</ul>
+</li>
+</ul>
 <h2 id="matrix_computations"><a href="#matrix_computations" class="header-anchor">Matrix Computations</a></h2>
 <ul>
 <li><p><a href="/pubs/matrix/sm_id/">Sherman-Morrison Identity:</a> Two brief derivations.</p>
@@ -69,53 +102,10 @@
 <li><p>The Adjoint Method &#91; ❗️ under construction 👷 &#93;</p>
 </li>
 </ul>
-<h2 id="the_boundary_element_method"><a href="#the_boundary_element_method" class="header-anchor">The Boundary Element Method</a></h2>
-<ul>
-<li><p><a href="/pubs/pde/helmholtz_equation/">From the Wave Equation to an Integral Equation:</a> A description harmonic time dependency and its influence on the Integral Equation.</p>
-<ul>
-<li><p><a href="/pubs/pde/BEM_helmholtz_derivation/">Green&#39;s function derivative:</a> A short derivation of derivative of the Green&#39;s function.</p>
-</li>
-</ul>
-</li>
-</ul>
-<ul>
-<li><p><a href="/pubs/pde/Element_methods/">Introduction to Boundary Elements:</a> Introduction to collocation.</p>
-<ul>
-<li><p><a href="/pubs/pde/BEM_elements/">Line Elements:</a> Description of continuous and discontinuous line elements.</p>
-</li>
-<li><p><a href="/pubs/pde/BEM_shapefunctions/">Shape Functions:</a> Old note on local descriptions of line and surface elements.</p>
-</li>
-<li><p><a href="/pubs/pde/BEM_galerkin/">The Galerkin Approach:</a> The basics of the Galerkin approach.</p>
-</li>
-<li><p><a href="/pubs/pde/BEM_burton_miller/">The Burton-Miller Method:</a> Removing irregular frequencies using Burton-Miller regularization.</p>
-</li>
-</ul>
-</li>
-<li><p><a href="/pubs/pde/BEM_quadrature/">Quadrature:</a> Introduction to quadrature scheme.</p>
-</li>
-<li><p><a href="/pubs/pde/BEM_integrals/">Approximating integrals:</a> Discription of how to approximate curve- and surface integrals.</p>
-</li>
-<li><p><a href="/pubs/pde/BEM_losses/">Acoustic BEM with Visco-Thermal Losses:</a> Some intuition behind viscous and thermal losses. Includes a short intrudction to the Kirchoff&#39;s decomposition and the sparsity patterns of the resulting system of equations.</p>
-<ul>
-<li><p><a href="/pubs/pde/BEM_shapefuncderiv/">Shape Function Derivatives:</a> Describes how to setup the Null-Divergence constraint as well as the Boundary Velocity Coupling &#40;as described in the previous note on viscothermal losses&#41;.</p>
-</li>
-</ul>
-</li>
-<li><p><a href="/pubs/pde/BEM_bli/">Boundary Layer Impedance:</a> A quick description of the BLI approximation of losses.</p>
-</li>
-</ul>
-<ul>
-<li><p><a href="/pubs/pde/BEM_shape_opt/">Shape optimization</a> Shape optimization using BEM in 2D &#91; ❗️ under construction 👷 &#93;</p>
-</li>
-<li><p><a href="">Shape optimization code:</a> How to performe shape optimization in 2D using BEM with less than 200 lines of code &#91; ❗️ under construction 👷 &#93;</p>
-</li>
-<li><p><a href="/pubs/pde/BEM_FMM/">The Fastmultipole Method for BEM:</a> How to apply the Fast Multipole Method to speed up acoustical BEM computations. &#91; ❗️ under construction 👷 &#93;</p>
-</li>
-</ul>
 <p></p>
 <div class="page-foot">
   <div class="copyright">
-    &copy; Mikkel Paltorp. Last modified: June 09, 2023. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Mikkel Paltorp. Last modified: October 04, 2023. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->

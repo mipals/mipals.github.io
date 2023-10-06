@@ -46,9 +46,9 @@
 \]
 <p>The idea is that we can now parametrize the curve of interest as</p>
 \[
-\mathbf{x}(u) = \mathbf{T}_\mathbf{x}(u)\mathbf{X}^\top,
+\mathbf{x}(u) = \mathbf{X}\mathbf{T}_\mathbf{x}(u),
 \]
-<p>where \(\mathbf{T}(u)\) is a vector function which represents the interpolation between each node \(\mathbf{x}_i\). In practice, however, it is usually more easy to introduce the so-called topology matrix &#40;also sometimes called a connectivity matrix&#41; as</p>
+<p>where \(\mathbf{T}_\mathbf{x}(u)\) is a vector function which represents the interpolation between each geometric node \(\mathbf{x}_i\). In practice, however, it is usually more easy to introduce the so-called topology matrix &#40;also sometimes called a connectivity matrix&#41; as</p>
 \[
 \left.
 \text{topology} = 
@@ -102,9 +102,9 @@ T_i(x)x_i + T_{i+1}(x)x_{i+1} = x_i\left(\frac{x_{i+1}-x}{h_i}\right) + x_{i+1}\
 \]
 <p>Now a crucial comment is that the above is only true when have \(x\in[x_i,x_{i+1}]\) &#40;i.e. when \(x\) is on element \(i\)&#41; it is there custom to instead write </p>
 \[
-N_i^1(x)x_i + N_i^2(x)x_{i+1},
+T_i^1(x)x_i + T_i^2(x)x_{i+1},
 \]
-<p>where \(N_i^1(x)=N_i^2(x) = 0\) when \(x\notin [x_i, x_{i+1}]\).  <img src="/assets/visualizations/FEM/fem_linear_element.png" alt="" /></p>
+<p>where \(T_i^1(x)=T_i^2(x) = 0\) when \(x\notin [x_i, x_{i+1}]\).  <img src="/assets/visualizations/FEM/fem_linear_element.png" alt="" /></p>
 <p>Now given the topology of the elements it is easy to extend the above results to the following  <img src="/assets/visualizations/FEM/fem_linear_basis.png" alt="" /></p>
 <p>Utilizing the same basis functions for the interpolation scheme for the physics we have that</p>
 \[
@@ -144,9 +144,9 @@ T_{i}(x)    &= 4\left(\frac{x-x_{i-1}}{h_i}\right)\left(\frac{x_{i+1}-x}{h_i}\ri
 T_{i+1}(x)  &= 2\left(\frac{x-x_{i-1}}{h_i}\right)\left(\frac{x-x_i}{h_i}\right)
 \end{aligned}
 \]
-<p>Similar to the linear functions the above is only true when \(x\in[x_{i-1},x_{i+1}]\). We therfore usually denote the element interpolation as</p>
+<p>Similar to the linear functions the above is only true when \(x\in[x_{i-1},x_{i+1}]\). We therefore usually denote the element interpolation as</p>
 <p><img src="/assets/visualizations/FEM/fem_quadratic_element.png" alt="" /></p>
-<p>Where \(N_i^1(x)=N_i^2(x)=N_i^3(x)=0\) when \(x\notin[x_{i-1},x_{i+1}]\). However, we can again easily generalize the definitions to hold for all \(x\) as</p>
+<p>Where \(T_i^1(x)=T_i^2(x)=T_i^3(x)=0\) when \(x\notin[x_{i-1},x_{i+1}]\). However, we can again easily generalize the definitions to hold for all \(x\) as</p>
 <p><img src="/assets/visualizations/FEM/fem_quadratic_basis.png" alt="" /></p>
 <p>We can again compute the quadratic interpolation as</p>
 \[
@@ -169,7 +169,7 @@ p(x) = \mathbf{T}_p(x)\mathbf{p}.
 \]
 <p>As the name suggest the is constant, this simply means that </p>
 \[
-N_i^1(x) = \begin{cases} 1, \quad x\in[x_i,x_{x_i}]\\0, \quad \text{otherwise}\end{cases},
+T_i^1(x) = \begin{cases} 1, \quad x\in[x_i,x_{x_i}]\\0, \quad \text{otherwise}\end{cases},
 \]
 <p>which can be visualized as follows</p>
 <p><img src="/assets/visualizations/FEM/fem_discconstant_basis.png" alt="" /></p>
@@ -219,7 +219,7 @@ T_{i+1}^\beta(x)  &= 2\left(\frac{x-\beta-x_{i-1}}{h_i}\right)\left(\frac{x-\bet
 <p>Again we can plot the interpolation as <img src="/assets/visualizations/FEM/fem_discquadratic_interp.png" alt="" /></p>
 <div class="page-foot">
   <div class="copyright">
-    &copy; Mikkel Paltorp. Last modified: November 08, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Mikkel Paltorp. Last modified: October 06, 2023. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->

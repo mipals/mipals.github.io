@@ -27,68 +27,88 @@
 
 
 <!-- Content appended here -->
-<div class="franklin-content"><h1 id="a_reduced_order_model_for_the_boundary_element_method"><a href="#a_reduced_order_model_for_the_boundary_element_method" class="header-anchor">A Reduced Order Model for the Boundary Element Method</a></h1>
+<div class="franklin-content"><h1 id="reduced_order_series_expansion_boundary_element_method_rosebem"><a href="#reduced_order_series_expansion_boundary_element_method_rosebem" class="header-anchor">Reduced Order Series Expansion Boundary Element Method &#40;ROSEBEM&#41;</a></h1>
+<p>This page includes &#40;some of&#41; the theoretical foundations speeding up multifrequency problems using the Reduced Order Series Expansion Boundary Element Method &#40;ROSEBEM&#41; <sup id="fnref:1"><a href="#fndef:1" class="fnref">[1]</a></sup> <sup id="fnref:2"><a href="#fndef:2" class="fnref">[2]</a></sup>.</p>
+<h2 id="the_rosebem"><a href="#the_rosebem" class="header-anchor">The ROSEBEM</a></h2>
+<p>In  the boundary integrals is made frequency independent by utilizing a Taylor expansion of w.r.t the wavenumber for the Green&#39;s function and its normal derivative</p>
 \[
-\begin{aligned}
-    \text{diag}(\mathbf{c})\mathbf{p} = \left(\sum_{m=0}^{\infty}\frac{(k-k_0)^m}{m!}\mathbf{G}_m\right)\frac{\partial\mathbf{p}}{\partial\mathbf{n}} -  &\left(\sum_{m=0}^{\infty}\frac{(k-k_0)^m}{m!}\mathbf{F}_m\right)\mathbf{p}
-\end{aligned}
+
+    G(\mathbf{x},\mathbf{y}) \approx \sum_{m=0}^{N_v - 1} \frac{(k - k_0)^m}{m!}\left[G^{(m)}(\mathbf{x},\mathbf{y},k_0)\right],\quad \frac{\partial G(\mathbf{x},\mathbf{y})}{\partial\mathbf{n}(\mathbf{y})} \approx \sum_{m=0}^{N_p-1} \frac{(k - k_0)^m}{m!}\left[\mathbf{n}(\mathbf{y})^\top\nabla G^{(m)}(\mathbf{x},\mathbf{y},k_0)\right],
+
 \]
-<a id="eqtalorinf" class="anchor"></a>\[
-    \left(\sum_{m=0}^\infty \frac{(k-k_0)^m}{m!}\mathbf{A}_m\right)\mathbf{z} = \sum_{m=0}^\infty\frac{(k-k_0)^m}{m!}\mathbf{b}_m.
-\]
+<p>where \(N_v\) and \(N_p\) is the number of terms included in the Taylor expansion of respectively the Green&#39;s function and its normal derivative while \(k_0\) is the expansion wavenumber. For simplification purposes, it is in the following chosen to set \(N_p=N_v=M\). Inserting the above into the Kirchhoff-Helmholtz integral equation the following system of equations will appear</p>
 \[
-    G(\mathbf{x}, \mathbf{y}) = \sum_{m=0}^\infty\frac{(k - k_0)^m}{m!}G^{(m)}(\mathbf{x}, \mathbf{y}, k_0)
+
+    \left(\text{diag}(\mathbf{\zeta}) + \sum_{m=0}^{M-1}\frac{(k - k_0)^m}{m!}\mathbf{F}_m(k_0)\right)\mathbf{p} \approx    
+    \mathrm{i} \rho_0 c k\left(\sum_{m=0}^{M-1}\frac{(k - k_0)^m}{m!}\mathbf{G}_m(k_0) \right)\mathbf{v}_n,
+
 \]
+<p>which it sometimes referred to as the series expansion boundary element method or SEBEM for short. The important aspect of above equation is that the two series of matrices, \(\mathbf{F}_m\) and \(\mathbf{G}_m\), depend only on the expansion wavenumber \(k_0\) and can therefore be computed in a so-called offline stage. After applying boundary conditions the system will have the form of </p>
 \[
-    \int_\Gamma G(\mathbf{x},\mathbf{y})\frac{\partial p(\mathbf{y})}{\partial\mathbf{n}_\mathbf{y}}\ \mathrm{d}S_\mathbf{y} = \sum_{m=0}^\infty \frac{(k - k_0)^m}{m!} \int_\Gamma G^{(m)}
-    (\mathbf{x}, \mathbf{y}, k_0)\frac{\partial p(\mathbf{y})}{\partial\mathbf{n}_\mathbf{y}}\ \mathrm{d}S_\mathbf{y}
+
+    \left(\sum_{m=0}^{M-1}\frac{(k - k_0)^m}{m!}\mathbf{A}_m(k_0)\right)\mathbf{z} \approx \sum_{m=0}^{M-1}\frac{(k - k_0)^m}{m!}\mathbf{b}_m(k_0),
+
 \]
-<h2 id="computing_a_suitable_projection_basisa_idsecprojection_classanchor"><a href="#computing_a_suitable_projection_basisa_idsecprojection_classanchor" class="header-anchor">Computing a Suitable Projection Basis<a id="secprojection" class="anchor"></a></a></h2>
-<p>An essential consideration when utilizing the SEBEM is the large amount of memory required if applied directly. Specifically the memory scale with \(\mathcal{O}(N^2M)\) meaning that even for reasonably large problems the memory requirement will be a bottleneck of this approach. From a computational point of view the method should also only be applied when the number of frequencies of interests &#40;\(N_f\)&#41; are above the number of included Taylor terms &#40;\(M\)&#41; i.e. when \(M \leq N_f\). To combat the memory issue of the SEBEM the Galerkin projection method was suggested in <sup id="fnref:1"><a href="#fndef:1" class="fnref">[1]</a></sup>. Utilizing the approach the memory required to store the desired Taylor expansion is \(\mathcal{O}(\ell^2M)\), which is a significant improvement in the case of \(\ell \ll N\). </p>
-<h3 id="galerkin_projection"><a href="#galerkin_projection" class="header-anchor">Galerkin Projection</a></h3>
-<p>The main assumption behind the projection method is that the solution as well as the right-hand side of <span class="eqref">(<a href="#eqtalorinf">2</a>)</span> for a certain frequency range can be spanned by a lower dimensional subspace, meaning that</p>
-<a id="eqlowerdimsubspace" class="anchor"></a>\[
-    \mathbf{z} \approx \mathbf{U}_\ell\mathbf{z}_\ell, \quad \mathbf{b}_m \approx \mathbf{W}_\ell \mathbf{b}_{\ell m}, \quad \ \mathbf{U}_\ell, \mathbf{W}_\ell \in \mathbb{C}^{N\times\ell}
-\]
-<p>will be a good approximations within this frequency range. An initial question should be why one would expect that the solution should be spanned by a lower dimensional subspace. The answer lies in the fact that Boundary Element matrices, in general, are well-conditioned. In short this means that iterative solvers such as the Generalized Minimal Residual Method &#40;GMRES&#41; usually converges quickly, even without preconditioning. A consequence of this is that the solution is well approximated by the Krylov space</p>
+<p>where \(\mathbf{z}\) is a vector containing nodal values of either \(\mathbf{p}\) or \(\mathbf{v}_n\). Unfortunately, the equation above does not resolve all the issues, as it only reduces the assembly from a discretization of boundary integrals to a sum of matrices that still scales as \(O(n^2)\) in both computation and storage. Additionally, for large systems, the time spent solving the linear system of equations is overshadowed by the time spent assembling the linear system, making the gain of using the equation above insignificant with respect to the total computational time. </p>
+<p>In order to reduce both the memory footprint and the assembly time of SEBEM a Galerkin projection can be applied. The main assumption behind this projection is that the solution, as well as the right-hand side of SEBEM is spanned by a lower dimensional subspace. This means that</p>
 \[
-    \mathcal{K}_q\left(\mathbf{A}, \mathbf{b}\right) = \text{span}\left\{\mathbf{b},\ \mathbf{A}\mathbf{b},\ \mathbf{A}^2\mathbf{b},\ \dots,\ \mathbf{A}^{q-1}\mathbf{b} \right\},
+
+    \mathbf{z} \approx \mathbf{U}_\ell\mathbf{z}_\ell, \quad \mathbf{b}_m \approx \mathbf{U}_\ell \mathbf{b}_{\ell m}, \quad \ \mathbf{U}_\ell, \in \mathbb{C}^{N\times\ell}
+
 \]
-<p>for a reasonably small value of \(q\). As such by setting the columns of \(\mathbf{U}_\ell\) equal to these Krylov vectors would results in <span class="eqref">(<a href="#eqlowerdimsubspace">5</a>)</span> being a good approximation - at least for a single frequency. In order for the approximation to be good for multiple frequencies the approach taken here is to set \(\mathbf{U}_\ell\) equal to a combination of the first \(q\) Krylov vectors for some predefined frequencies within the frequency range of interest. Adding on the assumption that the solutions changes smoothly when varying the frequency means that computing \(\mathbf{U}_\ell\) this way should result in <span class="eqref">(<a href="#eqlowerdimsubspace">5</a>)</span> being a good approximation at all points within the desired frequency range.</p>
-<p>The choice for \(\mathbf{W}_\ell\) is not as straight forward as the choice for \(\mathbf{U}_\ell\). It turns out that utilizing a Galerkin projection, i.e. setting \(\mathbf{W}_\ell = \mathbf{U}_\ell\), result in good approximations. Furthermore if one chooses \(\mathbf{U}_\ell\) to be orthogonal one find that</p>
-<a id="eqrhsprojection" class="anchor"></a>\[
-    \mathbf{b}_{\ell m} \approx \mathbf{U}_\ell^{\mathsf{H}} \mathbf{b}_m.
-\]
-<p>Applying the two projections to the Taylor expansion it follows that</p>
+<p>will be good approximations. For simplification purposes, it is often chosen to let \(\mathbf{U}_\ell\) be unitary. An intuitive explanation as to why this must be a good approximation is that most BE systems are well-conditioned and iterative solvers such as the generalized minimal residual method &#40;GMRes&#41; converge quickly. In addition, this motivates a good place to search for both \(\mathbf{U}_\ell\) is the \(\ell\)-Krylov subspace defined by </p>
 \[
-    \left(\sum_{m=0}^{M-1} \frac{(k-k_0)^m}{m!}\mathbf{A}_m\right)\mathbf{U}_\ell\mathbf{z}_\ell = \sum_{m=0}^{M-1}\frac{(k-k_0)^m}{m!}\mathbf{U}_\ell\mathbf{b}_{ \ell m}.
+
+    \mathcal{K}_\ell\left(\mathbf{A}(k), \mathbf{b}(k)\right) = \text{span}\left\{\mathbf{b}(k),\ \mathbf{A}(k)\mathbf{b}(k),\ \mathbf{A}(k)^2\mathbf{b}(k),\ \dots,\ \mathbf{A}(k)^{\ell-1}\mathbf{b}(k) \right\}.
+
 \]
-<p>Now multiplying with \(\mathbf{U}_\ell^{\mathsf{H}}\) from the left followed by moving \(\mathbf{U}_\ell\) &#40;and \(\mathbf{U}_\ell^{\mathsf{H}}\)&#41; inside the sum the above simplifies to</p>
-<a id="eqromtaylor" class="anchor"></a>\[
-    \left(\sum_{m=0}^{M-1} \frac{(k-k_0)^m}{m!}\mathbf{A}_{\ell m}\right)\mathbf{z}_\ell = \sum_{m=0}^{M-1}\frac{(k-k_0)^m}{m!}\mathbf{b}_{\ell m},
+<p>Setting the columns of \(\mathbf{U}_\ell\) equal to the Krylov vectors would result in the lower dimensional subspace approximation being a good approximation for wavenumbers close to \(k\). The subspace can be made to handle a wider range of wavenumbers by combining the Krylov subspace for the wavenumbers \(k_1,k_2,\dots k_L\). As such the final projection matrix, \(\mathbf{U}_\ell\), is computed as the singular value decomposition &#40;SVD&#41; of the concatenation of the columns of all the \(q\)-Krylov vector subspaces </p>
+\[
+
+    \mathbf{U}_\ell\Sigma_\ell \mathbf{V}_\ell^{\mathsf{H}} = \text{svd}\left( \begin{bmatrix}\mathbf{K}_{k_1}& \mathbf{K}_{k_2}& \dots & \mathbf{K}_{k_L}\end{bmatrix} \right),
+
 \]
-<p>where \(\mathbf{A}_{\ell m} \in \mathbb{C}^{\ell \times \ell}\) and \(\mathbf{b}_{\ell m} \in \mathbb{C}^{\ell}\). In order this approach to be reasonable we must have that \(\ell \ll N\), such that even storing all of the \(\mathbf{A}_{\ell m}\) would be less than storing just a single of the original \(\mathbf{A}_m\in\mathbb{C}^{N\times N}\) matrices.</p>
-<h3 id="visual_representation"><a href="#visual_representation" class="header-anchor">Visual representation</a></h3>
-<p>In regular BEM computations we solve the linear system 
-<img src="/assets/visualizations/ROM/BEM.png" alt="BEM" style="width:150px;", class="center"/>
-</p>
-<p>The Series Expansion BEM utilizes the Taylor series to relieve the pain of recomputing new BEM matrices for each frequency of interest. Visually this can be seen as <img src="/assets/visualizations/ROM/SEBEM.png" alt="" /></p>
-<p>A significant drawback is that the above requires storing a lot of &#40;possibly&#41; large matrices. To combat this issue we assume that the solution is can be spanned by a lower dimensional subspace. Visually this means that 
-<img src="/assets/visualizations/ROM/BASIS.png" alt="BEM" style="width:100px;", class="center"/>
-</p>
-<p>Utilizing this projection it follows that <img src="/assets/visualizations/ROM/BEM_BASIS.png" alt="" /></p>
-<p>Using the linearity of the sums we end up with the following system <img src="/assets/visualizations/ROM/ROM_BEM.png" alt="" /></p>
+<p>where \(\mathbf{K}_{k_i}\) denotes a matrix with columns equal to some Krylov vectors at wavenumber \(k_i\). Now inserting the lower dimensional subspace approximatiion into SEBEM equation while also multiplying both sides with the hermitian transpose of \(\mathbf{U}_\ell\) from the left it follows that</p>
+\[
+
+    \left(\sum_{m=0}^{M-1}\frac{(k - k_0)^m}{m!}\mathbf{U}_\ell^\mathsf{H}\mathbf{A}_m(k_0)\mathbf{U}_\ell\right)\mathbf{z}_\ell \approx \sum_{m=0}^{M-1}\frac{(k - k_0)^m}{m!}\mathbf{U}_\ell^\mathsf{H}\mathbf{U}_\ell\mathbf{b}_{\ell m}(k_0).
+
+\]
+<p>Using that \(\mathbf{U}_\ell\) is unitary while defining \(\mathbf{A}_{\ell m} = \mathbf{U}_\ell^\mathsf{H}\mathbf{A}_m(k_0)\mathbf{U}_\ell\) the above becomes</p>
+\[
+
+    \left(\sum_{m=0}^{M-1}\frac{(k - k_0)^m}{m!}\mathbf{A}_{\ell m}(k_0)\right)\mathbf{z}_\ell \approx \sum_{m=0}^{M-1}\frac{(k - k_0)^m}{m!}\mathbf{b}_{\ell m}(k_0).
+
+\]
+<p>The important part of the above is that \(\mathbf{A}_{\ell m}(k_0) \in \mathbb{C}^{\ell\times\ell}\) and \(\mathbf{b}_{\ell m}(k_0)\in\mathbb{C}^\ell\), which means that if \(\ell \ll n\) this representation requires significantly less memory than the original system. Note, however, that \(\mathbf{A}_m(k_0)\) should never explicitly be stored. Instead, the rows should be projected during the assembly phase.</p>
+<h2 id="visualization"><a href="#visualization" class="header-anchor">Visualization</a></h2>
+<p>In many cases visualizations of the mathematics gives rise to a deeper understanding. Therefore, a short visual introduction to the ROSEBEM incorporating the BLI boundary condition is given. We start by introducing the following visual representation of the vector spaces</p>
+<p><img src="/assets/figures/rosebem_1.png" alt="Step1" /></p>
+<p>Using this we can visualize the SEBEM as</p>
+<p><img src="/assets/figures/rosebem_2.png" alt="Step2" /></p>
+<p>Similarly, the reduced basis assumption, for both \(\mathbf{p}\) and \(\partial_\mathbf{n}\mathbf{p}\), is visualized as</p>
+<p><img src="/assets/figures/rosebem_3.png" alt="Step3" /></p>
+<p>Inserting assumption from above into the SEBEM visualization while also multiplying with the Hermitian transpose of the reduced basis </p>
+<p><img src="/assets/figures/rosebem_4.png" alt="Step4" /></p>
+<p>Finally, by performing the matrix-matrix, the ROSEBEM appears as</p>
+<p><img src="/assets/figures/rosebem_5.png" alt="Step5" /></p>
 <h2 id="references"><a href="#references" class="header-anchor">References</a></h2>
-<table class="fndef" id="fndef:1">
+<p><table class="fndef" id="fndef:1">
     <tr>
         <td class="fndef-backref"><a href="#fnref:1">[1]</a></td>
-        <td class="fndef-content">Panagiotopoulos, Dionysios, et al. “Krylov Subspaces Recycling Based Model Order Reduction for Acoustic BEM Systems and an Error Estimator.” Computer Methods in Applied Mechanics and Engineering, vol. 359, Elsevier B.V., 2020, p. 112755, doi:10.1016/j.cma.2019.112755.</td>
+        <td class="fndef-content">D. Panagiotopoulos, et al. “Krylov Subspaces Recycling Based Model Order Reduction for Acoustic BEM Systems and an Error Estimator.” Computer Methods in Applied Mechanics and Engineering, 2020, <a href="https://doi.org/10.1016/j.cma.2019.112755">doi:10.1016/j.cma.2019.112755</a>.</td>
     </tr>
 </table>
-
+<table class="fndef" id="fndef:2">
+    <tr>
+        <td class="fndef-backref"><a href="#fnref:2">[2]</a></td>
+        <td class="fndef-content">M. Paltorp, et al. &quot;A Reduced Order Series Expansion for the BEM Incorporating the Boundary Layer Impedance Condition.&quot; Journal of Theoretical and Computational Acoustics, 2023, <a href="https://doi.org/10.1142/S2591728523500123">doi.org/10.1142/S2591728523500123</a>.</td>
+    </tr>
+</table>
+</p>
 <div class="page-foot">
   <div class="copyright">
-    &copy; Mikkel Paltorp. Last modified: February 02, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Mikkel Paltorp. Last modified: October 06, 2023. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->
