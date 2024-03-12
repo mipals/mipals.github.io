@@ -55,11 +55,11 @@ T_i(\mathbf{x}_j) = \delta_{ij} =
 \[
     \mathbf{x}^e(\mathbf{u}) = \mathbf{X}^e\mathbf{N}^e(\mathbf{u}) \in \Gamma^e, \quad \forall \mathbf{u} \in \mathcal{L}^e,
 \]
-<p>where the superscript \(e\) denotes the element number, \(\mathbf{x}^e\) is a matrix with columns equal to the interpolation nodes of the geometry, \(\mathbf{N}^e(\mathbf{u})\) are the so-called shape functions, \(\Gamma^e\) is the element in global coordinates and \(\mathcal{L}^e\) are the local coordinates. The structure of some collection of interpolation nodes &#40;\(\mathbf{X}^e\)&#41; multiplied by some shape function &#40;\(\mathbf{N}^e(\mathbf{u})\)&#41; is the same for most geometric elements. For BEMs in 3D, it is common to work with triangular elements, which can be seen in the Figure below. In particular, the elements in the figure are linear, for which a description can be found in the Example.</p>
+<p>where the superscript \(e\) denotes the element number, \(\mathbf{X}^e\) is a matrix with columns equal to the interpolation nodes of the geometry, \(\mathbf{N}^e(\mathbf{u})\) are the so-called shape functions, \(\Gamma^e\) is the element in global coordinates and \(\mathcal{L}^e\) are the local coordinates. The structure of some collection of interpolation nodes &#40;\(\mathbf{X}^e\)&#41; multiplied by some shape function &#40;\(\mathbf{N}^e(\mathbf{u})\)&#41; is the same for most geometric elements. For BEMs in 3D, it is common to work with triangular elements, which can be seen in the Figure below. In particular, the elements in the figure are linear, for which a description can be found in the Example.</p>
 <p><img src="/assets/figures/shape_function.png" alt="Elements" /></p>
 <div class="example"><p><strong>Example</strong>: &#40;<em>Linear triangular elements</em>&#41;    The linear shape functions for a triangular element can have the form</p>
 \[
-        \mathbf{X}^e(u_1,u_2) = 
+        \mathbf{N}^e(u_1,u_2) = 
         \begin{bmatrix}
             1 - u_1 - u_2 \\ u_1 \\ u_2
         \end{bmatrix}, \quad u_1\in[0, 1],\ u_2\in[0, 1-u_1].
@@ -327,7 +327,7 @@ In the case of the discontinuous description the same element in discontinuous p
 <p>for the \(\mathbf{F}\)-matrix. The approximation itself is based on the fact that subblocks of the matrix is well approximated by low-rank matrices. In this library all \(\mathcal{H}\)-matrix computations is done using the <a href="https://github.com/WaveProp/HMatrices.jl">HMatrices.jl</a> package developed by Luiz M. Faria. The specific format implemented in this library is the standard that the scales \(O(n\text{log}(n))\) in terms of memory and computation. At the same some experimentation of the newly developed Interpolated Factored Green&#39;s Function &#40;IFGF&#41; approach using the <a href="https://github.com/WaveProp/IFGF.jl">IFGF.jl</a> package also developed by Luiz. Note, that an often mentioned strength of the \(\mathcal{H}\)-matrix approach is that it is possible to compute the LU-factorization of the matrix efficiently, which is particularly important for high-frequency problems where an iterative solver might have issue converging. However, in the case of collocation BEM an LU-factorization can not directly be applied. Worse so when dealing with losses where the linear system of equation is a collection of matrix products.</p>
 <div class="page-foot">
   <div class="copyright">
-    &copy; Mikkel Paltorp. Last modified: October 04, 2023. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Mikkel Paltorp. Last modified: November 14, 2023. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->

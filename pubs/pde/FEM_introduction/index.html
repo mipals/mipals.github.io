@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="stylesheet" href="/libs/katex/katex.min.css">
+     
+   <link rel="stylesheet" href="/libs/highlight/github.min.css">
+   
+  <link rel="stylesheet" href="/css/franklin.css">
+  <link rel="stylesheet" href="/css/basic.css">
+  <link rel="icon" href="/assets/favicon.png">
+   <title>Introduction to the FEM</title>  
+</head>
+<body>
+  <header>
+<div class="blog-name"><a href="/">Mikkel Paltorp</a></div>
+<nav>
+  <ul>
+    <li><a href="/">About Me</a></li>
+    <li><a href="/menu1/">Notes</a></li>
+    <li><a href="/menu2/">Software</a></li>
+  </ul>
+  <img src="/assets/hamburger.svg" id="menu-icon">
+</nav>
+</header>
+
+
+<!-- Content appended here -->
+<div class="franklin-content"><h1 id="the_finite_element_method"><a href="#the_finite_element_method" class="header-anchor">The Finite Element Method</a></h1>
+<p>The aim of the Finite Element Method &#40;FEM&#41; is to solve &#40;or more precisely approximate the solution of&#41; a Partial Differential Equation &#40;PDE&#41; using a computer. In general the solution to a PDE is a <em>function</em>. Unfortunately it is computationally intractable to task a computer with finding this underlying function. The idea to resolve this issue is to parametrize a family of functions with the aim of computing the parameters through solving linear system of equations. There are a plethora of ways to get to such a linear system of equations, with the most common being the so-called Galerkin approach. </p>
+<h2 id="getting_the_computer_to_understand_functions"><a href="#getting_the_computer_to_understand_functions" class="header-anchor">Getting the computer to understand functions</a></h2>
+<p>In the most basic terms, computers are only capable of understanding numbers, which means that they are inherently unable to solve equations where the unknowns are functions. This is a problem when trying to solve differential equations. To solve this problem, the functions are instead approximated using parameterizations for which the coefficients &#40;numbers&#41; are unknown. Intuitively, these numbers are exactly what the computer is asked to find. For element methods, this parameterization is chosen to be the simplest possible: A linear combination of functions</p>
+\[
+p(\mathbf{x}) \approx \mathbf{T}(\mathbf{x})\mathbf{p} 
+    = 
+    \begin{bmatrix} T_1(\mathbf{x}) &  T_2(\mathbf{x}) &  \dots  &  T_n(\mathbf{x}) \end{bmatrix}
+    \begin{bmatrix} p_1             \\ p_2             \\ \vdots \\ p_n             \end{bmatrix}. 
+\]
+<p>where \(p\) is the unknown function being approximated. Note that the linearity is with respect to the unknown parameters \(\mathbf{p}\), but not necessarily in the known basis functions \(\mathbf{T}(\mathbf{x})\). </p>
+<p>One might ask: <em>How does the above relate to The Finite Element Method?</em> The answer is that the functions \(\mathbf{T}_i\) are chosen to be simpler functions with support equal to only a few subdomains of the original domain. These subdomains are commonly referred to as elements. In the case of 1D <a href="/pubs/pde/BEM_elements/#continuous">line elements are used.</a></p>
+<h2 id="the_finite_element_method_for_the_helmholtz_equation"><a href="#the_finite_element_method_for_the_helmholtz_equation" class="header-anchor">The Finite Element Method for the Helmholtz equation</a></h2>
+<p>In acoustics we are often interested in solving Helmholtz equation given as</p>
+\[
+    \Delta p(\mathbf{x}) + k^2p(\mathbf{x}) = 0,  \mathbf{x} \in \Omega
+\]
+<p>where \(k\) is most often referred to as the wavenumber. </p>
+<p>At its current form there is a strict constraint on the order of the numerical solution of \(p(\mathbf{x})\), as the 2nd derivative of the functions \(\mathbf{T}(\mathbf{x})\) can not be zero. This constraint can be relieved using the so-called weak formulation. In order to do so we multiply the Helmholtz equation with a so-called test function \(\phi\) following by the integration over the domain \(\Omega\)</p>
+\[ 
+    \int_\Omega \phi(\mathbf{x})\left(\Delta p(\mathbf{x}) + k^2p(\mathbf{x})\right)\ \mathrm{d}\mathbf{x} = 0.
+\]
+<p>Utilizing integration by parts on the term including the Laplacian we can move derivatives from \(p(\mathbf{x})\) onto \(\phi(\mathbf{x})\) as</p>
+\[
+\int_\Omega \left(\nabla\phi(x)\right)^\top\nabla p(x)\ \mathrm{d}\mathbf{x} - k^2\int_\Omega\phi(x)p(x)\ \mathrm{d}\mathbf{x} - \int_{\partial\Omega}\phi(x)\frac{\partial p}{\partial n}(x)\ \mathrm{d}\mathbf{x} = 0.
+\]
+<p>In the above the constraint on the smoothness of \(p(\mathbf{x})\) has been reduced to first order. Furthermore the last term</p>
+\[
+\int_{\partial\Omega}\phi(x)\frac{\partial p}{\partial n}(x)\ \mathrm{d}\mathbf{x},
+\]
+<p>can be used to include the boundary conditions into the equation. For simplification purposes we will in the following assume that the above is equal to zero. As such we have that</p>
+\[
+0 = \int_\Omega \left(\nabla\phi(x)\right)^\top\nabla p(x)\ \mathrm{d}\mathbf{x} - k^2\int_\Omega\phi(x)p(x)\ \mathrm{d}\mathbf{x} .
+\]
+<p>We will now use the Galerkin approach to discretize the above equation. Note that Galerkin simply refers to the approach where \(\phi(\mathbf{x})\) and \(p(\mathbf{x})\) is discretized using the same basis functions &#40;\(\mathbf{T}(\mathbf{x})\)&#41;. In short this means that we introduce</p>
+\[
+p(\mathbf{x}) \approx \mathbf{T}(\mathbf{x})\mathbf{p}, \quad \phi(\mathbf{x}) \approx \mathbf{a}^\top\mathbf{T}(\mathbf{x})^\top,
+\]
+<p>where \(\mathbf{a} \in \mathbf{C}^n\) is a set of arbitrary coefficients that parametrized a whole <em>family</em> of test functions and \(\mathbf{p}\in\mathbb{C}^n\) is the coefficients that we aim to find. Inserting the approximations it follows that</p>
+\[
+\begin{aligned}
+0 &= \int_\Omega \left(\nabla\phi(x)\right)^\top\nabla p(x)\ \mathrm{d}\mathbf{x} - k^2\int_\Omega\phi(x)p(x)\ \mathrm{d}\mathbf{x}\\
+    &\approx \int_\Omega\mathbf{a}^\top(\nabla\mathbf{T}(\mathbf{x}))^\top\nabla\mathbf{T}(\mathbf{x})\mathbf{p}\ \mathrm{d}\mathbf{x} - k^2\int_\Omega\mathbf{a}^\top \mathbf{T}(\mathbf{x})^\top\mathbf{T}(\mathbf{x})\mathbf{p}\ \mathrm{d}\mathbf{x}\\
+    &= \mathbf{a}^\top\left(\int_\Omega(\nabla\mathbf{T}(\mathbf{x}))^\top\nabla\mathbf{T}(\mathbf{x})\ \mathrm{d}\mathbf{x}\right)\mathbf{p} - k^2\mathbf{a}^\top \left(\int_\Omega \mathbf{T}(\mathbf{x})^\top\mathbf{T}(\mathbf{x})\ \mathrm{d}\mathbf{x}\right)\mathbf{p}\\
+    &= \mathbf{a}^\top\left(\int_\Omega(\nabla\mathbf{T}(\mathbf{x}))^\top\nabla\mathbf{T}(\mathbf{x})\ \mathrm{d}\mathbf{x} - k^2\int_\Omega \mathbf{T}(\mathbf{x})^\top\mathbf{T}(\mathbf{x})\ \mathrm{d}\mathbf{x}\right)\mathbf{p}.\\
+\end{aligned}
+\]
+<p>We can make the above the equality hold for all possible test functions, i.e. for all \(\mathbf{a} \in \mathbb{C}^n\), if we find \(\mathbf{p}\) such that</p>
+\[
+\left(\int_\Omega(\nabla\mathbf{T}(\mathbf{x}))^\top\nabla\mathbf{T}(\mathbf{x})\ \mathrm{d}\mathbf{x} - k^2\int_\Omega \mathbf{T}(\mathbf{x})^\top\mathbf{T}(\mathbf{x})\ \mathrm{d}\mathbf{x}\right)\mathbf{p} = \mathbf{0}.
+\]
+<p>This is exactly what we do in Finite Element computations. As a shorthand the above can be written as</p>
+\[
+\left(\mathbf{K} - k^2\mathbf{M}\right)\mathbf{p} = \mathbf{0},
+\]
+<p>where \(\mathbf{K}\) is referred to as the stiffness matrix and \(\mathbf{M}\) as the mass matrix.  In literature the equation can also be found as</p>
+\[
+\left(c^2\mathbf{K} - \omega^2\mathbf{M}\right)\mathbf{p} = \mathbf{0},
+\]
+<p>where \(c\) is the propagation speed and \(\omega\) is the angular frequency.</p>
+<h2 id="what_is_an_element"><a href="#what_is_an_element" class="header-anchor">What is an element?</a></h2>
+<p>A key insight is that the element serves two purposes: It represents a subdomain of the original domain &#40;also referred to as the geometry&#41; while also describing parts of the unknown function&#40;s&#41; of interest. In the general this subdomain is described by a parameterization, i.e. the element, as</p>
+\[
+    \mathbf{x}^e(\mathbf{u}) = \mathbf{X}^e\mathbf{N}^e(\mathbf{u}) \in \Omega^e, \quad \forall \mathbf{u} \in \mathcal{L}^e,
+\]
+<p>where the superscript \(e\) denotes the element number, \(\mathbf{X}^e\) is a matrix with columns equal to the interpolation nodes of the geometry, \(\mathbf{N}^e(\mathbf{u})\) are the so-called shape functions, \(\Omega^e\) is the element in global coordinates and \(\mathcal{L}^e\) are the local coordinates. In addition to the geometric interpolation of each element, we need to further define interpolations of the unknown functions, which in acoustics is usually taken as the pressure \(p(\mathbf{x})\). On element \(e\) this interpolation can be done as</p>
+\[
+    p(\mathbf{x}^e(\mathbf{u})) = \mathbf{T}(\mathbf{x}^e(\mathbf{u}))\mathbf{p} = \underbrace{\mathbf{T}(\mathbf{x}(\mathbf{u}))(\mathbf{L}^e)^\top}_{\mathbf{T}^e(\mathbf{u})}\underbrace{\mathbf{L}^e\mathbf{p}}_{\mathbf{p}^e} = \mathbf{T}^e(u)\mathbf{p}^e, \quad \mathbf{u} \in \mathcal{L}^e
+\]
+<p>where \(\mathbf{L}^e\) is a permutation-like matrix that extracts the relevant values of \(\mathbf{p}\) and relevant functions of \(\mathbf{T}(\mathbf{x})\) and orders such that they correspond to the local values \(\mathbf{p}^e\) and local basis functions of \(\mathbf{T}^e(\mathbf{u})\).</p>
+<p>For examples of \(\mathbf{N}^e(\mathbf{u})\), \(\mathbf{T}^e(\mathbf{u})\) and \(\mathbf{L}_e\) see below.</p>
+<div class="example"><p><strong>Example</strong>: &#40;<em>Linear triangular elements</em>&#41;    <img src="/assets/figures/fem_interp_geom2.png" alt="Elements" /></p>
+<p>The linear shape functions for a triangular element can have the form</p>
+\[
+        \mathbf{N}^e(u_1,u_2) = 
+        \begin{bmatrix}
+            1 - u_1 - u_2 \\ u_1 \\ u_2
+        \end{bmatrix}, \quad u_1\in[0, 1],\ u_2\in[0, 1-u_1].
+    \]
+<p>The choice in the wording can is because the ordering of the columns of \(\mathbf{X}^e\) can change the ordering rows of \(\mathbf{N}^e(\mathbf{u})\) or vice versa. This is something that one should keep in mind in practice when using different mesh file formats. Taking the second element of Figure above as an example, it could be that</p>
+\[
+        \mathbf{X}^2 = \begin{bmatrix} \mathbf{x}_3 & \mathbf{x}_1 & \mathbf{x}_4 \end{bmatrix}.
+    \]
+<p>Note that extending the geometric interpolation to higher orders is as simple as adding more rows/functions to \(\mathbf{N}^e(u_1,u_2)\) as well as more columns/points to \(\mathbf{X}^e\).</p></div>
+<div class="example"><p><strong>Example</strong>: &#40;<em>Basis functions for continuous linear interpolation</em>&#41;    <img src="/assets/figures/fem_interp_continuous2.png" alt="Elements" /></p>
+<p>Continuous linear basis functions on triangular elements are similar to shape functions for a linear triangular element and differ only in the fact that it is the transpose.</p>
+\[
+        \mathbf{T}^e_\text{continuous}(u_1,u_2) = 
+        \begin{bmatrix}
+            1 - u_1 - u_2 & u_1 & u_2
+        \end{bmatrix}, \quad u_1\in[0, 1],\ u_2\in[0, 1-u_1],
+    \]
+<p>where the subscript &quot;continuous&quot; is only there to highlight that it is a continuous formulation. Again, the ordering of the columns of the row vector depends on the ordering of the element corners.</p></div>
+<div class="example"><p><strong>Example</strong>: &#40;<em>Basis functions for discontinuous linear interpolation</em>&#41;    <img src="/assets/figures/fem_interp_discontinuous2.png" alt="Elements" /></p>
+<p>The discontinuous linear interpolation is simply a scaled continuous formulation</p>
+\[
+        \mathbf{T}^e_\text{discontinuous}(u_1,u_2) = \mathbf{T}^e_\text{continuous}\left(\frac{u_1 - \beta}{1-3\beta},\frac{u_2 - \beta}{1 - 3\beta}\right),
+    \]
+<p>where \(\beta \in \left[0,\frac{1}{2}\right[\) is a scalar representing the location of the interpolation nodes in the local \(\mathcal{L}^e\) coordinates.</p></div>
+<div class="example"><p><strong>Example</strong>: &#40;<em>Element Localization Matrix</em>&#41;    For a continuous linear element \(e\) all three corners correspond to a value of the global vector \(\mathbf{p}\). For example, the second element in continuous plot has local corner values given by \(\mathbf{p}^2 = \begin{bmatrix}p_3 & p_1 & p_4 \end{bmatrix}^\top\). This element would have \(\mathbf{L}^e\) given as</p>
+\[
+        \mathbf{L}^2 = 
+        \begin{bmatrix}
+            0 & 0 & 1 & 0 & \dots & 0\\
+            1 & 0 & 0 & 0 & \dots & 0\\
+            0 & 0 & 0 & 1 & \dots & 0
+        \end{bmatrix},
+    \]
+<p>so that \(\mathbf{p}^2 = \mathbf{L}^2\mathbf{p}\). Note that \(\mathbf{L}^e\) is only an artifact of the mathematical description. Any reasonable implementation should use indexing instead of multiplication with \(\mathbf{L}^e\).
+
+In the case of the discontinuous description the same element in discontinuous plot would have \(\mathbf{p}^2 = \begin{bmatrix}p_4 & p_5 & p_6\end{bmatrix}^\top\) meaning that</p>
+\[
+        \mathbf{L}^2 = 
+        \begin{bmatrix}
+            0 & 0 & 0 & 1 & 0 & 0 & 0 & \dots & 0\\
+            0 & 0 & 0 & 0 & 1 & 0 & 0 & \dots & 0\\
+            0 & 0 & 0 & 0 & 0 & 1 & 0 & \dots & 0
+        \end{bmatrix}.
+    \]
+<p>Note here that the discontinuous nature result in \(\mathbf{L}^e\) simply picks out three consecutive values.</p></div>
+<h2 id="computing_the_stiffness_and_mass_matrices"><a href="#computing_the_stiffness_and_mass_matrices" class="header-anchor">Computing the stiffness and mass matrices </a></h2>
+<p>Using the element description of both the geometry and the pressure function the mass matrix can be computed as follows</p>
+\[
+\begin{aligned}
+    \mathbf{M} 
+    &= \int_\Omega \mathbf{T}(\mathbf{x})^\top\mathbf{T}(\mathbf{x})\ \mathrm{d}\mathbf{x} \\
+    &\approx \sum_{e=1}^N\int_{\Omega^e} \mathbf{L}_e^\top\mathbf{L}_e\mathbf{T}(\mathbf{x})^\top\mathbf{T}(\mathbf{x})\mathbf{L}_e^\top\mathbf{L}_e\ \mathrm{d}\mathbf{x} \\
+    &= \sum_{e=1}^N \mathbf{L}_e^\top\left(\int_{\mathcal{L}^e}\mathbf{T}^e(\mathbf{u})^\top\mathbf{T}^e(\mathbf{u})\text{jacobian}(\Omega^e,\mathbf{u})\ \mathrm{d}\mathbf{u}\right)\mathbf{L}_e \\
+    &= \sum_{e=1}^N \mathbf{L}_e^\top\left(\underbrace{\sum_{i=1}^{Q} w_i\mathbf{T}^e(\mathbf{u}_i)^\top\mathbf{T}^e(\mathbf{u}_i)\text{jacobian}(\Omega^e,\mathbf{u}_i)}_{\mathbf{M}_e}\right)\mathbf{L}_e,
+\end{aligned}
+\]
+<p>where jacobian&#40;\(\Omega^e,\mathbf{u}\)&#41; is a function that describes the distortion from the local coordinates \(\mathcal{L}^e\) onto the global element \(\Omega^e\). This distortion represent length, area, or volume depending on the dimensionality of the problem. Note that if the elements are the same size then \(\mathbf{M}^e\) is constant with respect to each element &#40;this is the case in the code below&#41;.</p>
+<p>The stiffness matrix is computed similarly but with a difference in the fact that the gradient must have its coordinates changed from global to local. Using the chain rule it follows that</p>
+\[
+\nabla_u p(\mathbf{x}(\mathbf{u})) = \mathbf{J}(\mathbf{u})\nabla_\mathbf{x} p(\mathbf{x}(\mathbf{u})), 
+\]
+<p>from which we can isolate the global gradient as</p>
+\[
+\nabla_\mathbf{x} p(\mathbf{x}(\mathbf{u})) = \mathbf{J}(\mathbf{u})^{-1}\nabla_u p(\mathbf{x}(\mathbf{u})).
+\]
+<p>Putting the things together the stiffness matrix can therefore be computed as</p>
+\[
+\begin{aligned}
+    \mathbf{K} 
+    &= \int_\Omega (\nabla\mathbf{T}(\mathbf{x}))^\top\nabla\mathbf{T}(\mathbf{x})\ \mathrm{d}\mathbf{x} \\
+    &= \sum_{e=1}^N\int_{\Omega^e} \mathbf{L}_e^\top\mathbf{L}_e(\nabla_\mathbf{x}\mathbf{T}(\mathbf{x}))^\top\nabla_\mathbf{x}\mathbf{T}(\mathbf{x})\mathbf{L}_e^\top\mathbf{L}_e\ \mathrm{d}\mathbf{x} \\
+    &= \sum_{e=1}^N\mathbf{L}_e^\top\left(\int_{\mathcal{L}^e} (\nabla_\mathbf{x}\mathbf{T}^e(\mathbf{u}))^\top\nabla_\mathbf{x}\mathbf{T}^e(\mathbf{u})\text{jacobian}(\Omega^e,\mathbf{u})\ \mathrm{d}\mathbf{u}\right)\mathbf{L}_e \\
+    &= \sum_{e=1}^N\mathbf{L}_e^\top\left(\int_{\mathcal{L}^e} (\nabla_\mathbf{u}\mathbf{T}^e(\mathbf{u}))^\top\mathbf{J}(\mathbf{u})^{-1}\left(\mathbf{J}(\mathbf{u})^\top\right)^{-1}\nabla_\mathbf{u}\mathbf{T}^e(\mathbf{u})\text{jacobian}(\Omega^e,\mathbf{u})\ \mathrm{d}\mathbf{u} \right)\mathbf{L}_e\\
+    &= \sum_{e=1}^N\mathbf{L}_e^\top\left(\underbrace{\sum_{i=1}^{Q} (\nabla_\mathbf{u}\mathbf{T}^e(\mathbf{u}_i))^\top\mathbf{J}(\mathbf{u}_i)^{-1}\left(\mathbf{J}(\mathbf{u}_i)^\top\right)^{-1}\nabla_\mathbf{u}\mathbf{T}^e(\mathbf{u}_i)\text{jacobian}(\Omega^e,\mathbf{u}_i)}_{\mathbf{K}_e} \right)\mathbf{L}_e.
+\end{aligned}
+\]
+<p>In the following code we implement three different ways of assembling the mass and stiffness matrices. Note that two first implementations are only for educational purposes as they&#39;re both based on dense matrices.</p>
+<pre><code class="language-julia">### Importing relevant packages
+using ForwardDiff
+using SparseArrays
+using LinearAlgebra
+using BenchmarkTools
+using FastGaussQuadrature
+## Defining geometry.
+# Models Impedance Tube of 10cm diameter and 1m in length &#40;used later&#41;
+D &#61; 0.1             # 100 mm diameter
+L &#61; 10*D            # Length of the cavity
+ne &#61; 600            # Number of quadratic elements
+nnt &#61; 2*ne&#43;1        # Total number of nodes
+h &#61; L/ne            # Length of the elements
+x &#61; Vector&#40;0:h/2:L&#41; # Coordinates table
+
+## Computing the element matrices
+# Defining local basis functions &#40;and gradient using ForwardDiff - This is inefficient but easy&#41;
+Tᵉ&#40;u&#41;  &#61; &#91;u .* &#40;u .- 1&#41;/2; 1 .- u .^2; u .* &#40;u .&#43; 1&#41;/2&#93;&#39;
+∇Tᵉ&#40;u&#41; &#61; hcat&#40;ForwardDiff.derivative.&#40;Tᵉ,u&#41;...&#41;
+# Every element is the same, so the Jacobian does not depend on the element in this case. 
+# Furthermore we map from &#91;-1,1&#93; onto &#91;x_i,x_&#123;i&#43;1&#125;&#93;. Meaning from length 2 to length h.
+jacobian&#40;u&#41; &#61; h/2 
+# In the 1D case the Jacobian function and matrix are equal. This is not true in higher dimensions.
+J&#40;u&#41; &#61; h/2
+# Defining the local element matrices. Since the elements are the same size its constant.
+Q &#61; 3  # Number of Gaussian points used in the integration. 
+u,w &#61; gausslegendre&#40;Q&#41;
+Me &#61; sum&#40;i -&gt; w&#91;i&#93;*Tᵉ&#40;u&#91;i&#93;&#41;&#39;*Tᵉ&#40;u&#91;i&#93;&#41;*jacobian&#40;u&#91;i&#93;&#41;,1:Q&#41;
+Ke &#61; sum&#40;i -&gt; w&#91;i&#93;*∇Tᵉ&#40;u&#91;i&#93;&#41;&#39;*J&#40;u&#91;i&#93;&#41;^&#40;-1&#41;*J&#40;u&#91;i&#93;&#41;^&#40;-1&#41;*∇Tᵉ&#40;u&#91;i&#93;&#41;*jacobian&#40;u&#91;i&#93;&#41;,1:Q&#41;
+
+## Assembly 1: Simple &#40;using the element localization matrices. Never do this&#33;&#41;
+function assembly1&#40;Me,Ke,nnt,ne&#41;
+    K &#61; zeros&#40;nnt,nnt&#41;  # Dense matrix&#33; Not ideal&#33;
+    M &#61; zeros&#40;nnt,nnt&#41;  # Dense matrix&#33; Not ideal&#33;
+    for ie &#61; 1:ne
+        Le &#61; zeros&#40;3,nnt&#41;
+        Le&#91;:,ie*2-1:ie*2&#43;1&#93; &#61; Diagonal&#40;ones&#40;3&#41;&#41;
+
+        K &#43;&#61; Le&#39;*Ke*Le
+        M &#43;&#61; Le&#39;*Me*Le
+    end
+    return K,M
+end
+@btime K,M &#61; assembly1&#40;Me,Ke,nnt,ne&#41;
+
+## Assembly 2: Intermediate &#40;using indexing instead of the element localization matrices&#41;
+function assembly2&#40;Me,Ke,nnt,ne&#41;
+    K &#61; zeros&#40;nnt,nnt&#41;  # Dense matrix&#33; Not ideal&#33;
+    M &#61; zeros&#40;nnt,nnt&#41;  # Dense matrix&#33; Not ideal&#33;
+    for ie &#61; 1:ne
+        K&#91;ie*2-1:ie*2&#43;1,ie*2-1:ie*2&#43;1&#93; &#43;&#61; Ke
+        M&#91;ie*2-1:ie*2&#43;1,ie*2-1:ie*2&#43;1&#93; &#43;&#61; Me
+    end
+    return K,M
+end
+@btime K,M &#61; assembly2&#40;Me,Ke,nnt,ne&#41; # Note that the matrices are here still dense. 
+
+## Assembly 3: Advanced &#40;Sparse assembly using the compact support of the elements.&#41;
+function assembly3&#40;Me,Ke,nnt,ne&#41;
+    I &#61; zeros&#40;Int64,4nnt-3&#41;
+    J &#61; zeros&#40;Int64,4nnt-3&#41;
+    Kd &#61; zeros&#40;ComplexF64,length&#40;I&#41;&#41;
+    Md &#61; zeros&#40;ComplexF64,length&#40;I&#41;&#41;
+    for ie&#61;1:ne
+        for i &#61; 1:3
+            I&#91;&#40;8*&#40;ie-1&#41;&#43;1 &#43; 3*&#40;i-1&#41;&#41;:&#40;8*&#40;ie-1&#41; &#43; 3*i&#41;&#93;  .&#61; ie*2-1:ie*2-1&#43;2
+            J&#91;&#40;8*&#40;ie-1&#41;&#43;1 &#43; 3*&#40;i-1&#41;&#41;:&#40;8*&#40;ie-1&#41; &#43; 3*i&#41;&#93;  .&#61; &#40;ie-1&#41;*2 &#43; i
+            Kd&#91;&#40;8*&#40;ie-1&#41;&#43;1 &#43; 3*&#40;i-1&#41;&#41;:&#40;8*&#40;ie-1&#41; &#43; 3*i&#41;&#93; &#43;&#61; Ke&#91;:,i&#93;
+            Md&#91;&#40;8*&#40;ie-1&#41;&#43;1 &#43; 3*&#40;i-1&#41;&#41;:&#40;8*&#40;ie-1&#41; &#43; 3*i&#41;&#93; &#43;&#61; Me&#91;:,i&#93;
+        end
+    end
+    K &#61; sparse&#40;I,J,Kd&#41;
+    M &#61; sparse&#40;I,J,Md&#41;
+    return K,M
+end
+@btime K,M &#61; assembly3&#40;Me,Ke,nnt,ne&#41;</code></pre>
+<pre><code class="plaintext code-output">  5.748 s (9005 allocations: 25.86 GiB)
+  1.071 ms (2405 allocations: 22.30 MiB)
+  406.250 μs (10837 allocations: 1.76 MiB)
+</code></pre>
+<h3 id="example_impedance_tube"><a href="#example_impedance_tube" class="header-anchor">Example: Impedance Tube</a></h3>
+<h4 id="analytical_expressions"><a href="#analytical_expressions" class="header-anchor">Analytical Expressions</a></h4>
+<p>The procedure used in an impedance tube to measure the surface impedance and absorption coefficient of an acoustic material. A loudspeaker is installed at one end &#40;\(x = L\)&#41; and an acoustic material of thickness \(h\) and surface impedance \(\hat{Z}\) is bonded onto the other rigid and impervious end &#40;\(x = 0\)&#41;. Below the cut-off frequency of the tube, only plane waves propagate and the problem is amenable to a one-dimensional analysis.</p>
+<p>In this case the surface impedance of the material can be obtained from the measurement of the transfer function \(\hat{H}_{12} = \hat{P}_2 / \hat{P}_1\) between two microphones adequately placed in the tube &#40;e.g., standard ASTM E-1050&#41;:</p>
+\[
+    \frac{\hat{Z}}{\rho_0c_0} = \frac{1 + R}{1 - R}, \quad R = \frac{\hat{H}_{12} - \exp(-ik_0s)}{\exp(ik_0s) - \hat{H}_{12}}\exp(2ik_0(d+s)),
+\]
+<p>where \(d\) is the distance from microphone 2 to the sample and \(s\) is the spacing between the two microphones. The normal incidence absorption coefficient \(\alpha\) is directly obtained from the reflection coefficient \(R\): \(\alpha = 1 - |R|^2\).</p>
+<p><img src="/assets/impedance_tube.png" alt="Step1" /></p>
+<p>The impedance of a material of thickness \(h\) bonded onto a rigid wall &#40;\(x=0\)&#41; and excited by a plane wave with incidence angle \(\theta=0\) is given by &#40;Allard and Atalla, 2009&#41;.</p>
+\[
+    \hat{Z} = -i\hat{Z}_c\cot(\hat{k}_ch).
+\]
+<p>In the following the loudspeaker is modeled as a displacement of \(\bar{U}_n=1\). Furthermore, the specific details of the setup is described as</p>
+<ul>
+<li><p>Diameter of impedance tube \(D = 10\) cm &#40;and thus cut-off frequency \(\frac{0.59c_0}{D} \approx 2006\) Hz&#41;.</p>
+</li>
+<li><p>Length of impedance tube: \(L = 10D\).</p>
+</li>
+<li><p>Microphone spacing: \(s = \frac{1}{2}D\).</p>
+</li>
+<li><p>Distance between microphone 2 and the surface of the material: \(d=D/2\).</p>
+</li>
+<li><p>Thickness of the material: \(h = 2 \text{cm}\).</p>
+</li>
+<li><p>Characteristic impedance \(\hat{Z}_c = \rho_0c_0\left[1 + 0.057X^{-0.754} - i0.189X^{-0.732}\right]\) &#40;where \(X = \frac{\rho_0 f}{\rho_p}\)&#41;.</p>
+</li>
+<li><p>Wave number \(\hat{k}_c = \frac{\omega}{c_0}\left[1 + 0.0978X^{-0.700} - i0.189X^{-0.595}\right]\) &#40;where \(X = \frac{\rho_0 f}{\rho_p}\)&#41;.</p>
+</li>
+<li><p>Density and propagation speed: \(\rho_0 = 1.2\ \text{kg}\text{m}^3\), \(c_0 = 340\) m/s.</p>
+</li>
+<li><p>Flow resistivity of the material \(\rho_p = 10000\) Rayls/m.</p>
+</li>
+</ul>
+<h4 id="finite_element_modeling"><a href="#finite_element_modeling" class="header-anchor">Finite Element Modeling</a></h4>
+<p>A 1D model of an impedance tube with a loudspeaker at \(x=L\) and a material at \(x=0\) can be described by the following set of equations</p>
+\[
+\begin{cases}
+    \frac{\mathrm{d}^2p}{\mathrm{d}x^2}(x) + \left(\frac{\omega}{c}\right)^2p(x) = 0,\ x\in[0,L]\\
+    \frac{\mathrm{d}p}{\mathrm{d}n}(L) = \mathrm{i}\rho\omega v_L = \rho\omega^2U_L\\
+    \frac{\mathrm{d}p}{\mathrm{d}n}(0) = ik\beta p(0) = ik\beta p_1
+\end{cases}
+\]
+<p>The PDE can is modeled using the FEM as previously</p>
+\[
+\left(\mathbf{K} - k^2\mathbf{M}\right)\mathbf{p} = \mathbf{0}.
+\]
+<p>However, in this case \(\int_{\partial\Omega}\phi(x)\frac{\partial p}{\partial n}(x)\ \mathrm{d}\mathbf{x} \neq 0\). Instead we have that</p>
+\[
+\begin{aligned}
+\left[\phi(x)\frac{\mathrm{d}p}{\mathrm{d}n}(x)\right]_0^L 
+    &= \mathbf{a}^\top\mathbf{T}(L)\frac{\mathrm{d}p}{\mathrm{d}x}(L) - \mathbf{a}^\top\mathbf{T}(0)\frac{\mathrm{d}p}{\mathrm{d}x}(0)\\
+    &= \mathbf{a}^\top\left(\begin{bmatrix}0 \\ 0 \\ \vdots \\ 1\end{bmatrix}\rho\omega^2U_L - \begin{bmatrix}1 \\ 0 \\ \vdots \\ 0\end{bmatrix}ik\beta p(0)\right)\\
+    &= \mathbf{a}^\top\left(\begin{bmatrix}0 \\ 0 \\ \vdots \\ 1\end{bmatrix}\rho\omega^2U_L - \text{diag}\left(\begin{bmatrix}ik\beta \\ 0 \\ \vdots \\ 0\end{bmatrix}\right)\mathbf{p}\right).\\
+\end{aligned}
+\]
+<p>Where in the above we utilized the prescribed boundary conditions as well as the definition of \(\mathbf{T}(x)\). Putting things together we find that</p>
+\[
+\left(\mathbf{K} - k^2\mathbf{M}+ \text{diag}\left(\begin{bmatrix}ik\beta \\ 0 \\ \vdots \\ 0\end{bmatrix}\right)\right)\mathbf{p} = \begin{bmatrix}0 \\ 0 \\ \vdots \\ 1\end{bmatrix}\rho\omega^2U_L.
+\]
+<h4 id="numerical_results"><a href="#numerical_results" class="header-anchor">Numerical Results</a></h4>
+<p>Using the previously implemented FEM routines we can numerically solve the problem. The analytical expression is used to check the results.</p>
+<pre><code class="language-julia">using Plots
+## Recomputing FEM matrices
+K,M &#61; assembly3&#40;Me,Ke,nnt,ne&#41; # &#40;using @btime earlier means not storing the results&#41;
+## Setup
+ρ₀ &#61; 1.2   # Fluid density
+c₀ &#61; 342.2 # Speed of sound
+Uₙ &#61; 1     # Piston displacement
+D &#61; 0.1    # Diameter of Impedance Tube
+s &#61; 0.5*D  # Microphone spacing
+d &#61; D/2    # Distance between mic 2 and sample
+## Frequency domain
+fc &#61; floor&#40;1.84*c₀/D/pi&#41; # Cut off frequency
+freq &#61; Vector&#40;100:2:fc&#41;  # Choose correctly the lowest frequency &#40; a funtion of mics spacing&#41;
+ω &#61; 2*pi*freq
+k₀ &#61; ω/c₀
+## Impedance properties
+Z₀ &#61; ρ₀ * c₀
+h &#61; 0.02  # thickness of the material
+σ &#61; 10000 # flow resitivity
+X &#61; ρ₀*freq/σ
+Zc &#61; Z₀*&#40;1 .&#43; 0.057*X.^&#40;-0.754&#41;-im*0.087.*X.^&#40;-0.732&#41;&#41;
+k &#61; k₀ .*&#40;1 .&#43;0.0978*X.^&#40;-0.700&#41;-im*0.189.*X.^&#40;-0.595&#41;&#41;
+Z &#61; -im.*Zc.*cot.&#40;k*h&#41; / Z₀
+beta&#61; 1.0 ./ Z # convert to admittance
+# Finding nodes located on the microphones. 
+in2&#61;findall&#40;x-&gt;x,abs.&#40;x .-d&#41; .&lt; 1e-6&#41;&#91;1&#93;        # Location of mic 2
+in1&#61;findall&#40;x-&gt;x,abs.&#40;x .-&#40;d&#43;s&#41;&#41; .&lt;1e-6&#41;&#91;1&#93;     # Location of mic 1
+# Correcting the s and d distances to fit the numerical values.
+s&#61;abs&#40;x&#91;in1&#93; - x&#91;in2&#93;&#41;  # Recalculate microphones separation
+d&#61;x&#91;in2&#93;                # Recalculate the distance between microphone 2 and the sample
+
+## Output
+ndof &#61; nnt
+nfreqs &#61; length&#40;ω&#41;
+P_mic1 &#61; zeros&#40;ComplexF64,nfreqs&#41;
+P_mic2 &#61; zeros&#40;ComplexF64,nfreqs&#41;
+A &#61; Diagonal&#40;zeros&#40;ComplexF64,nnt&#41;&#41;
+F &#61; zeros&#40;ComplexF64,ndof&#41; # Initialize force vector
+k &#61; ω/c₀
+
+## Frequency sweep
+for i in eachindex&#40;ω&#41;
+    A&#91;1,1&#93; &#61; im*k&#91;i&#93;*beta&#91;i&#93;
+    F&#91;end,1&#93; &#61; ρ₀*ω&#91;i&#93;^2*Uₙ
+    S &#61; K - k&#91;i&#93;^2*M &#43; A
+    p &#61; S\F
+    P_mic2&#91;i&#93; &#61; p&#91;in2&#93;
+    P_mic1&#91;i&#93; &#61; p&#91;in1&#93;
+end
+
+# Calculate the normalized impedance
+H₁₂ &#61; P_mic2./P_mic1
+R &#61; &#40;H₁₂ - exp.&#40;-im*k*s&#41;&#41;./&#40;exp.&#40;im*k*s&#41;-H₁₂&#41; .*exp.&#40;im*2*k * &#40;d &#43; s&#41;&#41;
+Z_num &#61; &#40;1 .&#43; R&#41;./&#40;1 .- R&#41;
+## Comparison with the exact solution
+plot&#40;freq,real.&#40;Z&#41;,label&#61;&quot;Analytical&quot;,linewidth&#61;2&#41;
+plot&#33;&#40;freq,real.&#40;Z_num&#41;,label&#61;&quot;FEM&quot;,linestyle&#61;:dash,linewidth&#61;2&#41;
+xlims&#33;&#40;&#40;100, 2000&#41;&#41;
+xlabel&#33;&#40;&quot;Frequency &#40;Hz&#41;&quot;&#41;
+ylabel&#33;&#40;&quot;Normalized Impedance - Real part&quot;&#41;</code></pre>
+
+<img src="/assets/pubs/pde/FEM_introduction/code/output/fem_fig.svg" alt="">
+<h3 id="example_computing_modes_in_2d"><a href="#example_computing_modes_in_2d" class="header-anchor">Example: Computing modes in 2D</a></h3>
+<p>The Finite Element Method can also be used to compute the modes, i.e. finding the eigenvalues of the system</p>
+\[
+    c^2\mathbf{K} - \omega^2\mathbf{M}.
+\]
+<p>For a square room with side lengths \(L_x\) and \(L_y\) the modes can be computed analytically as</p>
+\[
+ \frac{c}{2}\sqrt{\left(\frac{n_x}{L_x}\right)^2 + \left(\frac{n_y}{L_y}\right)^2}.
+\]
+<pre><code class="language-julia">## Defining geometry.
+Lx &#61; 10
+Ly &#61; 4
+n &#61; 20&#43;1
+m &#61; 8&#43;1
+ne &#61; &#40;n-1&#41;*&#40;m-1&#41;    # Number of linear elements
+nnt &#61; n*m           # Total number of nodes
+## Plotting the elements
+x &#61; Vector&#40;0:Lx/&#40;n-1&#41;:Lx&#41;
+y &#61; Vector&#40;0:Ly/&#40;m-1&#41;:Ly&#41;
+X &#61; kron&#40;x,ones&#40;m&#41;&#41;
+Y &#61; kron&#40;ones&#40;n&#41;,y&#41;
+scatter&#40;X,Y,aspect_ratio&#61;1,legend&#61;false,gridlinewidth&#61;1,gridalpha&#61;1,alpha&#61;0,background&#61;:gray,background_color_outside&#61;:white&#41;
+xticks&#33;&#40;x&#41;; xlims&#33;&#40;&#40;0,Lx&#41;&#41;; xlabel&#33;&#40;&quot;x&quot;&#41;; 
+yticks&#33;&#40;y&#41;; ylims&#33;&#40;&#40;0,Ly&#41;&#41;; ylabel&#33;&#40;&quot;y&quot;&#41;;</code></pre>
+
+<img src="/assets/pubs/pde/FEM_introduction/code/output/2d_mesh.svg" alt="">
+<p>The Finite Element computation for the 2D room will look similar to the one for the 1D impedance tube. However, one difference is the reliance on the topology/connectivity matrix. The code look as follows</p>
+<pre><code class="language-julia">## Creating the topology
+T &#61; reshape&#40;1:nnt,m,n&#41;      # Numbering all nodes on the grid
+topology &#61; zeros&#40;Int,4,ne&#41;  # Allocating the topology 
+topology&#91;1,:&#93; &#61; T&#91;1:end-1,1:end-1&#93;&#91;:&#93;   # Extracting submatrix
+topology&#91;2,:&#93; &#61; T&#91;2:end,1:end-1&#93;&#91;:&#93;     # Extracting submatrix
+topology&#91;3,:&#93; &#61; T&#91;2:end,2:end&#93;&#91;:&#93;       # Extracting submatrix
+topology&#91;4,:&#93; &#61; T&#91;1:end-1,2:end&#93;&#91;:&#93;     # Extracting submatrix
+## Computing Element matrices
+# Defining local basis functions &#40;and gradient using ForwardDiff - This is inefficient but easy&#41;
+Tᵉ&#40;u&#41;  &#61; &#91;&#40;1-u&#91;1&#93;&#41;*&#40;1-u&#91;2&#93;&#41;;&#40;1&#43;u&#91;1&#93;&#41;*&#40;1-u&#91;2&#93;&#41;;&#40;1&#43;u&#91;1&#93;&#41;*&#40;1&#43;u&#91;2&#93;&#41;;&#40;1-u&#91;1&#93;&#41;*&#40;1&#43;u&#91;2&#93;&#41;&#93;&#39;/4
+∇Tᵉ&#40;u&#41; &#61; hcat&#40;ForwardDiff.jacobian&#40;Tᵉ,u&#41;&#41;&#39;
+# Every element is the same, so the Jacobian does not depend on the element in this case.
+# Furthermore we map from &#91;-1,1&#93; onto &#91;x_i,x_&#123;i&#43;1&#125;&#93;. Meaning from length 2 to length h.
+jacobian&#40;u&#41; &#61; &#40;x&#91;2&#93;-x&#91;1&#93;&#41;/2*&#40;y&#91;2&#93;-y&#91;1&#93;&#41;/2
+# In the 1D case the Jacobian function and matrix are equal. This is not true in higher dimensions.
+J&#40;u&#41; &#61; Diagonal&#40;&#91;x&#91;2&#93;-x&#91;1&#93;;y&#91;2&#93;-y&#91;1&#93;&#93;&#41;/2
+# Defining the local element matrices. Since the elements are the same size its constant.
+Q &#61; 2  # Number of Gaussian points used in the integration.
+u,wu &#61; gausslegendre&#40;Q&#41;
+v,wv &#61; gausslegendre&#40;Q&#41;
+U &#61; kron&#40;u,ones&#40;Q&#41;&#41;
+V &#61; kron&#40;ones&#40;Q&#41;,v&#41;
+W &#61; kron&#40;wu,wv&#41;
+P &#61; &#91;U&#39;;V&#39;&#93;
+
+Me &#61; sum&#40;i -&gt; W&#91;i&#93;*jacobian&#40;P&#91;:,i&#93;&#41;*Tᵉ&#40;P&#91;:,i&#93;&#41;&#39;*Tᵉ&#40;P&#91;:,i&#93;&#41;,1:2Q&#41;
+Ke &#61; sum&#40;i -&gt; W&#91;i&#93;*jacobian&#40;P&#91;:,i&#93;&#41;*∇Tᵉ&#40;P&#91;:,i&#93;&#41;&#39;*J&#40;P&#91;:,i&#93;&#41;^&#40;-1&#41;*J&#40;P&#91;:,i&#93;&#41;^&#40;-1&#41;&#39;*∇Tᵉ&#40;P&#91;:,i&#93;&#41;,1:2Q&#41;
+
+## Assembly
+function connected_topology&#40;topology,nnt,ne&#41;
+    source_connections &#61; &#91;zeros&#40;Int,0&#41; for _ in 1:nnt&#93;
+    for element &#61; 1:ne
+        for i &#61; 1:4
+            append&#33;&#40;source_connections&#91;topology&#91;i,element&#93;&#93;,topology&#91;:,element&#93;&#41;
+        end
+    end
+    sort&#33;.&#40;unique.&#40;source_connections&#41;&#41;
+end
+function create_I_J&#40;connections&#41;
+    I &#61; zeros&#40;Int,sum&#40;length.&#40;connections&#41;&#41;&#41;
+    J &#61; zeros&#40;Int,sum&#40;length.&#40;connections&#41;&#41;&#41;
+    lower &#61; 1
+    for &#40;idx,con&#41; in enumerate&#40;connections&#41;
+        upper &#61; lower &#43; length&#40;con&#41;
+        I&#91;lower:upper-1&#93; .&#61; con
+        J&#91;lower:upper-1&#93; .&#61; idx
+        lower &#61; upper
+    end
+    return I,J
+end
+function assembly&#40;Me,Ke,topology,nnt&#41;
+    ne &#61; size&#40;topology,2&#41;
+    connections &#61; connected_topology&#40;topology,nnt,ne&#41;
+    I,J &#61; create_I_J&#40;connections&#41;
+    S &#61; sparse&#40;I,J,1:length&#40;I&#41;&#41; # Sparse matrix representing the indices of Kd and Md
+    Kd &#61; zeros&#40;length&#40;I&#41;&#41;
+    Md &#61; zeros&#40;length&#40;I&#41;&#41;
+    for ie&#61;1:ne
+        top &#61; topology&#91;:,ie&#93;
+        Kd&#91;S&#91;top,top&#93;&#93; &#43;&#61; Ke
+        Md&#91;S&#91;top,top&#93;&#93; &#43;&#61; Me
+    end
+    K &#61; sparse&#40;I,J,Kd&#41;
+    M &#61; sparse&#40;I,J,Md&#41;
+    return K,M
+end
+K,M &#61; assembly&#40;Me,Ke,topology,nnt&#41;;
+
+using Arpack
+F &#61; eigs&#40;c₀^2*K,M,which&#61;:SM,nev&#61;10&#41;;
+freq &#61; sort&#40;sqrt.&#40;abs.&#40;F&#91;1&#93;&#41;&#41;/2/π&#41;;
+plot&#40;&#40;contourf&#40;x,y,reshape&#40;F&#91;2&#93;&#91;:,id&#93;,m,n&#41;,linewidth&#61;0,levels&#61;1000,legend&#61;false,axis&#61;false,title&#61;&quot;&#36;&#40;round&#40;freq&#91;id&#93;,digits&#61;2&#41;&#41; Hz&quot;&#41; for id in 2:10&#41;..., layout &#61; &#40;3, 3&#41;&#41;</code></pre>
+<p> <img src="/assets/pubs/pde/FEM_introduction/code/output/modes_plot.svg" alt=""></p>
+<p>This can be compared to the analytical eigenvalues computed by </p>
+<pre><code class="language-julia">nx, ny &#61; 0:4, 0:4
+freq_analytical &#61; c₀/2*sqrt.&#40;&#40;nx/Lx&#41;.^2 .&#43; &#40;ny&#39;/Ly&#41;.^2&#41;
+analytical_freqs &#61; sort&#40;freq_analytical&#91;:&#93;&#41;
+print&#40;round.&#40;analytical_freqs&#91;2:10&#93;,digits&#61;2&#41;&#41;</code></pre>
+<pre><code class="plaintext code-output">[17.11, 34.22, 42.78, 46.07, 51.33, 54.78, 66.82, 68.44, 80.71]</code></pre>
+<div class="page-foot">
+  <div class="copyright">
+    &copy; Mikkel Paltorp. Last modified: February 04, 2024. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+  </div>
+</div>
+</div><!-- CONTENT ENDS HERE -->
+    
+        <script src="/libs/katex/katex.min.js"></script>
+<script src="/libs/katex/auto-render.min.js"></script>
+<script>renderMathInElement(document.body)</script>
+
+    
+    
+        <script src="/libs/highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();hljs.configure({tabReplace: '    '});</script>
+
+    
+  </body>
+</html>

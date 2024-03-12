@@ -21,13 +21,19 @@
 </url>
 <url>
     <loc>https://github.com/mipals/menu2/index.html</loc>
-    <lastmod>2023-06-09</lastmod>
+    <lastmod>2024-02-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
     <loc>https://github.com/mipals/pubs/pde/BEM/index.html</loc>
     <lastmod>2022-01-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+<url>
+    <loc>https://github.com/mipals/pubs/pde/FEM_introduction/index.html</loc>
+    <lastmod>2024-02-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
@@ -63,13 +69,13 @@
 </url>
 <url>
     <loc>https://github.com/mipals/menu1/index.html</loc>
-    <lastmod>2023-10-04</lastmod>
+    <lastmod>2024-03-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
     <loc>https://github.com/mipals/pubs/pde/BEM_quadrature/index.html</loc>
-    <lastmod>2023-10-04</lastmod>
+    <lastmod>2024-02-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
@@ -81,13 +87,13 @@
 </url>
 <url>
     <loc>https://github.com/mipals/pubs/matrix/smw_id/index.html</loc>
-    <lastmod>2022-12-20</lastmod>
+    <lastmod>2024-03-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
     <loc>https://github.com/mipals/pubs/pde/BEM_ROM/index.html</loc>
-    <lastmod>2023-10-04</lastmod>
+    <lastmod>2023-10-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
@@ -116,6 +122,12 @@
     <priority>0.5</priority>
 </url>
 <url>
+    <loc>https://github.com/mipals/pubs/matrix/sparse_lu/index.html</loc>
+    <lastmod>2024-01-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+<url>
     <loc>https://github.com/mipals/pubs/optimization/BFGS/index.html</loc>
     <lastmod>2022-04-05</lastmod>
     <changefreq>monthly</changefreq>
@@ -124,6 +136,12 @@
 <url>
     <loc>https://github.com/mipals/pubs/pde/BEM_shapefunctions/index.html</loc>
     <lastmod>2022-04-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+<url>
+    <loc>https://github.com/mipals/pubs/matrix/matrix_lemma/index.html</loc>
+    <lastmod>2024-03-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
@@ -183,13 +201,13 @@
 </url>
 <url>
     <loc>https://github.com/mipals/pubs/pde/BEM_elements/index.html</loc>
-    <lastmod>2023-10-04</lastmod>
+    <lastmod>2023-10-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
     <loc>https://github.com/mipals/pubs/matrix/hss/index.html</loc>
-    <lastmod>2022-12-20</lastmod>
+    <lastmod>2023-12-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
@@ -201,7 +219,7 @@
 </url>
 <url>
     <loc>https://github.com/mipals/pubs/pde/BEM_introduction/index.html</loc>
-    <lastmod>2023-10-04</lastmod>
+    <lastmod>2023-11-14</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
@@ -255,7 +273,7 @@
 </url>
 <url>
     <loc>https://github.com/mipals/index.html</loc>
-    <lastmod>2022-12-21</lastmod>
+    <lastmod>2024-02-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>

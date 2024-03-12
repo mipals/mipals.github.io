@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="stylesheet" href="/libs/katex/katex.min.css">
+     
+   <link rel="stylesheet" href="/libs/highlight/github.min.css">
+   
+  <link rel="stylesheet" href="/css/franklin.css">
+  <link rel="stylesheet" href="/css/basic.css">
+  <link rel="icon" href="/assets/favicon.png">
+   <title>Sparse Cholesky Factorization</title>  
+</head>
+<body>
+  <header>
+<div class="blog-name"><a href="/">Mikkel Paltorp</a></div>
+<nav>
+  <ul>
+    <li><a href="/">About Me</a></li>
+    <li><a href="/menu1/">Notes</a></li>
+    <li><a href="/menu2/">Software</a></li>
+  </ul>
+  <img src="/assets/hamburger.svg" id="menu-icon">
+</nav>
+</header>
+
+
+<!-- Content appended here -->
+<div class="franklin-content"><h1 id="cholesky_factorization_of_an_arrowhead_matrix"><a href="#cholesky_factorization_of_an_arrowhead_matrix" class="header-anchor">Cholesky factorization of an arrowhead matrix</a></h1>
+<p><em>The arrowhead example highlights why permutations are crucial when performing factorizations of sparse matrices. The example is from the book Convex Optimization by Stephen Boyd and Lieven Vandenberghe.</em></p>
+<p>We start by defining two arrowhead matrices. One with the arrow pointing towards the top left &#40;\(A_l\)&#41; and one pointing towards the bottom right \((A_r)\)</p>
+\[
+    A_l = \begin{bmatrix}
+        1 & u^\top\\
+        u & \text{diag}(d)
+    \end{bmatrix}, \quad
+    A_r = \begin{bmatrix}
+        \text{diag}(d)  & u\\
+        u^\top          & 1
+    \end{bmatrix},
+\]
+<p>where \(\text{diag}(d) \in \mathbb{R}^{n\times n}\) is a positive diagonal matrix and \(u \in \mathbb{R}^n\). In the case where \(u^\top\text{diag}(d)^{-1}u < 1\) the matrix is positive definite and a Cholesky factorization exist. For the left pointing arrowhead matrix the Cholesky factorization can be computed as</p>
+\[
+    A_l = \begin{bmatrix}
+        1 & u^\top\\
+        u & \text{diag}(d)
+    \end{bmatrix}
+     =
+    \begin{bmatrix}
+        1 & 0\\
+        u & L
+    \end{bmatrix}
+    \begin{bmatrix}
+        1  & u^\top\\
+        0  & L^\top
+    \end{bmatrix}.
+\]
+<p>Unfortunately looking at the bottom right block one find that \(LL^\top = \text{diag}(d) - uu^\top\). In general \(uu^\top\) will be dense meaning that \(L\) will also be a dense matrix. Visually we can represent the Cholesky factorization of the left pointing arrowhead matrix as <img src="/assets/visualizations/sparse_cholesky1.png" alt="" /></p>
+<p>Surprisingly, the right pointing arrowhead matrix &#40;which is simply a permutation of the left pointing arrowhead matrix&#41; have a sparse Cholesky</p>
+\[
+    \begin{bmatrix}
+        \text{diag}(d)  & u\\
+        u^\top          & 1
+    \end{bmatrix}
+     =
+    \begin{bmatrix}
+        \text{diag}(d)^{1/2}         & 0\\
+        u^\top \text{diag}(d)^{-1/2} & \sqrt{1 - u^\top \text{diag}(d)^{-1}u}
+    \end{bmatrix}
+    \begin{bmatrix}
+        \text{diag}(d)^{1/2} & \text{diag}(d)^{-1/2}u\\
+        0       & \sqrt{1 - u^\top \text{diag}(d)^{-1}u}
+    \end{bmatrix}.
+\]
+<p>Note that the above also shows why the constraint of \(u^\top\text{diag}(d)^{-1}u < 1\) was imposed earlier. We can similarly visualize the factorization as</p>
+<p><img src="/assets/visualizations/sparse_cholesky2.png" alt="" /></p>
+<h2 id="some_code"><a href="#some_code" class="header-anchor">Some Code</a></h2>
+<p>In most sparse linear algebra libraries the permutation of rows and columns happens automatically. To illustrate this a short example in Julia is given. We note here that the underlying sparse linear algebra library used in Julia is <a href="https://github.com/DrTimothyAldenDavis/SuiteSparse">SuiteSparse</a> &#40;wrapped in <a href="https://github.com/JuliaSparse/SparseArrays.jl">SparseArrays.jl</a>&#41;.</p>
+<p>We start by setting up the problem as</p>
+<pre><code class="language-julia">using LinearAlgebra
+using SparseArrays
+n &#61; 5
+u &#61; rand&#40;n&#41;
+d &#61; n./rand&#40;n&#41;
+D &#61; sparse&#40;1:n,1:n,d&#41;
+
+Al &#61; &#91;1 u&#39;; u D&#93;
+Ar &#61; &#91;D u; u&#39; 1&#93;
+
+# Checking if Al and Ar are positive definite
+u&#39;*&#40;D\u&#41;</code></pre>
+<p><pre><code class="plaintext code-output">0.07854883491519178
+</code></pre> We now compute the dense factorization of the left pointing arrowhead matrix &#40;which is expected to be dense&#41;</p>
+<pre><code class="language-julia">Fl_dense &#61; cholesky&#40;Matrix&#40;Al&#41;&#41;</code></pre>
+<pre><code class="plaintext code-output">6×6 LinearAlgebra.LowerTriangular{Float64, Matrix{Float64}}:
+ 1.0          ⋅            ⋅            ⋅            ⋅          ⋅ 
+ 0.331428    3.43691       ⋅            ⋅            ⋅          ⋅ 
+ 0.602185   -0.0580699    9.45525       ⋅            ⋅          ⋅ 
+ 0.0812995  -0.00783988  -0.00522595   2.97595       ⋅          ⋅ 
+ 0.331309   -0.0319488   -0.0212966   -0.00917255   6.26863     ⋅ 
+ 0.646985   -0.0623901   -0.0415883   -0.0179123   -0.0346799  2.52021</code></pre>
+<p>Now computing the dense factorization of the right pointing arrowhead matrix &#40;which is expected to be sparse&#41;</p>
+<pre><code class="language-julia">Fr_dense &#61; cholesky&#40;Matrix&#40;Ar&#41;&#41;</code></pre>
+<pre><code class="plaintext code-output">6×6 LinearAlgebra.LowerTriangular{Float64, Matrix{Float64}}:
+ 3.45285     ⋅         ⋅          ⋅          ⋅         ⋅ 
+ 0.0        9.47458    ⋅          ⋅          ⋅         ⋅ 
+ 0.0        0.0       2.97707     ⋅          ⋅         ⋅ 
+ 0.0        0.0       0.0        6.2775      ⋅         ⋅ 
+ 0.0        0.0       0.0        0.0        2.6033     ⋅ 
+ 0.0959868  0.063558  0.0273086  0.0527772  0.248525  0.959922</code></pre>
+<p>In both case our expectations are verified.</p>
+<p>We now redo the computations using a sparse factorization</p>
+<pre><code class="language-julia">Fl &#61; cholesky&#40;Al&#41;</code></pre>
+<pre><code class="plaintext code-output">6×6 SparseArrays.SparseMatrixCSC{Float64, Int64} with 11 stored entries:
+ 2.6033     ⋅          ⋅          ⋅         ⋅          ⋅ 
+  ⋅        6.2775      ⋅          ⋅         ⋅          ⋅ 
+  ⋅         ⋅         2.97707     ⋅         ⋅          ⋅ 
+  ⋅         ⋅          ⋅         9.47458    ⋅          ⋅ 
+  ⋅         ⋅          ⋅          ⋅        3.45285     ⋅ 
+ 0.248525  0.0527772  0.0273086  0.063558  0.0959868  0.959922</code></pre>
+<pre><code class="language-julia">Fr &#61; cholesky&#40;Ar&#41;</code></pre>
+<pre><code class="plaintext code-output">6×6 SparseArrays.SparseMatrixCSC{Float64, Int64} with 11 stored entries:
+ 2.6033     ⋅          ⋅          ⋅         ⋅          ⋅ 
+  ⋅        6.2775      ⋅          ⋅         ⋅          ⋅ 
+  ⋅         ⋅         2.97707     ⋅         ⋅          ⋅ 
+  ⋅         ⋅          ⋅         9.47458    ⋅          ⋅ 
+  ⋅         ⋅          ⋅          ⋅        3.45285     ⋅ 
+ 0.248525  0.0527772  0.0273086  0.063558  0.0959868  0.959922</code></pre>
+<p>Notably the sparse factorization is in both cases found. The reason here being the permutations &#40;which can be extracted from the factorizations using <em>.p</em>&#41;</p>
+<pre><code class="language-julia">show&#40;stdout, &quot;text/plain&quot;, Fl.p&#41;
+show&#40;stdout, &quot;text/plain&quot;, Fr.p&#41;</code></pre>
+<pre><code class="plaintext code-output">6-element Vector{Int64}:
+ 6
+ 5
+ 4
+ 3
+ 2
+ 1
+6-element Vector{Int64}:
+ 5
+ 4
+ 3
+ 2
+ 1
+ 6</code></pre>
+<p>Notice that the permutation heuristic in this case also end up reversing the entries of the diagonal matrix. However, the same final permutation is found for both the left and right pointing arrowhead matrices.</p>
+<pre><code class="language-julia">show&#40;stdout, &quot;text/plain&quot;, Al&#91;Fl.p,Fl.p&#93;&#41;</code></pre>
+<pre><code class="plaintext code-output">6×6 SparseArrays.SparseMatrixCSC{Float64, Int64} with 16 stored entries:
+ 6.77718     ⋅         ⋅           ⋅          ⋅        0.646985
+  ⋅        39.407      ⋅           ⋅          ⋅        0.331309
+  ⋅          ⋅        8.86296      ⋅          ⋅        0.0812995
+  ⋅          ⋅         ⋅         89.7677      ⋅        0.602185
+  ⋅          ⋅         ⋅           ⋅        11.9222    0.331428
+ 0.646985   0.331309  0.0812995   0.602185   0.331428  1.0</code></pre>
+<pre><code class="language-julia">show&#40;stdout, &quot;text/plain&quot;, Ar&#91;Fr.p,Fr.p&#93;&#41;</code></pre>
+<pre><code class="plaintext code-output">6×6 SparseArrays.SparseMatrixCSC{Float64, Int64} with 16 stored entries:
+ 6.77718     ⋅         ⋅           ⋅          ⋅        0.646985
+  ⋅        39.407      ⋅           ⋅          ⋅        0.331309
+  ⋅          ⋅        8.86296      ⋅          ⋅        0.0812995
+  ⋅          ⋅         ⋅         89.7677      ⋅        0.602185
+  ⋅          ⋅         ⋅           ⋅        11.9222    0.331428
+ 0.646985   0.331309  0.0812995   0.602185   0.331428  1.0</code></pre>
+<div class="page-foot">
+  <div class="copyright">
+    &copy; Mikkel Paltorp. Last modified: January 25, 2024. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+  </div>
+</div>
+</div><!-- CONTENT ENDS HERE -->
+    
+        <script src="/libs/katex/katex.min.js"></script>
+<script src="/libs/katex/auto-render.min.js"></script>
+<script>renderMathInElement(document.body)</script>
+
+    
+    
+        <script src="/libs/highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();hljs.configure({tabReplace: '    '});</script>
+
+    
+  </body>
+</html>

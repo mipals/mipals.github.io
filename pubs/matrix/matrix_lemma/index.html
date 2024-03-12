@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="stylesheet" href="/libs/katex/katex.min.css">
+     
+   <link rel="stylesheet" href="/libs/highlight/github.min.css">
+   
+  <link rel="stylesheet" href="/css/franklin.css">
+  <link rel="stylesheet" href="/css/basic.css">
+  <link rel="icon" href="/assets/favicon.png">
+   <title>General Sherman-Morrison-Woodbury Identity</title>  
+</head>
+<body>
+  <header>
+<div class="blog-name"><a href="/">Mikkel Paltorp</a></div>
+<nav>
+  <ul>
+    <li><a href="/">About Me</a></li>
+    <li><a href="/menu1/">Notes</a></li>
+    <li><a href="/menu2/">Software</a></li>
+  </ul>
+  <img src="/assets/hamburger.svg" id="menu-icon">
+</nav>
+</header>
+
+
+<!-- Content appended here -->
+<div class="franklin-content"><h1 id="general_sherman-morrison-woodbury_identity"><a href="#general_sherman-morrison-woodbury_identity" class="header-anchor">General Sherman-Morrison-Woodbury Identity</a></h1>
+<p>In this note we derive the general form of the Sherman-Morrison-Woodury identity. In addition, we derive an extension of the formula that is used in Kernel ridge regression, often without any explanation.</p>
+<h2 id="some_identities"><a href="#some_identities" class="header-anchor">Some identities</a></h2>
+<p>We start by introducing three useful identities.</p>
+<p><div class="definition"><strong>Identity 1</strong> The first identity comes from the standard mathematical trick of adding zero as \(I + P - P = I\). Using this it follows that \[\begin{aligned}
+    (I + P)^{-1} 
+    &= (I + P)^{-1}(I + P - P)\\
+    &= I - (I + P)^{-1}P
+\end{aligned}\]</div> <div class="definition"><strong>Identity 2</strong> For invertible A, but possible rectangular \(B, C\), and \(D\) one can show using identity 1 that \[\begin{aligned}
+    (A + BCD)^{-1} 
+    &= (A(I + A^{-1}BCD)^{-1})\quad\quad\quad\quad\quad\quad\quad\quad \text{Using invertible A}\\
+    &= (I + A^{-1}BCD)^{-1}A^{-1}\\
+    &= \left(I - (I + A^{-1}BCD)^{-1}A^{-1}BCD\right)A^{-1}\quad \text{Using identity 1}
+\end{aligned}\] This identity will be the first step in derivation of the general Sherman-Morrison-formula.</div> <div class="definition"><strong>Identity 3</strong>  First notice that we have \[
+    P + PQP = P(I + QP) = (I + PQ)P
+\] Moving the parentheses to the corresponding other sides of the equation result in \[
+    (I + PQ)^{-1}P = P(I + QP)^{-1}
+\] This identity is extensively used to move matrices from one side of an inverse to the other.</div></p>
+<p>For an invertible \(A\) and \(C\) one can, by repeadly using identity 3, show that the following hold</p>
+\[\begin{aligned}
+    (A + BCD)^{-1} BC
+    &= (A(I + A^{-1}BCD))^{-1}BC\quad\ \quad\ \ \ \text{Using Invertible A}\\
+    &= (I + A^{-1}BCD)^{-1}A^{-1}BC\\
+    &= A^{-1}(I + BCDA^{-1})^{-1}BC\quad\ \quad\ \ \ \text{Using Identity 3}\\
+    &= A^{-1}B(I + CDA^{-1}B)^{-1}C\quad\ \quad\ \ \ \text{Using Identity 3}\\
+    &= A^{-1}B(C(C^{-1} + DA^{-1}B))^{-1}C\quad \text{Using Invertible C}\\
+    &= A^{-1}B(C^{-1} + DA^{-1}B)^{-1}C^{-1}C\\
+    &= A^{-1}B(C^{-1} + DA^{-1}B)^{-1}
+\end{aligned}\]
+<p>This result is use in e.g. <a href="https://web2.qatar.cmu.edu/~gdicaro/10315-Fall19/additional/welling-notes-on-kernel-ridge.pdf">kernel ridge regression</a> as it makes it possible to possible change the size of the matrix being inverted. In particular if \(\Phi \in \mathbb{R}^{d \times n}\) we have that</p>
+\[\begin{aligned}
+    w 
+    &= (\lambda I_d + \Phi\Phi^\top)^{-1}\Phi y\\
+    &= \lambda^{-1}\Phi\left(I_n + \Phi^\top \lambda^{-1} \Phi\right)^{-1}y\\
+    &= \Phi\left(\lambda\left(I_n + \Phi^\top \lambda^{-1} \Phi\right)\right)^{-1}y\\
+    &= \Phi\left(\lambda I_n + \Phi^\top \Phi\right)^{-1}y.
+\end{aligned}\]
+<p>From which it can be seen that can compute \(w\) by either inverting a \(d\times d\) matrix of a \(n\times n\) matrix. </p>
+<p>We are now ready to introduce the general Sherman-Morrison-Woodbury identity as <div class="definition"><strong>General Sherman-Morrison-Woodbury identity</strong> \[\begin{aligned}
+    (A + BCD)^{-1} 
+    &= A^{-1} - (I + A^{-1}BCD)^{-1}BCDA^{-1}\quad\quad\ \text{   Using previous result}\\
+    &= A^{-1} - A^{-1}(I + BCDA^{-1})^{-1}BCDA^{-1}\quad \text{Using Identity 3}\\
+    &= A^{-1} - A^{-1}B(I + CDA^{-1}B)^{-1}CDA^{-1}\quad \text{Using Identity 3}\\
+    &= A^{-1} - A^{-1}BC(I + DA^{-1}BC)^{-1}DA^{-1}\quad \text{Using Identity 3}\\
+    &= A^{-1} - A^{-1}BCD(I + A^{-1}BCD)^{-1}A^{-1}\quad \text{Using Identity 3}\\
+    &= A^{-1} - A^{-1}BCDA^{-1}(I + BCDA^{-1})^{-1}\quad \text{Using Identity 3}\\
+\end{aligned}\]</div></p>
+<p>Either of the equalities might be of use, depending on the chosen application. In particular in the case of \(C\) being invertible we arrive at the more known Sherman-Morrison-Woodbury identity as</p>
+\[\begin{aligned}
+(A + BCD)^{-1} 
+    &= A^{-1} - A^{-1}B(C(C^{-1} + DA^{-1}B))^{-1}CDA^{-1}\\
+    &= A^{-1} - A^{-1}B(C^{-1} + DA^{-1}B)^{-1}C^{-1}CDA^{-1}\\
+    &= A^{-1} - A^{-1}B(C^{-1} + DA^{-1}B)^{-1}DA^{-1}\\
+\end{aligned}\]
+<div class="page-foot">
+  <div class="copyright">
+    &copy; Mikkel Paltorp. Last modified: March 12, 2024. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+  </div>
+</div>
+</div><!-- CONTENT ENDS HERE -->
+    
+        <script src="/libs/katex/katex.min.js"></script>
+<script src="/libs/katex/auto-render.min.js"></script>
+<script>renderMathInElement(document.body)</script>
+
+    
+    
+        <script src="/libs/highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();hljs.configure({tabReplace: '    '});</script>
+
+    
+  </body>
+</html>

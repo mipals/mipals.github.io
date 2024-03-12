@@ -31,27 +31,33 @@
 <p>Below are a few links to some short notes on various mathematical tricks and topics that I find interesting. </p>
 <h2 id="the_boundary_element_method"><a href="#the_boundary_element_method" class="header-anchor">The Boundary Element Method</a></h2>
 <ul>
-<li><p><a href="/pubs/pde/BEM_introduction/">Introduction to the Boundary Element Method:</a> Introduction to collocation BEM.</p>
+<li><p><a href="/pubs/pde/BEM_introduction/">Introduction to the Boundary Element Method</a></p>
 <ul>
-<li><p><a href="/pubs/pde/BEM_introduction/#the_fast_multipole_method_and_bem">The Fast Multipole Method for BEM:</a> How to apply the Fast Multipole Method to speed up the BEM computations.</p>
+<li><p><a href="/pubs/pde/BEM_introduction/#getting_the_computer_to_understand_functions">Getting the computer to understand functions:</a> Describes the parametrization of family of functions.</p>
 </li>
-<li><p><a href="/pubs/pde/BEM_introduction/#mathcalh-matrices">Hierarchical Matrices for BEM:</a> How to apply Hierarchical matrices to speed up the BEM computations.</p>
+<li><p><a href="/pubs/pde/BEM_introduction/#what_is_an_element">What is an element?:</a> Describes how elements describes both the geometry and serves as a basis for our parametrization of functions.</p>
+</li>
+<li><p><a href="/pubs/pde/BEM_introduction/#quadrature">Quadrature:</a> Describes how elements can be used to approximate part of the boundary integral. </p>
+</li>
+<li><p><a href="/pubs/pde/BEM_introduction/#the_boundary_element_method">The Boundary Element Method:</a> Combines the above and shows how the Kirchhoff-Helmholtz integral can be discretized.</p>
+</li>
+<li><p><a href="/pubs/pde/BEM_introduction/#the_fast_multipole_method_and_bem">The Fast Multipole Method for BEM:</a> Describes how the Fast Multipole Method can be used to speed up the BEM computations.</p>
+</li>
+<li><p><a href="/pubs/pde/BEM_introduction/#mathcalh-matrices">Hierarchical Matrices for BEM:</a> Describes ho Hierarchical matrices can be used to speed up the BEM computations.</p>
+</li>
+</ul>
 </li>
 <li><p><a href="/pubs/pde/BEM_elements/">Line Elements:</a> Description of continuous and discontinuous line elements. </p>
 </li>
-<li><p><a href="https://github.com/mipals/BEM200">BEM200:</a> A simple implementation of the 2D BEM in less than 200 lines of code.</p>
-</li>
 <li><p><a href="/pubs/pde/BEM_shapefunctions/">Shape Functions:</a> Old note on local descriptions of line and surface elements.</p>
 </li>
-</ul>
+<li><p><a href="https://github.com/mipals/BEM200">BEM200:</a> A simple implementation of the 2D BEM in less than 200 lines of code.</p>
 </li>
 <li><p><a href="/pubs/pde/BEM_ROM">Reduced Order Series Expansion Boundary Element Method:</a> How to speed-up multifrequency problems</p>
 </li>
 <li><p><a href="/pubs/pde/BEM_losses2/">Acoustical BEM with Visco-thermal losses:</a> Some intuition behind viscous and thermal losses. Includes a short introduction to the Kirchoff&#39;s decomposition and the sparsity patterns of the resulting system of equations.</p>
 </li>
 <li><p><a href="/pubs/pde/BEM_bli/">Boundary Layer Impedance:</a> A quick description of the BLI approximation of losses.</p>
-</li>
-<li><p><a href="/pubs/pde/BEM_shape_opt/">Shape optimization</a> Shape optimization using BEM in 2D &#91; ❗️ under construction 👷 &#93;</p>
 </li>
 <li><p><a href="/pubs/pde/BEM_burton_miller/">The Burton-Miller Method:</a> Removing irregular frequencies using Burton-Miller regularization.</p>
 </li>
@@ -62,11 +68,22 @@
 </ul>
 </li>
 </ul>
+<ul>
+<li><p><a href="/pubs/pde/BEM_quadrature/">Quadrature:</a> Introduction to quadrature scheme.</p>
+</li>
+</ul>
+<h2 id="the_finite_element_method"><a href="#the_finite_element_method" class="header-anchor">The Finite Element Method</a></h2>
+<ul>
+<li><p><a href="/pubs/pde/FEM_introduction/">Introduction for FEM for the Helmholtz equation:</a> Examples in 1D and 2D.</p>
+</li>
+</ul>
 <h2 id="matrix_computations"><a href="#matrix_computations" class="header-anchor">Matrix Computations</a></h2>
 <ul>
 <li><p><a href="/pubs/matrix/sm_id/">Sherman-Morrison Identity:</a> Two brief derivations.</p>
 </li>
 <li><p><a href="/pubs/matrix/smw_id/">Sherman-Morrison-Woodbury Identity:</a> Two brief derivations.</p>
+</li>
+<li><p><a href="/pubs/matrix/matrix_lemma/">General Sherman-Morrison-Woodbury Identity:</a> Some derivations.</p>
 </li>
 <li><p><a href="/pubs/matrix/matrix_determinant_lemma/">The Matrix Determinant Lemma:</a> Determinants of Block matrices.</p>
 </li>
@@ -76,19 +93,15 @@
 </li>
 <li><p><a href="/pubs/matrix/ACA/">Adaptive Cross Approximation:</a> Short description of the ACA algorithm.</p>
 </li>
-<li><p><a href="/pubs/matrix/HCA/">Hybrid Cross Approximation:</a> &#91; ❗️ under construction 👷 &#93;</p>
-</li>
-<li><p><a href="/pubs/matrix/GCA/">Greens Cross Approximation:</a> &#91; ❗️ under construction 👷 &#93;</p>
-</li>
 </ul>
 </li>
 <li><p>Hierarchical Matrices</p>
 <ul>
 <li><p><a href="/pubs/matrix/egrss/">Symmetric Extended Generator Representable Semiseparable Matrices:</a> Smoothing splines and Gaussian processes. &#40;For the interested: <a href="https://findit.dtu.dk/en/catalog/2451029082">My master&#39;s thesis</a> and <a href="https://github.com/mipals/SymSemiseparableMatrices.jl">SymSemiseparableMatrices.jl</a>&#41;. </p>
 </li>
-<li><p><a href="/pubs/matrix/hss/">HSS Matrices:</a> &#91; ❗️ under construction 👷 &#93;</p>
-</li>
 </ul>
+</li>
+<li><p><a href="/pubs/matrix/sparse_lu/">Sparse Factorization:</a> An example on the importance of permuting</p>
 </li>
 </ul>
 <h2 id="optimization"><a href="#optimization" class="header-anchor">Optimization</a></h2>
@@ -97,15 +110,11 @@
 </li>
 <li><p><a href="/pubs/optimization/MMA/">The Method of Moving Asymptotes &#40;MMA&#41;:</a> A short description.</p>
 </li>
-<li><p>Proximal Algorithms &#91; ❗️ under construction 👷 &#93;</p>
-</li>
-<li><p>The Adjoint Method &#91; ❗️ under construction 👷 &#93;</p>
-</li>
 </ul>
 <p></p>
 <div class="page-foot">
   <div class="copyright">
-    &copy; Mikkel Paltorp. Last modified: October 04, 2023. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Mikkel Paltorp. Last modified: March 12, 2024. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->

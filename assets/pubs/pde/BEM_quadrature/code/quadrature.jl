@@ -1,5 +1,5 @@
 # This file was generated, do not modify it. # hide
-using FastGaussQuadrature, LinearAlgebra, Plots
+using FastGaussQuadrature, LaTeXStrings, LinearAlgebra, Plots
 N = 50
 a = 0 
 b = 2*pi
