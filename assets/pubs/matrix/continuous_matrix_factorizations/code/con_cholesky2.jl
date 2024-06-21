@@ -1,6 +1,6 @@
 # This file was generated, do not modify it. # hide
 #hideall
-function PivotedCholesky(X,G,r; strategy=:rand)
+function PivotedCholesky(X,G,r; strategy=:rand) 
     d = [G(x,x) for x in eachrow(X)]
     tr_true = sum(d)
     n = length(d)

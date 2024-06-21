@@ -481,8 +481,8 @@ K,M &#61; assembly&#40;Me,Ke,topology,nnt&#41;;
 using Arpack
 F &#61; eigs&#40;c₀^2*K,M,which&#61;:SM,nev&#61;10&#41;;
 freq &#61; sort&#40;sqrt.&#40;abs.&#40;F&#91;1&#93;&#41;&#41;/2/π&#41;;
-plot&#40;&#40;contourf&#40;x,y,reshape&#40;F&#91;2&#93;&#91;:,id&#93;,m,n&#41;,linewidth&#61;0,levels&#61;1000,legend&#61;false,axis&#61;false,title&#61;&quot;&#36;&#40;round&#40;freq&#91;id&#93;,digits&#61;2&#41;&#41; Hz&quot;&#41; for id in 2:10&#41;..., layout &#61; &#40;3, 3&#41;,dpi&#61;300&#41;</code></pre>
-<p> <img src="/assets/pubs/pde/FEM_introduction/code/output/modes_plot.png" alt=""></p>
+plot&#40;&#40;contourf&#40;x,y,reshape&#40;F&#91;2&#93;&#91;:,id&#93;,m,n&#41;,linewidth&#61;0,levels&#61;1000,legend&#61;false,axis&#61;false,title&#61;&quot;&#36;&#40;round&#40;freq&#91;id&#93;,digits&#61;2&#41;&#41; Hz&quot;&#41; for id in 2:10&#41;..., layout &#61; &#40;3, 3&#41;&#41;</code></pre>
+<p> <img src="/assets/pubs/pde/FEM_introduction/code/output/modes_plot.svg" alt=""></p>
 <p>This can be compared to the analytical eigenvalues computed by </p>
 <pre><code class="language-julia">nx, ny &#61; 0:4, 0:4
 freq_analytical &#61; c₀/2*sqrt.&#40;&#40;nx/Lx&#41;.^2 .&#43; &#40;ny&#39;/Ly&#41;.^2&#41;

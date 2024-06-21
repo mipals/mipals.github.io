@@ -70,5 +70,5 @@ K,M = assembly(Me,Ke,topology,nnt);
 using Arpack
 F = eigs(c₀^2*K,M,which=:SM,nev=10);
 freq = sort(sqrt.(abs.(F[1]))/2/π);
-plot((contourf(x,y,reshape(F[2][:,id],m,n),linewidth=0,levels=1000,legend=false,axis=false,title="$(round(freq[id],digits=2)) Hz") for id in 2:10)..., layout = (3, 3),dpi=300)
-savefig(joinpath(@OUTPUT, "modes_plot.png")) # hide
+plot((contourf(x,y,reshape(F[2][:,id],m,n),linewidth=0,levels=1000,legend=false,axis=false,title="$(round(freq[id],digits=2)) Hz") for id in 2:10)..., layout = (3, 3)) 
+savefig(joinpath(@OUTPUT, "modes_plot.svg")) # hide
