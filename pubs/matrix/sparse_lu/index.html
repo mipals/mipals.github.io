@@ -90,43 +90,43 @@ Ar &#61; &#91;D u; u&#39; 1&#93;
 
 # Checking if Al and Ar are positive definite
 u&#39;*&#40;D\u&#41;</code></pre>
-<p><pre><code class="plaintext code-output">0.07854883491519178
+<p><pre><code class="plaintext code-output">0.1581857727942345
 </code></pre> We now compute the dense factorization of the left pointing arrowhead matrix &#40;which is expected to be dense&#41;</p>
 <pre><code class="language-julia">Fl_dense &#61; cholesky&#40;Matrix&#40;Al&#41;&#41;</code></pre>
 <pre><code class="plaintext code-output">6×6 LinearAlgebra.LowerTriangular{Float64, Matrix{Float64}}:
- 1.0          ⋅            ⋅            ⋅            ⋅          ⋅ 
- 0.331428    3.43691       ⋅            ⋅            ⋅          ⋅ 
- 0.602185   -0.0580699    9.45525       ⋅            ⋅          ⋅ 
- 0.0812995  -0.00783988  -0.00522595   2.97595       ⋅          ⋅ 
- 0.331309   -0.0319488   -0.0212966   -0.00917255   6.26863     ⋅ 
- 0.646985   -0.0623901   -0.0415883   -0.0179123   -0.0346799  2.52021</code></pre>
+ 1.0         ⋅           ⋅           ⋅           ⋅          ⋅ 
+ 0.153143   2.26883      ⋅           ⋅           ⋅          ⋅ 
+ 0.817509  -0.0551806   3.28754      ⋅           ⋅          ⋅ 
+ 0.295787  -0.0199652  -0.0738882   3.73591      ⋅          ⋅ 
+ 0.160635  -0.0108426  -0.0401269  -0.0135697   3.67376     ⋅ 
+ 0.743808  -0.0502059  -0.185805   -0.0628335  -0.0349327  2.39629</code></pre>
 <p>Now computing the dense factorization of the right pointing arrowhead matrix &#40;which is expected to be sparse&#41;</p>
 <pre><code class="language-julia">Fr_dense &#61; cholesky&#40;Matrix&#40;Ar&#41;&#41;</code></pre>
 <pre><code class="plaintext code-output">6×6 LinearAlgebra.LowerTriangular{Float64, Matrix{Float64}}:
- 3.45285     ⋅         ⋅          ⋅          ⋅         ⋅ 
- 0.0        9.47458    ⋅          ⋅          ⋅         ⋅ 
- 0.0        0.0       2.97707     ⋅          ⋅         ⋅ 
- 0.0        0.0       0.0        6.2775      ⋅         ⋅ 
- 0.0        0.0       0.0        0.0        2.6033     ⋅ 
- 0.0959868  0.063558  0.0273086  0.0527772  0.248525  0.959922</code></pre>
+ 2.274       ⋅         ⋅          ⋅          ⋅         ⋅ 
+ 0.0        3.38811    ⋅          ⋅          ⋅         ⋅ 
+ 0.0        0.0       3.74838     ⋅          ⋅         ⋅ 
+ 0.0        0.0       0.0        3.67753     ⋅         ⋅ 
+ 0.0        0.0       0.0        0.0        2.51747    ⋅ 
+ 0.0673452  0.241288  0.0789107  0.0436801  0.295459  0.917504</code></pre>
 <p>In both case our expectations are verified.</p>
 <p>We now redo the computations using a sparse factorization</p>
 <pre><code class="language-julia">Fl &#61; cholesky&#40;Al&#41;</code></pre>
 <pre><code class="plaintext code-output">6×6 SparseArrays.SparseMatrixCSC{Float64, Int64} with 11 stored entries:
- 2.6033     ⋅          ⋅          ⋅         ⋅          ⋅ 
-  ⋅        6.2775      ⋅          ⋅         ⋅          ⋅ 
-  ⋅         ⋅         2.97707     ⋅         ⋅          ⋅ 
-  ⋅         ⋅          ⋅         9.47458    ⋅          ⋅ 
-  ⋅         ⋅          ⋅          ⋅        3.45285     ⋅ 
- 0.248525  0.0527772  0.0273086  0.063558  0.0959868  0.959922</code></pre>
+ 2.51747    ⋅          ⋅          ⋅         ⋅          ⋅ 
+  ⋅        3.67753     ⋅          ⋅         ⋅          ⋅ 
+  ⋅         ⋅         3.74838     ⋅         ⋅          ⋅ 
+  ⋅         ⋅          ⋅         3.38811    ⋅          ⋅ 
+  ⋅         ⋅          ⋅          ⋅        2.274       ⋅ 
+ 0.295459  0.0436801  0.0789107  0.241288  0.0673452  0.917504</code></pre>
 <pre><code class="language-julia">Fr &#61; cholesky&#40;Ar&#41;</code></pre>
 <pre><code class="plaintext code-output">6×6 SparseArrays.SparseMatrixCSC{Float64, Int64} with 11 stored entries:
- 2.6033     ⋅          ⋅          ⋅         ⋅          ⋅ 
-  ⋅        6.2775      ⋅          ⋅         ⋅          ⋅ 
-  ⋅         ⋅         2.97707     ⋅         ⋅          ⋅ 
-  ⋅         ⋅          ⋅         9.47458    ⋅          ⋅ 
-  ⋅         ⋅          ⋅          ⋅        3.45285     ⋅ 
- 0.248525  0.0527772  0.0273086  0.063558  0.0959868  0.959922</code></pre>
+ 2.51747    ⋅          ⋅          ⋅         ⋅          ⋅ 
+  ⋅        3.67753     ⋅          ⋅         ⋅          ⋅ 
+  ⋅         ⋅         3.74838     ⋅         ⋅          ⋅ 
+  ⋅         ⋅          ⋅         3.38811    ⋅          ⋅ 
+  ⋅         ⋅          ⋅          ⋅        2.274       ⋅ 
+ 0.295459  0.0436801  0.0789107  0.241288  0.0673452  0.917504</code></pre>
 <p>Notably the sparse factorization is in both cases found. The reason here being the permutations &#40;which can be extracted from the factorizations using <em>.p</em>&#41;</p>
 <pre><code class="language-julia">show&#40;stdout, &quot;text/plain&quot;, Fl.p&#41;
 show&#40;stdout, &quot;text/plain&quot;, Fr.p&#41;</code></pre>
@@ -147,23 +147,23 @@ show&#40;stdout, &quot;text/plain&quot;, Fr.p&#41;</code></pre>
 <p>Notice that the permutation heuristic in this case also end up reversing the entries of the diagonal matrix. However, the same final permutation is found for both the left and right pointing arrowhead matrices.</p>
 <pre><code class="language-julia">show&#40;stdout, &quot;text/plain&quot;, Al&#91;Fl.p,Fl.p&#93;&#41;</code></pre>
 <pre><code class="plaintext code-output">6×6 SparseArrays.SparseMatrixCSC{Float64, Int64} with 16 stored entries:
- 6.77718     ⋅         ⋅           ⋅          ⋅        0.646985
-  ⋅        39.407      ⋅           ⋅          ⋅        0.331309
-  ⋅          ⋅        8.86296      ⋅          ⋅        0.0812995
-  ⋅          ⋅         ⋅         89.7677      ⋅        0.602185
-  ⋅          ⋅         ⋅           ⋅        11.9222    0.331428
- 0.646985   0.331309  0.0812995   0.602185   0.331428  1.0</code></pre>
+ 6.33766     ⋅          ⋅          ⋅         ⋅        0.743808
+  ⋅        13.5242      ⋅          ⋅         ⋅        0.160635
+  ⋅          ⋅        14.0504      ⋅         ⋅        0.295787
+  ⋅          ⋅          ⋅        11.4793     ⋅        0.817509
+  ⋅          ⋅          ⋅          ⋅        5.17105   0.153143
+ 0.743808   0.160635   0.295787   0.817509  0.153143  1.0</code></pre>
 <pre><code class="language-julia">show&#40;stdout, &quot;text/plain&quot;, Ar&#91;Fr.p,Fr.p&#93;&#41;</code></pre>
 <pre><code class="plaintext code-output">6×6 SparseArrays.SparseMatrixCSC{Float64, Int64} with 16 stored entries:
- 6.77718     ⋅         ⋅           ⋅          ⋅        0.646985
-  ⋅        39.407      ⋅           ⋅          ⋅        0.331309
-  ⋅          ⋅        8.86296      ⋅          ⋅        0.0812995
-  ⋅          ⋅         ⋅         89.7677      ⋅        0.602185
-  ⋅          ⋅         ⋅           ⋅        11.9222    0.331428
- 0.646985   0.331309  0.0812995   0.602185   0.331428  1.0</code></pre>
+ 6.33766     ⋅          ⋅          ⋅         ⋅        0.743808
+  ⋅        13.5242      ⋅          ⋅         ⋅        0.160635
+  ⋅          ⋅        14.0504      ⋅         ⋅        0.295787
+  ⋅          ⋅          ⋅        11.4793     ⋅        0.817509
+  ⋅          ⋅          ⋅          ⋅        5.17105   0.153143
+ 0.743808   0.160635   0.295787   0.817509  0.153143  1.0</code></pre>
 <div class="page-foot">
   <div class="copyright">
-    &copy; Mikkel Paltorp. Last modified: January 25, 2024. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Mikkel Paltorp. Last modified: May 27, 2024. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->

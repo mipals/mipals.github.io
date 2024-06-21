@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="stylesheet" href="/libs/katex/katex.min.css">
+     
+   <link rel="stylesheet" href="/libs/highlight/github.min.css">
+   
+  <link rel="stylesheet" href="/css/franklin.css">
+  <link rel="stylesheet" href="/css/basic.css">
+  <link rel="icon" href="/assets/favicon.png">
+   <title>Continuous Cholesky Factorization</title>  
+</head>
+<body>
+  <header>
+<div class="blog-name"><a href="/">Mikkel Paltorp</a></div>
+<nav>
+  <ul>
+    <li><a href="/">About Me</a></li>
+    <li><a href="/menu1/">Notes</a></li>
+    <li><a href="/menu2/">Software</a></li>
+  </ul>
+  <img src="/assets/hamburger.svg" id="menu-icon">
+</nav>
+</header>
+
+
+<!-- Content appended here -->
+<div class="franklin-content"><h1 id="continuous_cholesky_factorization"><a href="#continuous_cholesky_factorization" class="header-anchor">Continuous Cholesky Factorization</a></h1>
+<p>This note was inspired by the plenary talk by Joel A. Tropp at SIAM LA24. While I could not find the specific talk online a very similar talk was recorded at the <a href="https://www.youtube.com/watch?v&#61;A9D8KT6N1-8">Boeing Colloquium Series</a>. In the talk Joel presented the work of <sup id="fnref:1"><a href="#fndef:1" class="fnref">[1]</a></sup>, and I will in this note make the relation between that work and that on continuous matrix factorizations by Alex Townsend <sup id="fnref:2"><a href="#fndef:2" class="fnref">[2]</a></sup>.</p>
+<h2 id="the_discrete_cholesky_factorization"><a href="#the_discrete_cholesky_factorization" class="header-anchor">The &#40;discrete&#41; Cholesky factorization</a></h2>
+<p>The Cholesky factorization of a positive semidefinite matrix \(\mathbf{K}\) is given by</p>
+\[
+    \mathbf{K} = \mathbf{L}\mathbf{L}^\top \in \mathbb{R}^{n\times n},
+\]
+<p>where \(\mathbf{L}\) is a lower triangular matrix. Where \(\mathbf{L}\) and \(\mathbf{L}^\top\) are the factors of interest. The factorization is useful as it can be used to solve the linear systems \(\mathbf{K}\mathbf{s} =\mathbf{t}\) by performing two triangular solves &#40;\(\mathbf{L}\mathbf{y} = \mathbf{t}, \mathbf{L}^\top\mathbf{s} = \mathbf{y}\)&#41;. The Cholesky factorization can be computed by performing \(n\) rank-1-updates of the original matrix. The first iterate is</p>
+\[
+    \mathbf{K}^{(0)} =
+    \begin{bmatrix}k & \mathbf{m}^\top \\ \mathbf{m} & \mathbf{M}\end{bmatrix}
+    = \frac{1}{k}\begin{bmatrix}k \\ \mathbf{m}\end{bmatrix}\begin{bmatrix}k \\ \mathbf{m}\end{bmatrix}^\top + \underbrace{\begin{bmatrix} 0 & 0 \\0 & \mathbf{M} - \mathbf{m}\mathbf{m}^\top /k\end{bmatrix}}_{\text{Residual. Denoted by } \mathbf{K}^{(1)}}.
+\]
+<p>Each iteration eliminates a row and a column of the <em>residual</em> \(\mathbf{K}^{(i)}\), with the first residual being the matrix itself. Thus after \(r\) rank-1-update we have eliminated \(r\) rows and columns of \(\mathbf{K}\). The rows and columns that gets eliminated at the \(i\)th iteration is called the \(i\)th <em>pivot</em>. After \(n\) iterations every row and column have been eliminated and we have the full factorization. </p>
+<p>In this note we will be mostly be interested in the <em>partial</em> Cholesky factorization, which corresponds to the Cholesky factorization after \(r\) iterations. The partial Cholesky factorization will be a rank \(r\) approximation of \(\mathbf{K}\). The aim is that if \(r \ll n\), then the approximation is a &quot;data efficient&quot; representation of \(\mathbf{K}\). There exist various of approaches of how to chose the pivots <sup id="fnref:2"><a href="#fndef:2" class="fnref">[2]</a></sup> </p>
+<div class="example"><p><strong>Example</strong>: &#40;<em>Pivoting strategies</em>&#41;    Let \(\mathcal{I}_i\) be the unpicked columns after \(i\) iterations. Then we can pick the next pivots as</p>
+<ul>
+<li><p>Greedy: Pick the Next pivot element on the diagonal</p>
+</li>
+</ul>
+\[
+  s_i = \text{argmax}_{k\in \mathcal{I}_i}\ \mathbf{A}^{(i-1)}(k,k)
+  \]
+<ul>
+<li><p>Uniform: Pick uniformly </p>
+</li>
+</ul>
+\[
+  s_i \sim \text{uniform}\{\mathcal{I}_i\}
+  \]
+<ul>
+<li><p>Random pivoting: Pick with probability proportional to the diagonal element</p>
+</li>
+</ul>
+\[
+  \mathbb{P}\left\{s_i = j\right\} = \frac{\mathbf{A}^{(i-1)}(j,j)}{\text{tr}\ \mathbf{A}^{(i-1)}}, \quad \forall j = 1,\dots,N
+  \]
+<p>Note that the above strategies are all of the same family of choosing the pivots w.r.t. the Gibbs distribution &#40;the above can be achieved by \(\beta \in \{\infty,0,1\}\)&#41;</p>
+\[
+  \mathbb{P}\left\{s_i = j\right\} = \frac{|\mathbf{A}^{(i-1)}(j,j)|^\beta}{\sum_{k=1}^N |\mathbf{A}^{(i-1)}(k,k)|^\beta}, \quad \forall j = 1,\dots,N
+  \]</div>
+<p>In <sup id="fnref:1"><a href="#fndef:1" class="fnref">[1]</a></sup> it is argued that the randomized approach works best. But why? In short it is stable with respect to the ordering of the data. </p>
+<h2 id="kernel_matrices_and_kernel_functions"><a href="#kernel_matrices_and_kernel_functions" class="header-anchor">Kernel matrices and kernel functions</a></h2>
+<p>The motivation for the note is that of Gaussian process regression. A key concept in Gaussian process regression is that of a kernel matrix. The kernel matrix, \(\mathbf{K}\), is a matrix whose elements are generated from a so-called kernel function \(k(\mathbf{x},\mathbf{y})\). </p>
+\[
+    \mathbf{K}_{ij} = k(\mathbf{x}_i, \mathbf{x}_j),\ \text{    where   }\ \mathbf{x}_i, \mathbf{x}_j \in X
+\]
+<p>where \(X = \{\mathbf{x}_1, \mathbf{x}_2, \dots, \mathbf{x}_n \}\) is a collection of data points. An important property of the kernel function is that it is positive semidefinite </p>
+\[
+    k(\mathbf{x},\mathbf{x}) \geq 0,
+\]
+<p>which has the consequence of the resulting kernel matrix \(\mathbf{K}\) is positive semidefinite. This is important since the kernel matrix represent the correlation between the the data points in \(X\). A commonly used kernel function is the squared exponential given by</p>
+\[
+    k(\mathbf{x},\mathbf{x}) = \exp\left(\frac{\|\mathbf{x}_i - \mathbf{x}_j\|_2^2}{2\ell}\right),
+\]
+<p>where \(\ell\) is commonly referred to as the length scale.</p>
+<p>To illustrate the process we simulate data points \(\mathbf{x}_i \in [-2,2]\) and plot both the discrete / observed kernel matrix \(\mathbf{K}\) and the continuos kernel function. Two things to note: First that the \(y-\)axes below are flipped to conform to the standard kernel matrix form and secondly that the data is sorted, giving some structure to the kernel matrix.</p>
+<pre><code class="language-julia">using LinearAlgebra, StatsBase, Plots, Random, InvertedIndices
+Random.seed&#33;&#40;1234&#41;
+
+n &#61; 20  # Number of data points
+k &#61; 5   # Rank of approximation
+dim &#61; 1 # Dimension of data
+l &#61; 2.0 # Lengthscale parameter
+
+X &#61; &#91;rand&#40;floor&#40;Int,n/3&#41;,dim&#41; .- 2; rand&#40;floor&#40;Int,n/3&#41;,dim&#41;; rand&#40;floor&#40;Int,n/3&#41;,dim&#41;/2 .&#43; 1.5&#93; # Three groups
+n &#61; length&#40;X&#41; # Number of data points
+X &#61; sort&#40;X&#91;:&#93;&#41; # Soring the data - Not strictly necessary, but makes the discrete form nicer
+G&#40;x,y,l&#61;l&#41; &#61; exp&#40;-norm&#40;x-y&#41;^2/&#40;2*l&#41;&#41;
+
+# The actual view is in 2D
+o &#61; ones&#40;n&#41;
+Xx &#61; kron&#40;X,o&#41;
+Xy &#61; kron&#40;o,X&#41;
+Gk &#61; &#91;G&#40;x,y&#41; for &#40;x,y&#41; in zip&#40;Xx,Xy&#41;&#93;
+plot_matrix &#61; heatmap&#40;sort&#40;X&#91;:&#93;&#41;,sort&#40;X&#91;:&#93;&#41;,reshape&#40;Gk,n,n&#41;,aspect_ratio&#61;:equal, title&#61;&quot;Discrete&quot;&#41;
+scatter&#33;&#40;plot_matrix,Xx,Xy, label&#61;false&#41;
+xlabel&#33;&#40;plot_matrix,&quot;x&quot;&#41;; ylabel&#33;&#40;plot_matrix,&quot;y&quot;&#41;; yflip&#33;&#40;true&#41;
+
+Xc &#61; range&#40;-2,2,300&#41;
+plot_smooth &#61; contour&#40;Xc,Xc, &#40;x,y&#41; -&gt; G&#40;x,y&#41;, fill&#61;true,aspect_ratio&#61;:equal,clim&#61;&#40;0,1&#41;&#41;
+xlabel&#33;&#40;plot_smooth,&quot;x&quot;&#41;; ylabel&#33;&#40;plot_smooth,&quot;y&quot;&#41;; yflip&#33;&#40;true&#41;
+scatter&#33;&#40;plot_smooth,Xx,Xy, label&#61;false,title&#61;&quot;Continuous&quot;&#41;
+scatter&#33;&#40;plot_smooth,X,X, label&#61;false, color&#61;:black&#41;
+plot&#40;plot_matrix,plot_smooth, layour&#61;&#40;1,2&#41;,dpi&#61;300&#41;</code></pre>
+
+<img src="/assets/pubs/matrix/continuous_matrix_factorizations/code/output/initial_scatter.png" alt="">
+<h2 id="the_continuous_cholesky_factorization"><a href="#the_continuous_cholesky_factorization" class="header-anchor">The continuous Cholesky factorization</a></h2>
+<p>Approximating the discrete form with a low-rank matrix is as easy performing a partial Cholesky. However, a different approach is needed in order to approximate the continuous form the a &quot;low-rank&quot; function. In <sup id="fnref:2"><a href="#fndef:2" class="fnref">[2]</a></sup> continuous analogous to matrix factorization is introduced in the context of so-called <em>cmatrices</em>. These matrices can be represented as function of two continuous variables, i.e. that they are elements of \(C([a,b]\times[c,d])\). While the properties is only stated for scalar \(x\) and \(y\) one can easily extend the ideas for a general bivariate function such as a kernel function.</p>
+<p>The continuous Cholesky factorization of rank \(r\) of kernel function is given as</p>
+\[
+k(\mathbf{x},\mathbf{y}) \approx \sum_{i=1}^{r}\frac{k_i(\mathbf{x},\mathbf{x}_i)k_i(\mathbf{x}_i, \mathbf{y})}{k_i(\mathbf{x}_i, \mathbf{x}_i)} = \sum_{i=1}^{r}\frac{k_i(\mathbf{x},\mathbf{x}_i)}{\sqrt{k_i(\mathbf{x}_i, \mathbf{x}_i)}}\frac{k_i(\mathbf{x}_i, \mathbf{y})}{\sqrt{k_i(\mathbf{x}_i, \mathbf{x}_i)}}
+\]
+<p>where \((\mathbf{x}_i,\mathbf{x}_i)\) are the so-called pivot points and </p>
+\[
+k_i(\mathbf{x},\mathbf{y}) = 
+\begin{cases}
+ k(\mathbf{x},\mathbf{y}) \quad &i = 1\\
+ k_{i-1}(\mathbf{x},\mathbf{y}) - \frac{k_{i-1}(\mathbf{x},\mathbf{x}_{i-1})k_{i-1}(\mathbf{x}_{i-1},\mathbf{y})}{k_{i-1}(\mathbf{x}_{i-1},\mathbf{x}_{i-1})}\quad &i \geq 2.
+\end{cases}
+\]
+<p>Note that \(k(\mathbf{x},\mathbf{x}_i)\) and \(k(\mathbf{x}_i,\mathbf{y})\) can be viewed as removing the columns and rows  </p>
+<h2 id="visual_representations"><a href="#visual_representations" class="header-anchor">Visual Representations</a></h2>
+<h3 id="the_greedy_approach"><a href="#the_greedy_approach" class="header-anchor">The Greedy Approach</a></h3>
+<p>As the initial residual is just the matrix itself \((\mathbf{K}^{(0)})\) then its diagonal is filled with ones. As such the greedy method will simply pick the first pivot depending on the ordering of the data. This is one of the weaknesses of the greedy method, namely that is susceptible to bad ordering of the data. In fact <sup id="fnref:1"><a href="#fndef:1" class="fnref">[1]</a></sup> gives an example full of outliers. On this example the greedy approach completely fails and gets stuck picking the pivots equal to the ordering of the data. Note that had the ordering of the data in <sup id="fnref:1"><a href="#fndef:1" class="fnref">[1]</a></sup> been random, then implicitly the greedy method would not have failed. </p>
+<p>In the previously data introduces is completely ordered w.r.t. \(x\), and the greedy method therefore picks the first pivot as the point with smallest value. The next iteration again start by looking at the diagonal, but this time of the residual \(\mathbf{K}^{(1)}\). Given that the first pivot was chosen as smallest value, it is no surprise that the worst approximation happens furthest away. As such the next pivot point will be at the largest value. The two iterations highlight the weakness of the greedy method: In most cases it ends up picking pivots on the borders of the dataset. </p>
+<p>The series of the first 4 iterations can be seen below.</p>
+<h5 id="1st_iteration"><a href="#1st_iteration" class="header-anchor">1st iteration</a></h5>
+<p><p><span style="color:red;">// Image matching '/assets/pubs/matrix/continuous_matrix_factorizations/code/rank0_diag' not found. //</span></p> <p><span style="color:red;">// Image matching '/assets/pubs/matrix/continuous_matrix_factorizations/code/rank1_approx' not found. //</span></p></p>
+<h5 id="2nd_iteration"><a href="#2nd_iteration" class="header-anchor">2nd iteration</a></h5>
+<p><p><span style="color:red;">// Image matching '/assets/pubs/matrix/continuous_matrix_factorizations/code/rank1_diag' not found. //</span></p> <p><span style="color:red;">// Image matching '/assets/pubs/matrix/continuous_matrix_factorizations/code/rank2_approx' not found. //</span></p></p>
+<h5 id="3rd_iteration"><a href="#3rd_iteration" class="header-anchor">3rd iteration</a></h5>
+<p><p><span style="color:red;">// Image matching '/assets/pubs/matrix/continuous_matrix_factorizations/code/rank2_diag' not found. //</span></p> <p><span style="color:red;">// Image matching '/assets/pubs/matrix/continuous_matrix_factorizations/code/rank3_approx' not found. //</span></p></p>
+<h5 id="4th_iteration"><a href="#4th_iteration" class="header-anchor">4th iteration</a></h5>
+<p><p><span style="color:red;">// Image matching '/assets/pubs/matrix/continuous_matrix_factorizations/code/rank3_diag' not found. //</span></p> <p><span style="color:red;">// Image matching '/assets/pubs/matrix/continuous_matrix_factorizations/code/rank4_approx' not found. //</span></p></p>
+<h3 id="the_randomized_approach"><a href="#the_randomized_approach" class="header-anchor">The Randomized Approach</a></h3>
+<p>We now repeat the first 4th, but using randomized pivoting approach. A noticeable difference between the greedy and the randomized approach is that the randomized approach prioritizes &#40;with some probability off course&#41; to pick points close to where the data actually is. This is a win, as a point &quot;inside&quot; of the dataset will reduce the overall diagonal of the residual in the places of where data is actually located. In addition the approach is also completely robust against the ordering of the data, as a randomization of the data is built directly into the approach.</p>
+<h5 id="1st_iteration__2"><a href="#1st_iteration__2" class="header-anchor">1st iteration</a></h5>
+<p><p><span style="color:red;">// Image matching '/assets/pubs/matrix/continuous_matrix_factorizations/code/rank0_diag_random' not found. //</span></p> <p><span style="color:red;">// Image matching '/assets/pubs/matrix/continuous_matrix_factorizations/code/rank1_approx_random' not found. //</span></p></p>
+<h5 id="2nd_iteration__2"><a href="#2nd_iteration__2" class="header-anchor">2nd iteration</a></h5>
+<p><p><span style="color:red;">// Image matching '/assets/pubs/matrix/continuous_matrix_factorizations/code/rank1_diag_random' not found. //</span></p> <p><span style="color:red;">// Image matching '/assets/pubs/matrix/continuous_matrix_factorizations/code/rank2_approx_random' not found. //</span></p></p>
+<h5 id="3rd_iteration__2"><a href="#3rd_iteration__2" class="header-anchor">3rd iteration</a></h5>
+<p><p><span style="color:red;">// Image matching '/assets/pubs/matrix/continuous_matrix_factorizations/code/rank2_diag_random' not found. //</span></p> <p><span style="color:red;">// Image matching '/assets/pubs/matrix/continuous_matrix_factorizations/code/rank3_approx_random' not found. //</span></p></p>
+<h5 id="4th_iteration__2"><a href="#4th_iteration__2" class="header-anchor">4th iteration</a></h5>
+<p><p><span style="color:red;">// Image matching '/assets/pubs/matrix/continuous_matrix_factorizations/code/rank3_diag_random' not found. //</span></p> <p><span style="color:red;">// Image matching '/assets/pubs/matrix/continuous_matrix_factorizations/code/rank4_approx_random' not found. //</span></p></p>
+<h3 id="comparing_diagonals"><a href="#comparing_diagonals" class="header-anchor">Comparing diagonals</a></h3>
+<p>To highlight the differences between the two approaches we plot the diagonals together. The overall decay of the diagonal is similar for each methods. However, the residual within the dataset is clearly smaller for the randomized approach as compared to the greedy approach. A downside of the randomized approach is that the approximation is not as good &quot;outside&quot; of the data. Said differently, the randomized approach generalizes worse than the greedy approach, by relying on pivots inside, rather than the border, of the dataset. </p>
+<p><p><span style="color:red;">// Image matching '/assets/pubs/matrix/continuous_matrix_factorizations/code/rank1_diags' not found. //</span></p> <p><span style="color:red;">// Image matching '/assets/pubs/matrix/continuous_matrix_factorizations/code/rank2_diags' not found. //</span></p> <p><span style="color:red;">// Image matching '/assets/pubs/matrix/continuous_matrix_factorizations/code/rank3_diags' not found. //</span></p> <p><span style="color:red;">// Image matching '/assets/pubs/matrix/continuous_matrix_factorizations/code/rank4_diags' not found. //</span></p></p>
+
+
+
+
+
+
+
+
+
+
+<h2 id="references"><a href="#references" class="header-anchor">References</a></h2>
+<p><table class="fndef" id="fndef:1">
+    <tr>
+        <td class="fndef-backref"><a href="#fnref:1">[1]</a></td>
+        <td class="fndef-content">Chen, Y., Epperly, E., Tropp, J., &amp; Webber, R. &#40;2022&#41;. Randomly pivoted Cholesky: Practical approximation of a kernel matrix with few entry evaluations. arXiv e-prints, arXiv:2207.06503.</td>
+    </tr>
+</table>
+<table class="fndef" id="fndef:2">
+    <tr>
+        <td class="fndef-backref"><a href="#fnref:2">[2]</a></td>
+        <td class="fndef-content">Townsend, A., &amp; Trefethen, L. N. &#40;2015&#41;. Continuous analogues of matrix factorizations. Proceedings of the Royal Society A: Mathematical, Physical and Engineering Sciences, 471&#40;2173&#41;, 20140585. https://doi.org/10.1098/rspa.2014.0585</td>
+    </tr>
+</table>
+</p>
+<div class="page-foot">
+  <div class="copyright">
+    &copy; Mikkel Paltorp. Last modified: June 21, 2024. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+  </div>
+</div>
+</div><!-- CONTENT ENDS HERE -->
+    
+        <script src="/libs/katex/katex.min.js"></script>
+<script src="/libs/katex/auto-render.min.js"></script>
+<script>renderMathInElement(document.body)</script>
+
+    
+    
+        <script src="/libs/highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();hljs.configure({tabReplace: '    '});</script>
+
+    
+  </body>
+</html>

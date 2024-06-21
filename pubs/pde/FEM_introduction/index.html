@@ -255,9 +255,9 @@ function assembly3&#40;Me,Ke,nnt,ne&#41;
     return K,M
 end
 @btime K,M &#61; assembly3&#40;Me,Ke,nnt,ne&#41;</code></pre>
-<pre><code class="plaintext code-output">  5.748 s (9005 allocations: 25.86 GiB)
-  1.071 ms (2405 allocations: 22.30 MiB)
-  406.250 μs (10837 allocations: 1.76 MiB)
+<pre><code class="plaintext code-output">  6.298 s (9005 allocations: 25.86 GiB)
+  509.166 μs (2405 allocations: 22.30 MiB)
+  251.834 μs (10837 allocations: 1.76 MiB)
 </code></pre>
 <h3 id="example_impedance_tube"><a href="#example_impedance_tube" class="header-anchor">Example: Impedance Tube</a></h3>
 <h4 id="analytical_expressions"><a href="#analytical_expressions" class="header-anchor">Analytical Expressions</a></h4>
@@ -481,8 +481,8 @@ K,M &#61; assembly&#40;Me,Ke,topology,nnt&#41;;
 using Arpack
 F &#61; eigs&#40;c₀^2*K,M,which&#61;:SM,nev&#61;10&#41;;
 freq &#61; sort&#40;sqrt.&#40;abs.&#40;F&#91;1&#93;&#41;&#41;/2/π&#41;;
-plot&#40;&#40;contourf&#40;x,y,reshape&#40;F&#91;2&#93;&#91;:,id&#93;,m,n&#41;,linewidth&#61;0,levels&#61;1000,legend&#61;false,axis&#61;false,title&#61;&quot;&#36;&#40;round&#40;freq&#91;id&#93;,digits&#61;2&#41;&#41; Hz&quot;&#41; for id in 2:10&#41;..., layout &#61; &#40;3, 3&#41;&#41;</code></pre>
-<p> <img src="/assets/pubs/pde/FEM_introduction/code/output/modes_plot.svg" alt=""></p>
+plot&#40;&#40;contourf&#40;x,y,reshape&#40;F&#91;2&#93;&#91;:,id&#93;,m,n&#41;,linewidth&#61;0,levels&#61;1000,legend&#61;false,axis&#61;false,title&#61;&quot;&#36;&#40;round&#40;freq&#91;id&#93;,digits&#61;2&#41;&#41; Hz&quot;&#41; for id in 2:10&#41;..., layout &#61; &#40;3, 3&#41;,dpi&#61;300&#41;</code></pre>
+<p> <img src="/assets/pubs/pde/FEM_introduction/code/output/modes_plot.png" alt=""></p>
 <p>This can be compared to the analytical eigenvalues computed by </p>
 <pre><code class="language-julia">nx, ny &#61; 0:4, 0:4
 freq_analytical &#61; c₀/2*sqrt.&#40;&#40;nx/Lx&#41;.^2 .&#43; &#40;ny&#39;/Ly&#41;.^2&#41;
@@ -491,7 +491,7 @@ print&#40;round.&#40;analytical_freqs&#91;2:10&#93;,digits&#61;2&#41;&#41;</code
 <pre><code class="plaintext code-output">[17.11, 34.22, 42.78, 46.07, 51.33, 54.78, 66.82, 68.44, 80.71]</code></pre>
 <div class="page-foot">
   <div class="copyright">
-    &copy; Mikkel Paltorp. Last modified: February 04, 2024. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+    &copy; Mikkel Paltorp. Last modified: June 21, 2024. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
 </div><!-- CONTENT ENDS HERE -->

@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="stylesheet" href="/libs/katex/katex.min.css">
+     
+   <link rel="stylesheet" href="/libs/highlight/github.min.css">
+   
+  <link rel="stylesheet" href="/css/franklin.css">
+  <link rel="stylesheet" href="/css/basic.css">
+  <link rel="icon" href="/assets/favicon.png">
+   <title>Low-rank as a graph</title>  
+</head>
+<body>
+  <header>
+<div class="blog-name"><a href="/">Mikkel Paltorp</a></div>
+<nav>
+  <ul>
+    <li><a href="/">About Me</a></li>
+    <li><a href="/menu1/">Notes</a></li>
+    <li><a href="/menu2/">Software</a></li>
+  </ul>
+  <img src="/assets/hamburger.svg" id="menu-icon">
+</nav>
+</header>
+
+
+<!-- Content appended here -->
+<div class="franklin-content"><h1 id="thinking_of_sparse_plus_low-rank_as_a_graph"><a href="#thinking_of_sparse_plus_low-rank_as_a_graph" class="header-anchor">Thinking of &quot;sparse plus low-rank&quot; as a graph</a></h1>
+<p>A general matrix-plus-low-rank is given by</p>
+\[
+A + UV^\top, \quad A \in \mathbb{R}^{n\times n},\ U,V \in \mathbb{n\times r}
+\]
+<p>In the case of \(A\) being sparse &#40;\(A\) is often diagonal - e.g. in Nesterov Todd scaling of a second-order cones&#41;, this matrix will <em>structure</em>. However, this structure will not be utilized if one e.g. naively solves the linear system</p>
+\[
+    \left(A + UV^\top\right)x = b,
+\]
+<p>as forming the product \(UV^\top\) will result in a <em>dense</em> matrix. Thinking of a matrix as a graph, then a dense matrix can be represented as a connected graph. An example of connected graph representing a dense \(6\times6\) matrix can be seen below.</p>
+
+<img class="center" style="width:25%;" src="/assets/figures/low-rank/fully_connected.png">
+
+<p>Computationally a connected graph is prohibitive, as it means that all nodes are communicating. Worse so adding an extra node will result in adding \(n\) edges. Furthermore, in the case of \(A\) being a sparse matrix we lose the sparsity when the connected graph of \(UV^\top\) is added. Thankfully, forming the product \(UV^\top\) can be circumvented by introducing an auxiliary variable \(\alpha\) so that</p>
+\[
+Ax + U\left(\underbrace{V^\top x}_{\alpha}\right) = Ax + U\underbrace{\alpha}_{V^\top x} = b.
+\]
+<p>By explicitly writing out the relation \(\alpha = V^\top x\) as \(V^\top x - \alpha = 0\) &#40;so that the unknowns \(x\) and \(\alpha\) are on the same side&#41; we get the following linear system</p>
+\[
+\begin{bmatrix}
+A & U \\ V^\top & -I
+\end{bmatrix}
+\begin{bmatrix}
+x\\ \alpha
+\end{bmatrix}
+= 
+\begin{bmatrix}
+b \\ 0
+\end{bmatrix}.
+\]
+<p>In the above system the sparsity of \(A\) can be utilized, with the cost of adding the low-rank term being the addition of dense rows &#40;\(V^\top\)&#41; and columns \((U)\) and a diagonal matrix \(-I\). For even modestly sized matrices the above representation comes with a significant reduction in memory usage and computational time. </p>
+<p>The introduced auxiliary variables &#40;\(\alpha\)&#41; can be viewed as simply adding additional nodes to the graph, and then letting the nodes &quot;communicate&quot; through these artificial nodes instead of to the other nodes directly. The reason why is possible is that a low-rank matrix represents that all flow in a graph is proportional. </p>
+<p>In the case of \(A\) being diagonal and \(U\) and \(V\) being vectors, then the auxillary variable approach can be visualized as. 
+<img class="center" style="width:25%;" src="/assets/figures/low-rank/fully_connected_expanded.png">
+ In general one would need to add an extra node for each column in \(U\) &#40;or \(V\)&#41; and had \(A\) not been diagonal, then the edges stemming from its sparsity pattern would also be observed in the above graph.  </p>
+<h2 id="interpreting_low-rank_structure_as_prices"><a href="#interpreting_low-rank_structure_as_prices" class="header-anchor">Interpreting low-rank structure as prices</a></h2>
+<p>An analogical explanation of why low-rank additions has a structure that can be utilized for efficient computations is through prices of items in different currencies. Let \(x\) represent the number of items to buy, then the following analogous are true:</p>
+<ul>
+<li><p>\(V\) are the prices of items &#40;each column is a different currency&#41;. </p>
+</li>
+<li><p>\(U\) is the exchange rates of the prices given in \(V\) to other currencies.</p>
+</li>
+<li><p>\(UV^\top\) is prices of buying the items in the prices of \(V\) in the various currencies of \(U\).</p>
+</li>
+<li><p>\(U(V^\top x)\), states that we should first compute the total price of buying \(x\) items in the currencies of \(V\) &#40;\(V^\top x\)&#41; and then convert the total prices to the correct currencies described by exchange rates of \(U\). <em>Notice that this is what anyone would do in practice.</em></p>
+</li>
+<li><p>The additional matrix \(A\) denotes some specific pricing differences between the countries for every item &#40;taxations, import fees, shipping fees, etc.&#41;.</p>
+</li>
+</ul>
+<div class="page-foot">
+  <div class="copyright">
+    &copy; Mikkel Paltorp. Last modified: June 03, 2024. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+  </div>
+</div>
+</div><!-- CONTENT ENDS HERE -->
+    
+        <script src="/libs/katex/katex.min.js"></script>
+<script src="/libs/katex/auto-render.min.js"></script>
+<script>renderMathInElement(document.body)</script>
+
+    
+    
+        <script src="/libs/highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();hljs.configure({tabReplace: '    '});</script>
+
+    
+  </body>
+</html>

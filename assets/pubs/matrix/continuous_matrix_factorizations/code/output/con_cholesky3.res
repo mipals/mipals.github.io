@@ -1,0 +1,1 @@
+"/Users/mpasc/Documents/GitHub/website/__site/assets/pubs/matrix/continuous_matrix_factorizations/code/output/rank2_diag_random.png"
