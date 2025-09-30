@@ -1,12 +1,11 @@
 {
   "basics": {
-    "name": "Albert Einstein",
-    "label": "Scientist",
+    "name": "",
+    "label": "",
     "image": "",
-    "email": "albert@einstein.de",
-    "phone": "(912) 123-4567",
-    "url": "https://alshedivat.github.io/al-folio/",
-    "summary": "A German-born theoretical physicist, widely ranked among the greatest and most influential scientists of all time",
+    "email": "mikkel.paltorp@gmail.com",
+    "url": "mipals.github.io",
+    "summary": "",
     "location": {
       "address": "2712 Broadway St",
       "postalCode": "CA 94115",
@@ -24,13 +23,15 @@
   },
   "work": [
     {
-      "name": "Institute for Advanced Study, Princeton University",
-      "position": "Professor of Theoretical Physics",
-      "url": "https://example.com",
-      "startDate": "1933-01-01",
-      "endDate": "1955-01-01",
-      "summary": "Teaching at Palmer Physical Laboratory (now 302 Frist Campus Center). While not a professor at Princeton, I associated with the physics professors and continued to give lectures on campus.",
-      "highlights": ["Relativity"]
+      "name": "Section for Scientific Computating, Technical University of Denmark",
+      "position": "Postdoctoral Researcher",
+      "url": "https://www.dtu.dk",
+      "startDate": "2024-02-01",
+      "endDate": "Present",
+      "summary": "",
+      "highlights": ["Conic Optimization for Finite Element Limit Analysis", 
+                      "Structured Linear Algebra (sparsity, low-rank, hierarchical, etc.)", 
+                      "Population-based Structural Health Monitoring"]
     }
   ],
   "volunteer": [
@@ -47,15 +48,40 @@
   ],
   "education": [
     {
-      "institution": "University of Zurich, Zurich, Switzerland",
-      "location": "Zurich, Switzerland",
-      "url": "https://www.uzh.ch/",
-      "area": "Software Development",
+      "institution": "Technical University of Denmark",
+      "location": "Kongens Lyngby",
+      "url": "https://www.dtu.dk/",
+      "area": "Computational Acoustics",
       "studyType": "PhD",
-      "startDate": "1905-01-01",
-      "endDate": "1905-01-01",
-      "score": "10",
-      "courses": ["Theory of Relativity"]
+      "startDate": "2020-09-01",
+      "endDate": "2023-11-27",
+      "score": "",
+      "courses": ["My thesis dealt with scalable algorithms for viscothermal acoustics", 
+                  "Worked with Fast Multipole Methods and Hierarchical Matrices (scalable linear algebra)", 
+                  "Taught in the Numerical Acoustics course"]
+    },
+    {
+      "institution": "Technical University of Denmark",
+      "location": "Kongens Lyngby",
+      "url": "https://www.dtu.dk/",
+      "area": "Mathematical Modelling and Computation",
+      "studyType": "M.Sc.Eng",
+      "startDate": "2017-09-01",
+      "endDate": "2020-02-01",
+      "score": "",
+      "courses": ["Focus on numerical analysis and optimization algorithms", 
+                  "Did my thesis on fast algorithms for Gaussian Processes"]
+    },
+    {
+      "institution": "Technical University of Denmark",
+      "location": "Kongens Lyngby",
+      "url": "https://www.dtu.dk/",
+      "area": "Mathematics and Technology",
+      "studyType": "B.Sc.Eng",
+      "startDate": "2014-09-01",
+      "endDate": "2017-09-01",
+      "score": "",
+      "courses": ["Focus on nonlinear dynamics and chaos"]
     }
   ],
   "awards": [
@@ -151,7 +177,7 @@
   ],
   "languages": [
     {
-      "language": "German",
+      "language": "Danish",
       "fluency": "Native speaker",
       "icon": ""
     },
