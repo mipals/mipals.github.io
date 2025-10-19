@@ -32,27 +32,16 @@ ninja.data = [{
           },
         },{id: "nav-cv",
           title: "cv",
-          description: "A pdf of my CV can be found on the link to the right.",
+          description: "",
           section: "Navigation",
           handler: () => {
             window.location.href = "/cv/";
           },
-        },{id: "post-the-adjoint-method",
-        
-          title: "The Adjoint Method",
-        
-        description: "and why its easier than people make it out to be",
-        section: "Posts",
-        handler: () => {
-          
-            window.location.href = "/blog/2025/adjoint-method/";
-          
-        },
-      },{id: "post-associative-scan",
+        },{id: "post-associative-scan",
         
           title: "Associative Scan",
         
-        description: "and its state-space models",
+        description: "and its relation to state-space models",
         section: "Posts",
         handler: () => {
           

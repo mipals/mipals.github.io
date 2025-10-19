@@ -1,4 +1,4 @@
-using LinearAlgebra, FillArrays, LinearAlgebra, BlockBandedMatrices, Test
+using LinearAlgebra, LinearAlgebra, BlockBandedMatrices, Test
 
 T = 5 # Sequence length
 n = 3 # blk sizes
