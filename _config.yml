@@ -226,13 +226,15 @@ exclude:
   - _posts/2024-12-04-photo-gallery.md
   - _posts/2025-03-26-plotly.md
   - _posts/2025-07-29-conic-optimization.md
+  - _posts/2025-07-01-adjoint-method.md
+  - _posts/2025-01-01-polar-express.md
+  - _posts/2025-01-01-bem-intro.md
+  - _posts/2025-01-01-fem-intro.md
+  - _posts/2025-01-01-fela.md
   - purgecss.config.js
   - README.md
   - readme_preview/
   - vendor
-  - _posts/2025-01-01-bem-intro.md
-  - _posts/2025-01-01-fem-intro.md
-  - _posts/2025-01-01-fela.md
 keep_files:
   - CNAME
   - .nojekyll

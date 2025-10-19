@@ -104,7 +104,7 @@ Some Julia code implementing the above is given below.
 
 {% details Code %}
 ```julia
-using LinearAlgebra, FillArrays, LinearAlgebra, BlockBandedMatrices, Test
+using LinearAlgebra, LinearAlgebra, BlockBandedMatrices, Test
 
 T = 5 # Sequence length
 n = 3 # blk sizes
@@ -141,6 +141,7 @@ U = vcat(U_blk...)
 V = vcat(V_blk...)
 @test tril(U*V') ≈ tril(inv(K))
 @test triu(V*U') ≈ triu(inv(K))
+
 ```
 {% enddetails %}
 

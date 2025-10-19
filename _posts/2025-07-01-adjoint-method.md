@@ -1,8 +1,8 @@
 ---
 layout: distill
 title: The Adjoint Method
-description: and why its easier than people make it out to be
-tags: optimization constrained-optimization adjoint-method
+description: and why backpropagation is really just the adjoint method in disguise
+tags: optimization constrained-optimization adjoint-method neural-networks backpropagation
 giscus_comments: true
 date: 2025-08-01 12:06:00
 featured: true
@@ -22,8 +22,10 @@ bibliography: 2018-12-22-distill.bib
 #     for hyperlinks within the post to work correctly.
 #   - we may want to automate TOC generation in the future using
 #     jekyll-toc plugin (https://github.com/toshimaru/jekyll-toc).
-# toc:
-#   - name: The Adjoint Method
+toc:
+  - name: The Adjoint Method
+  - name: Linearly constrained problem with structure
+  - name: Backpropagation and the adjoint method
 
 
 # Below is an example of injecting additional post-specific styles.
@@ -116,7 +118,7 @@ $$
 To conclude: The adjoint method is a simple way to avoid the computational bottleneck of computing the sensitivities $\frac{\mathrm{d}u}{\mathrm{d}\theta}$ by cleverly computing the so-called adjoint variable $\lambda$ in a way that eliminates the need to compute the problematic sensitivities. 
 
 
-### Example
+### Linearly constrained problem with structure
 In order to illustrate the adjoint method we consider a simple linearly constrained problem of the form (inspiration from problem 38 in <d-cite key="bright2025matrixcalculusformachine"></d-cite>)
 
 $$
@@ -209,6 +211,239 @@ using Test, ForwardDiff
 {% enddetails %}
 
 
+### Backpropagation and the adjoint method
+
+Section 5.5 of <d-cite key="edelman:backprop"></d-cite> includes an example of how the adjoint method and backpropagation of neural networks are similar. In neural networks we are often interested in minimizing a loss function of the form
+
+$$
+    L(\theta; u_0) = \| \Phi_N(\theta; u_0) - y \|_2^2 + \lambda \mathcal{R}(\theta), \quad \theta \in \mathbb{R}^k, \quad u_0 \in \mathbb{R}^m, \quad y \in \mathbb{R}^n,
+$$
+
+where the notation "$;u_0$" is used in order to highlight that $u_0$ is a constant input and $\mathcal{R}(\theta)$ is some regularization function (e.g. $\mathcal{R}(\theta) = \|\theta\|_2^2$). That means that $\Phi_N(\theta;u_0): \mathbb{R}^k \to \mathbb{R}^n$ is a neural network with $N$ layers that given a set of constant input $u_0$ maps the parameters $\theta$ to an output. The first step to use the adjoint method is to realize that a $N$-layer neural network is nothing more than a series of composition of $N$ functions
+
+$$
+    \Phi_N(\theta; u_0) = \Phi_N(\Phi_{N-1}(\cdots(\Phi_1(\theta_1; u_0)\cdots,\theta;u_0),\theta;u_0), 
+$$
+
+In order to utilize the adjoint method we have to rewrite the above to an equality, that is
+
+$$
+    f(u,\theta) = u - \Phi(u,\theta) 
+    = 
+    \underbrace{\begin{bmatrix} u_1 \\ u_2 \\ \vdots \\ u_N \end{bmatrix}}_{u}
+    -
+    \begin{bmatrix} \Phi_1(\theta; u_0) \\ \Phi_2(u_1, \theta; u_0) \\ \vdots \\ \Phi_N(u_1,\ldots,u_{N-1}, \theta; u_0) \end{bmatrix}.
+$$
+
+Using this notation (and removing the explicit dependence on $x_0$) we see that we are in practice aiming to solve the following optimization problem
+
+$$
+\begin{aligned}
+    \min_{\theta}     \quad & L(u,\theta) = \| u_N - y \|_2^2 + \lambda \mathcal{R}(\theta), \\
+    \text{subject to }\quad & f(u,\theta) = 0. \\
+\end{aligned}
+$$
+
+We can now use the adjoint method to compute the gradient of $L$ with respect to $\theta$. As a reminder this means that
+
+$$
+    \frac{\mathrm{d}L}{\mathrm{d}\theta} = \frac{\partial L}{\partial\theta} \underbrace{- \frac{\partial L}{\partial u}\left(\frac{\partial f}{\partial u}\right)^{-1}}_{\lambda^\top}\frac{\partial f}{\partial\theta}.
+$$
+
+
+For simplicity, we assume that $u_N$ is just a scalar, that is $u_N = e_N^\top u$ where $e_N$ is the $N$'th canonical basis vector. In this case we have that
+
+$$
+    \frac{\partial L}{\partial u} = 2(e_N^\top u - y)e_N^\top  = 2(u_N - y)e_N^\top = g_N^\top,
+$$
+
+Now what is left to compute is $\frac{\partial f}{\partial u}$ and $\frac{\partial f}{\partial\theta}$. Starting with $\frac{\partial f}{\partial u}$ we note because $f$ only propagates the $u_i$'s forwards the resulting partial derivative is a lower block triangular matrix of the form
+
+$$
+    \frac{\partial f}{\partial u} =
+    \begin{bmatrix}
+        I                                   & 0      & \cdots                                   & 0       \\
+        \frac{\partial\Phi_2}{\partial u_1} & I      & \cdots                                   & 0       \\
+        \vdots                              & \vdots & \ddots                                   & \vdots  \\
+        \frac{\partial\Phi_N}{\partial u_1} & \cdots & \frac{\partial\Phi_N}{\partial u_{N-1}}  & I
+    \end{bmatrix}
+    = L,
+$$
+
+In case of a standard MLP, which does not include any skip connections, we have the special case that $L$ is a block bidiagonal matrix. In any case we have that any products with the inverse of $\frac{\partial f}{\partial u}$ can be done cheaply using forward/backward substitution. In fact both forward and backwards substitutions can be done without the inversion of any matrices as the diagonal blocks are the identity.
+
+What is left is to compute $\frac{\partial f}{\partial \theta}$, which standardly is done as
+
+$$
+    \frac{\partial f}{\partial \theta} =  
+    -\underbrace{\begin{bmatrix}
+        \frac{\partial\Phi_1}{\partial \theta_1} & \cdots  & \frac{\partial\Phi_1}{\partial \theta_k}       \\
+        \vdots                                   & \ddots  & \vdots  \\
+        \frac{\partial\Phi_N}{\partial \theta_1} & \cdots  & \frac{\partial\Phi_N}{\partial \theta_k}
+    \end{bmatrix}}_{M^\top}
+    = -M^\top.
+$$
+
+Now, in case of the layers not sharing any parameters the matrix $M^\top$ will have a block diagonal structure of the form
+
+$$
+    M^\top = \text{blkdiag}\left(\frac{\partial\Phi_1}{\partial\theta_1}, \ldots, \frac{\partial\Phi_N}{\partial\theta_N}\right), \quad 
+    \theta = \begin{bmatrix}\theta_1 \\ \vdots \\ \theta_N \end{bmatrix},
+$$
+
+where $\theta_i$ are the parameters of layer $i$. 
+
+Putting everything together we find that the gradient of $L$ with respect to $\theta$ is given by
+
+$$
+\begin{aligned}
+    \frac{\mathrm{d}\mathcal{L}}{\mathrm{d}\theta} 
+    &= \frac{\partial L}{\partial\theta} - \frac{\partial L}{\partial u}\left(\frac{\partial f}{\partial u}\right)^{-1}\frac{\partial f}{\partial\theta}\\
+    &= \lambda\frac{\partial \mathcal{R}}{\partial\theta} - \left( g_N^\top L^{-1}(- M^\top)\right)\\
+    &= \lambda\frac{\partial \mathcal{R}}{\partial\theta} + 2(u_N - y)e_N^\top L^{-1}M^\top.
+\end{aligned}
+$$
+
+As noted previously both $L^{-1}$ and $M^\top$ are structured, meaning that the above can be computed efficiently.
+
+{% details How to compute the elements of $L$ and $M^\top$ %}
+For a standard linear layer an activation function $\sigma$ is usually applied element wise. In practice this means that we really should look at the rows of $\Phi_i$ separately. For row $j$th the gradients are easily seen to be
+
+$$
+\begin{alignat*}{2}
+    \nabla_{u_{i-1}}\sigma(w_j^\top u_{i-1} + b_j) &= \sigma'(w_j^\top u_{i-1} + b_j)w_j,\quad\ \quad &&\text{Goes in to $L$}\\
+    \nabla_{w_j}\sigma(w_j^\top u_{i-1} + b_j) &= \sigma'(w_j^\top u_{i-1} + b_j)u_{i-1},\quad  &&\text{Goes in to $M^\top$}\\
+    \nabla_{b_j}\sigma(w_j^\top u_{i-1} + b_j) &= \sigma'(w_j^\top u_{i-1} + b_j), \quad\ \quad &&\text{Goes in to $M^\top$}
+\end{alignat*}
+$$
+
+Using the above we see that 
+
+$$
+    \frac{\partial\Phi_i}{\partial u_{i-1}} = \text{diag}(\sigma'(W_i u_{i-1} + b))W_i,
+$$
+
+where $\sigma'(\cdot)$ is applied element wise. Now for $\frac{\partial\Phi_i}{\partial\theta_i}$ we have to pick a way of how to vectorize the parameters. Here we choose 
+
+$$
+    \theta_i = \begin{bmatrix} \text{vec}(W_i) \\ b_i\end{bmatrix},
+$$
+
+where $\text{vec}(W)$ vectorizes by stacking the columns of $W$. Using the vectorization we can write the sought after sensitivity as
+
+$$
+    \frac{\partial\Phi_i}{\partial\theta_i} = \text{diag}(\sigma'(W_i u_{i-1} + b))\left( \begin{bmatrix}u_{i-1} & 1\end{bmatrix} \otimes I_{n_i}\right).
+$$
+
+While the Kronecker above does result in a sparse matrix, it is even more structured. Using the standard property of Kronecker products, i.e. $(A\otimes B )v = B \text{mat}(v) A^\top $, where $\text{mat}(v)$ is the inverse operation of $\text{vec}(W)$.-
+
+
+A final remark here is that the diagonal matrices that goes into the elements of $L$ and $M^\top$ are the same. That is if we define
+
+$$
+\begin{aligned}
+    D   &= \text{diag}(\sigma'(W_1 u_{0} + b_1), \dots, \sigma'(W_N u_{N-1} + b_N)) \\
+        &= \text{blkdiag}(\text{diag}(\sigma'(W_1 u_{0} + b_1)), \dots, \text{diag}(\sigma'(W_N u_{N-1} + b_N))),
+\end{aligned}
+$$
+
+then it follows that
+
+$$
+\begin{aligned}
+    L       &= I - D\text{blkdiag}(W_1, \dots, W_{N-1},-1), \quad \\
+    M^\top  &= D\text{blkdiag}\left(\begin{bmatrix}u_0 & 1\end{bmatrix} \otimes I_{n_1}, \dots, \begin{bmatrix}u_{N-1} & 1\end{bmatrix} \otimes I_{n_N}\right).
+\end{aligned}
+$$
+
+with the little unusual notation of $\text{blkdiag}(\cdot,-1)$ means that is the lower block diagonal matrix. 
+
+{% enddetails %}
+
+{% details Julia implementation %}
+```julia
+using Test, ForwardDiff, LinearAlgebra, BlockBandedMatrices, SparseArrays, BlockDiagonalMatrices, Kronecker
+h(x) =   exp(-x) # sample activation function
+∇h(x) = -exp(-x)
+
+n = [50,40,30,20,10,1]  ## this contains [n₀...n_N]
+k = 10 # batchsize
+N = length(n)-1
+init(sizes...) = 0.01randn(sizes...)
+Ws = [init(n[i+1],n[i])  for i=1:N]
+bs = [init(n[i+1]) for i = 1:N]
+y  = init(n[end],k); #  y is what we will compare X_N agains
+u0 = init(n[1],1)[:]
+θ = zip(Ws,bs)
+
+function fd(Ws,bs,u0,i;e=1e-6)
+    Ws_sizes = prod.(size.(Ws)) # Number of W-parameters by layer
+    cumulative_no_params_pr_layer = cumsum(Ws_sizes + length.(bs))
+    idx = searchsortedfirst(cumulative_no_params_pr_layer,i) # Find layer for parameter "i"
+    v = [0; cumulative_no_params_pr_layer]  # Parameter offset pr. layer
+    We, be = deepcopy(Ws), deepcopy(bs)     # Copying input parameters
+    # Add small change ("e") to either W or b
+    if i - v[idx] <= Ws_sizes[idx]
+        We[idx][i- v[idx]] += e
+    else 
+        be[idx][i - v[idx] - Ws_sizes[idx]] += e
+    end
+    # Initialize both forward passes
+    x0, xe = u0, u0
+    for (W,b,Wd,be) in zip(Ws,bs,We,be)
+        x0, xe = h.(W*x0 + b), h.(Wd*xe + be) # Forward Pass
+    end
+    return sum((xe-x0)/e)
+end
+function forward_pass(u0,θ)
+    x0 = u0
+    diags = empty([u0])
+    krons = empty([u0' ⊗ I(2) ])
+    for (W,b) in θ
+        push!(krons,[x0; 1]' ⊗ I(length(b))) # Lazy Kronecker
+        tmp = W*x0 + b  # Can be used for both forward pass and derivative
+        x0 = h.(tmp)
+        push!(diags, ∇h.(tmp))
+    end
+    return krons, diags
+end
+function backsub(dblks,wblks,b)
+    y  = copy(b)
+    j0 = length(b)
+    i0 = length(b) - size(wblks[end],1)
+    @views for (D,blk) in (zip(reverse(dblks),reverse(Transpose.(wblks))))
+        i1,j1 = size(blk)
+        tmp = D .* y[j0-j1+1:j0]
+        mul!(y[i0-i1+1:i0], blk, tmp, 1, 1) # We have to use y here
+        j0 -= j1
+        i0 -= i1
+    end
+    return y
+end
+# First we compute the forward pass
+krons, ddiags = forward_pass(u0,θ)
+# Now we lazyly form the matries
+D = Diagonal(vcat(ddiags...))
+K = BlockDiagonal(krons)
+# g have the size to all the combined size of all output states
+g = zeros(sum(n[2:end]))
+g[end] = 1 # Final layer is the scaler we're after
+# We can now compute the gradient using the adjoint method
+grad_adjoint = (backsub(ddiags,Ws[2:end],g')*D)*K
+# We use the Finite-Difference method to verify the result
+idx = 4000 # Index of parameter we want to check
+@test fd(Ws,bs,u0,idx;e=1e-5) ≈ grad_adjoint[idx] atol=1e-6
+```
+{% enddetails %}
+
+
+<!-- $$
+    \frac{\mathrm{d}L}{\mathrm{d}\theta} 
+    = \lambda\frac{\partial \mathcal{R}}{\partial\theta} + 
+    \begin{bmatrix}0 & \dots & 2(u_N - y)\end{bmatrix} 
+    (\begin{bmatrix} I & 0 & \dots & 0\end{bmatrix})^{-1}
+    \begin{bmatrix}\begin{bmatrix}u_0 & 1\end{bmatrix} \otimes I_{n_1} & & \\ & \ddots & \\ & & \begin{bmatrix}u_{N-1} & 1\end{bmatrix} \otimes I_{n_N}\end{bmatrix}.
+$$ -->
 
 <!-- ## Example: ODEs
 Given a cost function $l$ that depends on the solution $u$ as well as the parameters $\theta \in \mathbb{R}^{n_\theta}$, we can efficiently compute its gradient using the so-called adjoint method. The main objective of the adjoint method is to eliminate the expensive computation of $\left(\frac{\mathrm{d}u}{\mathrm{d}\theta} \in \mathbb{R}^{n_u \times n_\theta}\right)$ when computing the gradient of a scalar loss function w.r.t. $\theta$. As this operation scales as $\mathcal{O}(nn_\theta)$ this is highly important. In general, we are trying to solve an ODE constrained optimization problem of the form
@@ -284,3 +519,14 @@ $$
 $$
 
 In the case of the initial condition not depending on the parameters. -->
+
+<!-- To summarize the results of the adjoint method for neural networks we have the following table
+
+| Adjoint Method                        |  Matrix                               |     Size     |
+| ------------------------------------- | ------------------------------------- | ------------ |
+| $\frac{\partial f}{\partial u}$       | $I - \tilde{L}$                       | $N \times N$ |
+| $\frac{\partial f}{\partial \theta}$  | $-M^{\mathsf{T}}$                     | $N \times k$ |
+| $\frac{\partial u}{\partial \theta}$  | $(I - \tilde{L})^{-1} M^{\mathsf{T}}$ | $N \times k$ |
+ -->
+
+

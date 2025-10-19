@@ -5,7 +5,7 @@ description: and their relation to kernel approximations
 tags: linear-algebra gaussian-processes low-rank-approximation randomized-linear-algebra
 giscus_comments: true
 date: 2024-05-20 12:00:00
-featured: false
+featured: true
 # citation: true
 
 authors:

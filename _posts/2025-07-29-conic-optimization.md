@@ -78,7 +78,7 @@ where $x \in \mathbb{R}^n$ is the decision variable, $s \in \mathbb{R}^m$ is the
 * The **power cone**: $\mathcal{K}_\text{pow} := \lbrace (z_1,z_2,z_3) \in \mathbb{R}^3\ \|\ z_1^\alpha z_2^{1-\alpha} \geq \|z_3\|, z_1,z_2> 0 \rbrace$.
 
 
-where $\mathbf{smat}(x)$ creates a symmetric matrix from $x$. This can be done in a plethora of ways, but and often used definition is
+where $\mathbf{smat}(x)$ creates a symmetric matrix from $x$. This can be done in a plethora of ways, but an often used definition is
 
 $$
 \begin{equation}

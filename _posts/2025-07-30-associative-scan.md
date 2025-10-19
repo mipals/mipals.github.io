@@ -1,7 +1,7 @@
 ---
 layout: distill
 title: Associative Scan
-description: and its state-space models
+description: and its relation to state-space models
 tags: linear-algebra state-space-models semiseparable-matrices
 giscus_comments: true
 date: 2025-07-30 12:06:00
