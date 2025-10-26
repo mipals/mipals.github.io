@@ -176,3 +176,34 @@ axislegend(ax)  # or Legend(fig[...] , ... ) and place where desired
 
 # show in browser (starts a local server)
 display(fig)
+
+
+
+using Test, LinearAlgebra
+A = rand(2,2)
+A = Diagonal([0.5, -0.5])
+S = svd(A)
+@test S.U * Diagonal(sin.(S.S)) * S.Vt ≈ sin(A)
+@test S.U * Diagonal(cos.(S.S)) * S.Vt ≈ cos(A) # Now f is not odd
+
+
+fsin(A,k=3) = sum(n -> (-1)^n*A^(2n+1)/factorial(2n+1), 0:k)
+fcos(A,k=3) = sum(n -> (-1)^n*A^(2n)/factorial(2n), 0:k)
+
+
+Podd(x) = x - x^3/6 + x^5/120 - x^7/5040
+@test S.U * Diagonal(Podd.(S.S)) * S.Vt ≈ Podd(A)
+Peven(x) = x - x^2/2 + x^4/24 - x^6/720
+@test S.U * Diagonal(Peven.(S.S)) * S.Vt ≈ Peven(A)
+
+
+
+# Newton Schulz
+P = randn(100,100)/25
+S = svd(P)
+Polar = S.U*S.Vt
+p(x,order=5) = order == 5 ? (15*x - 10*(x*x')*x + 3*(x*x')^2*x)/8 :  3/2*x - (x*x')*x/2
+for i = 1:20
+    P = p(P)
+    println("iteration $i: ||P - UV'||_F = ", norm(P - Polar))
+end

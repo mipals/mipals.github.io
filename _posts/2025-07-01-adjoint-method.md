@@ -1,10 +1,10 @@
 ---
 layout: distill
-title: The Adjoint Method
-description: and why backpropagation is really just the adjoint method in disguise
+title: Backpropagation is The Adjoint Method
+description: Backpropagation is often introduced as something developed within the field of machine learning. However, the story is that backpropagation really is just a special case of the adjoint method. This note is in two parts. In the first part we review the adjoint method while in the second part we describe how backpropagation is a special case of the adjoint method with a structure that result in scalable computations algorithms.
 tags: optimization constrained-optimization adjoint-method neural-networks backpropagation
 giscus_comments: true
-date: 2025-08-01 12:06:00
+date: 2025-10-25 12:00:00
 featured: true
 # citation: true
 
@@ -24,9 +24,7 @@ bibliography: 2018-12-22-distill.bib
 #     jekyll-toc plugin (https://github.com/toshimaru/jekyll-toc).
 toc:
   - name: The Adjoint Method
-  - name: Linearly constrained problem with structure
   - name: Backpropagation and the adjoint method
-
 
 # Below is an example of injecting additional post-specific styles.
 # If you use this post as a template, delete this _styles block.
@@ -60,6 +58,7 @@ $$
 
 without having to explicitly compute the sensitivity of the implicitly defined variable $u$ of the optimization problem $\left(\text{i.e.}\ \frac{\mathrm{d}u}{\mathrm{d}\theta} \in \mathbb{R}^{n_u \times n_\theta}\right)$. The key reason why this is important is that forming the sensitivities explicitly would scale as $\mathcal{O}(n_un_\theta)$, which would make it impossible to solve large scale problems. The adjoint method can be used to resolve the issue by eliminating the need to compute the sensitivities at all. The first step in the derivation of the adjoint method is to introduce the Lagrangian of the objective function, i.e. -->
 
+# The adjoint method
 
 In many engineering applications we are interested in solving equality constrained optimization problems where the optimization variable ($\theta$) implicitly defines another variable ($u$) that then appears in the objective function<d-footnote>A famous example of this is [topology optimization](https://en.wikipedia.org/wiki/Topology_optimization).</d-footnote>. Written out this means solving optimization problems of the following form
 
@@ -73,9 +72,9 @@ $$
 \end{equation}
 $$
 
-Most methods for solving equality constrained optimization problems requires the computation of gradient of the objective function with respect to the optimization variable $\theta$. This is where the problem comes in: Naively computing the gradient requires the computation of the sensitivities of the implicitly defined variable $u$ with respect to the optimization variable $\theta$ $\left(\text{i.e.}\ \frac{\mathrm{d}u}{\mathrm{d}\theta} \in \mathbb{R}^{n_u \times n_\theta}\right)$. This result in a computational bottleneck as forming the sensitivities scales as $\mathcal{O}(n_un_\theta)$, meaning that adding a new parameter adds $n_u$ additional sensitivities (and one adding one more variable would add $n_\theta$ additional sensitivities). 
+Most methods for solving equality constrained optimization problems requires the computation of gradient of the objective function with respect to the optimization variable $\theta$. This is where the problem comes in: Naively computing the gradient requires the computation of the sensitivities of the implicitly defined variable $u$ with respect to the optimization variable $\theta$ $\left(\text{i.e.}\ \frac{\mathrm{d}u}{\mathrm{d}\theta} \in \mathbb{R}^{n_u \times n_\theta}\right)$. This result in a computational bottleneck as forming the sensitivities scales as $\mathcal{O}(n_un_\theta)$, meaning that adding a new parameter adds $n_u$ additional sensitivities (and similarly adding one more variable would add $n_\theta$ additional sensitivities). 
 
-To resolve this computational bottleneck we can make use the adjoint method. The first step in the derivation of the adjoint method is to introduce the Lagrangian of the objective function, i.e.
+To resolve this computational bottleneck the adjoint method was introduced. The first step in the derivation of the adjoint method is to introduce the Lagrangian of the objective function, i.e.
 
 $$
 \begin{equation}
@@ -118,7 +117,7 @@ $$
 To conclude: The adjoint method is a simple way to avoid the computational bottleneck of computing the sensitivities $\frac{\mathrm{d}u}{\mathrm{d}\theta}$ by cleverly computing the so-called adjoint variable $\lambda$ in a way that eliminates the need to compute the problematic sensitivities. 
 
 
-### Linearly constrained problem with structure
+### Example: Linearly constrained problem with structure
 In order to illustrate the adjoint method we consider a simple linearly constrained problem of the form (inspiration from problem 38 in <d-cite key="bright2025matrixcalculusformachine"></d-cite>)
 
 $$
@@ -211,7 +210,7 @@ using Test, ForwardDiff
 {% enddetails %}
 
 
-### Backpropagation and the adjoint method
+# Backpropagation and the adjoint method
 
 Section 5.5 of <d-cite key="edelman:backprop"></d-cite> includes an example of how the adjoint method and backpropagation of neural networks are similar. In neural networks we are often interested in minimizing a loss function of the form
 
@@ -219,23 +218,24 @@ $$
     L(\theta; u_0) = \| \Phi_N(\theta; u_0) - y \|_2^2 + \lambda \mathcal{R}(\theta), \quad \theta \in \mathbb{R}^k, \quad u_0 \in \mathbb{R}^m, \quad y \in \mathbb{R}^n,
 $$
 
-where the notation "$;u_0$" is used in order to highlight that $u_0$ is a constant input and $\mathcal{R}(\theta)$ is some regularization function (e.g. $\mathcal{R}(\theta) = \|\theta\|_2^2$). That means that $\Phi_N(\theta;u_0): \mathbb{R}^k \to \mathbb{R}^n$ is a neural network with $N$ layers that given a set of constant input $u_0$ maps the parameters $\theta$ to an output. The first step to use the adjoint method is to realize that a $N$-layer neural network is nothing more than a series of composition of $N$ functions
+where the notation "$;u_0$" is used in order to highlight that $u_0$ is a constant input (i.e. most often the "data") and $\mathcal{R}(\theta)$ is some regularization function (e.g. $\mathcal{R}(\theta) = \Vert\theta\Vert_2^2$). Furthermore $\Phi_N(\theta;u_0): \mathbb{R}^k \to \mathbb{R}^n$ is a neural network with $N$ layers that given a set of constant inputs $u_0$ maps the parameters $\theta$ to an output. Now, the above objective functions does not include any equality constraints. However, one should realize that the a $N$-layer neural network is nothing more than a series of composition of $N$ functions
 
 $$
     \Phi_N(\theta; u_0) = \Phi_N(\Phi_{N-1}(\cdots(\Phi_1(\theta_1; u_0)\cdots,\theta;u_0),\theta;u_0), 
 $$
 
-In order to utilize the adjoint method we have to rewrite the above to an equality, that is
+Now using the notation that $u_i$ is the output of the $i$th layer of the network we can write the propagation through the network as a large nonlinear system of equations that have to be satisfied
 
 $$
     f(u,\theta) = u - \Phi(u,\theta) 
     = 
     \underbrace{\begin{bmatrix} u_1 \\ u_2 \\ \vdots \\ u_N \end{bmatrix}}_{u}
     -
-    \begin{bmatrix} \Phi_1(\theta; u_0) \\ \Phi_2(u_1, \theta; u_0) \\ \vdots \\ \Phi_N(u_1,\ldots,u_{N-1}, \theta; u_0) \end{bmatrix}.
+    \begin{bmatrix} \Phi_1(\theta; u_0) \\ \Phi_2(u_1, \theta; u_0) \\ \vdots \\ \Phi_N(u_1,\ldots,u_{N-1}, \theta; u_0) \end{bmatrix} = 
+    \begin{bmatrix}0 \\ 0 \\ \vdots \\ 0\end{bmatrix}.
 $$
 
-Using this notation (and removing the explicit dependence on $x_0$) we see that we are in practice aiming to solve the following optimization problem
+Using this notation (and removing the explicit dependence on $x_0$) we see that optimizing a neural network is really nothing more solving the following equality constrained optimization problem
 
 $$
 \begin{aligned}
@@ -270,7 +270,7 @@ $$
     = L,
 $$
 
-In case of a standard MLP, which does not include any skip connections, we have the special case that $L$ is a block bidiagonal matrix. In any case we have that any products with the inverse of $\frac{\partial f}{\partial u}$ can be done cheaply using forward/backward substitution. In fact both forward and backwards substitutions can be done without the inversion of any matrices as the diagonal blocks are the identity.
+Now is a good place to stop and think of a key concept of backpropagation: The resulting computational graph should result in a Directed Acyclic Graph (DAG). This is indeed equivalent to stating that $ \frac{\partial f}{\partial u}$ should be a lower triangular matrix. This is an important property as the adjoint method requires us to invert $ \frac{\partial f}{\partial u} $, which can be done cheaply for a lower triangular matrix. Even more importantly is that the diagonal blocks are the identity, meaning that forward/backward substitutions can be done without any matrix inversions at all. 
 
 What is left is to compute $\frac{\partial f}{\partial \theta}$, which standardly is done as
 
@@ -362,77 +362,110 @@ with the little unusual notation of $\text{blkdiag}(\cdot,-1)$ means that is the
 
 {% details Julia implementation %}
 ```julia
+# add https://github.com/mipals/BlockDiagonalMatrices.jl.git # For BlockDiagonalMatrices
 using Test, ForwardDiff, LinearAlgebra, BlockBandedMatrices, SparseArrays, BlockDiagonalMatrices, Kronecker
-h(x) =   exp(-x) # sample activation function
-∇h(x) = -exp(-x)
+h(x)  =  exp(-x) # activation function
+∇h(x) = -exp(-x) # derivative of activation function
 
-n = [50,40,30,20,10,1]  ## this contains [n₀...n_N]
-k = 10 # batchsize
-N = length(n)-1
-init(sizes...) = 0.01randn(sizes...)
-Ws = [init(n[i+1],n[i])  for i=1:N]
-bs = [init(n[i+1]) for i = 1:N]
-y  = init(n[end],k); #  y is what we will compare X_N agains
-u0 = init(n[1],1)[:]
-θ = zip(Ws,bs)
-
-function fd(Ws,bs,u0,i;e=1e-6)
-    Ws_sizes = prod.(size.(Ws)) # Number of W-parameters by layer
-    cumulative_no_params_pr_layer = cumsum(Ws_sizes + length.(bs))
-    idx = searchsortedfirst(cumulative_no_params_pr_layer,i) # Find layer for parameter "i"
-    v = [0; cumulative_no_params_pr_layer]  # Parameter offset pr. layer
-    We, be = deepcopy(Ws), deepcopy(bs)     # Copying input parameters
-    # Add small change ("e") to either W or b
-    if i - v[idx] <= Ws_sizes[idx]
-        We[idx][i- v[idx]] += e
-    else 
-        be[idx][i - v[idx] - Ws_sizes[idx]] += e
-    end
-    # Initialize both forward passes
-    x0, xe = u0, u0
-    for (W,b,Wd,be) in zip(Ws,bs,We,be)
-        x0, xe = h.(W*x0 + b), h.(Wd*xe + be) # Forward Pass
-    end
-    return sum((xe-x0)/e)
-end
+# Forward pass including the derivatives
 function forward_pass(u0,θ)
     x0 = u0
-    diags = empty([u0])
-    krons = empty([u0' ⊗ I(2) ])
+    diags = empty([first(θ)[2]])
+    krons = empty([first(θ)[2]' ⊗ I(2) ])
     for (W,b) in θ
-        push!(krons,[x0; 1]' ⊗ I(length(b))) # Lazy Kronecker
-        tmp = W*x0 + b  # Can be used for both forward pass and derivative
+        push!(krons,[x0; 1]' ⊗ I(length(b))) # Lazy Kronecker producect using Kronecker.jl
+        tmp = W*x0 + b  # Can be used for both forward pass and derivative pass
         x0 = h.(tmp)
         push!(diags, ∇h.(tmp))
     end
-    return krons, diags
+    return krons, diags, x0
 end
+# Block backsubstitution: Solving L^(-T)y = b
 function backsub(dblks,wblks,b)
-    y  = copy(b)
+    y  = convert.(eltype(wblks[1]), copy(b))
     j0 = length(b)
     i0 = length(b) - size(wblks[end],1)
     @views for (D,blk) in (zip(reverse(dblks),reverse(Transpose.(wblks))))
         i1,j1 = size(blk)
         tmp = D .* y[j0-j1+1:j0]
-        mul!(y[i0-i1+1:i0], blk, tmp, 1, 1) # We have to use y here
+        mul!(y[i0-i1+1:i0], blk, tmp, 1, 1)
         j0 -= j1
         i0 -= i1
     end
     return y
 end
+# Helper function thats packs a vector θ into Ws and bs
+function pack_θ(θ, Ws_sizes, bs_sizes)
+    We = empty([ones(eltype(θ),1,1)])
+    be = empty([ones(eltype(θ),1)])
+    i = 1
+    for (W_size,b_size) in zip(Ws_sizes, bs_sizes)
+        j = i+prod(W_size)
+        push!(We, reshape(θ[i:j-1], W_size...))
+        i = j + b_size
+        push!(be, θ[j:i-1])
+    end
+    return We, be
+end
+# Evaluating f using the forward pass
+function eval_f(θ, Ws_sizes, bs_sizes, u0)
+    We,be = pack_θ(θ, Ws_sizes, bs_sizes)
+    _,_,uN = forward_pass(u0, zip(We,be))
+    return uN
+end
+# Gradient computation using the adjoint method
+function ∇f(θ, Ws_sizes, bs_sizes, u0; y=0.0)
+    # First pack vector parameters to matrices
+    We,be = pack_θ(θ, Ws_sizes, bs_sizes)
+    # Forward parse includes derivative information
+    krons, ddiags, uN = forward_pass(u0, zip(We,be))
+    # We here use that L' = I - blkdiag(W_1,..., W_N)D' and M^T = D*K 
+    D = Diagonal(vcat(ddiags...))
+    K = BlockDiagonal(krons)
+    g = zeros(eltype(θ), sum(w_sizes -> w_sizes[1], Ws_sizes))
+    g[end] = 2*(uN[1] - y) # uN is a 1x1 matrix so extract the scalar
+    # The final step is to evaluate the gradient from the right
+    grad_adjoint = (backsub(ddiags,We[2:end],g')*D)*K
+    return grad_adjoint'
+end
+# Forward difference to test the adjoint gradient implementation
+function fd(θ, Ws_sizes,bs_sizes,u0,i;e=1e-6,y=2.0)
+    f0 = eval_f(θ, Ws_sizes, bs_sizes, u0)
+    θ[i] += e
+    f1 = eval_f(θ, Ws_sizes, bs_sizes, u0)
+    θ[i] -= e
+    return sum(((f1[1] - y)^2 - (f0[1] - y)^2)/e)
+end
+
+# Setting up parameters 
+layer_sizes = [50,40,30,20,10,1]
+N = length(layer_sizes) - 1
+init(sizes...) = 0.01*randn(sizes...)
+Ws = [init(layer_sizes[i+1],layer_sizes[i]) for i=1:N]
+bs = [init(layer_sizes[i+1]) for i = 1:N]
+u0 = init(layer_sizes[1],1)[:]
+θ  = zip(Ws,bs)
+
+Ws_sizes = size.(Ws)
+bs_sizes = length.(bs)
+
 # First we compute the forward pass
-krons, ddiags = forward_pass(u0,θ)
-# Now we lazyly form the matries
-D = Diagonal(vcat(ddiags...))
-K = BlockDiagonal(krons)
-# g have the size to all the combined size of all output states
-g = zeros(sum(n[2:end]))
-g[end] = 1 # Final layer is the scaler we're after
-# We can now compute the gradient using the adjoint method
-grad_adjoint = (backsub(ddiags,Ws[2:end],g')*D)*K
-# We use the Finite-Difference method to verify the result
-idx = 4000 # Index of parameter we want to check
-@test fd(Ws,bs,u0,idx;e=1e-5) ≈ grad_adjoint[idx] atol=1e-6
+θvec = vcat([[W[:]; b] for (W,b) in θ]...)
+
+## Testing the gradient
+y = 3.0 # We aim to have the final output be 3.0
+grad_adjoint = ∇f(θvec, Ws_sizes, bs_sizes, u0;y=y)
+idx = 4000
+@test fd(θvec, Ws_sizes,bs_sizes,u0,idx;e=1e-5,y=y) ≈ grad_adjoint[idx] atol=1e-6
+
+# Optimizing to get the output y
+for iter = 1:1000
+    grad = ∇f(θvec, Ws_sizes, bs_sizes, u0; y=y) # Y is the output value we want
+    θvec -= 0.001*grad
+end
+@test eval_f(θvec,Ws_sizes,bs_sizes,u0)[1] ≈ y
+@test ∇f(θvec, Ws_sizes, bs_sizes, u0;y=y) ≈ zeros(length(θvec)) atol=1e-10
+
 ```
 {% enddetails %}
 

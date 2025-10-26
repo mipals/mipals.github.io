@@ -30,53 +30,25 @@ using Test, ForwardDiff
 
 
 #### Example: Neural Network
+# add https://github.com/mipals/BlockDiagonalMatrices.jl.git # For BlockDiagonalMatrices
 using Test, ForwardDiff, LinearAlgebra, BlockBandedMatrices, SparseArrays, BlockDiagonalMatrices, Kronecker
-h(x) =   exp(-x) # sample activation function
-∇h(x) = -exp(-x)
+h(x)  =  exp(-x) # activation function
+∇h(x) = -exp(-x) # derivative of activation function
 
-n = [50,40,30,20,10,1]  ## this contains [n₀...n_N]
-k = 10 # batchsize
-N = length(n)-1
-init(sizes...) = 0.01randn(sizes...)
-Ws = [init(n[i+1],n[i])  for i=1:N]
-bs = [init(n[i+1]) for i = 1:N]
-y  = init(n[end],k); #  y is what we will compare X_N agains
-u0 = init(n[1],1)[:]
-θ = zip(Ws,bs)
-
-function fd(Ws,bs,u0,i;e=1e-6,y=2.0)
-    Ws_sizes = prod.(size.(Ws)) # Number of W-parameters by layer
-    cumulative_no_params_pr_layer = cumsum(Ws_sizes + length.(bs))
-    idx = searchsortedfirst(cumulative_no_params_pr_layer,i) # Find layer for parameter "i"
-    v = [0; cumulative_no_params_pr_layer]  # Parameter offset pr. layer
-    We, be = deepcopy(Ws), deepcopy(bs)     # Copying input parameters
-    # Add small change ("e") to either W or b
-    if i - v[idx] <= Ws_sizes[idx]
-        We[idx][i- v[idx]] += e
-    else 
-        be[idx][i - v[idx] - Ws_sizes[idx]] += e
-    end
-    # Initialize both forward passes
-    x0, xe = u0, u0
-    for (W,b,Wd,be) in zip(Ws,bs,We,be)
-        x0, xe = h.(W*x0 + b), h.(Wd*xe + be) # Forward Pass
-    end
-    return sum(((xe[1] - y)^2 - (x0[1] - y)^2)/e)
-end
+# Forward pass including the derivatives
 function forward_pass(u0,θ)
     x0 = u0
     diags = empty([first(θ)[2]])
     krons = empty([first(θ)[2]' ⊗ I(2) ])
-    # krons = Vector{Any}()
     for (W,b) in θ
-        push!(krons,[x0; 1]' ⊗ I(length(b))) # Lazy Kronecker
-        # push!(krons,kron([x0; 1]', I(length(b)))) # Dense Kronecker
-        tmp = W*x0 + b  # Can be used for both forward pass and derivative
+        push!(krons,[x0; 1]' ⊗ I(length(b))) # Lazy Kronecker producect using Kronecker.jl
+        tmp = W*x0 + b  # Can be used for both forward pass and derivative pass
         x0 = h.(tmp)
         push!(diags, ∇h.(tmp))
     end
     return krons, diags, x0
 end
+# Block backsubstitution: Solving L^(-T)y = b
 function backsub(dblks,wblks,b)
     y  = convert.(eltype(wblks[1]), copy(b))
     j0 = length(b)
@@ -84,13 +56,13 @@ function backsub(dblks,wblks,b)
     @views for (D,blk) in (zip(reverse(dblks),reverse(Transpose.(wblks))))
         i1,j1 = size(blk)
         tmp = D .* y[j0-j1+1:j0]
-        mul!(y[i0-i1+1:i0], blk, tmp, 1, 1) # We have to use y here
-        # y[i0-i1+1:i0] += blk*tmp
+        mul!(y[i0-i1+1:i0], blk, tmp, 1, 1)
         j0 -= j1
         i0 -= i1
     end
     return y
 end
+# Helper function thats packs a vector θ into Ws and bs
 function pack_θ(θ, Ws_sizes, bs_sizes)
     We = empty([ones(eltype(θ),1,1)])
     be = empty([ones(eltype(θ),1)])
@@ -103,46 +75,64 @@ function pack_θ(θ, Ws_sizes, bs_sizes)
     end
     return We, be
 end
-function eval_f(θ, Ws, bs, u0)
-    We,be = pack_θ(θ,Ws,bs)
+# Evaluating f using the forward pass
+function eval_f(θ, Ws_sizes, bs_sizes, u0)
+    We,be = pack_θ(θ, Ws_sizes, bs_sizes)
     _,_,uN = forward_pass(u0, zip(We,be))
     return uN
 end
-function ∇f(θ, Ws_sizes, bs_sizes, u0; y=2.0)
+# Gradient computation using the adjoint method
+function ∇f(θ, Ws_sizes, bs_sizes, u0; y=0.0)
+    # First pack vector parameters to matrices
     We,be = pack_θ(θ, Ws_sizes, bs_sizes)
+    # Forward parse includes derivative information
     krons, ddiags, uN = forward_pass(u0, zip(We,be))
+    # We here use that L' = I - blkdiag(W_1,..., W_N)D' and M^T = D*K 
     D = Diagonal(vcat(ddiags...))
-    # println(eltype(krons))
     K = BlockDiagonal(krons)
-    # g have the size to all the combined size of all output states
-    g = zeros(eltype(θ), sum(n[2:end]))
-    g[end] = 2*(uN[1] - y) # Final layer is the scaler we're after
-    # # We can now compute the gradient using the adjoint method
+    g = zeros(eltype(θ), sum(w_sizes -> w_sizes[1], Ws_sizes))
+    g[end] = 2*(uN[1] - y) # uN is a 1x1 matrix so extract the scalar
+    # The final step is to evaluate the gradient from the right
     grad_adjoint = (backsub(ddiags,We[2:end],g')*D)*K
     return grad_adjoint'
 end
+# Forward difference to test the adjoint gradient implementation
+function fd(θ, Ws_sizes,bs_sizes,u0,i;e=1e-6,y=2.0)
+    f0 = eval_f(θ, Ws_sizes, bs_sizes, u0)
+    θ[i] += e
+    f1 = eval_f(θ, Ws_sizes, bs_sizes, u0)
+    θ[i] -= e
+    return sum(((f1[1] - y)^2 - (f0[1] - y)^2)/e)
+end
 
-Ws_sizes = size.(Ws) # Number of W-parameters by layer
+# Setting up parameters 
+layer_sizes = [50,40,30,20,10,1]
+N = length(layer_sizes) - 1
+init(sizes...) = 0.01*randn(sizes...)
+Ws = [init(layer_sizes[i+1],layer_sizes[i]) for i=1:N]
+bs = [init(layer_sizes[i+1]) for i = 1:N]
+u0 = init(layer_sizes[1],1)[:]
+θ  = zip(Ws,bs)
+
+Ws_sizes = size.(Ws)
 bs_sizes = length.(bs)
 
 # First we compute the forward pass
 θvec = vcat([[W[:]; b] for (W,b) in θ]...)
-eval_f(θvec,Ws_sizes,bs_sizes,u0)
 
 ## Testing the gradient
-y = 3.0
+y = 3.0 # We aim to have the final output be 3.0
 grad_adjoint = ∇f(θvec, Ws_sizes, bs_sizes, u0;y=y)
 idx = 4000
-@test fd(Ws,bs,u0,idx;e=1e-5,y=y) ≈ grad_adjoint[idx] atol=1e-6
-
+@test fd(θvec, Ws_sizes,bs_sizes,u0,idx;e=1e-5,y=y) ≈ grad_adjoint[idx] atol=1e-6
 
 # Optimizing to get the output y
 for iter = 1:1000
     grad = ∇f(θvec, Ws_sizes, bs_sizes, u0; y=y) # Y is the output value we want
     θvec -= 0.001*grad
 end
-eval_f(θvec,Ws_sizes,bs_sizes,u0)
-∇f(θvec, Ws_sizes, bs_sizes, u0;y=y) # Is the gradient close to 0?
+@test eval_f(θvec,Ws_sizes,bs_sizes,u0)[1] ≈ y
+@test ∇f(θvec, Ws_sizes, bs_sizes, u0;y=y) ≈ zeros(length(θvec)) atol=1e-10
 
 
 # Jacobian vs. JVP
