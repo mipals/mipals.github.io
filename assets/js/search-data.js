@@ -37,7 +37,18 @@ ninja.data = [{
           handler: () => {
             window.location.href = "/cv/";
           },
-        },{id: "post-associative-scan",
+        },{id: "post-backpropagation-is-the-adjoint-method",
+        
+          title: "Backpropagation is The Adjoint Method",
+        
+        description: "Backpropagation is often introduced as something developed within the field of machine learning. However, the story is that backpropagation really is just a special case of the adjoint method. This note is in two parts. In the first part we review the adjoint method while in the second part we describe how backpropagation is a special case of the adjoint method with a structure that result in scalable computations algorithms.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2025/adjoint-method/";
+          
+        },
+      },{id: "post-associative-scan",
         
           title: "Associative Scan",
         
