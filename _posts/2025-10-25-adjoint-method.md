@@ -249,6 +249,7 @@ We can now use the adjoint method to compute the gradient of $L$ with respect to
 $$
     \frac{\mathrm{d}L}{\mathrm{d}\theta} = \frac{\partial L}{\partial\theta} \underbrace{- \frac{\partial L}{\partial u}\left(\frac{\partial f}{\partial u}\right)^{-1}}_{\lambda^\top}\frac{\partial f}{\partial\theta},
 $$
+
 where $\lambda$ is referred to as the adjoint variable. For simplicity, we assume that $u_N$ is just a scalar, that is $u_N = e_N^\top u$ where $e_N$ is the $N$'th canonical basis vector. In this case we have that
 
 $$
