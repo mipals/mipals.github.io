@@ -110,7 +110,7 @@ Inserting $\lambda^\top$ back into the equation we find that the gradient of the
 
 $$
 \begin{equation}
-    \frac{\mathrm{d}\mathcal{L}}{\mathrm{d}\theta} = \frac{\partial L}{\partial\theta} \underbrace{- \frac{\partial L}{\partial u}\left(\frac{\partial f}{\partial u}\right)^{-1}}_{\lambda^\top}\frac{\partial f}{\partial\theta} \left(= \frac{\mathrm{d}L}{\mathrm{d}\theta}\right).
+    \frac{\mathrm{d}\mathcal{L}}{\mathrm{d}\theta} = \frac{\partial L}{\partial\theta} \underbrace{- \frac{\partial L}{\partial u}\left(\frac{\partial f}{\partial u}\right)^{-1}}_{\lambda^\top}\frac{\partial f}{\partial\theta}.
 \end{equation}
 $$
 
@@ -215,7 +215,7 @@ using Test, ForwardDiff
 Section 5.5 of <d-cite key="edelman:backprop"></d-cite> includes an example of how the adjoint method and backpropagation of neural networks are similar. In neural networks we are often interested in minimizing a loss function of the form
 
 $$
-    L(\theta; u_0) = \| \Phi_N(\theta; u_0) - y \|_2^2 + \lambda \mathcal{R}(\theta), \quad \theta \in \mathbb{R}^k, \quad u_0 \in \mathbb{R}^m, \quad y \in \mathbb{R}^n,
+    L(\theta; u_0) = \| \Phi_N(\theta; u_0) - y \|_2^2 + \mu \mathcal{R}(\theta), \quad \theta \in \mathbb{R}^k, \quad u_0 \in \mathbb{R}^m, \quad y \in \mathbb{R}^n,
 $$
 
 where the notation "$;u_0$" is used in order to highlight that $u_0$ is a constant input (i.e. most often the "data") and $\mathcal{R}(\theta)$ is some regularization function (e.g. $\mathcal{R}(\theta) = \Vert\theta\Vert_2^2$). Furthermore $\Phi_N(\theta;u_0): \mathbb{R}^k \to \mathbb{R}^n$ is a neural network with $N$ layers that given a set of constant inputs $u_0$ maps the parameters $\theta$ to an output. Now, the above objective functions does not include any equality constraints. However, one should realize that the a $N$-layer neural network is nothing more than a series of composition of $N$ functions
@@ -239,7 +239,7 @@ Using this notation (and removing the explicit dependence on $x_0$) we see that 
 
 $$
 \begin{aligned}
-    \min_{\theta}     \quad & L(u,\theta) = \| u_N - y \|_2^2 + \lambda \mathcal{R}(\theta), \\
+    \min_{\theta}     \quad & L(u,\theta) = \| u_N - y \|_2^2 + \mu \mathcal{R}(\theta), \\
     \text{subject to }\quad & f(u,\theta) = 0. \\
 \end{aligned}
 $$
@@ -247,11 +247,9 @@ $$
 We can now use the adjoint method to compute the gradient of $L$ with respect to $\theta$. As a reminder this means that
 
 $$
-    \frac{\mathrm{d}L}{\mathrm{d}\theta} = \frac{\partial L}{\partial\theta} \underbrace{- \frac{\partial L}{\partial u}\left(\frac{\partial f}{\partial u}\right)^{-1}}_{\lambda^\top}\frac{\partial f}{\partial\theta}.
+    \frac{\mathrm{d}L}{\mathrm{d}\theta} = \frac{\partial L}{\partial\theta} \underbrace{- \frac{\partial L}{\partial u}\left(\frac{\partial f}{\partial u}\right)^{-1}}_{\lambda^\top}\frac{\partial f}{\partial\theta},
 $$
-
-
-For simplicity, we assume that $u_N$ is just a scalar, that is $u_N = e_N^\top u$ where $e_N$ is the $N$'th canonical basis vector. In this case we have that
+where $\lambda$ is referred to as the adjoint variable. For simplicity, we assume that $u_N$ is just a scalar, that is $u_N = e_N^\top u$ where $e_N$ is the $N$'th canonical basis vector. In this case we have that
 
 $$
     \frac{\partial L}{\partial u} = 2(e_N^\top u - y)e_N^\top  = 2(u_N - y)e_N^\top = g_N^\top,
@@ -299,8 +297,8 @@ $$
 \begin{aligned}
     \frac{\mathrm{d}\mathcal{L}}{\mathrm{d}\theta} 
     &= \frac{\partial L}{\partial\theta} - \frac{\partial L}{\partial u}\left(\frac{\partial f}{\partial u}\right)^{-1}\frac{\partial f}{\partial\theta}\\
-    &= \lambda\frac{\partial \mathcal{R}}{\partial\theta} - \left( g_N^\top L^{-1}(- M^\top)\right)\\
-    &= \lambda\frac{\partial \mathcal{R}}{\partial\theta} + 2(u_N - y)e_N^\top L^{-1}M^\top.
+    &= \mu\frac{\partial \mathcal{R}}{\partial\theta} - \left( g_N^\top L^{-1}(- M^\top)\right)\\
+    &= \mu\frac{\partial \mathcal{R}}{\partial\theta} + 2(u_N - y)e_N^\top L^{-1}M^\top.
 \end{aligned}
 $$
 
