@@ -1,0 +1,586 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>dual numbers</title><link rel="icon" href="/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tufte-css/1.8.0/tufte.min.css"><link rel="stylesheet" href="/assets/tufted.css"><link rel="stylesheet" href="/assets/custom.css"><style>/* Alignment */
+mtable.right-align mtd,
+mtable mtd.right-align,
+mtable.left-align mtd.right-align,
+mtable.aligned mtd:nth-child(odd) {
+  justify-items: end;
+  text-align: right;
+}
+mtable.cases mtd,
+mtable.left-align mtd,
+mtable mtd.left-align,
+mtable.aligned mtd:nth-child(even),
+math:is(:not([display])) > mtable.multiline-equation mtd {
+  justify-items: start;
+  text-align: left;
+}
+mtable.cases mtd,
+mtable.aligned mtd,
+mtable mtd.flushed,
+mtable mtd.left-flush {
+  padding-left: 0;
+}
+mtable.cases mtd,
+mtable.aligned mtd,
+mtable mtd.flushed,
+mtable mtd.right-flush {
+  padding-right: 0;
+}
+
+/* Tables */
+mtable {
+  math-style: inherit;
+}
+mtd {
+  math-depth: auto-add;
+  math-style: compact;
+  math-shift: compact;
+}
+
+/* Equations */
+mtable.multiline-equation mtd {
+  math-depth: inherit;
+  math-style: inherit;
+  math-shift: inherit;
+  padding: 0;
+}
+math > mtable.multiline-equation mtr:not(:last-child) mtd {
+  padding-bottom: 0.5em;
+}
+
+/* Fractions */
+mfrac {
+  padding-inline: 0;
+  margin-inline: 0.1em;
+}
+
+/* Accents */
+mover[accent="true" i] > :first-child {
+  font-feature-settings: "dtls";
+}
+mover.dotted[accent="true" i] > :first-child {
+  font-feature-settings: "dtls" 0;
+}
+
+/* Other rules for scriptlevel, displaystyle and math-shift */
+munder > :nth-child(2),
+munderover > :nth-child(2) {
+  math-shift: compact
+}
+munder[accentunder="true" i] > :not(:first-child),
+mover[accent="true" i] > :not(:first-child) {
+  math-depth: inherit;
+  math-style: inherit;
+  math-shift: inherit;
+}</style></head><body><header><nav><a href="/">home</a><a href="/blog/">blog</a><a href="/publications/">publications</a><a href="/repositories/">repositories</a><a href="/about/">about</a><a href="/solver/">conic solver</a><a href="/marimo/">marimo</a></nav></header><article><section><style>@layer components {
+  .expressive-code {
+    position: relative;
+    font-family: var(
+      --ec-uiFontFamily,
+      ui-sans-serif,
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      sans-serif
+    );
+    font-size: var(--ec-uiFontSize, 0.9rem);
+    font-weight: var(--ec-uiFontWeight, 400);
+    line-height: var(--ec-uiLineHeight, 1.65);
+    text-size-adjust: none;
+    -webkit-text-size-adjust: none;
+  }
+
+  .expressive-code *:not(:is(svg, svg *)) {
+    box-sizing: border-box;
+  }
+
+  .expressive-code::selection {
+    background: var(--ec-uiSelBg, var(--ec-codeBg, #0d1117));
+    color: var(--ec-uiSelFg, currentColor);
+  }
+
+  .expressive-code pre {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    border: var(--ec-borderWd, 1.5px) solid
+      var(--ec-borderCol, rgba(148, 163, 184, 0.25));
+    border-radius: calc(
+      var(--ec-borderRad, 0.3rem) + var(--ec-borderWd, 1.5px)
+    );
+    background: var(--ec-codeBg, #0d1117);
+    color: var(--ec-codeFg, #c9d1d9);
+    overflow-x: auto;
+    position: relative;
+    z-index: 1;
+    container-type: inline-size;
+  }
+
+  .expressive-code pre:focus-visible {
+    outline: 3px solid var(--ec-focusBorder, #3b82f6);
+    outline-offset: -3px;
+  }
+
+  .expressive-code pre > code {
+    all: unset;
+    display: block;
+    flex: 1 0 100%;
+    padding: var(--ec-codePadBlk, 0.5rem) 0;
+    color: var(--ec-codeFg, #c9d1d9);
+    font-family: var(
+      --ec-codeFontFamily,
+      ui-monospace,
+      SFMono-Regular,
+      Menlo,
+      Monaco,
+      Consolas,
+      "Liberation Mono",
+      "Courier New",
+      monospace
+    );
+    font-size: var(--ec-codeFontSize, 0.85rem);
+    font-weight: var(--ec-codeFontWeight, 400);
+    line-height: var(--ec-codeLineHeight, 1.35);
+  }
+
+  .expressive-code pre > code::selection {
+    background: var(--ec-codeSelBg, rgba(56, 189, 248, 0.35));
+    color: inherit;
+  }
+
+  .expressive-code pre.wrap .ec-line .code {
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    min-width: min(20ch, var(--ecMaxLine, 20ch));
+  }
+
+  /* When lines are allowed to wrap, the absolute overlay can overlap
+     wrapped text. Disable the overlay in wrap mode and rely on per-slot
+     borders for guides (these are handled by .indent-slot). */
+  .expressive-code pre.wrap .ec-line .code .indent-overlay {
+    display: none;
+  }
+
+  .expressive-code pre.wrap .ec-line .code::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    /* use the code line-height times the element font-size to match one line */
+    height: calc(var(--ec-codeLineHeight, 1.65) * 1em);
+    width: max(0px, calc(var(--ecIndent, 0) - 2px));
+    pointer-events: none;
+    background-image: repeating-linear-gradient(
+      to right,
+      transparent 0,
+      transparent calc(var(--ec-indentStep, 4ch) - 1px),
+      var(--ec-indentGuideCol, rgba(148, 163, 184, 0.35))
+        calc(var(--ec-indentStep, 4ch) - 1px),
+      var(--ec-indentGuideCol, rgba(148, 163, 184, 0.35))
+        var(--ec-indentStep, 4ch)
+    );
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    mix-blend-mode: multiply;
+    opacity: 0.85;
+    z-index: 0;
+  }
+
+  .expressive-code pre.wrap .ec-line .code span.indent {
+    white-space: pre;
+  }
+
+  .expressive-code .ec-line .code .indent {
+    display: inline-flex;
+    white-space: pre;
+  }
+
+  .expressive-code .ec-line .code .indent-slot {
+    display: inline-flex;
+    white-space: pre;
+    position: relative;
+  }
+
+  .expressive-code.has-indent-guides .ec-line .code .indent-slot {
+    border-inline-end: 1px solid
+      var(--ec-indentGuideCol, rgba(148, 163, 184, 0.35));
+  }
+
+  .expressive-code.has-indent-guides
+    .ec-line
+    .code
+    .indent-slot.indent-slot-partial {
+    border-inline-end: none;
+  }
+
+  .expressive-code pre::-webkit-scrollbar,
+  .expressive-code pre::-webkit-scrollbar-track {
+    background-color: inherit;
+    border-radius: calc(
+      var(--ec-borderRad, 0.3rem) + var(--ec-borderWd, 1.5px)
+    );
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+
+  .expressive-code pre::-webkit-scrollbar-thumb {
+    background-color: var(--ec-scrollbarThumbCol, rgba(148, 163, 184, 0.4));
+    border: 4px solid transparent;
+    background-clip: content-box;
+    border-radius: 10px;
+  }
+
+  .expressive-code pre::-webkit-scrollbar-thumb:hover {
+    background-color: var(
+      --ec-scrollbarThumbHoverCol,
+      rgba(148, 163, 184, 0.55)
+    );
+  }
+
+  .expressive-code .code-lang {
+    position: absolute;
+    top: 0.25rem;
+    right: 0.6rem;
+    padding: 0;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.25rem;
+    background: none;
+    color: var(--ec-langFg, var(--ec-codeFg, currentColor));
+    font-size: 0.68em;
+    pointer-events: none;
+    opacity: 0.6;
+    transition: opacity 160ms ease, color 160ms ease;
+    z-index: 2;
+  }
+
+  .expressive-code:focus-within .code-lang,
+  .expressive-code:hover .code-lang {
+    opacity: 1;
+    color: var(--ec-langFg, var(--ec-codeFg, currentColor));
+  }
+
+  .expressive-code .copy-button {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.3rem;
+    height: 2.3rem;
+    border-radius: 0.45rem;
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    background-color: var(--ec-copyBg, rgba(15, 23, 42, 0.04));
+    color: var(--ec-copyFg, rgba(15, 23, 42, 0.7));
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: auto;
+    transition: opacity 160ms ease, transform 160ms ease,
+      background-color 140ms ease, color 140ms ease;
+    transform: translateY(-0.3rem);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns%3D%27http://www.w3.org/2000/svg%27 viewBox%3D%270 0 24 24%27 fill%3D%27none%27 stroke%3D%27currentColor%27 stroke-width%3D%271.75%27 stroke-linecap%3D%27round%27 stroke-linejoin%3D%27round%27%3E%3Cpath d%3D%27M3 19a2 2 0 0 1-1-2V3a2 2 0 0 1 1-1h13a2 2 0 0 1 2 1%27/%3E%3Crect x%3D%276%27 y%3D%275%27 width%3D%2716%27 height%3D%2718%27 rx%3D%271.6%27 ry%3D%271.6%27/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 60%;
+    z-index: 3;
+  }
+
+  .expressive-code .copy-button:is(:hover, :focus-visible, :active) {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .expressive-code .copy-button:focus-visible {
+    outline: 2px solid rgba(148, 163, 184, 0.55);
+    outline-offset: 2px;
+    background-color: var(--ec-copyBgFocus, rgba(15, 23, 42, 0.16));
+    color: var(--ec-copyFgFocus, rgba(15, 23, 42, 1));
+  }
+
+  .expressive-code .copy-button::before {
+    content: "";
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    background: transparent;
+    border: none;
+    pointer-events: none;
+  }
+
+  .expressive-code .copy-button::after {
+    content: none;
+    pointer-events: none;
+  }
+
+  .expressive-code .copy-button .copy-label,
+  .expressive-code .copy-button .copy-feedback {
+    display: none;
+  }
+
+  .expressive-code .copy-button:hover {
+    background-color: var(--ec-copyBgHover, rgba(15, 23, 42, 0.12));
+    color: var(--ec-copyFgHover, rgba(15, 23, 42, 0.9));
+  }
+
+  .expressive-code .copy-button span[aria-hidden="true"] {
+    font-family: var(--ec-uiFontFamily, inherit);
+  }
+
+  .expressive-code .ec-header,
+  .expressive-code .ec-footer {
+    display: block;
+    padding: 0.35rem var(--ec-codePadInl, 1.35rem);
+    color: var(--ec-uiFg, currentColor);
+  }
+
+  .expressive-code .ec-header.ec-ext,
+  .expressive-code .ec-footer.ec-ext {
+    padding: 0.25rem var(--ec-codePadInl, 1.35rem);
+  }
+
+  .expressive-code .ec-line {
+    direction: ltr;
+    unicode-bidi: isolate;
+    display: grid;
+    grid-template-areas: "gutter code";
+    grid-template-columns: auto 1fr;
+    column-gap: var(--ec-gutterGap, 0.25rem);
+    position: relative;
+    --lineBg: var(--ec-codeBg, #0d1117);
+    background: var(--lineBg);
+  }
+
+  .expressive-code:not(.has-gutter) .ec-line {
+    grid-template-columns: 1fr;
+  }
+
+  .expressive-code:not(.has-gutter) .ec-line .code {
+    padding-inline: var(--ec-codePadInl, 1.35rem);
+  }
+
+  .expressive-code .ec-line .gutter {
+    grid-area: gutter;
+    color: var(--ec-gtrFg, rgba(148, 163, 184, 0.8));
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: var(--lineBg, var(--ec-gutterBg, var(--ec-codeBg, #0d1117)));
+    box-shadow: 1px 0 0 var(--ec-gtrBrdCol, rgba(148, 163, 184, 0.2));
+  }
+
+  .expressive-code .ec-line .gutter > * {
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .expressive-code .ec-line .gutter ~ .code {
+    --ecLineBrdCol: var(--ec-gtrBrdCol, rgba(148, 163, 184, 0.2));
+  }
+
+  .expressive-code .ec-line.highlight .gutter {
+    color: var(--ec-gtrHighlightFg, rgba(226, 232, 240, 0.95));
+  }
+
+  .expressive-code .ec-line .gutter .ln {
+    display: inline-flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+    box-sizing: content-box;
+    min-width: var(--lnWidth, 2ch);
+    padding-inline-start: var(--ec-gutterPadLeft, 0.5rem);
+    padding-inline-end: var(--ec-codePadInl, 1.35rem);
+    font-size: var(--ec-codeFontSize, 0.85rem);
+    font-variant-numeric: tabular-nums;
+    color: inherit;
+  }
+
+  .expressive-code .ec-line .gutter .ln > span + span {
+    margin-inline-start: 0.25em;
+  }
+
+  .expressive-code .ec-line .code {
+    position: relative;
+    z-index: 1;
+  }
+
+  .expressive-code .ec-line .code .indent-overlay {
+    display: none;
+  }
+
+  .expressive-code.has-indent-guides .ec-line .code .indent-overlay {
+    position: absolute;
+    inset: 0 auto 0 0;
+    display: block;
+    /* Shrink overlay by 1px to avoid drawing a vertical guide at the very end of
+       the inline area (prevents an extra line appearing at each row end).
+       Use max(...) to avoid negative values when --ecIndent is small. */
+    width: max(0px, calc(var(--ecIndent, 0) - 2px));
+    pointer-events: none;
+    background-image: repeating-linear-gradient(
+      to right,
+      transparent 0,
+      transparent calc(var(--ec-indentStep, 4ch) - 1px),
+      var(--ec-indentGuideCol, rgba(148, 163, 184, 0.35))
+        calc(var(--ec-indentStep, 4ch) - 1px),
+      var(--ec-indentGuideCol, rgba(148, 163, 184, 0.35))
+        var(--ec-indentStep, 4ch)
+    );
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    mix-blend-mode: multiply;
+    opacity: 0.85;
+    z-index: 0;
+  }
+  .expressive-code .ec-comment {
+    grid-column: 1 / -1;
+    padding: 0.55rem calc(var(--ec-codePadInl, 1.35rem) + 0.25rem);
+    font-size: 0.85em;
+    background: var(--ec-commentBg, rgba(56, 189, 248, 0.18));
+    color: var(--ec-commentFg, currentColor);
+    box-shadow: inset 0 1px 0 rgba(15, 23, 42, 0.08),
+      inset 0 -1px 0 rgba(15, 23, 42, 0.06);
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    width: 100cqw;
+    box-sizing: border-box;
+  }
+
+  .expressive-code .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  code.expressive-code-inline {
+    display: inline-block;
+    padding: 0 var(--ec-inlinePadInl, 0.4rem);
+    border-radius: calc(var(--ec-borderRad, 0.3rem) / 1.2);
+    background: var(--ec-inlineBg, rgba(148, 163, 184, 0.2));
+    color: var(--ec-inlineFg, inherit);
+    font-family: var(
+      --ec-codeFontFamily,
+      ui-monospace,
+      SFMono-Regular,
+      Menlo,
+      Monaco,
+      Consolas,
+      "Liberation Mono",
+      "Courier New",
+      monospace
+    );
+    font-size: 0.95em;
+    line-height: 1.2;
+    white-space: pre;
+  }
+}
+</style><script>const CODE_BLOCK_SELECTOR = ".expressive-code";
+const COPY_BUTTON_SELECTOR = ".copy-button";
+
+const selectCodeBlocks = () =>
+  Array.from(document.querySelectorAll(CODE_BLOCK_SELECTOR));
+
+const extractCodeText = (codeBlock) =>
+  Array.from(codeBlock.querySelectorAll(".ec-line .code"))
+    .map((line) => {
+      const indent = line.dataset.indent ?? "";
+      const content = line.textContent
+        .replace(/\u00a0/g, " ")
+        .replace(/\u200b/gi, "");
+      return indent + content;
+    })
+    .join("\n");
+
+const fallbackCopy = (text) => {
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.setAttribute("readonly", "true");
+  textarea.style.position = "absolute";
+  textarea.style.left = "-9999px";
+  document.body.appendChild(textarea);
+  textarea.select();
+  /** @type {any} */ (document).execCommand("copy");
+  document.body.removeChild(textarea);
+};
+
+const setStateWithTimeout = (button, state, delay = 1600) => {
+  button.dataset.state = state;
+  if (state === "copied") {
+    setTimeout(() => {
+      if (button.dataset.state === "copied") {
+        button.dataset.state = "idle";
+      }
+    }, delay);
+  }
+};
+
+const bindCopyButton = (codeBlock) => {
+  if (!codeBlock || codeBlock.dataset.copyBound === "true") return;
+
+  const copyButton = codeBlock.querySelector(COPY_BUTTON_SELECTOR);
+  if (!copyButton) return;
+
+  codeBlock.dataset.copyBound = "true";
+
+  const copyHandler = async () => {
+    const code = extractCodeText(codeBlock);
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(code);
+      } else {
+        fallbackCopy(code);
+      }
+      setStateWithTimeout(copyButton, "copied");
+    } catch (error) {
+      try {
+        fallbackCopy(code);
+        setStateWithTimeout(copyButton, "copied");
+      } catch (fallbackError) {
+        setStateWithTimeout(copyButton, "error", 2200);
+      }
+    }
+  };
+
+  const resetHandler = () => {
+    if (copyButton.dataset.state === "copied") {
+      copyButton.dataset.state = "idle";
+    }
+  };
+
+  copyButton.addEventListener("click", copyHandler);
+  copyButton.addEventListener("blur", resetHandler);
+  copyButton.addEventListener("mouseleave", resetHandler);
+};
+
+selectCodeBlocks().forEach(bindCopyButton);
+
+const observer = new MutationObserver((mutations) => {
+  for (const mutation of mutations) {
+    mutation.addedNodes.forEach((node) => {
+      if (!(node instanceof HTMLElement)) return;
+      if (node.matches?.(CODE_BLOCK_SELECTOR)) {
+        bindCopyButton(node);
+      } else {
+        node
+          .querySelectorAll?.(CODE_BLOCK_SELECTOR)
+          .forEach((block) => bindCopyButton(block));
+      }
+    });
+  }
+});
+
+observer.observe(document.documentElement, {
+  childList: true,
+  subtree: true,
+});
+</script><h1>Dual Numbers for Automatic Differentiation</h1><p class="post-meta"><time datetime="2026-09-25">25 September 2026</time> · <a href="/pdf/2026/09-25-dual-numbers/dual-numbers.pdf">Download PDF</a> · <a href="julia-examples.zip">Download code</a></p><nav class="post-toc marginnote"><div class="post-toc-title">Contents</div><ol><li class="post-toc-section"><a href="#loc-1"><span class="post-toc-number">1.</span> Scalar derivatives</a></li><li class="post-toc-section"><a href="#loc-3"><span class="post-toc-number">2.</span> Jacobian-vector products</a></li><li class="post-toc-section"><a href="#loc-4">Bibliography</a></li></ol></nav><h2 id="loc-1">1. Scalar derivatives</h2><p>Dual numbers are a key part of forward-mode differentiation. However, I find the introduction of them unintuitive. Usually, as done in <a id="loc-2" href="#loc-5" role="doc-biblioref">[1]</a>, they are introduced such that</p><div id="standard-dual-number" class="numbered-equation"><math display="block"><mi>𝑓</mi><mrow><mo>(</mo><mrow><mi>𝑥</mi><mo>+</mo><mi>𝜀</mi></mrow><mo>)</mo></mrow><mo>=</mo><mi>𝑓</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mo>+</mo><msup><mi>𝑓</mi><mo>′</mo></msup><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mi>𝜀</mi><mo rspace="0em">,</mo></math><p><span class="equation-number">(1)</span></p></div><p>where <math><msup><mi>𝜀</mi><mn>2</mn></msup><mo>=</mo><mn>0</mn></math>. This is not incorrect. However, I think it is more natural to think of dual numbers, at least in the context of automatic differentiation, as a number type that simply tracks both <math><mi>𝑓</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow></math> and <math><msup><mi>𝑓</mi><mo>′</mo></msup><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow></math> at the same time by introducing an <math><mi>𝜀</mi></math>. This is sort of similar to how a complex number can be seen to track an <math><mi>𝑎</mi></math> and <math><mi>𝑏</mi></math> at the same time by introducing an <math><mi>𝑖</mi></math>. However, for complex numbers the aim is to be able to solve <math><msup><mi>𝑥</mi><mn>2</mn></msup><mo>=</mo><mo form="prefix">−</mo><mn>1</mn></math>. For dual numbers the intent, as noted before, is to track <math><mi>𝑓</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow></math> and <math><msup><mi>𝑓</mi><mo>′</mo></msup><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow></math> at the same time. We therefore define how a function acts on a dual number by the composition rule</p><div id="composition-rule" class="numbered-equation"><math display="block"><mtable class="multiline-equation aligned"><mtr><mtd><mi>𝑓</mi><mrow><mo>(</mo><mrow><mi>𝑔</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mo>+</mo><msup><mi>𝑔</mi><mo>′</mo></msup><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mi>𝜀</mi></mrow><mo>)</mo></mrow></mtd><mtd><mo form="infix">≔</mo><mi>𝑓</mi><mrow><mo>(</mo><mrow><mi>𝑔</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow></mrow><mo>)</mo></mrow><mo>+</mo><msup><mrow><mo>(</mo><mrow><mi>𝑓</mi><mrow><mo>(</mo><mrow><mi>𝑔</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow></mrow><mo>)</mo></mrow></mrow><mo>)</mo></mrow><mo>′</mo></msup><mi>𝜀</mi></mtd></mtr><mtr><mtd></mtd><mtd><mo form="infix">=</mo><mi>𝑓</mi><mrow><mo>(</mo><mrow><mi>𝑔</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow></mrow><mo>)</mo></mrow><mo>+</mo><msup><mi>𝑓</mi><mo>′</mo></msup><mrow><mo>(</mo><mrow><mi>𝑔</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow></mrow><mo>)</mo></mrow><msup><mi>𝑔</mi><mo>′</mo></msup><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mi>𝜀</mi><mo rspace="0em">,</mo></mtd></mtr></mtable></math><p><span class="equation-number">(2)</span></p></div><p>of which <a href="#standard-dual-number">(1)</a> is the special case <math><mi>𝑔</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mo>+</mo><msup><mi>𝑔</mi><mo>′</mo></msup><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mi>𝜀</mi><mo>=</mo><mi>𝑥</mi><mo>+</mo><mi>𝜀</mi></math>. In the same way we define multiplication and division of dual numbers by the product and quotient rules</p><div class="smaller-equation" style="--equation-scale: 0.88"><div class="numbered-equation"><math display="block"><mtable class="multiline-equation aligned"><mtr><mtd><mrow><mo>(</mo><mrow><mi>𝑓</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mo>+</mo><msup><mi>𝑓</mi><mo>′</mo></msup><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mi>𝜀</mi></mrow><mo>)</mo></mrow><mrow><mo>(</mo><mrow><mi>𝑔</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mo>+</mo><msup><mi>𝑔</mi><mo>′</mo></msup><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mi>𝜀</mi></mrow><mo>)</mo></mrow></mtd><mtd><mo form="infix">≔</mo><mi>𝑓</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mi>𝑔</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mo>+</mo><msup><mrow><mo>(</mo><mrow><mi>𝑓</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mi>𝑔</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow></mrow><mo>)</mo></mrow><mo>′</mo></msup><mi>𝜀</mi></mtd></mtr><mtr><mtd></mtd><mtd><mo form="infix">=</mo><mi>𝑓</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mi>𝑔</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mo>+</mo><mrow><mo>(</mo><mrow><msup><mi>𝑓</mi><mo>′</mo></msup><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mi>𝑔</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mo>+</mo><mi>𝑓</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><msup><mi>𝑔</mi><mo>′</mo></msup><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow></mrow><mo>)</mo></mrow><mi>𝜀</mi><mo rspace="0em">,</mo></mtd></mtr><mtr><mtd><mfrac><mrow><mi>𝑓</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mo>+</mo><msup><mi>𝑓</mi><mo>′</mo></msup><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mi>𝜀</mi></mrow><mrow><mi>𝑔</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mo>+</mo><msup><mi>𝑔</mi><mo>′</mo></msup><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mi>𝜀</mi></mrow></mfrac></mtd><mtd><mo form="infix">≔</mo><mfrac><mrow><mi>𝑓</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow></mrow><mrow><mi>𝑔</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow></mrow></mfrac><mo>+</mo><msup><mrow><mo>(</mo><mfrac><mrow><mi>𝑓</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow></mrow><mrow><mi>𝑔</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow></mrow></mfrac><mo>)</mo></mrow><mo>′</mo></msup><mi>𝜀</mi></mtd></mtr><mtr><mtd></mtd><mtd><mo form="infix">=</mo><mfrac><mrow><mi>𝑓</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow></mrow><mrow><mi>𝑔</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow></mrow></mfrac><mo>+</mo><mfrac><mrow><msup><mi>𝑓</mi><mo>′</mo></msup><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mi>𝑔</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mo>−</mo><mi>𝑓</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><msup><mi>𝑔</mi><mo>′</mo></msup><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow></mrow><msup><mrow><mi>𝑔</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow></mrow><mn>2</mn></msup></mfrac><mi>𝜀</mi><mo rspace="0em">,</mo></mtd></mtr></mtable></math><p><span class="equation-number">(3)</span></p></div></div><p>and addition and subtraction by the sum and difference rules</p><div class="smaller-equation" style="--equation-scale: 0.91"><div class="numbered-equation"><math display="block"><mtable class="multiline-equation aligned"><mtr><mtd><mrow><mo>(</mo><mrow><mi>𝑓</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mo>+</mo><msup><mi>𝑓</mi><mo>′</mo></msup><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mi>𝜀</mi></mrow><mo>)</mo></mrow><mo>+</mo><mrow><mo>(</mo><mrow><mi>𝑔</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mo>+</mo><msup><mi>𝑔</mi><mo>′</mo></msup><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mi>𝜀</mi></mrow><mo>)</mo></mrow></mtd><mtd><mo form="infix">≔</mo><mrow><mo>(</mo><mrow><mi>𝑓</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mo>+</mo><mi>𝑔</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow></mrow><mo>)</mo></mrow><mo>+</mo><msup><mrow><mo>(</mo><mrow><mi>𝑓</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mo>+</mo><mi>𝑔</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow></mrow><mo>)</mo></mrow><mo>′</mo></msup><mi>𝜀</mi></mtd></mtr><mtr><mtd></mtd><mtd><mo form="infix">=</mo><mrow><mo>(</mo><mrow><mi>𝑓</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mo>+</mo><mi>𝑔</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow></mrow><mo>)</mo></mrow><mo>+</mo><mrow><mo>(</mo><mrow><msup><mi>𝑓</mi><mo>′</mo></msup><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mo>+</mo><msup><mi>𝑔</mi><mo>′</mo></msup><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow></mrow><mo>)</mo></mrow><mi>𝜀</mi><mo rspace="0em">,</mo></mtd></mtr><mtr><mtd><mrow><mo>(</mo><mrow><mi>𝑓</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mo>+</mo><msup><mi>𝑓</mi><mo>′</mo></msup><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mi>𝜀</mi></mrow><mo>)</mo></mrow><mo>+</mo><mrow><mo>(</mo><mrow><mi>𝑐</mi><mo>+</mo><mn>0</mn><mi>𝜀</mi></mrow><mo>)</mo></mrow></mtd><mtd><mo form="infix">≔</mo><mrow><mo>(</mo><mrow><mi>𝑓</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mo>+</mo><mi>𝑐</mi></mrow><mo>)</mo></mrow><mo>+</mo><msup><mrow><mo>(</mo><mrow><mi>𝑓</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mo>+</mo><mi>𝑐</mi></mrow><mo>)</mo></mrow><mo>′</mo></msup><mi>𝜀</mi></mtd></mtr><mtr><mtd></mtd><mtd><mo form="infix">=</mo><mrow><mo>(</mo><mrow><mi>𝑓</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mo>+</mo><mi>𝑐</mi></mrow><mo>)</mo></mrow><mo>+</mo><msup><mi>𝑓</mi><mo>′</mo></msup><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mi>𝜀</mi><mo rspace="0em">,</mo></mtd></mtr><mtr><mtd><mrow><mo>(</mo><mrow><mi>𝑓</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mo>+</mo><msup><mi>𝑓</mi><mo>′</mo></msup><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mi>𝜀</mi></mrow><mo>)</mo></mrow><mo>−</mo><mrow><mo>(</mo><mrow><mi>𝑔</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mo>+</mo><msup><mi>𝑔</mi><mo>′</mo></msup><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mi>𝜀</mi></mrow><mo>)</mo></mrow></mtd><mtd><mo form="infix">≔</mo><mrow><mo>(</mo><mrow><mi>𝑓</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mo>−</mo><mi>𝑔</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow></mrow><mo>)</mo></mrow><mo>+</mo><msup><mrow><mo>(</mo><mrow><mi>𝑓</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mo>−</mo><mi>𝑔</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow></mrow><mo>)</mo></mrow><mo>′</mo></msup><mi>𝜀</mi></mtd></mtr><mtr><mtd></mtd><mtd><mo form="infix">=</mo><mrow><mo>(</mo><mrow><mi>𝑓</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mo>−</mo><mi>𝑔</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow></mrow><mo>)</mo></mrow><mo>+</mo><mrow><mo>(</mo><mrow><msup><mi>𝑓</mi><mo>′</mo></msup><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mo>−</mo><msup><mi>𝑔</mi><mo>′</mo></msup><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow></mrow><mo>)</mo></mrow><mi>𝜀</mi><mi>.</mi></mtd></mtr></mtable></math><p><span class="equation-number">(4)</span></p></div></div><p>Now an initial complaint would be: What if <math><msup><mi>𝑓</mi><mo>′</mo></msup><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow></math> (or <math><msup><mi>𝑔</mi><mo>′</mo></msup><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow></math>) is not known—which is usually the case when forward-mode differentiation is applied to a general function <math><mi>𝑓</mi></math>? The answer is that we don’t need to know them as long as the derivatives of the basic operations that make up <math><mi>𝑓</mi></math> are known. That is, we can simply evaluate <math><mi>𝑓</mi><mrow><mo>(</mo><mrow><mi>𝑥</mi><mo>+</mo><mi>𝜀</mi></mrow><mo>)</mo></mrow></math>, which by <a href="#composition-rule">(2)</a> should give us the derivative of <math><mi>𝑓</mi></math> at <math><mi>𝑥</mi></math> as the coefficient of <math><mi>𝜀</mi></math>. In the code example below we define the following composition rules for the elementary functions <math><mo form="prefix" lspace="0em" rspace="0em">sin</mo></math> and <math><mo form="prefix" lspace="0em" rspace="0em">exp</mo></math> as</p><div class="numbered-equation"><math display="block"><mtable class="multiline-equation aligned"><mtr><mtd><mo lspace="0em" rspace="0em">sin</mo><mrow><mo>(</mo><mrow><mi>𝑎</mi><mo>+</mo><mi>𝑏</mi><mi>𝜀</mi></mrow><mo>)</mo></mrow></mtd><mtd><mo form="infix">=</mo><mo form="prefix" lspace="0em" rspace="0em">sin</mo><mrow><mo>(</mo><mi>𝑎</mi><mo>)</mo></mrow><mo>+</mo><mi>𝑏</mi><mo form="prefix" lspace="0.16666666666666666em" rspace="0em">cos</mo><mrow><mo>(</mo><mi>𝑎</mi><mo>)</mo></mrow><mi>𝜀</mi><mo rspace="0em">,</mo></mtd></mtr><mtr><mtd><mo lspace="0em" rspace="0em">exp</mo><mrow><mo>(</mo><mrow><mi>𝑎</mi><mo>+</mo><mi>𝑏</mi><mi>𝜀</mi></mrow><mo>)</mo></mrow></mtd><mtd><mo form="infix">=</mo><mo form="prefix" lspace="0em" rspace="0em">exp</mo><mrow><mo>(</mo><mi>𝑎</mi><mo>)</mo></mrow><mo>+</mo><mi>𝑏</mi><mo form="prefix" lspace="0.16666666666666666em" rspace="0em">exp</mo><mrow><mo>(</mo><mi>𝑎</mi><mo>)</mo></mrow><mi>𝜀</mi><mi>.</mi></mtd></mtr></mtable></math><p><span class="equation-number">(5)</span></p></div><p>Note that in general <math><mi>𝑏</mi></math> does not have to come from the derivative of <math><mi>𝑎</mi></math> with respect to some variable.</p><figure><p><span class="marginnote">Example 1: Evaluating a function on a dual number</span></p><div class="blog-example"><div style="background: #3d997026; border-radius: .4em; padding: 1em; width: 100%; box-sizing: border-box; margin-bottom: .5em;"><p><strong>Example 1 (Evaluating a function on a dual number)</strong>   Let <math><mi>𝑓</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mo>=</mo><mo form="prefix" lspace="0em" rspace="0em">sin</mo><mrow><mo>(</mo><mrow><mi>𝑥</mi><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">⋅</mo><mi>𝑥</mi></mrow><mo>)</mo></mrow><mo>+</mo><mi>𝑥</mi></math> and <math><mi>𝑥</mi><mo>=</mo><mn>2</mn></math>. Evaluating <math><mi>𝑓</mi><mrow><mo>(</mo><mrow><mn>2</mn><mo>+</mo><mi>𝜀</mi></mrow><mo>)</mo></mrow></math> one operation at a time using the rules above gives</p><div class="numbered-equation"><math display="block"><mtable class="multiline-equation aligned"><mtr><mtd><mi>𝑥</mi></mtd><mtd><mo form="infix">=</mo><mn>2</mn><mo>+</mo><mi>𝜀</mi><mo rspace="0em">,</mo></mtd></mtr><mtr><mtd><mi>𝑥</mi><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">⋅</mo><mi>𝑥</mi></mtd><mtd><mo form="infix">=</mo><mn>4</mn><mo>+</mo><mrow><mo>(</mo><mrow><mn>1</mn><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">⋅</mo><mn>2</mn><mo>+</mo><mn>2</mn><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">⋅</mo><mn>1</mn></mrow><mo>)</mo></mrow><mi>𝜀</mi><mo>=</mo><mn>4</mn><mo>+</mo><mn>4</mn><mi>𝜀</mi><mo rspace="0em">,</mo></mtd></mtr><mtr><mtd><mo lspace="0em" rspace="0em">sin</mo><mrow><mo>(</mo><mrow><mi>𝑥</mi><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">⋅</mo><mi>𝑥</mi></mrow><mo>)</mo></mrow></mtd><mtd><mo form="infix">=</mo><mo form="prefix" lspace="0em" rspace="0em">sin</mo><mrow><mo>(</mo><mn>4</mn><mo>)</mo></mrow><mo>+</mo><mn>4</mn><mo form="prefix" lspace="0.16666666666666666em" rspace="0em">cos</mo><mrow><mo>(</mo><mn>4</mn><mo>)</mo></mrow><mi>𝜀</mi><mo rspace="0em">,</mo></mtd></mtr><mtr><mtd><mo lspace="0em" rspace="0em">sin</mo><mrow><mo>(</mo><mrow><mi>𝑥</mi><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">⋅</mo><mi>𝑥</mi></mrow><mo>)</mo></mrow><mo>+</mo><mi>𝑥</mi></mtd><mtd><mo form="infix">=</mo><mrow><mo>(</mo><mrow><mo lspace="0em" rspace="0em">sin</mo><mrow><mo>(</mo><mn>4</mn><mo>)</mo></mrow><mo>+</mo><mn>2</mn></mrow><mo>)</mo></mrow><mo>+</mo><mrow><mo>(</mo><mrow><mn>4</mn><mo form="prefix" lspace="0.16666666666666666em" rspace="0em">cos</mo><mrow><mo>(</mo><mn>4</mn><mo>)</mo></mrow><mo>+</mo><mn>1</mn></mrow><mo>)</mo></mrow><mi>𝜀</mi><mi>.</mi></mtd></mtr></mtable></math><p><span class="equation-number">(6)</span></p></div><p>The coefficient of <math><mi>𝜀</mi></math> is <math><msup><mi>𝑓</mi><mo>′</mo></msup><mrow><mo>(</mo><mn>2</mn><mo>)</mo></mrow><mo>=</mo><mn>2</mn><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">⋅</mo><mn>2</mn><mo form="prefix" lspace="0.16666666666666666em" rspace="0em">cos</mo><mrow><mo>(</mo><msup><mn>2</mn><mn>2</mn></msup><mo>)</mo></mrow><mo>+</mo><mn>1</mn><mo>=</mo><mn>4</mn><mo form="prefix" lspace="0.16666666666666666em" rspace="0em">cos</mo><mrow><mo>(</mo><mn>4</mn><mo>)</mo></mrow><mo>+</mo><mn>1</mn></math>, even though <math><msup><mi>𝑓</mi><mo>′</mo></msup></math> was never written down.</p></div></div></figure><figure><p><span class="marginnote">Example 2: Scalar derivative in Julia</span></p><div class="blog-example"><div style="background: #3d997026; border-radius: .4em; padding: 1em; width: 100%; box-sizing: border-box; margin-bottom: .5em;"><p><strong>Example 2 (Scalar derivative in Julia)</strong>   Julia lets us define the arithmetic of a new type directly, so the scalar case takes only a few lines of code.</p><div class="expressive-code has-gutter" style="--ec-borderRad:0.34em;--ec-codePadBlk:0.34em;--ec-codePadInl:0.34em;--ec-codeFg:#000000;--ec-codeBg:#f5f5f5;--ec-langBg:#effbf9;--ec-langFg:#000000;--ec-copyBg:#f7f7f7;--ec-copyFg:#000000;--ec-gutterBg:#f5f5f5;--ec-gutterGap:0.25rem;--ec-gutterPadLeft:0.5rem;--ec-codeFontSize:0.85em;--ec-codeLineHeight:1.5;--ec-copyBgHover:#f8f8f8;--ec-copyBgFocus:#f8f8f8;--ec-copyFgHover:#000000;--ec-copyFgFocus:#000000;--ec-hlBg:#dff6f2;--ec-commentBg:#effbf9;--ec-gtrFg:#999999;--ec-gtrHighlightFg:#737373;--ec-gtrBrdCol:#999999a6"><div class="code-lang" translate="no">julia</div><button type="button" class="copy-button" title="Copy code" data-state="idle" aria-label="Copy code"><span class="sr-only">Copy code</span><span class="copy-label" aria-hidden="true">Copy</span><span class="copy-feedback" aria-hidden="true">Copied!</span></button><pre data-language="julia" class="wrap" style="--lnWidth:2ch"><code class="language-julia"><div class="ec-header ec-ext" style="background:#f5f5f5"></div><div class="ec-line"><div class="gutter"><div class="ln">1</div></div><div class="code" data-indent><span style="color: #74747c">#</span><span style="color: #74747c"> A small, deliberately incomplete forward-mode AD implementation.</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">2</div></div><div class="code" data-indent><span style="color: #d73948">struct</span> <span style="color: #4b69c6">Dual</span>{T<span style="color: #d73948">&lt;:</span><span style="color: #4b69c6">Real</span>}</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">3</div></div><div class="code" data-indent="    ">    value<span style="color: #d73948">::</span>T</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">4</div></div><div class="code" data-indent="    ">    deriv<span style="color: #d73948">::</span>T</div></div><div class="ec-line"><div class="gutter"><div class="ln">5</div></div><div class="code" data-indent><span style="color: #d73948">end</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">6</div></div><div class="code" data-indent><span style="color: #74747c">#</span><span style="color: #74747c"> Promote mixed inputs such as Dual(2, 1.0) to a common type</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">7</div></div><div class="code" data-indent>Dual(value<span style="color: #d73948">::</span><span style="color: #4b69c6">Real</span>, deriv<span style="color: #d73948">::</span><span style="color: #4b69c6">Real</span>) <span style="color: #d73948">=</span> Dual(promote(value, deriv)<span style="color: #d73948">...</span>)</div></div><div class="ec-line"><div class="gutter"><div class="ln">8</div></div><div class="code" data-indent></div></div><div class="ec-line"><div class="gutter"><div class="ln">9</div></div><div class="code" data-indent><span style="color: #74747c">#</span><span style="color: #74747c"> Product rule: (f * g)' = f' * g + f * g'</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">10</div></div><div class="code" data-indent><span style="color: #4b69c6">Base</span><span style="color: #d73948">.</span><span style="color: #d73948">:</span><span style="color: #d73948">*</span>(f<span style="color: #d73948">::</span>Dual, g<span style="color: #d73948">::</span>Dual) <span style="color: #d73948">=</span> Dual(</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">11</div></div><div class="code" data-indent="    ">    f.value <span style="color: #d73948">*</span> g.value,</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">12</div></div><div class="code" data-indent="    ">    f.deriv <span style="color: #d73948">*</span> g.value <span style="color: #d73948">+</span> f.value <span style="color: #d73948">*</span> g.deriv,</div></div><div class="ec-line"><div class="gutter"><div class="ln">13</div></div><div class="code" data-indent>)</div></div><div class="ec-line"><div class="gutter"><div class="ln">14</div></div><div class="code" data-indent><span style="color: #4b69c6">Base</span><span style="color: #d73948">.</span><span style="color: #d73948">:</span><span style="color: #d73948">*</span>(f<span style="color: #d73948">::</span>Dual, g<span style="color: #d73948">::</span><span style="color: #4b69c6">Real</span>) <span style="color: #d73948">=</span> f <span style="color: #d73948">*</span> Dual(g, zero(g))</div></div><div class="ec-line"><div class="gutter"><div class="ln">15</div></div><div class="code" data-indent><span style="color: #4b69c6">Base</span><span style="color: #d73948">.</span><span style="color: #d73948">:</span><span style="color: #d73948">*</span>(f<span style="color: #d73948">::</span><span style="color: #4b69c6">Real</span>, g<span style="color: #d73948">::</span>Dual) <span style="color: #d73948">=</span> Dual(f, zero(f)) <span style="color: #d73948">*</span> g</div></div><div class="ec-line"><div class="gutter"><div class="ln">16</div></div><div class="code" data-indent></div></div><div class="ec-line"><div class="gutter"><div class="ln">17</div></div><div class="code" data-indent><span style="color: #74747c">#</span><span style="color: #74747c"> Quotient rule: (f / g)' = (f' * g - f * g') / g^2</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">18</div></div><div class="code" data-indent><span style="color: #4b69c6">Base</span><span style="color: #d73948">.</span><span style="color: #d73948">:</span><span style="color: #d73948">/</span>(f<span style="color: #d73948">::</span>Dual, g<span style="color: #d73948">::</span>Dual) <span style="color: #d73948">=</span> Dual(</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">19</div></div><div class="code" data-indent="    ">    f.value <span style="color: #d73948">/</span> g.value,</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">20</div></div><div class="code" data-indent="    ">    (f.deriv <span style="color: #d73948">*</span> g.value <span style="color: #d73948">-</span> f.value <span style="color: #d73948">*</span> g.deriv) <span style="color: #d73948">/</span> g.value<span style="color: #d73948">^</span><span style="color: #b60157">2</span>,</div></div><div class="ec-line"><div class="gutter"><div class="ln">21</div></div><div class="code" data-indent>)</div></div><div class="ec-line"><div class="gutter"><div class="ln">22</div></div><div class="code" data-indent></div></div><div class="ec-line"><div class="gutter"><div class="ln">23</div></div><div class="code" data-indent><span style="color: #74747c">#</span><span style="color: #74747c"> Composition rule: (f ∘ g)' = (f' ∘ g) * g'</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">24</div></div><div class="code" data-indent><span style="color: #4b69c6">Base</span>.sin(f<span style="color: #d73948">::</span>Dual) <span style="color: #d73948">=</span> Dual(sin(f.value), cos(f.value) <span style="color: #d73948">*</span> f.deriv)</div></div><div class="ec-line"><div class="gutter"><div class="ln">25</div></div><div class="code" data-indent><span style="color: #4b69c6">Base</span>.exp(f<span style="color: #d73948">::</span>Dual) <span style="color: #d73948">=</span> Dual(exp(f.value), exp(f.value) <span style="color: #d73948">*</span> f.deriv)</div></div><div class="ec-line"><div class="gutter"><div class="ln">26</div></div><div class="code" data-indent></div></div><div class="ec-line"><div class="gutter"><div class="ln">27</div></div><div class="code" data-indent><span style="color: #74747c">#</span><span style="color: #74747c"> Addition rules: (f + g)' = f' + g', (f + c)' = f', (c + f)' = f'</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">28</div></div><div class="code" data-indent><span style="color: #4b69c6">Base</span><span style="color: #d73948">.</span><span style="color: #d73948">:</span><span style="color: #d73948">+</span>(f<span style="color: #d73948">::</span>Dual, g<span style="color: #d73948">::</span>Dual) <span style="color: #d73948">=</span> Dual(f.value <span style="color: #d73948">+</span> g.value, f.deriv <span style="color: #d73948">+</span> g.deriv)</div></div><div class="ec-line"><div class="gutter"><div class="ln">29</div></div><div class="code" data-indent><span style="color: #4b69c6">Base</span><span style="color: #d73948">.</span><span style="color: #d73948">:</span><span style="color: #d73948">+</span>(f<span style="color: #d73948">::</span>Dual, c<span style="color: #d73948">::</span><span style="color: #4b69c6">Real</span>) <span style="color: #d73948">=</span> f <span style="color: #d73948">+</span> Dual(c, zero(c))</div></div><div class="ec-line"><div class="gutter"><div class="ln">30</div></div><div class="code" data-indent><span style="color: #4b69c6">Base</span><span style="color: #d73948">.</span><span style="color: #d73948">:</span><span style="color: #d73948">+</span>(c<span style="color: #d73948">::</span><span style="color: #4b69c6">Real</span>, g<span style="color: #d73948">::</span>Dual) <span style="color: #d73948">=</span> Dual(c, zero(c)) <span style="color: #d73948">+</span> g</div></div><div class="ec-line"><div class="gutter"><div class="ln">31</div></div><div class="code" data-indent></div></div><div class="ec-line"><div class="gutter"><div class="ln">32</div></div><div class="code" data-indent><span style="color: #74747c">#</span><span style="color: #74747c"> Subtraction rules: (-f)' = -f', (f - g)' = f' - g'</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">33</div></div><div class="code" data-indent><span style="color: #4b69c6">Base</span><span style="color: #d73948">.</span><span style="color: #d73948">:</span><span style="color: #d73948">-</span>(f<span style="color: #d73948">::</span>Dual) <span style="color: #d73948">=</span> Dual(<span style="color: #d73948">-</span>f.value, <span style="color: #d73948">-</span>f.deriv)</div></div><div class="ec-line"><div class="gutter"><div class="ln">34</div></div><div class="code" data-indent><span style="color: #4b69c6">Base</span><span style="color: #d73948">.</span><span style="color: #d73948">:</span><span style="color: #d73948">-</span>(f<span style="color: #d73948">::</span>Dual, g<span style="color: #d73948">::</span>Dual) <span style="color: #d73948">=</span> f <span style="color: #d73948">+</span> (<span style="color: #d73948">-</span>g)</div></div><div class="ec-line"><div class="gutter"><div class="ln">35</div></div><div class="code" data-indent></div></div><div class="ec-line"><div class="gutter"><div class="ln">36</div></div><div class="code" data-indent><span style="color: #74747c">#</span><span style="color: #74747c"> The derivative is the epsilon coefficient of f(x + 1*epsilon)</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">37</div></div><div class="code" data-indent>derivative(f, x) <span style="color: #d73948">=</span> f(Dual(x, one(x))).deriv</div></div><div class="ec-line"><div class="gutter"><div class="ln">38</div></div><div class="code" data-indent></div></div><div class="ec-line"><div class="gutter"><div class="ln">39</div></div><div class="code" data-indent><span style="color: #74747c">#</span><span style="color: #74747c"> Dual is not a Number, so Base's generic ^ does not apply to it and</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">40</div></div><div class="code" data-indent><span style="color: #74747c">#</span><span style="color: #74747c"> f_scalar(x) = sin(x^2) + x would throw a MethodError</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">41</div></div><div class="code" data-indent>f_scalar(x) <span style="color: #d73948">=</span> sin(x <span style="color: #d73948">*</span> x) <span style="color: #d73948">+</span> x</div></div><div class="ec-line"><div class="gutter"><div class="ln">42</div></div><div class="code" data-indent>@<span style="color: #4b69c6">assert</span> isapprox(derivative(f_scalar, <span style="color: #b60157">2.0</span>), <span style="color: #b60157">4</span>cos(<span style="color: #b60157">4.0</span>) <span style="color: #d73948">+</span> <span style="color: #b60157">1</span>)</div></div><div class="ec-line"><div class="gutter"><div class="ln">43</div></div><div class="code" data-indent></div></div><div class="ec-line"><div class="gutter"><div class="ln">44</div></div><div class="code" data-indent>println(<span style="color: #198810">"</span><span style="color: #198810">f'(2) = </span><span style="color: #198810">"</span>, derivative(f_scalar, <span style="color: #b60157">2.0</span>))</div></div><div class="ec-footer ec-ext" style="background:#f5f5f5"></div></code></pre></div></div></div></figure><h2 id="loc-3">2. Jacobian-vector products</h2><p>For a multivariate function <math><mi>𝑓</mi><mo lspace="0.2777777777777778em" rspace="0.2777777777777778em">:</mo><msup><mi>ℝ</mi><mi>𝑛</mi></msup><mo stretchy="false">→</mo><msup><mi>ℝ</mi><mi>𝑚</mi></msup></math> the simplest extension keeps a single <math><mi>𝜀</mi></math> and seeds each input <math><msub><mi>𝑥</mi><mi>𝑗</mi></msub></math> with a direction <math><msub><mi>𝑣</mi><mi>𝑗</mi></msub></math>. The dual numbers then track the function value and a directional derivative (a Jacobian-vector product) at the same time, i.e.,</p><div id="jvp" class="numbered-equation"><math display="block"><mi>𝑓</mi><mrow><mo>(</mo><mrow><mi>𝑥</mi><mo>+</mo><mi>𝜀</mi><mi>𝑣</mi></mrow><mo>)</mo></mrow><mo>=</mo><mi>𝑓</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mo>+</mo><mrow><mo>(</mo><mrow><msub><mi>𝐽</mi><mi>𝑓</mi></msub><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mi>𝑣</mi></mrow><mo>)</mo></mrow><mi>𝜀</mi><mo rspace="0em">,</mo></math><p><span class="equation-number">(7)</span></p></div><p>where <math><msub><mi>𝐽</mi><mi>𝑓</mi></msub><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow></math> is the Jacobian. This definition follows directly by looking at the <math><mi>𝑖</mi></math>th entry as</p><div class="numbered-equation"><math display="block"><msub><mrow><mi>𝑓</mi><mrow><mo>(</mo><mrow><mi>𝑥</mi><mo>+</mo><mi>𝜀</mi><mi>𝑣</mi></mrow><mo>)</mo></mrow></mrow><mi>𝑖</mi></msub><mo>=</mo><msub><mi>𝑓</mi><mi>𝑖</mi></msub><mrow><mo>(</mo><mrow><mi>𝑥</mi><mo>+</mo><mi>𝜀</mi><mi>𝑣</mi></mrow><mo>)</mo></mrow><mo>=</mo><msub><mi>𝑓</mi><mi>𝑖</mi></msub><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mo>+</mo><mrow><mo>(</mo><mrow><munderover><mo lspace="0em">∑</mo><mrow><mi>𝑗</mi><mo lspace="0em" rspace="0em">=</mo><mn>1</mn></mrow><mi>𝑛</mi></munderover><mfrac><mrow><mi>𝜕</mi><msub><mi>𝑓</mi><mi>𝑖</mi></msub><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow></mrow><mrow><mi>𝜕</mi><msub><mi>𝑥</mi><mi>𝑗</mi></msub></mrow></mfrac><msub><mi>𝑣</mi><mi>𝑗</mi></msub></mrow><mo>)</mo></mrow><mi>𝜀</mi><mi>.</mi></math><p><span class="equation-number">(8)</span></p></div><p>A thing to note here is that the sum is computed automatically by the dual number arithmetic, and hence we never form the Jacobian. From a scaling perspective, this is a big win as the Jacobian is <math><mi>𝑚</mi><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">×</mo><mi>𝑛</mi></math> in size, and hence can be very large.</p><p>The price is that one evaluation gives one product <math><msub><mi>𝐽</mi><mi>𝑓</mi></msub><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mi>𝑣</mi></math>. Its cost is a small multiple of the cost of evaluating <math><mi>𝑓</mi></math>, but the full Jacobian requires <math><mi>𝑛</mi></math> evaluations, one for each unit vector <math><mi>𝑣</mi><mo>=</mo><msub><mi>𝑒</mi><mi>𝑗</mi></msub></math>. Forward mode is therefore well suited when <math><mi>𝑛</mi></math> is small compared to <math><mi>𝑚</mi></math>. In the opposite case reverse mode (backpropagation) is preferred. It computes one vector-Jacobian product <math><msup><mi>𝑤</mi><mi>⊤</mi></msup><msub><mi>𝐽</mi><mi>𝑓</mi></msub><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow></math> per evaluation, also at a small multiple of the cost of evaluating <math><mi>𝑓</mi></math>, so the full Jacobian requires <math><mi>𝑚</mi></math> evaluations, one for each unit vector <math><mi>𝑤</mi><mo>=</mo><msub><mi>𝑒</mi><mi>𝑖</mi></msub></math>. The price is that the intermediate values of <math><mi>𝑓</mi></math> must be stored for the backward pass. The common case of a scalar loss of many parameters (<math><mi>𝑚</mi><mo>=</mo><mn>1</mn></math>) needs only a single evaluation; see <a href="/blog/2026/10-05-backpropagation-linear-solve/">Backpropagation as a Linear Solve</a>.<sup class="footnote-ref"><a class="footnote-ref-link" href="#fn-1" id="fnref-1">1</a></sup><span class="marginnote" id="fn-1"><sup><a class="footnote-ref-link" href="#fnref-1">1</a></sup> In the notation of that post, the Jacobian of a network is <math><mi>𝑃</mi><msup><mi>𝐿</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><msup><mi>𝑀</mi><mi>⊤</mi></msup></math>, where <math><mi>𝐿</mi></math> is block lower triangular. Forward mode multiplies <math><mi>𝑣</mi></math> from the right, <math><mi>𝑃</mi><mrow><mo>(</mo><mrow><msup><mi>𝐿</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mrow><mo>(</mo><mrow><msup><mi>𝑀</mi><mi>⊤</mi></msup><mi>𝑣</mi></mrow><mo>)</mo></mrow></mrow><mo>)</mo></mrow></math>, so the solve with <math><mi>𝐿</mi></math> is a forward substitution that follows the layers in order, exactly as the dual numbers do. Reverse mode multiplies <math><msup><mi>𝑤</mi><mi>⊤</mi></msup></math> from the left, <math><mrow><mo>(</mo><mrow><mrow><mo>(</mo><mrow><msup><mi>𝑤</mi><mi>⊤</mi></msup><mi>𝑃</mi></mrow><mo>)</mo></mrow><msup><mi>𝐿</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup></mrow><mo>)</mo></mrow><msup><mi>𝑀</mi><mi>⊤</mi></msup></math>, so the solve becomes the backward substitution <math><msup><mi>𝐿</mi><mi>⊤</mi></msup><mi>𝜆</mi><mo>=</mo><msup><mi>𝑃</mi><mi>⊤</mi></msup><mi>𝑤</mi></math>.</span></p><figure><p><span class="marginnote">Example 3: Jacobian-vector product in Julia</span></p><div class="blog-example"><div style="background: #3d997026; border-radius: .4em; padding: 1em; width: 100%; box-sizing: border-box; margin-bottom: .5em;"><p><strong>Example 3 (Jacobian-vector product in Julia)</strong>   Let</p><div class="numbered-equation"><math display="block"><mi>𝑓</mi><mrow><mo>(</mo><mrow><msub><mi>𝑥</mi><mn>1</mn></msub><mo>,</mo><msub><mi>𝑥</mi><mn>2</mn></msub></mrow><mo>)</mo></mrow><mo>=</mo><mrow><mo>(</mo><mrow><msub><mi>𝑥</mi><mn>1</mn></msub><msub><mi>𝑥</mi><mn>2</mn></msub><mo>+</mo><mo form="prefix" lspace="0em" rspace="0em">sin</mo><mrow><mo>(</mo><msub><mi>𝑥</mi><mn>1</mn></msub><mo>)</mo></mrow><mo>,</mo><mo form="prefix" lspace="0em" rspace="0em">exp</mo><mrow><mo>(</mo><msub><mi>𝑥</mi><mn>2</mn></msub><mo>)</mo></mrow></mrow><mo>)</mo></mrow><mi>.</mi></math><p><span class="equation-number">(9)</span></p></div><p>At <math><mi>𝑥</mi><mo>=</mo><mrow><mo>(</mo><mrow><mn>2</mn><mo>,</mo><mn>3</mn></mrow><mo>)</mo></mrow></math> in the direction <math><mi>𝑣</mi><mo>=</mo><mrow><mo>(</mo><mrow><mn>1</mn><mo>,</mo><mo form="prefix">−</mo><mn>1</mn></mrow><mo>)</mo></mrow></math>, <a href="#jvp">(7)</a> gives</p><div class="numbered-equation"><math display="block"><msub><mi>𝐽</mi><mi>𝑓</mi></msub><mrow><mo>(</mo><mrow><mn>2</mn><mo>,</mo><mn>3</mn></mrow><mo>)</mo></mrow><mi>𝑣</mi><mo>=</mo><mrow><mo>[</mo><mtable><mtr><mtd><mn>3</mn><mo>+</mo><mo form="prefix" lspace="0em" rspace="0em">cos</mo><mrow><mo>(</mo><mn>2</mn><mo>)</mo></mrow></mtd><mtd><mn>2</mn></mtd></mtr><mtr><mtd><mn>0</mn></mtd><mtd><mo lspace="0em" rspace="0em">exp</mo><mrow><mo>(</mo><mn>3</mn><mo>)</mo></mrow></mtd></mtr></mtable><mo>]</mo></mrow><mrow><mo>[</mo><mtable><mtr><mtd><mn>1</mn></mtd></mtr><mtr><mtd><mo>−</mo><mn>1</mn></mtd></mtr></mtable><mo>]</mo></mrow><mo>=</mo><mrow><mo>[</mo><mtable><mtr><mtd><mn>1</mn><mo>+</mo><mo form="prefix" lspace="0em" rspace="0em">cos</mo><mrow><mo>(</mo><mn>2</mn><mo>)</mo></mrow></mtd></mtr><mtr><mtd><mo>−</mo><mo form="prefix" lspace="0.16666666666666666em" rspace="0em">exp</mo><mrow><mo>(</mo><mn>3</mn><mo>)</mo></mrow></mtd></mtr></mtable><mo>]</mo></mrow><mi>.</mi></math><p><span class="equation-number">(10)</span></p></div><div class="expressive-code has-gutter" style="--ec-borderRad:0.34em;--ec-codePadBlk:0.34em;--ec-codePadInl:0.34em;--ec-codeFg:#000000;--ec-codeBg:#f5f5f5;--ec-langBg:#effbf9;--ec-langFg:#000000;--ec-copyBg:#f7f7f7;--ec-copyFg:#000000;--ec-gutterBg:#f5f5f5;--ec-gutterGap:0.25rem;--ec-gutterPadLeft:0.5rem;--ec-codeFontSize:0.85em;--ec-codeLineHeight:1.5;--ec-copyBgHover:#f8f8f8;--ec-copyBgFocus:#f8f8f8;--ec-copyFgHover:#000000;--ec-copyFgFocus:#000000;--ec-hlBg:#dff6f2;--ec-commentBg:#effbf9;--ec-gtrFg:#999999;--ec-gtrHighlightFg:#737373;--ec-gtrBrdCol:#999999a6"><div class="code-lang" translate="no">julia</div><button type="button" class="copy-button" title="Copy code" data-state="idle" aria-label="Copy code"><span class="sr-only">Copy code</span><span class="copy-label" aria-hidden="true">Copy</span><span class="copy-feedback" aria-hidden="true">Copied!</span></button><pre data-language="julia" class="wrap" style="--lnWidth:2ch"><code class="language-julia"><div class="ec-header ec-ext" style="background:#f5f5f5"></div><div class="ec-line"><div class="gutter"><div class="ln">1</div></div><div class="code" data-indent>@<span style="color: #4b69c6">isdefined</span>(Dual) <span style="color: #d73948">||</span> include(<span style="color: #198810">"</span><span style="color: #198810">dual_numbers.jl</span><span style="color: #198810">"</span>)</div></div><div class="ec-line"><div class="gutter"><div class="ln">2</div></div><div class="code" data-indent></div></div><div class="ec-line"><div class="gutter"><div class="ln">3</div></div><div class="code" data-indent><span style="color: #d73948">function</span> <span style="color: #4b69c6">jvp</span>(f, x, v)</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">4</div></div><div class="code" data-indent="    ">    @<span style="color: #4b69c6">assert</span> length(x) <span style="color: #d73948">==</span> length(v)</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">5</div></div><div class="code" data-indent="    ">    seeded <span style="color: #d73948">=</span> [Dual(xi, vi) <span style="color: #d73948">for</span> (xi, vi) <span style="color: #d73948">in</span> zip(x, v)]</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">6</div></div><div class="code" data-indent="    ">    result <span style="color: #d73948">=</span> f(seeded)</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">7</div></div><div class="code" data-indent="    ">    <span style="color: #d73948">return</span> map(z <span style="color: #d73948">-></span> z.value, result), map(z <span style="color: #d73948">-></span> z.deriv, result)</div></div><div class="ec-line"><div class="gutter"><div class="ln">8</div></div><div class="code" data-indent><span style="color: #d73948">end</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">9</div></div><div class="code" data-indent></div></div><div class="ec-line"><div class="gutter"><div class="ln">10</div></div><div class="code" data-indent>f_vector(x) <span style="color: #d73948">=</span> (x[<span style="color: #b60157">1</span>] <span style="color: #d73948">*</span> x[<span style="color: #b60157">2</span>] <span style="color: #d73948">+</span> sin(x[<span style="color: #b60157">1</span>]), exp(x[<span style="color: #b60157">2</span>]))</div></div><div class="ec-line"><div class="gutter"><div class="ln">11</div></div><div class="code" data-indent>x, v <span style="color: #d73948">=</span> [<span style="color: #b60157">2.0</span>, <span style="color: #b60157">3.0</span>], [<span style="color: #b60157">1.0</span>, <span style="color: #d73948">-</span><span style="color: #b60157">1.0</span>]</div></div><div class="ec-line"><div class="gutter"><div class="ln">12</div></div><div class="code" data-indent>value, deriv <span style="color: #d73948">=</span> jvp(f_vector, x, v)</div></div><div class="ec-line"><div class="gutter"><div class="ln">13</div></div><div class="code" data-indent>@<span style="color: #4b69c6">assert</span> all(isapprox<span style="color: #d73948">.</span>(value, (<span style="color: #b60157">6</span> <span style="color: #d73948">+</span> sin(<span style="color: #b60157">2.0</span>), exp(<span style="color: #b60157">3.0</span>))))</div></div><div class="ec-line"><div class="gutter"><div class="ln">14</div></div><div class="code" data-indent>@<span style="color: #4b69c6">assert</span> all(isapprox<span style="color: #d73948">.</span>(deriv, (<span style="color: #b60157">1</span> <span style="color: #d73948">+</span> cos(<span style="color: #b60157">2.0</span>), <span style="color: #d73948">-</span>exp(<span style="color: #b60157">3.0</span>))))</div></div><div class="ec-line"><div class="gutter"><div class="ln">15</div></div><div class="code" data-indent></div></div><div class="ec-line"><div class="gutter"><div class="ln">16</div></div><div class="code" data-indent>println(<span style="color: #198810">"</span><span style="color: #198810">f(</span><span style="color: #d73948">$</span><span style="color: #8b41b1">x</span><span style="color: #198810">) = </span><span style="color: #198810">"</span>, value)</div></div><div class="ec-line"><div class="gutter"><div class="ln">17</div></div><div class="code" data-indent>println(<span style="color: #198810">"</span><span style="color: #198810">Jf(</span><span style="color: #d73948">$</span><span style="color: #8b41b1">x</span><span style="color: #198810">)</span><span style="color: #d73948">$</span><span style="color: #8b41b1">v</span><span style="color: #198810"> = </span><span style="color: #198810">"</span>, deriv)</div></div><div class="ec-footer ec-ext" style="background:#f5f5f5"></div></code></pre></div></div></div></figure><section class="post-citation"><h2>Cite this post</h2><div class="expressive-code" style="--ec-borderRad:0.34em;--ec-codePadBlk:0.34em;--ec-codePadInl:0.34em;--ec-codeFg:#000000;--ec-codeBg:#f5f5f5;--ec-langBg:#effbf9;--ec-langFg:#000000;--ec-copyBg:#f7f7f7;--ec-copyFg:#000000;--ec-gutterBg:#f5f5f5;--ec-gutterGap:0.25rem;--ec-gutterPadLeft:0.5rem;--ec-codeFontSize:0.85em;--ec-codeLineHeight:1.5;--ec-copyBgHover:#f8f8f8;--ec-copyBgFocus:#f8f8f8;--ec-copyFgHover:#000000;--ec-copyFgFocus:#000000;--ec-hlBg:#dff6f2;--ec-commentBg:#effbf9"><div class="code-lang" translate="no">bibtex</div><button type="button" class="copy-button" title="Copy code" data-state="idle" aria-label="Copy code"><span class="sr-only">Copy code</span><span class="copy-label" aria-hidden="true">Copy</span><span class="copy-feedback" aria-hidden="true">Copied!</span></button><pre data-language="bibtex"><code class="language-bibtex"><div class="ec-header ec-ext" style="background:#f5f5f5"></div><div class="ec-line"><div class="code" data-indent>@misc{paltorp2026dualnumbers,</div></div><div class="ec-line" style="--ecIndent:2ch"><div class="code" data-indent="  ">  author = {Paltorp, Mikkel},</div></div><div class="ec-line" style="--ecIndent:2ch"><div class="code" data-indent="  ">  title = {{Dual Numbers for Automatic Differentiation}},</div></div><div class="ec-line" style="--ecIndent:2ch"><div class="code" data-indent="  ">  year = {2026},</div></div><div class="ec-line" style="--ecIndent:2ch"><div class="code" data-indent="  ">  month = sep,</div></div><div class="ec-line" style="--ecIndent:2ch"><div class="code" data-indent="  ">  url = {https://mipals.github.io/pdf/2026/09-25-dual-numbers/dual-numbers.pdf},</div></div><div class="ec-line" style="--ecIndent:2ch"><div class="code" data-indent="  ">  note = {Blog post}</div></div><div class="ec-line"><div class="code" data-indent>}</div></div><div class="ec-footer ec-ext" style="background:#f5f5f5"></div></code></pre></div></section><section role="doc-bibliography"><h2 id="loc-4">Bibliography</h2><ul style="list-style-type: none"><li id="loc-5"><span class="prefix"><a href="#loc-2" role="doc-backlink">[1]</a></span> J. Revels, M. Lubin, and T. Papamarkou, “Forward-Mode Automatic Differentiation in Julia,” <em>arXiv</em>, 2016, [Online].<span style="white-space: pre-wrap">&#x20;&#x20;</span>Available: <a href="https://arxiv.org/abs/1607.07892">https://arxiv.org/abs/1607.07892</a></li></ul></section><script>document.querySelectorAll('.ec-line .code[data-indent]').forEach((line) => line.removeAttribute('data-indent'));</script></section></article></body></html>

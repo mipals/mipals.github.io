@@ -1,0 +1,1616 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>polar express</title><link rel="icon" href="/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tufte-css/1.8.0/tufte.min.css"><link rel="stylesheet" href="/assets/tufted.css"><link rel="stylesheet" href="/assets/custom.css"><style>/* Alignment */
+mtable.right-align mtd,
+mtable mtd.right-align,
+mtable.left-align mtd.right-align,
+mtable.aligned mtd:nth-child(odd) {
+  justify-items: end;
+  text-align: right;
+}
+mtable.cases mtd,
+mtable.left-align mtd,
+mtable mtd.left-align,
+mtable.aligned mtd:nth-child(even),
+math:is(:not([display])) > mtable.multiline-equation mtd {
+  justify-items: start;
+  text-align: left;
+}
+mtable.cases mtd,
+mtable.aligned mtd,
+mtable mtd.flushed,
+mtable mtd.left-flush {
+  padding-left: 0;
+}
+mtable.cases mtd,
+mtable.aligned mtd,
+mtable mtd.flushed,
+mtable mtd.right-flush {
+  padding-right: 0;
+}
+
+/* Tables */
+mtable {
+  math-style: inherit;
+}
+mtd {
+  math-depth: auto-add;
+  math-style: compact;
+  math-shift: compact;
+}
+
+/* Equations */
+mtable.multiline-equation mtd {
+  math-depth: inherit;
+  math-style: inherit;
+  math-shift: inherit;
+  padding: 0;
+}
+math > mtable.multiline-equation mtr:not(:last-child) mtd {
+  padding-bottom: 0.5em;
+}
+
+/* Fractions */
+mfrac {
+  padding-inline: 0;
+  margin-inline: 0.1em;
+}
+
+/* Accents */
+mover[accent="true" i] > :first-child {
+  font-feature-settings: "dtls";
+}
+mover.dotted[accent="true" i] > :first-child {
+  font-feature-settings: "dtls" 0;
+}
+
+/* Other rules for scriptlevel, displaystyle and math-shift */
+munder > :nth-child(2),
+munderover > :nth-child(2) {
+  math-shift: compact
+}
+munder[accentunder="true" i] > :not(:first-child),
+mover[accent="true" i] > :not(:first-child) {
+  math-depth: inherit;
+  math-style: inherit;
+  math-shift: inherit;
+}</style></head><body><header><nav><a href="/">home</a><a href="/blog/">blog</a><a href="/publications/">publications</a><a href="/repositories/">repositories</a><a href="/about/">about</a><a href="/solver/">conic solver</a><a href="/marimo/">marimo</a></nav></header><article><section><style>@layer components {
+  .expressive-code {
+    position: relative;
+    font-family: var(
+      --ec-uiFontFamily,
+      ui-sans-serif,
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      sans-serif
+    );
+    font-size: var(--ec-uiFontSize, 0.9rem);
+    font-weight: var(--ec-uiFontWeight, 400);
+    line-height: var(--ec-uiLineHeight, 1.65);
+    text-size-adjust: none;
+    -webkit-text-size-adjust: none;
+  }
+
+  .expressive-code *:not(:is(svg, svg *)) {
+    box-sizing: border-box;
+  }
+
+  .expressive-code::selection {
+    background: var(--ec-uiSelBg, var(--ec-codeBg, #0d1117));
+    color: var(--ec-uiSelFg, currentColor);
+  }
+
+  .expressive-code pre {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    border: var(--ec-borderWd, 1.5px) solid
+      var(--ec-borderCol, rgba(148, 163, 184, 0.25));
+    border-radius: calc(
+      var(--ec-borderRad, 0.3rem) + var(--ec-borderWd, 1.5px)
+    );
+    background: var(--ec-codeBg, #0d1117);
+    color: var(--ec-codeFg, #c9d1d9);
+    overflow-x: auto;
+    position: relative;
+    z-index: 1;
+    container-type: inline-size;
+  }
+
+  .expressive-code pre:focus-visible {
+    outline: 3px solid var(--ec-focusBorder, #3b82f6);
+    outline-offset: -3px;
+  }
+
+  .expressive-code pre > code {
+    all: unset;
+    display: block;
+    flex: 1 0 100%;
+    padding: var(--ec-codePadBlk, 0.5rem) 0;
+    color: var(--ec-codeFg, #c9d1d9);
+    font-family: var(
+      --ec-codeFontFamily,
+      ui-monospace,
+      SFMono-Regular,
+      Menlo,
+      Monaco,
+      Consolas,
+      "Liberation Mono",
+      "Courier New",
+      monospace
+    );
+    font-size: var(--ec-codeFontSize, 0.85rem);
+    font-weight: var(--ec-codeFontWeight, 400);
+    line-height: var(--ec-codeLineHeight, 1.35);
+  }
+
+  .expressive-code pre > code::selection {
+    background: var(--ec-codeSelBg, rgba(56, 189, 248, 0.35));
+    color: inherit;
+  }
+
+  .expressive-code pre.wrap .ec-line .code {
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    min-width: min(20ch, var(--ecMaxLine, 20ch));
+  }
+
+  /* When lines are allowed to wrap, the absolute overlay can overlap
+     wrapped text. Disable the overlay in wrap mode and rely on per-slot
+     borders for guides (these are handled by .indent-slot). */
+  .expressive-code pre.wrap .ec-line .code .indent-overlay {
+    display: none;
+  }
+
+  .expressive-code pre.wrap .ec-line .code::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    /* use the code line-height times the element font-size to match one line */
+    height: calc(var(--ec-codeLineHeight, 1.65) * 1em);
+    width: max(0px, calc(var(--ecIndent, 0) - 2px));
+    pointer-events: none;
+    background-image: repeating-linear-gradient(
+      to right,
+      transparent 0,
+      transparent calc(var(--ec-indentStep, 4ch) - 1px),
+      var(--ec-indentGuideCol, rgba(148, 163, 184, 0.35))
+        calc(var(--ec-indentStep, 4ch) - 1px),
+      var(--ec-indentGuideCol, rgba(148, 163, 184, 0.35))
+        var(--ec-indentStep, 4ch)
+    );
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    mix-blend-mode: multiply;
+    opacity: 0.85;
+    z-index: 0;
+  }
+
+  .expressive-code pre.wrap .ec-line .code span.indent {
+    white-space: pre;
+  }
+
+  .expressive-code .ec-line .code .indent {
+    display: inline-flex;
+    white-space: pre;
+  }
+
+  .expressive-code .ec-line .code .indent-slot {
+    display: inline-flex;
+    white-space: pre;
+    position: relative;
+  }
+
+  .expressive-code.has-indent-guides .ec-line .code .indent-slot {
+    border-inline-end: 1px solid
+      var(--ec-indentGuideCol, rgba(148, 163, 184, 0.35));
+  }
+
+  .expressive-code.has-indent-guides
+    .ec-line
+    .code
+    .indent-slot.indent-slot-partial {
+    border-inline-end: none;
+  }
+
+  .expressive-code pre::-webkit-scrollbar,
+  .expressive-code pre::-webkit-scrollbar-track {
+    background-color: inherit;
+    border-radius: calc(
+      var(--ec-borderRad, 0.3rem) + var(--ec-borderWd, 1.5px)
+    );
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+
+  .expressive-code pre::-webkit-scrollbar-thumb {
+    background-color: var(--ec-scrollbarThumbCol, rgba(148, 163, 184, 0.4));
+    border: 4px solid transparent;
+    background-clip: content-box;
+    border-radius: 10px;
+  }
+
+  .expressive-code pre::-webkit-scrollbar-thumb:hover {
+    background-color: var(
+      --ec-scrollbarThumbHoverCol,
+      rgba(148, 163, 184, 0.55)
+    );
+  }
+
+  .expressive-code .code-lang {
+    position: absolute;
+    top: 0.25rem;
+    right: 0.6rem;
+    padding: 0;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.25rem;
+    background: none;
+    color: var(--ec-langFg, var(--ec-codeFg, currentColor));
+    font-size: 0.68em;
+    pointer-events: none;
+    opacity: 0.6;
+    transition: opacity 160ms ease, color 160ms ease;
+    z-index: 2;
+  }
+
+  .expressive-code:focus-within .code-lang,
+  .expressive-code:hover .code-lang {
+    opacity: 1;
+    color: var(--ec-langFg, var(--ec-codeFg, currentColor));
+  }
+
+  .expressive-code .copy-button {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.3rem;
+    height: 2.3rem;
+    border-radius: 0.45rem;
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    background-color: var(--ec-copyBg, rgba(15, 23, 42, 0.04));
+    color: var(--ec-copyFg, rgba(15, 23, 42, 0.7));
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: auto;
+    transition: opacity 160ms ease, transform 160ms ease,
+      background-color 140ms ease, color 140ms ease;
+    transform: translateY(-0.3rem);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns%3D%27http://www.w3.org/2000/svg%27 viewBox%3D%270 0 24 24%27 fill%3D%27none%27 stroke%3D%27currentColor%27 stroke-width%3D%271.75%27 stroke-linecap%3D%27round%27 stroke-linejoin%3D%27round%27%3E%3Cpath d%3D%27M3 19a2 2 0 0 1-1-2V3a2 2 0 0 1 1-1h13a2 2 0 0 1 2 1%27/%3E%3Crect x%3D%276%27 y%3D%275%27 width%3D%2716%27 height%3D%2718%27 rx%3D%271.6%27 ry%3D%271.6%27/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 60%;
+    z-index: 3;
+  }
+
+  .expressive-code .copy-button:is(:hover, :focus-visible, :active) {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .expressive-code .copy-button:focus-visible {
+    outline: 2px solid rgba(148, 163, 184, 0.55);
+    outline-offset: 2px;
+    background-color: var(--ec-copyBgFocus, rgba(15, 23, 42, 0.16));
+    color: var(--ec-copyFgFocus, rgba(15, 23, 42, 1));
+  }
+
+  .expressive-code .copy-button::before {
+    content: "";
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    background: transparent;
+    border: none;
+    pointer-events: none;
+  }
+
+  .expressive-code .copy-button::after {
+    content: none;
+    pointer-events: none;
+  }
+
+  .expressive-code .copy-button .copy-label,
+  .expressive-code .copy-button .copy-feedback {
+    display: none;
+  }
+
+  .expressive-code .copy-button:hover {
+    background-color: var(--ec-copyBgHover, rgba(15, 23, 42, 0.12));
+    color: var(--ec-copyFgHover, rgba(15, 23, 42, 0.9));
+  }
+
+  .expressive-code .copy-button span[aria-hidden="true"] {
+    font-family: var(--ec-uiFontFamily, inherit);
+  }
+
+  .expressive-code .ec-header,
+  .expressive-code .ec-footer {
+    display: block;
+    padding: 0.35rem var(--ec-codePadInl, 1.35rem);
+    color: var(--ec-uiFg, currentColor);
+  }
+
+  .expressive-code .ec-header.ec-ext,
+  .expressive-code .ec-footer.ec-ext {
+    padding: 0.25rem var(--ec-codePadInl, 1.35rem);
+  }
+
+  .expressive-code .ec-line {
+    direction: ltr;
+    unicode-bidi: isolate;
+    display: grid;
+    grid-template-areas: "gutter code";
+    grid-template-columns: auto 1fr;
+    column-gap: var(--ec-gutterGap, 0.25rem);
+    position: relative;
+    --lineBg: var(--ec-codeBg, #0d1117);
+    background: var(--lineBg);
+  }
+
+  .expressive-code:not(.has-gutter) .ec-line {
+    grid-template-columns: 1fr;
+  }
+
+  .expressive-code:not(.has-gutter) .ec-line .code {
+    padding-inline: var(--ec-codePadInl, 1.35rem);
+  }
+
+  .expressive-code .ec-line .gutter {
+    grid-area: gutter;
+    color: var(--ec-gtrFg, rgba(148, 163, 184, 0.8));
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: var(--lineBg, var(--ec-gutterBg, var(--ec-codeBg, #0d1117)));
+    box-shadow: 1px 0 0 var(--ec-gtrBrdCol, rgba(148, 163, 184, 0.2));
+  }
+
+  .expressive-code .ec-line .gutter > * {
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .expressive-code .ec-line .gutter ~ .code {
+    --ecLineBrdCol: var(--ec-gtrBrdCol, rgba(148, 163, 184, 0.2));
+  }
+
+  .expressive-code .ec-line.highlight .gutter {
+    color: var(--ec-gtrHighlightFg, rgba(226, 232, 240, 0.95));
+  }
+
+  .expressive-code .ec-line .gutter .ln {
+    display: inline-flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+    box-sizing: content-box;
+    min-width: var(--lnWidth, 2ch);
+    padding-inline-start: var(--ec-gutterPadLeft, 0.5rem);
+    padding-inline-end: var(--ec-codePadInl, 1.35rem);
+    font-size: var(--ec-codeFontSize, 0.85rem);
+    font-variant-numeric: tabular-nums;
+    color: inherit;
+  }
+
+  .expressive-code .ec-line .gutter .ln > span + span {
+    margin-inline-start: 0.25em;
+  }
+
+  .expressive-code .ec-line .code {
+    position: relative;
+    z-index: 1;
+  }
+
+  .expressive-code .ec-line .code .indent-overlay {
+    display: none;
+  }
+
+  .expressive-code.has-indent-guides .ec-line .code .indent-overlay {
+    position: absolute;
+    inset: 0 auto 0 0;
+    display: block;
+    /* Shrink overlay by 1px to avoid drawing a vertical guide at the very end of
+       the inline area (prevents an extra line appearing at each row end).
+       Use max(...) to avoid negative values when --ecIndent is small. */
+    width: max(0px, calc(var(--ecIndent, 0) - 2px));
+    pointer-events: none;
+    background-image: repeating-linear-gradient(
+      to right,
+      transparent 0,
+      transparent calc(var(--ec-indentStep, 4ch) - 1px),
+      var(--ec-indentGuideCol, rgba(148, 163, 184, 0.35))
+        calc(var(--ec-indentStep, 4ch) - 1px),
+      var(--ec-indentGuideCol, rgba(148, 163, 184, 0.35))
+        var(--ec-indentStep, 4ch)
+    );
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    mix-blend-mode: multiply;
+    opacity: 0.85;
+    z-index: 0;
+  }
+  .expressive-code .ec-comment {
+    grid-column: 1 / -1;
+    padding: 0.55rem calc(var(--ec-codePadInl, 1.35rem) + 0.25rem);
+    font-size: 0.85em;
+    background: var(--ec-commentBg, rgba(56, 189, 248, 0.18));
+    color: var(--ec-commentFg, currentColor);
+    box-shadow: inset 0 1px 0 rgba(15, 23, 42, 0.08),
+      inset 0 -1px 0 rgba(15, 23, 42, 0.06);
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    width: 100cqw;
+    box-sizing: border-box;
+  }
+
+  .expressive-code .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  code.expressive-code-inline {
+    display: inline-block;
+    padding: 0 var(--ec-inlinePadInl, 0.4rem);
+    border-radius: calc(var(--ec-borderRad, 0.3rem) / 1.2);
+    background: var(--ec-inlineBg, rgba(148, 163, 184, 0.2));
+    color: var(--ec-inlineFg, inherit);
+    font-family: var(
+      --ec-codeFontFamily,
+      ui-monospace,
+      SFMono-Regular,
+      Menlo,
+      Monaco,
+      Consolas,
+      "Liberation Mono",
+      "Courier New",
+      monospace
+    );
+    font-size: 0.95em;
+    line-height: 1.2;
+    white-space: pre;
+  }
+}
+</style><script>const CODE_BLOCK_SELECTOR = ".expressive-code";
+const COPY_BUTTON_SELECTOR = ".copy-button";
+
+const selectCodeBlocks = () =>
+  Array.from(document.querySelectorAll(CODE_BLOCK_SELECTOR));
+
+const extractCodeText = (codeBlock) =>
+  Array.from(codeBlock.querySelectorAll(".ec-line .code"))
+    .map((line) => {
+      const indent = line.dataset.indent ?? "";
+      const content = line.textContent
+        .replace(/\u00a0/g, " ")
+        .replace(/\u200b/gi, "");
+      return indent + content;
+    })
+    .join("\n");
+
+const fallbackCopy = (text) => {
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.setAttribute("readonly", "true");
+  textarea.style.position = "absolute";
+  textarea.style.left = "-9999px";
+  document.body.appendChild(textarea);
+  textarea.select();
+  /** @type {any} */ (document).execCommand("copy");
+  document.body.removeChild(textarea);
+};
+
+const setStateWithTimeout = (button, state, delay = 1600) => {
+  button.dataset.state = state;
+  if (state === "copied") {
+    setTimeout(() => {
+      if (button.dataset.state === "copied") {
+        button.dataset.state = "idle";
+      }
+    }, delay);
+  }
+};
+
+const bindCopyButton = (codeBlock) => {
+  if (!codeBlock || codeBlock.dataset.copyBound === "true") return;
+
+  const copyButton = codeBlock.querySelector(COPY_BUTTON_SELECTOR);
+  if (!copyButton) return;
+
+  codeBlock.dataset.copyBound = "true";
+
+  const copyHandler = async () => {
+    const code = extractCodeText(codeBlock);
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(code);
+      } else {
+        fallbackCopy(code);
+      }
+      setStateWithTimeout(copyButton, "copied");
+    } catch (error) {
+      try {
+        fallbackCopy(code);
+        setStateWithTimeout(copyButton, "copied");
+      } catch (fallbackError) {
+        setStateWithTimeout(copyButton, "error", 2200);
+      }
+    }
+  };
+
+  const resetHandler = () => {
+    if (copyButton.dataset.state === "copied") {
+      copyButton.dataset.state = "idle";
+    }
+  };
+
+  copyButton.addEventListener("click", copyHandler);
+  copyButton.addEventListener("blur", resetHandler);
+  copyButton.addEventListener("mouseleave", resetHandler);
+};
+
+selectCodeBlocks().forEach(bindCopyButton);
+
+const observer = new MutationObserver((mutations) => {
+  for (const mutation of mutations) {
+    mutation.addedNodes.forEach((node) => {
+      if (!(node instanceof HTMLElement)) return;
+      if (node.matches?.(CODE_BLOCK_SELECTOR)) {
+        bindCopyButton(node);
+      } else {
+        node
+          .querySelectorAll?.(CODE_BLOCK_SELECTOR)
+          .forEach((block) => bindCopyButton(block));
+      }
+    });
+  }
+});
+
+observer.observe(document.documentElement, {
+  childList: true,
+  subtree: true,
+});
+</script><h1>The Polar Express Algorithm</h1><p class="post-meta"><time datetime="2026-10-10">10 October 2026</time> · <a href="/pdf/2026/01-03-polar-express/polar-express.pdf">Download PDF</a></p><nav class="post-toc marginnote"><div class="post-toc-title">Contents</div><ol><li class="post-toc-section"><a href="#loc-3"><span class="post-toc-number">1.</span> The Singular Value Transformation</a></li><li class="post-toc-section"><a href="#loc-4"><span class="post-toc-number">2.</span> Approximating the Polar Normalization</a></li><li class="post-toc-section"><a href="#loc-5"><span class="post-toc-number">3.</span> The Polar Express Algorithm</a></li><li class="post-toc-section"><a href="#loc-7"><span class="post-toc-number">4.</span> Projection onto the semidefinite cone</a></li><li class="post-toc-section"><a href="#loc-10">Bibliography</a></li></ol></nav><script id="desmos-api" src="https://www.desmos.com/api/v1.12/calculator.js?apiKey=e83ab14005ac45daa83926c3b7056ed7" async onerror="window.__desmosFailed = true"></script><script>(function () {
+  // Show at least the requested region, with equal scales on both axes so
+  // that circles stay round whatever the size of the graph.
+  function fitBounds(calc, b) {
+    var px = calc.graphpaperBounds.pixelCoordinates;
+    var scale = Math.max((b.right - b.left) / px.width, (b.top - b.bottom) / px.height);
+    var cx = (b.left + b.right) / 2, cy = (b.bottom + b.top) / 2;
+    calc.setMathBounds({
+      left: cx - scale * px.width / 2, right: cx + scale * px.width / 2,
+      bottom: cy - scale * px.height / 2, top: cy + scale * px.height / 2,
+    });
+  }
+
+  function boot() {
+    document.querySelectorAll(".desmos-embed").forEach(function (el) {
+      if (el.dataset.ready) return;
+      el.dataset.ready = "1";
+      var dark = window.matchMedia("(prefers-color-scheme: dark)");
+      var options = JSON.parse(el.dataset.options || "{}");
+      options.invertedColors = dark.matches;
+      var calc = Desmos.GraphingCalculator(el.querySelector(".desmos-graph"), options);
+      calc.setExpressions(JSON.parse(el.dataset.state));
+      var bounds = el.dataset.bounds ? JSON.parse(el.dataset.bounds) : null;
+      if (bounds) fitBounds(calc, bounds);
+      // Each slider below the graph sets its variable.
+      el.querySelectorAll(".desmos-controls input").forEach(function (input) {
+        var output = input.parentElement.querySelector("output");
+        var reciprocal = input.dataset.reciprocal === "true";
+        input.addEventListener("input", function () {
+          calc.setExpression({ id: input.dataset.name, latex: input.dataset.name + "=" + input.value });
+          var v = parseFloat(input.value);
+          var shown = reciprocal ? (v === 0 ? Infinity : 1 / v) : v;
+          output.textContent = shown === Infinity ? "∞" : String(+shown.toFixed(2));
+        });
+      });
+      // Each menu below the graph sets its variable to the chosen value.
+      el.querySelectorAll(".desmos-controls select").forEach(function (select) {
+        select.addEventListener("change", function () {
+          calc.setExpression({ id: select.dataset.name, latex: select.dataset.name + "=" + select.value });
+        });
+      });
+      // Each readout shows a matrix of Desmos values, as MathML. It may be in
+      // the caption, outside the graph but in the same figure.
+      (el.closest("figure") || el.parentElement).querySelectorAll(".desmos-readout [data-entries]").forEach(function (span) {
+        var rows = JSON.parse(span.dataset.entries);
+        var helpers = rows.map(function (row) {
+          return row.map(function (latex) { return calc.HelperExpression({ latex: latex }); });
+        });
+        function show() {
+          var cells = helpers.map(function (row) {
+            return "<mtr>" + row.map(function (h) {
+              var v = h.numericValue;
+              var text = isFinite(v) ? (Math.abs(v) < 0.005 ? 0 : v).toFixed(2).replace("-", "−") : "?";
+              return "<mtd><mn>" + text + "</mn></mtd>";
+            }).join("") + "</mtr>";
+          }).join("");
+          span.innerHTML = '<math><mrow><mo>[</mo><mtable>' + cells + '</mtable><mo>]</mo></mrow></math>';
+        }
+        helpers.forEach(function (row) {
+          row.forEach(function (h) { h.observe("numericValue", show); });
+        });
+        show();
+      });
+      dark.addEventListener("change", function (e) {
+        calc.updateSettings({ invertedColors: e.matches });
+      });
+      // expose this graph so the screenshot tool can find it
+      window.__desmosEmbeds = window.__desmosEmbeds || [];
+      window.__desmosEmbeds.push({ calc: calc, img: el.dataset.img || null, bounds: bounds });
+    });
+  }
+  // Without the API, say so in each graph rather than leave it empty.
+  function fail() {
+    document.querySelectorAll(".desmos-embed .desmos-graph").forEach(function (graph) {
+      graph.classList.add("desmos-failed");
+      graph.textContent = "The interactive graph could not be loaded.";
+    });
+  }
+
+  // The API loads asynchronously, so start once both the page and the API are
+  // there, in whichever order they arrive.
+  function start() {
+    if (window.Desmos) return boot();
+    if (window.__desmosFailed) return fail();
+    var api = document.getElementById("desmos-api");
+    api.addEventListener("load", boot);
+    api.addEventListener("error", fail);
+  }
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", start);
+  } else {
+    start();
+  }
+})();
+</script><p>In this note we look at how the sign function can be approximated by compositions of polynomials, as in the Polar Express algorithm <a id="loc-1" href="#loc-11" role="doc-biblioref">[1]</a>. This simple idea has a number of applications in modern machine learning and optimization, as it can be used to approximate matrix functions using only matrix-matrix products, which are very efficient to compute on modern hardware such as GPUs. Applied to the singular values of a matrix, the approximation of the sign function gives the polar factor <math><mi>𝑈</mi><msup><mi>𝑉</mi><mi>⊤</mi></msup></math>. This is, e.g., the basis of the update of the Muon optimizer <a id="loc-2" href="#loc-12" role="doc-biblioref">[2]</a>, which would otherwise require an SVD, an expensive computation that is not very GPU friendly. Muon is explained as steepest descent in the spectral norm in <a href="/blog/2026/10-13-steepest-descent/">Which Way Is Down?</a> It is furthermore possible to approximate the ReLU function in a similar way, which can be used to project matrices onto the cone of positive semidefinite matrices.</p><h2 id="loc-3">1. The Singular Value Transformation</h2><p>The singular value transformation is defined for any odd function <math><mi>𝑓</mi></math>, as</p><div class="numbered-equation"><math display="block"><mi>𝑓</mi><mrow><mo>(</mo><mi>𝑀</mi><mo>)</mo></mrow><mo>≔</mo><mi>𝑈</mi><mi>𝑓</mi><mrow><mo>(</mo><mi mathvariant="normal">Σ</mi><mo>)</mo></mrow><msup><mi>𝑉</mi><mi>⊤</mi></msup><mo rspace="0em">,</mo><mspace width="1em"/><mi>𝑀</mi><mo>=</mo><mi>𝑈</mi><mi mathvariant="normal">Σ</mi><msup><mi>𝑉</mi><mi>⊤</mi></msup><mi>.</mi></math><p><span class="equation-number">(1)</span></p></div><p>When <math><mi>𝑀</mi></math> is square and symmetric, the singular value transformation of an odd <math><mi>𝑓</mi></math> coincides with the matrix function <math><mi>𝑓</mi><mrow><mo>(</mo><mi>𝑀</mi><mo>)</mo></mrow><mo>=</mo><mi>𝑄</mi><mi>𝑓</mi><mrow><mo>(</mo><mi mathvariant="normal">Λ</mi><mo>)</mo></mrow><msup><mi>𝑄</mi><mi>⊤</mi></msup></math>, which applies <math><mi>𝑓</mi></math> to the eigenvalues. Writing <math><mi>𝑀</mi><mo>=</mo><mi>𝑄</mi><mi mathvariant="normal">Λ</mi><msup><mi>𝑄</mi><mi>⊤</mi></msup><mo>=</mo><mrow><mo>(</mo><mrow><mi>𝑄</mi><mspace width="0.2222em"/><mtext>sign</mtext><mrow><mo>(</mo><mi mathvariant="normal">Λ</mi><mo>)</mo></mrow></mrow><mo>)</mo></mrow><mspace width="0.2222em"/><mo lspace="0em" rspace="0em">|</mo><mi mathvariant="normal">Λ</mi><mo lspace="0em" rspace="0em">|</mo><mspace width="0.2222em"/><msup><mi>𝑄</mi><mi>⊤</mi></msup></math> shows that <math><mi>𝑈</mi><mo>=</mo><mi>𝑄</mi><mspace width="0.2222em"/><mtext>sign</mtext><mrow><mo>(</mo><mi mathvariant="normal">Λ</mi><mo>)</mo></mrow></math>, <math><mi mathvariant="normal">Σ</mi><mo>=</mo><mo lspace="0em" rspace="0em">|</mo><mi mathvariant="normal">Λ</mi><mo stretchy="false">|</mo></math> and <math><mi>𝑉</mi><mo>=</mo><mi>𝑄</mi></math>, and since <math><mi>𝑓</mi></math> is odd,</p><div class="numbered-equation"><math display="block"><mi>𝑓</mi><mrow><mo>(</mo><mi>𝑀</mi><mo>)</mo></mrow><mo>=</mo><mi>𝑄</mi><mi>𝑓</mi><mrow><mo>(</mo><mi mathvariant="normal">Λ</mi><mo>)</mo></mrow><msup><mi>𝑄</mi><mi>⊤</mi></msup><mo>=</mo><mi>𝑄</mi><mspace width="0.2222em"/><mtext>sign</mtext><mrow><mo>(</mo><mi mathvariant="normal">Λ</mi><mo>)</mo></mrow><mi>𝑓</mi><mrow><mo>(</mo><mrow><mo stretchy="false">|</mo><mi mathvariant="normal">Λ</mi><mo stretchy="false">|</mo></mrow><mo>)</mo></mrow><msup><mi>𝑄</mi><mi>⊤</mi></msup><mo>=</mo><mi>𝑈</mi><mi>𝑓</mi><mrow><mo>(</mo><mi mathvariant="normal">Σ</mi><mo>)</mo></mrow><msup><mi>𝑉</mi><mi>⊤</mi></msup><mo rspace="0em">,</mo></math><p><span class="equation-number">(2)</span></p></div><p>where the sign function is defined as the odd function</p><div class="numbered-equation"><math display="block"><mtext>sign</mtext><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mo lspace="0.2777777777777778em" rspace="0em">:</mo><mo lspace="0em">=</mo><mrow><mo>{</mo><mtable class="cases"><mtr><mtd><mn>1</mn><mo>,</mo></mtd><mtd><mi>𝑥</mi><mo>></mo><mn>0</mn><mo rspace="0em">,</mo></mtd></mtr><mtr><mtd><mn>0</mn><mo>,</mo></mtd><mtd><mi>𝑥</mi><mo>=</mo><mn>0</mn><mo rspace="0em">,</mo></mtd></mtr><mtr><mtd><mo>−</mo><mn>1</mn><mo>,</mo></mtd><mtd><mi>𝑥</mi><mo>&lt;</mo><mn>0</mn><mo rspace="0em">,</mo></mtd></mtr></mtable></mrow></math><p><span class="equation-number">(3)</span></p></div><h2 id="loc-4">2. Approximating the Polar Normalization</h2><p>Polar normalization corresponds to the singular value transformation when <math><mi>𝑓</mi></math> itself is the sign function, i.e.</p><div class="numbered-equation"><math display="block"><mtext>polar</mtext><mrow><mo>(</mo><mi>𝑀</mi><mo>)</mo></mrow><mo>=</mo><mi>𝑈</mi><mspace width="0.2222em"/><mtext>diag</mtext><mrow><mo>(</mo><mrow><mtext>sign</mtext><mrow><mo>(</mo><msub><mi>𝜎</mi><mn>1</mn></msub><mo>)</mo></mrow><mo>,</mo><mi>…</mi><mo>,</mo><mtext>sign</mtext><mrow><mo>(</mo><msub><mi>𝜎</mi><mi>𝑘</mi></msub><mo>)</mo></mrow></mrow><mo>)</mo></mrow><msup><mi>𝑉</mi><mi>⊤</mi></msup><mo>=</mo><mi>𝑈</mi><msup><mi>𝑉</mi><mi>⊤</mi></msup><mo rspace="0em">,</mo></math><p><span class="equation-number">(4)</span></p></div><p>where the last equality takes <math><mi>𝑈</mi></math> and <math><mi>𝑉</mi></math> from the compact SVD, which keeps only the singular vectors of the nonzero singular values. Zero singular values stay zero, as <math><mtext>sign</mtext><mrow><mo>(</mo><mn>0</mn><mo>)</mo></mrow><mo>=</mo><mn>0</mn></math>.</p><p>Computed directly, the polar factor requires an SVD, which is computationally expensive and not very GPU friendly (it is primarily memory bound rather than compute bound). The Polar Express algorithm instead approximates the matrix sign function using just matrix-matrix products <a href="#loc-11" role="doc-biblioref">[1]</a>. The key idea is rather simple: Approximate the function <math><mi>𝑓</mi></math> using a composition of polynomials, e.g.,</p><div class="numbered-equation"><math display="block"><mi>𝑓</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mo>≈</mo><msub><mi>𝑝</mi><mi>𝑘</mi></msub><mrow><mo>(</mo><mrow><msub><mi>𝑝</mi><mrow><mi>𝑘</mi><mo lspace="0em" rspace="0em">−</mo><mn>1</mn></mrow></msub><mrow><mo>(</mo><mrow><mi>…</mi><msub><mi>𝑝</mi><mn>2</mn></msub><mrow><mo>(</mo><mrow><msub><mi>𝑝</mi><mn>1</mn></msub><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow></mrow><mo>)</mo></mrow><mi>…</mi></mrow><mo>)</mo></mrow></mrow><mo>)</mo></mrow><mi>.</mi></math><p><span class="equation-number">(5)</span></p></div><p>Since the above is a composition of polynomials, it can be evaluated using just additions and multiplications.</p><figure id="ex-newton-schulz"><p><span class="marginnote">Example 1: Newton–Schulz</span></p><div class="blog-example"><div style="background: #3d997026; border-radius: .4em; padding: 1em; width: 100%; box-sizing: border-box; margin-bottom: .5em;"><p><strong>Example 1 (Newton–Schulz)</strong>   The idea of approximating functions using repeated polynomial application is not new. An example is the Newton–Schulz algorithm which is based on repeatedly applying the same polynomial, i.e. <math><msub><mi>𝑝</mi><mn>1</mn></msub><mo>=</mo><msub><mi>𝑝</mi><mn>2</mn></msub><mo>=</mo><mi>…</mi><mo>=</mo><msub><mi>𝑝</mi><mi>𝑘</mi></msub></math>, in order to approximate the sign function. For order 3 and 5 the polynomials look as follows</p><div class="numbered-equation"><math display="block"><mi>𝑝</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mo>=</mo><mfrac><mn>3</mn><mn>2</mn></mfrac><mi>𝑥</mi><mo>−</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><msup><mi>𝑥</mi><mn>3</mn></msup><mo rspace="0em">,</mo><mspace width="1em"/><mi>𝑝</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mo>=</mo><mrow><mo>(</mo><mrow><mn>15</mn><mi>𝑥</mi><mo>−</mo><mn>10</mn><msup><mi>𝑥</mi><mn>3</mn></msup><mo>+</mo><mn>3</mn><msup><mi>𝑥</mi><mn>5</mn></msup></mrow><mo>)</mo></mrow><mi>/</mi><mn>8</mn><mi>.</mi></math><p><span class="equation-number">(6)</span></p></div><p>While the Newton–Schulz method converges for all <math><mi>𝑥</mi><mo>∈</mo><mrow><mo>[</mo><mrow><mo>−</mo><mn>1</mn><mo>,</mo><mn>1</mn></mrow><mo>]</mo></mrow></math>, the convergence is only fast for values close to <math><mo>±</mo><mn>1</mn></math>. Conversely, for values that are close to zero the convergence is slow. The slow convergence is exactly what the Polar Express method explained shortly aims to fix. The graph shows the cubic and quintic polynomials composed <math><mi>𝑘</mi></math> times, together with the sign function (dotted). The shaded interval <math><mrow><mo>[</mo><mrow><mo>−</mo><mn>1</mn><mo>,</mo><mn>1</mn></mrow><mo>]</mo></mrow></math> is where they approximate it.</p><div class="desmos-embed" data-state="[
+  {
+    &quot;id&quot;: &quot;k&quot;,
+    &quot;latex&quot;: &quot;k=3&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;t\\left(y,j\\right)=\\frac{3y-y^{3}}{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;T_{0}\\left(x\\right)=x&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;T_{1}\\left(x\\right)=t\\left(T_{0}\\left(x\\right),1\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;T_{2}\\left(x\\right)=t\\left(T_{1}\\left(x\\right),2\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;T_{3}\\left(x\\right)=t\\left(T_{2}\\left(x\\right),3\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;T_{4}\\left(x\\right)=t\\left(T_{3}\\left(x\\right),4\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;T_{5}\\left(x\\right)=t\\left(T_{4}\\left(x\\right),5\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;T_{6}\\left(x\\right)=t\\left(T_{5}\\left(x\\right),6\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;T_{7}\\left(x\\right)=t\\left(T_{6}\\left(x\\right),7\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;T_{8}\\left(x\\right)=t\\left(T_{7}\\left(x\\right),8\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;T_{9}\\left(x\\right)=t\\left(T_{8}\\left(x\\right),9\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;T_{10}\\left(x\\right)=t\\left(T_{9}\\left(x\\right),10\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;C\\left(x\\right)=\\left\\{k=0:T_{0}\\left(x\\right),k=1:T_{1}\\left(x\\right),k=2:T_{2}\\left(x\\right),k=3:T_{3}\\left(x\\right),k=4:T_{4}\\left(x\\right),k=5:T_{5}\\left(x\\right),k=6:T_{6}\\left(x\\right),k=7:T_{7}\\left(x\\right),k=8:T_{8}\\left(x\\right),k=9:T_{9}\\left(x\\right),k=10:T_{10}\\left(x\\right)\\right\\}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;n\\left(y,j\\right)=\\frac{15y-10y^{3}+3y^{5}}{8}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;N_{0}\\left(x\\right)=x&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;N_{1}\\left(x\\right)=n\\left(N_{0}\\left(x\\right),1\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;N_{2}\\left(x\\right)=n\\left(N_{1}\\left(x\\right),2\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;N_{3}\\left(x\\right)=n\\left(N_{2}\\left(x\\right),3\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;N_{4}\\left(x\\right)=n\\left(N_{3}\\left(x\\right),4\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;N_{5}\\left(x\\right)=n\\left(N_{4}\\left(x\\right),5\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;N_{6}\\left(x\\right)=n\\left(N_{5}\\left(x\\right),6\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;N_{7}\\left(x\\right)=n\\left(N_{6}\\left(x\\right),7\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;N_{8}\\left(x\\right)=n\\left(N_{7}\\left(x\\right),8\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;N_{9}\\left(x\\right)=n\\left(N_{8}\\left(x\\right),9\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;N_{10}\\left(x\\right)=n\\left(N_{9}\\left(x\\right),10\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;Q\\left(x\\right)=\\left\\{k=0:N_{0}\\left(x\\right),k=1:N_{1}\\left(x\\right),k=2:N_{2}\\left(x\\right),k=3:N_{3}\\left(x\\right),k=4:N_{4}\\left(x\\right),k=5:N_{5}\\left(x\\right),k=6:N_{6}\\left(x\\right),k=7:N_{7}\\left(x\\right),k=8:N_{8}\\left(x\\right),k=9:N_{9}\\left(x\\right),k=10:N_{10}\\left(x\\right)\\right\\}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;-1\\le x\\le1&quot;,
+    &quot;color&quot;: &quot;#000000&quot;,
+    &quot;fillOpacity&quot;: &quot;0.08&quot;,
+    &quot;lines&quot;: false
+  },
+  {
+    &quot;latex&quot;: &quot;y=\\operatorname{sign}\\left(x\\right)&quot;,
+    &quot;color&quot;: &quot;#000000&quot;,
+    &quot;lineStyle&quot;: &quot;DOTTED&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;y=C\\left(x\\right)&quot;,
+    &quot;color&quot;: &quot;#2d70b3&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;y=Q\\left(x\\right)&quot;,
+    &quot;color&quot;: &quot;#c74440&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;\\left(0.25,C\\left(0.25\\right)\\right)&quot;,
+    &quot;color&quot;: &quot;#000000&quot;,
+    &quot;pointSize&quot;: &quot;0&quot;,
+    &quot;label&quot;: &quot;cubic&quot;,
+    &quot;showLabel&quot;: true,
+    &quot;labelOrientation&quot;: &quot;right&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;\\left(-0.13,Q\\left(-0.13\\right)\\right)&quot;,
+    &quot;color&quot;: &quot;#000000&quot;,
+    &quot;pointSize&quot;: &quot;0&quot;,
+    &quot;label&quot;: &quot;quintic&quot;,
+    &quot;showLabel&quot;: true,
+    &quot;labelOrientation&quot;: &quot;right&quot;
+  }
+]" data-options="{
+  &quot;expressions&quot;: false,
+  &quot;settingsMenu&quot;: false,
+  &quot;zoomButtons&quot;: false,
+  &quot;keypad&quot;: false
+}" id="graph-newton-schulz" data-img="figures/newton-schulz.png" data-bounds="{
+  &quot;left&quot;: -1.2,
+  &quot;right&quot;: 1.2,
+  &quot;bottom&quot;: -1.3,
+  &quot;top&quot;: 1.3
+}"><div class="desmos-graph" style="height:400px;"></div><div class="desmos-controls"><label><span class="desmos-control-label"><math><mi>𝑘</mi></math></span><input type="range" data-name="k" value="3" min="0" max="10" step="1"><output>3</output></label></div></div><p>A note here is that for non-square matrices we cannot simply do <math><msup><mi>𝑀</mi><mi>𝑛</mi></msup></math>. Instead, what is done is that <math><msup><mi>𝑀</mi><mrow><mn>2</mn><mi>𝑛</mi><mo lspace="0em" rspace="0em">+</mo><mn>1</mn></mrow></msup><mo>=</mo><msup><mrow><mi>𝑀</mi><mrow><mo>(</mo><mrow><msup><mi>𝑀</mi><mi>⊤</mi></msup><mi>𝑀</mi></mrow><mo>)</mo></mrow></mrow><mi>𝑛</mi></msup><mo>=</mo><msup><mrow><mo>(</mo><mrow><mi>𝑀</mi><msup><mi>𝑀</mi><mi>⊤</mi></msup></mrow><mo>)</mo></mrow><mi>𝑛</mi></msup><mi>𝑀</mi></math>.</p></div></div></figure><h2 id="loc-5">3. The Polar Express Algorithm</h2><p>The basic question that the Polar Express algorithm aims to solve is as follows: Given a set of <math><mi>𝑇</mi></math> polynomials <math><mo stretchy="false">{</mo><msub><mi>𝑝</mi><mi>𝑖</mi></msub><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mo>=</mo><msubsup><mi>𝑎</mi><mn>1</mn><mi>𝑖</mi></msubsup><mi>𝑥</mi><mo>+</mo><msubsup><mi>𝑎</mi><mn>3</mn><mi>𝑖</mi></msubsup><msup><mi>𝑥</mi><mn>3</mn></msup><mo>+</mo><msubsup><mi>𝑎</mi><mn>5</mn><mi>𝑖</mi></msubsup><msup><mi>𝑥</mi><mn>5</mn></msup><msubsup><mo stretchy="false">}</mo><mrow><mi>𝑖</mi><mo lspace="0em" rspace="0em">=</mo><mn>1</mn></mrow><mi>𝑇</mi></msubsup></math>, can we find an optimal set of coefficients that minimizes the maximum error over a given interval <math><mrow><mo>[</mo><mrow><mi>ℓ</mi><mo>,</mo><mi>𝑢</mi></mrow><mo>]</mo></mrow></math>? Define their composition as <math><mi>𝑝</mi><mo>=</mo><msub><mi>𝑝</mi><mi>𝑇</mi></msub><mi>⚬</mi><msub><mi>𝑝</mi><mrow><mi>𝑇</mi><mo lspace="0em" rspace="0em">−</mo><mn>1</mn></mrow></msub><mi>⚬</mi><mi>⋯</mi><mi>⚬</mi><msub><mi>𝑝</mi><mn>1</mn></msub></math>. We then solve</p><div class="numbered-equation"><math display="block"><mtable class="multiline-equation aligned"><mtr><mtd><mrow><mo>(</mo><mrow><msubsup><mi>𝑝</mi><mn>1</mn><mo>⋆</mo></msubsup><mo>,</mo><mi>…</mi><mo>,</mo><msubsup><mi>𝑝</mi><mi>𝑇</mi><mo>⋆</mo></msubsup></mrow><mo>)</mo></mrow></mtd><mtd><mo form="infix">=</mo><munder><mo form="prefix" lspace="0em" rspace="0em">arg min</mo><mrow><msub><mi>𝑝</mi><mn>1</mn></msub><mo rspace="0em">,</mo><mi>…</mi><mo rspace="0em">,</mo><msub><mi>𝑝</mi><mi>𝑇</mi></msub></mrow></munder><mspace width="0.2778em"/><munder><mo form="prefix" lspace="0em" rspace="0em">max</mo><mtable class="multiline-equation"><mtr><mtd><mi>𝑀</mi><mo lspace="0em" rspace="0em">∈</mo><msup><mi>ℝ</mi><mrow><mi>𝑚</mi><mo lspace="0em" rspace="0em">×</mo><mi>𝑛</mi></mrow></msup></mtd></mtr><mtr><mtd><mi>𝜎</mi><mrow><mo>(</mo><mi>𝑀</mi><mo>)</mo></mrow><mo lspace="0em" rspace="0em">⊂</mo><mrow><mo>[</mo><mrow><mi>ℓ</mi><mo rspace="0em">,</mo><mi>𝑢</mi></mrow><mo>]</mo></mrow></mtd></mtr></mtable></munder><mspace width="0.2778em"/><mo stretchy="false">‖</mo><mo form="prefix" lspace="0.16666666666666666em" rspace="0em">polar</mo><mrow><mo>(</mo><mi>𝑀</mi><mo>)</mo></mrow><mo>−</mo><mi>𝑝</mi><mrow><mo>(</mo><mi>𝑀</mi><mo>)</mo></mrow><mspace width="0.2222em"/><msub><mo stretchy="false">‖</mo><mn>2</mn></msub></mtd></mtr><mtr><mtd><mspace width="1em"/><mtext>subject to</mtext><mspace width="1em"/></mtd><mtd><msub><mi>𝑝</mi><mi>𝑡</mi></msub><mo>∈</mo><msubsup><mi>ℝ</mi><mn>5</mn><mtext>odd</mtext></msubsup><mrow><mo>[</mo><mi>𝑥</mi><mo>]</mo></mrow><mo rspace="0em">,</mo><mspace width="0.2778em"/><mi>𝑡</mi><mo>=</mo><mn>1</mn><mo>,</mo><mi>…</mi><mo>,</mo><mi>𝑇</mi><mi>.</mi></mtd></mtr></mtable></math><p><span class="equation-number">(7)</span></p></div><p>Here <math><msubsup><mi>ℝ</mi><mi>𝑑</mi><mtext>odd</mtext></msubsup><mrow><mo>[</mo><mi>𝑥</mi><mo>]</mo></mrow></math> denotes the space of real odd polynomials of degree at most <math><mi>𝑑</mi></math>. Since <math><mi>𝑝</mi></math> is odd, <math><mi>𝑝</mi><mrow><mo>(</mo><mi>𝑀</mi><mo>)</mo></mrow><mo>=</mo><mi>𝑈</mi><mi>𝑝</mi><mrow><mo>(</mo><mi mathvariant="normal">Σ</mi><mo>)</mo></mrow><msup><mi>𝑉</mi><mi>⊤</mi></msup></math>, so the error is <math><msub><mo lspace="0em" rspace="0em">max</mo><mi>𝑖</mi></msub><mo lspace="0em" rspace="0em">|</mo><mn>1</mn><mo>−</mo><mi>𝑝</mi><mrow><mo>(</mo><msub><mi>𝜎</mi><mi>𝑖</mi></msub><mo>)</mo></mrow><mo stretchy="false">|</mo></math>, and the problem is the scalar one of approximating <math><mn>1</mn></math> on <math><mrow><mo>[</mo><mrow><mi>ℓ</mi><mo>,</mo><mi>𝑢</mi></mrow><mo>]</mo></mrow></math>, or by oddness the sign function on <math><mrow><mo>[</mo><mrow><mo>−</mo><mi>𝑢</mi><mo>,</mo><mo form="prefix">−</mo><mi>ℓ</mi></mrow><mo>]</mo></mrow><mo>∪</mo><mrow><mo>[</mo><mrow><mi>ℓ</mi><mo>,</mo><mi>𝑢</mi></mrow><mo>]</mo></mrow></math>.</p><p>In <a href="#loc-11" role="doc-biblioref">[1]</a> they show that the above can be solved by a greedy approach, with a caveat that the error bound only holds if the smallest singular value is at least <math><mi>ℓ</mi></math>, which we do not know in advance. Smaller singular values still converge, but more slowly. A comment here is that the main focus in the paper is on bfloat16. Here the spacing between representable numbers at 1 is <math><msup><mn>2</mn><mrow><mo>−</mo><mn>7</mn></mrow></msup><mo>=</mo><mn>0.0078125</mn></math>, so singular values much smaller than this are at the level of rounding errors. They therefore suggest setting <math><mi>ℓ</mi><mo>=</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>3</mn></mrow></msup></math>, and <math><mi>𝑢</mi><mo>=</mo><mn>1</mn></math> after scaling <math><mi>𝑀</mi></math> by its Frobenius norm so that <math><msub><mi>𝜎</mi><mn>1</mn></msub><mo>≤</mo><mn>1</mn></math>. In addition, they provide a few modifications in order to make the method numerically robust. These additions are skipped here, but can be found in the original paper.</p><figure><p><span class="marginnote">Interactive figure 1: Polar Express against Newton–Schulz</span></p><div class="blog-interactive"><div style="background: #6042a626; border-radius: .4em; padding: 1em; width: 100%; box-sizing: border-box; margin-bottom: .5em;"><p><strong>Interactive figure 1 (Polar Express against Newton–Schulz)</strong>   The graph compares the first <math><mi>𝑘</mi></math> Polar Express polynomials for <math><mrow><mo>[</mo><mrow><mi>ℓ</mi><mo>,</mo><mi>𝑢</mi></mrow><mo>]</mo></mrow><mo>=</mo><mrow><mo>[</mo><mrow><msup><mn>10</mn><mrow><mo>−</mo><mn>3</mn></mrow></msup><mo>,</mo><mn>1</mn></mrow><mo>]</mo></mrow></math>, composed, with the Newton–Schulz quintic composed <math><mi>𝑘</mi></math> times, drawn as in <a href="#ex-newton-schulz">Example 1</a>. Newton–Schulz approaches <math><mo>±</mo><mn>1</mn></math> slowly from below, while Polar Express first lifts the small values and then oscillates around <math><mo>±</mo><mn>1</mn></math>, with every step shrinking the oscillation. The oscillation is the price for the smallest worst-case error. By the equioscillation theorem, the polynomial with the smallest maximum error on an interval reaches that error several times with alternating sign <a id="loc-6" href="#loc-13" role="doc-biblioref">[3]</a>, so each optimal step has to oscillate around <math><mo>±</mo><mn>1</mn></math>. Newton–Schulz instead matches the sign function closely at <math><mo>±</mo><mn>1</mn></math>, where <math><msup><mi>𝑝</mi><mo>′</mo></msup><mrow><mo>(</mo><mn>1</mn><mo>)</mo></mrow><mo>=</mo><mn>0</mn></math>, which makes it accurate close to <math><mo>±</mo><mn>1</mn></math> but slow close to zero. After a few steps the oscillations become too dense to be told apart, and soon after that too small to be seen. The readout gives both compositions at <math><mi>ℓ</mi></math>, which is too close to zero to be seen in the graph.</p><div class="desmos-embed" data-state="[
+  {
+    &quot;id&quot;: &quot;k&quot;,
+    &quot;latex&quot;: &quot;k=6&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;n\\left(y,j\\right)=\\frac{15y-10y^{3}+3y^{5}}{8}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;N_{0}\\left(x\\right)=x&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;N_{1}\\left(x\\right)=n\\left(N_{0}\\left(x\\right),1\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;N_{2}\\left(x\\right)=n\\left(N_{1}\\left(x\\right),2\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;N_{3}\\left(x\\right)=n\\left(N_{2}\\left(x\\right),3\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;N_{4}\\left(x\\right)=n\\left(N_{3}\\left(x\\right),4\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;N_{5}\\left(x\\right)=n\\left(N_{4}\\left(x\\right),5\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;N_{6}\\left(x\\right)=n\\left(N_{5}\\left(x\\right),6\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;N_{7}\\left(x\\right)=n\\left(N_{6}\\left(x\\right),7\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;N_{8}\\left(x\\right)=n\\left(N_{7}\\left(x\\right),8\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;N_{9}\\left(x\\right)=n\\left(N_{8}\\left(x\\right),9\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;N_{10}\\left(x\\right)=n\\left(N_{9}\\left(x\\right),10\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;Q\\left(x\\right)=\\left\\{k=0:N_{0}\\left(x\\right),k=1:N_{1}\\left(x\\right),k=2:N_{2}\\left(x\\right),k=3:N_{3}\\left(x\\right),k=4:N_{4}\\left(x\\right),k=5:N_{5}\\left(x\\right),k=6:N_{6}\\left(x\\right),k=7:N_{7}\\left(x\\right),k=8:N_{8}\\left(x\\right),k=9:N_{9}\\left(x\\right),k=10:N_{10}\\left(x\\right)\\right\\}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;a_{P}=\\left[8.470328803848073,4.182834183293943,3.9618572789616,3.286586217027959,2.2737499944340382,1.88871619735183,1.8750008859145961,1.875,1.875,1.875\\right]&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;b_{P}=\\left[-25.10807470666188,-3.108701109889243,-2.954063746359378,-2.4647201345312815,-1.6446603679080685,-1.2651572253386019,-1.2500009844021425,-1.25,-1.25,-1.25\\right]&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{P}=\\left[18.629275599118017,0.5806066813500494,0.5629761179538962,0.5073576938614549,0.41619092749788605,0.3765189255574909,0.3750000984878768,0.375,0.375,0.375\\right]&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;p\\left(y,j\\right)=a_{P}\\left[j\\right]y+b_{P}\\left[j\\right]y^{3}+c_{P}\\left[j\\right]y^{5}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;E_{0}\\left(x\\right)=x&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;E_{1}\\left(x\\right)=p\\left(E_{0}\\left(x\\right),1\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;E_{2}\\left(x\\right)=p\\left(E_{1}\\left(x\\right),2\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;E_{3}\\left(x\\right)=p\\left(E_{2}\\left(x\\right),3\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;E_{4}\\left(x\\right)=p\\left(E_{3}\\left(x\\right),4\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;E_{5}\\left(x\\right)=p\\left(E_{4}\\left(x\\right),5\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;E_{6}\\left(x\\right)=p\\left(E_{5}\\left(x\\right),6\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;E_{7}\\left(x\\right)=p\\left(E_{6}\\left(x\\right),7\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;E_{8}\\left(x\\right)=p\\left(E_{7}\\left(x\\right),8\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;E_{9}\\left(x\\right)=p\\left(E_{8}\\left(x\\right),9\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;E_{10}\\left(x\\right)=p\\left(E_{9}\\left(x\\right),10\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;P\\left(x\\right)=\\left\\{k=0:E_{0}\\left(x\\right),k=1:E_{1}\\left(x\\right),k=2:E_{2}\\left(x\\right),k=3:E_{3}\\left(x\\right),k=4:E_{4}\\left(x\\right),k=5:E_{5}\\left(x\\right),k=6:E_{6}\\left(x\\right),k=7:E_{7}\\left(x\\right),k=8:E_{8}\\left(x\\right),k=9:E_{9}\\left(x\\right),k=10:E_{10}\\left(x\\right)\\right\\}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;-1\\le x\\le1&quot;,
+    &quot;color&quot;: &quot;#000000&quot;,
+    &quot;fillOpacity&quot;: &quot;0.08&quot;,
+    &quot;lines&quot;: false
+  },
+  {
+    &quot;latex&quot;: &quot;y=\\operatorname{sign}\\left(x\\right)&quot;,
+    &quot;color&quot;: &quot;#000000&quot;,
+    &quot;lineStyle&quot;: &quot;DOTTED&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;y=Q\\left(x\\right)&quot;,
+    &quot;color&quot;: &quot;#c74440&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;y=P\\left(x\\right)&quot;,
+    &quot;color&quot;: &quot;#6042a6&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;\\left(0.05,P\\left(0.05\\right)\\right)&quot;,
+    &quot;color&quot;: &quot;#000000&quot;,
+    &quot;pointSize&quot;: &quot;0&quot;,
+    &quot;label&quot;: &quot;Polar Express&quot;,
+    &quot;showLabel&quot;: true,
+    &quot;labelOrientation&quot;: &quot;above_left&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;\\left(0.1,Q\\left(0.1\\right)\\right)&quot;,
+    &quot;color&quot;: &quot;#000000&quot;,
+    &quot;pointSize&quot;: &quot;0&quot;,
+    &quot;label&quot;: &quot;Newton-Schulz&quot;,
+    &quot;showLabel&quot;: true,
+    &quot;labelOrientation&quot;: &quot;below_right&quot;
+  }
+]" data-options="{
+  &quot;expressions&quot;: false,
+  &quot;settingsMenu&quot;: false,
+  &quot;zoomButtons&quot;: false,
+  &quot;keypad&quot;: false
+}" id="graph-polar-express" data-img="figures/polar-express.png" data-bounds="{
+  &quot;left&quot;: -1.2,
+  &quot;right&quot;: 1.2,
+  &quot;bottom&quot;: -2.1,
+  &quot;top&quot;: 2.1
+}"><div class="desmos-graph" style="height:450px;"></div><div class="desmos-controls"><label><span class="desmos-control-label"><math><mi>𝑘</mi></math></span><input type="range" data-name="k" value="6" min="0" max="10" step="1"><output>6</output></label></div></div><p><span class="desmos-readout">Values at <math><mi>𝜎</mi><mo>=</mo><mi>ℓ</mi></math>, Newton–Schulz and Polar Express:<span data-entries="[
+  [
+    &quot;Q\\left(10^{-3}\\right)&quot;,
+    &quot;P\\left(10^{-3}\\right)&quot;
+  ]
+]"></span></span></p></div></div></figure><figure><p><span class="marginnote">Interactive figure 2: Polar Express on a matrix</span></p><div class="blog-interactive"><div style="background: #6042a626; border-radius: .4em; padding: 1em; width: 100%; box-sizing: border-box; margin-bottom: .5em;"><p><strong>Interactive figure 2 (Polar Express on a matrix)</strong>   The same polynomials applied to a <math><mn>2</mn><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">×</mo><mn>2</mn></math> matrix <math><mi>𝑀</mi></math>. A matrix maps the unit circle (dotted) to an ellipse whose semi-axes are its singular values. The dashed ellipse belongs to <math><mi>𝑀</mi></math>, scaled so that <math><msub><mi>𝜎</mi><mn>1</mn></msub><mo>≤</mo><mn>1</mn></math>,<sup class="footnote-ref"><a class="footnote-ref-link" href="#fn-1" id="fnref-1">1</a></sup><span class="marginnote" id="fn-1"><sup><a class="footnote-ref-link" href="#fnref-1">1</a></sup> The scaling is a requirement: the polynomials are designed for singular values in <math><mrow><mo>[</mo><mrow><mi>ℓ</mi><mo>,</mo><mn>1</mn></mrow><mo>]</mo></mrow></math>, the positive half of <math><mrow><mo>[</mo><mrow><mo>−</mo><mn>1</mn><mo>,</mo><mn>1</mn></mrow><mo>]</mo></mrow></math> in the previous figure, and larger singular values need not converge. Dividing <math><mi>𝑀</mi></math> by its Frobenius norm guarantees <math><msub><mi>𝜎</mi><mn>1</mn></msub><mo>≤</mo><mn>1</mn></math>, as the Frobenius norm is at least the largest singular value.</span> and its columns (the two points) can be dragged. The solid ellipse and arrows show the matrix after <math><mi>𝑘</mi></math> steps. Each step applies the next polynomial to the singular values, so the ellipse turns into the unit circle, which is the ellipse of <math><mi>𝑈</mi><msup><mi>𝑉</mi><mi>⊤</mi></msup></math>.</p><div class="desmos-embed" data-state="[
+  {
+    &quot;id&quot;: &quot;k&quot;,
+    &quot;latex&quot;: &quot;k=3&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;m_{11}=0.8&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;m_{21}=0.15&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;m_{12}=0.45&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;m_{22}=0.3&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;M_{1}=\\left(m_{11},m_{21}\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;M_{2}=\\left(m_{12},m_{22}\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;n=\\max\\left(1,\\sqrt{M_{1}.x^{2}+M_{1}.y^{2}+M_{2}.x^{2}+M_{2}.y^{2}}\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;U_{0}=\\frac{M_{1}}{n}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;V_{0}=\\frac{M_{2}}{n}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;a_{P}=\\left[8.470328803848073,4.182834183293943,3.9618572789616,3.286586217027959,2.2737499944340382,1.88871619735183,1.8750008859145961,1.875,1.875,1.875\\right]&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;b_{P}=\\left[-25.10807470666188,-3.108701109889243,-2.954063746359378,-2.4647201345312815,-1.6446603679080685,-1.2651572253386019,-1.2500009844021425,-1.25,-1.25,-1.25\\right]&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{P}=\\left[18.629275599118017,0.5806066813500494,0.5629761179538962,0.5073576938614549,0.41619092749788605,0.3765189255574909,0.3750000984878768,0.375,0.375,0.375\\right]&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;g_{1}\\left(a,b,c,d\\right)=a^{2}+b^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;g_{2}\\left(a,b,c,d\\right)=ac+bd&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;g_{3}\\left(a,b,c,d\\right)=c^{2}+d^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;s_{1}\\left(a,b,c,d,j\\right)=a_{P}\\left[j\\right]+b_{P}\\left[j\\right]g_{1}\\left(a,b,c,d\\right)+c_{P}\\left[j\\right]\\left(g_{1}\\left(a,b,c,d\\right)^{2}+g_{2}\\left(a,b,c,d\\right)^{2}\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;s_{2}\\left(a,b,c,d,j\\right)=b_{P}\\left[j\\right]g_{2}\\left(a,b,c,d\\right)+c_{P}\\left[j\\right]g_{2}\\left(a,b,c,d\\right)\\left(g_{1}\\left(a,b,c,d\\right)+g_{3}\\left(a,b,c,d\\right)\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;s_{3}\\left(a,b,c,d,j\\right)=a_{P}\\left[j\\right]+b_{P}\\left[j\\right]g_{3}\\left(a,b,c,d\\right)+c_{P}\\left[j\\right]\\left(g_{2}\\left(a,b,c,d\\right)^{2}+g_{3}\\left(a,b,c,d\\right)^{2}\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;U_{1}=s_{1}\\left(U_{0}.x,U_{0}.y,V_{0}.x,V_{0}.y,1\\right)U_{0}+s_{2}\\left(U_{0}.x,U_{0}.y,V_{0}.x,V_{0}.y,1\\right)V_{0}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;V_{1}=s_{2}\\left(U_{0}.x,U_{0}.y,V_{0}.x,V_{0}.y,1\\right)U_{0}+s_{3}\\left(U_{0}.x,U_{0}.y,V_{0}.x,V_{0}.y,1\\right)V_{0}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;U_{2}=s_{1}\\left(U_{1}.x,U_{1}.y,V_{1}.x,V_{1}.y,2\\right)U_{1}+s_{2}\\left(U_{1}.x,U_{1}.y,V_{1}.x,V_{1}.y,2\\right)V_{1}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;V_{2}=s_{2}\\left(U_{1}.x,U_{1}.y,V_{1}.x,V_{1}.y,2\\right)U_{1}+s_{3}\\left(U_{1}.x,U_{1}.y,V_{1}.x,V_{1}.y,2\\right)V_{1}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;U_{3}=s_{1}\\left(U_{2}.x,U_{2}.y,V_{2}.x,V_{2}.y,3\\right)U_{2}+s_{2}\\left(U_{2}.x,U_{2}.y,V_{2}.x,V_{2}.y,3\\right)V_{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;V_{3}=s_{2}\\left(U_{2}.x,U_{2}.y,V_{2}.x,V_{2}.y,3\\right)U_{2}+s_{3}\\left(U_{2}.x,U_{2}.y,V_{2}.x,V_{2}.y,3\\right)V_{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;U_{4}=s_{1}\\left(U_{3}.x,U_{3}.y,V_{3}.x,V_{3}.y,4\\right)U_{3}+s_{2}\\left(U_{3}.x,U_{3}.y,V_{3}.x,V_{3}.y,4\\right)V_{3}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;V_{4}=s_{2}\\left(U_{3}.x,U_{3}.y,V_{3}.x,V_{3}.y,4\\right)U_{3}+s_{3}\\left(U_{3}.x,U_{3}.y,V_{3}.x,V_{3}.y,4\\right)V_{3}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;U_{5}=s_{1}\\left(U_{4}.x,U_{4}.y,V_{4}.x,V_{4}.y,5\\right)U_{4}+s_{2}\\left(U_{4}.x,U_{4}.y,V_{4}.x,V_{4}.y,5\\right)V_{4}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;V_{5}=s_{2}\\left(U_{4}.x,U_{4}.y,V_{4}.x,V_{4}.y,5\\right)U_{4}+s_{3}\\left(U_{4}.x,U_{4}.y,V_{4}.x,V_{4}.y,5\\right)V_{4}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;U_{6}=s_{1}\\left(U_{5}.x,U_{5}.y,V_{5}.x,V_{5}.y,6\\right)U_{5}+s_{2}\\left(U_{5}.x,U_{5}.y,V_{5}.x,V_{5}.y,6\\right)V_{5}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;V_{6}=s_{2}\\left(U_{5}.x,U_{5}.y,V_{5}.x,V_{5}.y,6\\right)U_{5}+s_{3}\\left(U_{5}.x,U_{5}.y,V_{5}.x,V_{5}.y,6\\right)V_{5}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;U_{7}=s_{1}\\left(U_{6}.x,U_{6}.y,V_{6}.x,V_{6}.y,7\\right)U_{6}+s_{2}\\left(U_{6}.x,U_{6}.y,V_{6}.x,V_{6}.y,7\\right)V_{6}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;V_{7}=s_{2}\\left(U_{6}.x,U_{6}.y,V_{6}.x,V_{6}.y,7\\right)U_{6}+s_{3}\\left(U_{6}.x,U_{6}.y,V_{6}.x,V_{6}.y,7\\right)V_{6}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;U_{8}=s_{1}\\left(U_{7}.x,U_{7}.y,V_{7}.x,V_{7}.y,8\\right)U_{7}+s_{2}\\left(U_{7}.x,U_{7}.y,V_{7}.x,V_{7}.y,8\\right)V_{7}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;V_{8}=s_{2}\\left(U_{7}.x,U_{7}.y,V_{7}.x,V_{7}.y,8\\right)U_{7}+s_{3}\\left(U_{7}.x,U_{7}.y,V_{7}.x,V_{7}.y,8\\right)V_{7}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;U_{9}=s_{1}\\left(U_{8}.x,U_{8}.y,V_{8}.x,V_{8}.y,9\\right)U_{8}+s_{2}\\left(U_{8}.x,U_{8}.y,V_{8}.x,V_{8}.y,9\\right)V_{8}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;V_{9}=s_{2}\\left(U_{8}.x,U_{8}.y,V_{8}.x,V_{8}.y,9\\right)U_{8}+s_{3}\\left(U_{8}.x,U_{8}.y,V_{8}.x,V_{8}.y,9\\right)V_{8}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;U_{10}=s_{1}\\left(U_{9}.x,U_{9}.y,V_{9}.x,V_{9}.y,10\\right)U_{9}+s_{2}\\left(U_{9}.x,U_{9}.y,V_{9}.x,V_{9}.y,10\\right)V_{9}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;V_{10}=s_{2}\\left(U_{9}.x,U_{9}.y,V_{9}.x,V_{9}.y,10\\right)U_{9}+s_{3}\\left(U_{9}.x,U_{9}.y,V_{9}.x,V_{9}.y,10\\right)V_{9}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;W_{1}=\\left[U_{0},U_{1},U_{2},U_{3},U_{4},U_{5},U_{6},U_{7},U_{8},U_{9},U_{10}\\right]\\left[k+1\\right]&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;W_{2}=\\left[V_{0},V_{1},V_{2},V_{3},V_{4},V_{5},V_{6},V_{7},V_{8},V_{9},V_{10}\\right]\\left[k+1\\right]&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;x^{2}+y^{2}=1&quot;,
+    &quot;color&quot;: &quot;#000000&quot;,
+    &quot;lineStyle&quot;: &quot;DOTTED&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;\\cos\\left(t\\right)U_{0}+\\sin\\left(t\\right)V_{0}&quot;,
+    &quot;parametricDomain&quot;: {
+      &quot;min&quot;: &quot;0&quot;,
+      &quot;max&quot;: &quot;2\\pi&quot;
+    },
+    &quot;color&quot;: &quot;#c74440&quot;,
+    &quot;lineStyle&quot;: &quot;DASHED&quot;,
+    &quot;lineOpacity&quot;: &quot;0.5&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;\\cos\\left(t\\right)W_{1}+\\sin\\left(t\\right)W_{2}&quot;,
+    &quot;parametricDomain&quot;: {
+      &quot;min&quot;: &quot;0&quot;,
+      &quot;max&quot;: &quot;2\\pi&quot;
+    },
+    &quot;color&quot;: &quot;#6042a6&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;tW_{1}&quot;,
+    &quot;parametricDomain&quot;: {
+      &quot;min&quot;: &quot;0&quot;,
+      &quot;max&quot;: &quot;1&quot;
+    },
+    &quot;color&quot;: &quot;#6042a6&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;tW_{2}&quot;,
+    &quot;parametricDomain&quot;: {
+      &quot;min&quot;: &quot;0&quot;,
+      &quot;max&quot;: &quot;1&quot;
+    },
+    &quot;color&quot;: &quot;#6042a6&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;W_{1}&quot;,
+    &quot;color&quot;: &quot;#6042a6&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;W_{2}&quot;,
+    &quot;color&quot;: &quot;#6042a6&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;\\left(m_{11},m_{21}\\right)&quot;,
+    &quot;color&quot;: &quot;#c74440&quot;,
+    &quot;label&quot;: &quot;`Me_{1}`&quot;,
+    &quot;showLabel&quot;: true,
+    &quot;labelOrientation&quot;: &quot;below&quot;,
+    &quot;dragMode&quot;: &quot;XY&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;\\left(m_{12},m_{22}\\right)&quot;,
+    &quot;color&quot;: &quot;#c74440&quot;,
+    &quot;label&quot;: &quot;`Me_{2}`&quot;,
+    &quot;showLabel&quot;: true,
+    &quot;labelOrientation&quot;: &quot;left&quot;,
+    &quot;dragMode&quot;: &quot;XY&quot;
+  }
+]" data-options="{
+  &quot;expressions&quot;: false,
+  &quot;settingsMenu&quot;: false,
+  &quot;zoomButtons&quot;: false,
+  &quot;keypad&quot;: false
+}" id="graph-polar-matrix" data-img="figures/polar-matrix.png" data-bounds="{
+  &quot;left&quot;: -1.8,
+  &quot;right&quot;: 1.8,
+  &quot;bottom&quot;: -1.8,
+  &quot;top&quot;: 1.8
+}"><div class="desmos-graph" style="height:450px;"></div><div class="desmos-controls"><label><span class="desmos-control-label"><math><mi>𝑘</mi></math></span><input type="range" data-name="k" value="3" min="0" max="10" step="1"><output>3</output></label></div></div><p><span class="desmos-readout">After <math><mi>𝑘</mi></math> steps:<span data-entries="[
+  [
+    &quot;W_{1}.x&quot;,
+    &quot;W_{2}.x&quot;
+  ],
+  [
+    &quot;W_{1}.y&quot;,
+    &quot;W_{2}.y&quot;
+  ]
+]"></span></span></p></div></div></figure><h2 id="loc-7">4. Projection onto the semidefinite cone</h2><p>The positive semidefinite cone is the set of all real symmetric <math><mi>𝑛</mi><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">×</mo><mi>𝑛</mi></math> positive semidefinite matrices. That is</p><div class="numbered-equation"><math display="block"><msubsup><mi>𝕊</mi><mo>+</mo><mi>𝑛</mi></msubsup><mo lspace="0.2777777777777778em" rspace="0em">:</mo><mo lspace="0em">=</mo><mo form="prefix" stretchy="false">{</mo><mi>𝑋</mi><mo>∈</mo><msup><mi>ℝ</mi><mrow><mi>𝑛</mi><mo lspace="0em" rspace="0em">×</mo><mi>𝑛</mi></mrow></msup><mspace width="0.2222em"/><mo lspace="0em" rspace="0em">|</mo><mspace width="0.2222em"/><mi>𝑋</mi><mo>=</mo><msup><mi>𝑋</mi><mi>⊤</mi></msup><mo rspace="0em">,</mo><mspace width="0.2778em"/><mi>𝑋</mi><mo>⪰</mo><mn>0</mn><mo form="postfix" stretchy="false">}</mo><mi>.</mi></math><p><span class="equation-number">(8)</span></p></div><p>Semidefinite programming (SDP) problems are optimization problems for which matrix variables are constrained to be positive semidefinite, a special case of the conic programs in <a href="/blog/2026/01-04-conic-optimization/">Conic Optimization</a>. As such, algorithms that aim to solve SDPs need to ensure that the solution satisfies the positive semidefinite constraint. In interior point methods this is done by only taking steps for which the next iterate remains inside the cone, while first-order methods most often rely on projecting back onto the set after taking a step, i.e., for a symmetric <math><mi>𝑋</mi><mo>=</mo><mi>𝑈</mi><mi mathvariant="normal">Λ</mi><msup><mi>𝑈</mi><mi>⊤</mi></msup></math>,</p><div class="numbered-equation"><math display="block"><msub><mi mathvariant="normal">Π</mi><msubsup><mi>𝕊</mi><mo>+</mo><mi>𝑛</mi></msubsup></msub><mrow><mo>(</mo><mi>𝑋</mi><mo>)</mo></mrow><mo>=</mo><munder><mo form="prefix" lspace="0em" rspace="0em">arg min</mo><mrow><mi>𝑌</mi><mo lspace="0em" rspace="0em">∈</mo><msubsup><mi>𝕊</mi><mo>+</mo><mi>𝑛</mi></msubsup></mrow></munder><mspace width="0.2778em"/><mo stretchy="false">‖</mo><mspace width="0.2222em"/><mi>𝑌</mi><mo>−</mo><mi>𝑋</mi><mspace width="0.2222em"/><msub><mo stretchy="false">‖</mo><mi>𝐹</mi></msub><mo>=</mo><mi>𝑈</mi><mspace width="0.2222em"/><mtext>diag</mtext><mrow><mo>(</mo><mrow><mtext>ReLU</mtext><mrow><mo>(</mo><msub><mi>𝜆</mi><mn>1</mn></msub><mo>)</mo></mrow><mo>,</mo><mi>…</mi><mo>,</mo><mtext>ReLU</mtext><mrow><mo>(</mo><msub><mi>𝜆</mi><mi>𝑛</mi></msub><mo>)</mo></mrow></mrow><mo>)</mo></mrow><msup><mi>𝑈</mi><mi>⊤</mi></msup><mi>.</mi></math><p><span class="equation-number">(9)</span></p></div><p>While the idea of projecting back onto the semidefinite cone using just matrix-matrix products is not new (a similar fixed-point approach was suggested in <a id="loc-8" href="#loc-14" role="doc-biblioref">[4]</a>), the main takeaway is that the ideas of Polar Express can be used to find a faster converging method <a id="loc-9" href="#loc-15" role="doc-biblioref">[5]</a>. An initial idea would be to directly find polynomials that approximate the ReLU function, i.e., solving</p><div class="numbered-equation"><math display="block"><mtable class="multiline-equation aligned"><mtr><mtd></mtd><mtd><munder><mo lspace="0em" rspace="0em">inf</mo><mrow><msub><mi>𝑓</mi><mn>1</mn></msub><mo rspace="0em">,</mo><mi>…</mi><mo rspace="0em">,</mo><msub><mi>𝑓</mi><mi>𝑇</mi></msub></mrow></munder><mspace width="0.2778em"/><munder><mo form="prefix" lspace="0em" rspace="0em">max</mo><mrow><mi>𝑥</mi><mo lspace="0em" rspace="0em">∈</mo><mrow><mo>[</mo><mrow><mo>−</mo><mn>1</mn><mo rspace="0em">,</mo><mn>1</mn></mrow><mo>]</mo></mrow></mrow></munder><mspace width="0.2778em"/><mo lspace="0em" rspace="0em">|</mo><mspace width="0.2222em"/><msub><mi>𝑓</mi><mi>𝑇</mi></msub><mi>⚬</mi><msub><mi>𝑓</mi><mrow><mi>𝑇</mi><mo lspace="0em" rspace="0em">−</mo><mn>1</mn></mrow></msub><mi>⚬</mi><mi>⋯</mi><mi>⚬</mi><msub><mi>𝑓</mi><mn>1</mn></msub><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mo>−</mo><mtext>ReLU</mtext><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mspace width="0.2222em"/><mo stretchy="false">|</mo></mtd></mtr><mtr><mtd><mspace width="1em"/><mtext>subject to</mtext><mspace width="1em"/></mtd><mtd><msub><mi>𝑓</mi><mi>𝑡</mi></msub><mo>∈</mo><msub><mi>ℝ</mi><msub><mi>𝑑</mi><mi>𝑡</mi></msub></msub><mrow><mo>[</mo><mi>𝑥</mi><mo>]</mo></mrow><mo rspace="0em">,</mo><mspace width="0.2778em"/><mi>𝑡</mi><mo>=</mo><mn>1</mn><mo>,</mo><mi>…</mi><mo>,</mo><mi>𝑇</mi><mo rspace="0em">,</mo></mtd></mtr></mtable></math><p><span class="equation-number">(10)</span></p></div><p>where <math><mi>𝑇</mi></math> is the total number of polynomials in the composition, <math><msub><mi>𝑑</mi><mi>𝑡</mi></msub></math> is the degree of the <math><mi>𝑡</mi></math>’th polynomial, and the degrees are fixed in advance as part of a “matrix-matrix” multiplication budget. Unfortunately, directly solving the above is challenging, and instead a two-stage approach is proposed. The idea is to realize that we can write the ReLU function as</p><div class="numbered-equation"><math display="block"><mtext>ReLU</mtext><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>𝑥</mi><mrow><mo>(</mo><mrow><mn>1</mn><mo>+</mo><mtext>sign</mtext><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow></mrow><mo>)</mo></mrow><mi>.</mi></math><p><span class="equation-number">(11)</span></p></div><p>The first step is to compute optimal coefficients for approximating the sign function using the Polar Express approach. The second step is then to refine the coefficients of the polynomials found in the first step by minimizing the error to the ReLU function on the entire interval <math><mrow><mo>[</mo><mrow><mo>−</mo><mn>1</mn><mo>,</mo><mn>1</mn></mrow><mo>]</mo></mrow></math>, i.e., minimizing the following loss function</p><div class="numbered-equation"><math display="block"><mi>𝐿</mi><mrow><mo>(</mo><mrow><msub><mi>𝑓</mi><mi>𝑇</mi></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>𝑓</mi><mn>1</mn></msub></mrow><mo>)</mo></mrow><mo lspace="0.2777777777777778em" rspace="0em">:</mo><mo lspace="0em">=</mo><munder><mo form="prefix" lspace="0em" rspace="0em">max</mo><mrow><mi>𝑥</mi><mo lspace="0em" rspace="0em">∈</mo><mrow><mo>[</mo><mrow><mo>−</mo><mn>1</mn><mo rspace="0em">,</mo><mn>1</mn></mrow><mo>]</mo></mrow></mrow></munder><mo lspace="0em" rspace="0em">|</mo><mspace width="0.2222em"/><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>𝑥</mi><mrow><mo>(</mo><mrow><mn>1</mn><mo>+</mo><msub><mi>𝑓</mi><mi>𝑇</mi></msub><mi>⚬</mi><msub><mi>𝑓</mi><mrow><mi>𝑇</mi><mo lspace="0em" rspace="0em">−</mo><mn>1</mn></mrow></msub><mi>⚬</mi><mi>⋯</mi><mi>⚬</mi><msub><mi>𝑓</mi><mn>1</mn></msub><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow></mrow><mo>)</mo></mrow><mo>−</mo><mtext>ReLU</mtext><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow><mspace width="0.2222em"/><mo lspace="0em" rspace="0em">|</mo><mspace width="0.2222em"/><mi>.</mi></math><p><span class="equation-number">(12)</span></p></div><figure><p><span class="marginnote">Interactive figure 3: From the sign function to the ReLU</span></p><div class="blog-interactive"><div style="background: #6042a626; border-radius: .4em; padding: 1em; width: 100%; box-sizing: border-box; margin-bottom: .5em;"><p><strong>Interactive figure 3 (From the sign function to the ReLU)</strong>   The graph shows <math><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>𝑥</mi><mrow><mo>(</mo><mrow><mn>1</mn><mo>+</mo><mi>𝑝</mi><mrow><mo>(</mo><mi>𝑥</mi><mo>)</mo></mrow></mrow><mo>)</mo></mrow></math>, with <math><mi>𝑝</mi></math> the Polar Express composition from the previous figure, together with the ReLU (dotted). The shaded interval <math><mrow><mo>[</mo><mrow><mo>−</mo><mn>1</mn><mo>,</mo><mn>1</mn></mrow><mo>]</mo></mrow></math> is where it approximates the ReLU. The oscillation is inherited from <math><mi>𝑝</mi></math>, and the factor <math><mi>𝑥</mi></math> damps the error of <math><mi>𝑝</mi></math> where it is largest, close to zero.</p><div class="desmos-embed" data-state="[
+  {
+    &quot;id&quot;: &quot;k&quot;,
+    &quot;latex&quot;: &quot;k=5&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;a_{P}=\\left[8.470328803848073,4.182834183293943,3.9618572789616,3.286586217027959,2.2737499944340382,1.88871619735183,1.8750008859145961,1.875,1.875,1.875\\right]&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;b_{P}=\\left[-25.10807470666188,-3.108701109889243,-2.954063746359378,-2.4647201345312815,-1.6446603679080685,-1.2651572253386019,-1.2500009844021425,-1.25,-1.25,-1.25\\right]&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{P}=\\left[18.629275599118017,0.5806066813500494,0.5629761179538962,0.5073576938614549,0.41619092749788605,0.3765189255574909,0.3750000984878768,0.375,0.375,0.375\\right]&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;p\\left(y,j\\right)=a_{P}\\left[j\\right]y+b_{P}\\left[j\\right]y^{3}+c_{P}\\left[j\\right]y^{5}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;E_{0}\\left(x\\right)=x&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;E_{1}\\left(x\\right)=p\\left(E_{0}\\left(x\\right),1\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;E_{2}\\left(x\\right)=p\\left(E_{1}\\left(x\\right),2\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;E_{3}\\left(x\\right)=p\\left(E_{2}\\left(x\\right),3\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;E_{4}\\left(x\\right)=p\\left(E_{3}\\left(x\\right),4\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;E_{5}\\left(x\\right)=p\\left(E_{4}\\left(x\\right),5\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;E_{6}\\left(x\\right)=p\\left(E_{5}\\left(x\\right),6\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;E_{7}\\left(x\\right)=p\\left(E_{6}\\left(x\\right),7\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;E_{8}\\left(x\\right)=p\\left(E_{7}\\left(x\\right),8\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;E_{9}\\left(x\\right)=p\\left(E_{8}\\left(x\\right),9\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;E_{10}\\left(x\\right)=p\\left(E_{9}\\left(x\\right),10\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;P\\left(x\\right)=\\left\\{k=0:E_{0}\\left(x\\right),k=1:E_{1}\\left(x\\right),k=2:E_{2}\\left(x\\right),k=3:E_{3}\\left(x\\right),k=4:E_{4}\\left(x\\right),k=5:E_{5}\\left(x\\right),k=6:E_{6}\\left(x\\right),k=7:E_{7}\\left(x\\right),k=8:E_{8}\\left(x\\right),k=9:E_{9}\\left(x\\right),k=10:E_{10}\\left(x\\right)\\right\\}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;-1\\le x\\le1&quot;,
+    &quot;color&quot;: &quot;#000000&quot;,
+    &quot;fillOpacity&quot;: &quot;0.08&quot;,
+    &quot;lines&quot;: false
+  },
+  {
+    &quot;latex&quot;: &quot;y=\\max\\left(0,x\\right)&quot;,
+    &quot;color&quot;: &quot;#000000&quot;,
+    &quot;lineStyle&quot;: &quot;DOTTED&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;y=\\frac{1}{2}x\\left(1+P\\left(x\\right)\\right)&quot;,
+    &quot;color&quot;: &quot;#6042a6&quot;
+  }
+]" data-options="{
+  &quot;expressions&quot;: false,
+  &quot;settingsMenu&quot;: false,
+  &quot;zoomButtons&quot;: false,
+  &quot;keypad&quot;: false
+}" id="graph-relu" data-img="figures/relu.png" data-bounds="{
+  &quot;left&quot;: -1.2,
+  &quot;right&quot;: 1.2,
+  &quot;bottom&quot;: -0.3,
+  &quot;top&quot;: 1.3
+}"><div class="desmos-graph" style="height:400px;"></div><div class="desmos-controls"><label><span class="desmos-control-label"><math><mi>𝑘</mi></math></span><input type="range" data-name="k" value="5" min="0" max="10" step="1"><output>5</output></label></div></div></div></div></figure><figure><p><span class="marginnote">Interactive figure 4: Projecting a matrix onto the semidefinite cone</span></p><div class="blog-interactive"><div style="background: #6042a626; border-radius: .4em; padding: 1em; width: 100%; box-sizing: border-box; margin-bottom: .5em;"><p><strong>Interactive figure 4 (Projecting a matrix onto the semidefinite cone)</strong>   The same idea for a symmetric <math><mn>2</mn><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">×</mo><mn>2</mn></math> matrix <math><mi>𝐴</mi></math> with eigenvalues <math><msub><mi>𝜆</mi><mn>1</mn></msub><mo>,</mo><msub><mi>𝜆</mi><mn>2</mn></msub></math> and an eigenvector at angle <math><mi>𝜑</mi></math>. For each unit vector <math><mi>𝑢</mi></math> the graph draws a point at distance <math><mo stretchy="false">|</mo><msup><mi>𝑢</mi><mi>⊤</mi></msup><mi>𝐴</mi><mi>𝑢</mi><mo stretchy="false">|</mo></math> in the direction of <math><mi>𝑢</mi></math>, solid where <math><msup><mi>𝑢</mi><mi>⊤</mi></msup><mi>𝐴</mi><mi>𝑢</mi><mo>></mo><mn>0</mn></math> and dashed where it is negative, so the lobes point along the eigenvectors and have lengths <math><mo stretchy="false">|</mo><msub><mi>𝜆</mi><mn>1</mn></msub><mo stretchy="false">|</mo></math> and <math><mo stretchy="false">|</mo><msub><mi>𝜆</mi><mn>2</mn></msub><mo stretchy="false">|</mo></math>. <math><mi>𝐴</mi></math> is positive semidefinite exactly when nothing is dashed.<sup class="footnote-ref"><a class="footnote-ref-link" href="#fn-2" id="fnref-2">2</a></sup><span class="marginnote" id="fn-2"><sup><a class="footnote-ref-link" href="#fnref-2">2</a></sup> If <math><mi>𝐴</mi></math> is already positive semidefinite, the curve first moves away from <math><mi>𝐴</mi></math> and then returns. The first polynomials are tuned for singular values near <math><mi>ℓ</mi><mo>=</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>3</mn></mrow></msup></math> and temporarily push values close to <math><mn>1</mn></math> far off.</span> The faint lobes are <math><mi>𝐴</mi></math>, the dotted curve its exact projection, and the bold curve the approximation <math><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>𝐴</mi><mrow><mo>(</mo><mrow><mi>𝐼</mi><mo>+</mo><mi>𝑝</mi><mrow><mo>(</mo><mi>𝐴</mi><mo>)</mo></mrow></mrow><mo>)</mo></mrow></math> after <math><mi>𝑘</mi></math> steps. As <math><mi>𝑘</mi></math> grows, the dashed lobes vanish and the solid ones grow slightly, since the negative eigenvalue no longer subtracts from them.</p><div class="desmos-embed" data-state="[
+  {
+    &quot;id&quot;: &quot;l_{1}&quot;,
+    &quot;latex&quot;: &quot;l_{1}=0.8&quot;
+  },
+  {
+    &quot;id&quot;: &quot;l_{2}&quot;,
+    &quot;latex&quot;: &quot;l_{2}=-0.5&quot;
+  },
+  {
+    &quot;id&quot;: &quot;w&quot;,
+    &quot;latex&quot;: &quot;w=30&quot;
+  },
+  {
+    &quot;id&quot;: &quot;k&quot;,
+    &quot;latex&quot;: &quot;k=3&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;m=\\frac{w\\pi}{180}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;A_{11}=l_{1}\\cos^{2}\\left(m\\right)+l_{2}\\sin^{2}\\left(m\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;A_{12}=\\left(l_{1}-l_{2}\\right)\\cos\\left(m\\right)\\sin\\left(m\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;A_{22}=l_{1}\\sin^{2}\\left(m\\right)+l_{2}\\cos^{2}\\left(m\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;n=\\max\\left(10^{-9},\\sqrt{l_{1}^{2}+l_{2}^{2}}\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;U_{0}=\\frac{\\left(A_{11},A_{12}\\right)}{n}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;V_{0}=\\frac{\\left(A_{12},A_{22}\\right)}{n}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;a_{P}=\\left[8.470328803848073,4.182834183293943,3.9618572789616,3.286586217027959,2.2737499944340382,1.88871619735183,1.8750008859145961,1.875,1.875,1.875\\right]&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;b_{P}=\\left[-25.10807470666188,-3.108701109889243,-2.954063746359378,-2.4647201345312815,-1.6446603679080685,-1.2651572253386019,-1.2500009844021425,-1.25,-1.25,-1.25\\right]&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{P}=\\left[18.629275599118017,0.5806066813500494,0.5629761179538962,0.5073576938614549,0.41619092749788605,0.3765189255574909,0.3750000984878768,0.375,0.375,0.375\\right]&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;g_{1}\\left(a,b,c,d\\right)=a^{2}+b^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;g_{2}\\left(a,b,c,d\\right)=ac+bd&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;g_{3}\\left(a,b,c,d\\right)=c^{2}+d^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;s_{1}\\left(a,b,c,d,j\\right)=a_{P}\\left[j\\right]+b_{P}\\left[j\\right]g_{1}\\left(a,b,c,d\\right)+c_{P}\\left[j\\right]\\left(g_{1}\\left(a,b,c,d\\right)^{2}+g_{2}\\left(a,b,c,d\\right)^{2}\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;s_{2}\\left(a,b,c,d,j\\right)=b_{P}\\left[j\\right]g_{2}\\left(a,b,c,d\\right)+c_{P}\\left[j\\right]g_{2}\\left(a,b,c,d\\right)\\left(g_{1}\\left(a,b,c,d\\right)+g_{3}\\left(a,b,c,d\\right)\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;s_{3}\\left(a,b,c,d,j\\right)=a_{P}\\left[j\\right]+b_{P}\\left[j\\right]g_{3}\\left(a,b,c,d\\right)+c_{P}\\left[j\\right]\\left(g_{2}\\left(a,b,c,d\\right)^{2}+g_{3}\\left(a,b,c,d\\right)^{2}\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;U_{1}=s_{1}\\left(U_{0}.x,U_{0}.y,V_{0}.x,V_{0}.y,1\\right)U_{0}+s_{2}\\left(U_{0}.x,U_{0}.y,V_{0}.x,V_{0}.y,1\\right)V_{0}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;V_{1}=s_{2}\\left(U_{0}.x,U_{0}.y,V_{0}.x,V_{0}.y,1\\right)U_{0}+s_{3}\\left(U_{0}.x,U_{0}.y,V_{0}.x,V_{0}.y,1\\right)V_{0}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;U_{2}=s_{1}\\left(U_{1}.x,U_{1}.y,V_{1}.x,V_{1}.y,2\\right)U_{1}+s_{2}\\left(U_{1}.x,U_{1}.y,V_{1}.x,V_{1}.y,2\\right)V_{1}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;V_{2}=s_{2}\\left(U_{1}.x,U_{1}.y,V_{1}.x,V_{1}.y,2\\right)U_{1}+s_{3}\\left(U_{1}.x,U_{1}.y,V_{1}.x,V_{1}.y,2\\right)V_{1}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;U_{3}=s_{1}\\left(U_{2}.x,U_{2}.y,V_{2}.x,V_{2}.y,3\\right)U_{2}+s_{2}\\left(U_{2}.x,U_{2}.y,V_{2}.x,V_{2}.y,3\\right)V_{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;V_{3}=s_{2}\\left(U_{2}.x,U_{2}.y,V_{2}.x,V_{2}.y,3\\right)U_{2}+s_{3}\\left(U_{2}.x,U_{2}.y,V_{2}.x,V_{2}.y,3\\right)V_{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;U_{4}=s_{1}\\left(U_{3}.x,U_{3}.y,V_{3}.x,V_{3}.y,4\\right)U_{3}+s_{2}\\left(U_{3}.x,U_{3}.y,V_{3}.x,V_{3}.y,4\\right)V_{3}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;V_{4}=s_{2}\\left(U_{3}.x,U_{3}.y,V_{3}.x,V_{3}.y,4\\right)U_{3}+s_{3}\\left(U_{3}.x,U_{3}.y,V_{3}.x,V_{3}.y,4\\right)V_{3}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;U_{5}=s_{1}\\left(U_{4}.x,U_{4}.y,V_{4}.x,V_{4}.y,5\\right)U_{4}+s_{2}\\left(U_{4}.x,U_{4}.y,V_{4}.x,V_{4}.y,5\\right)V_{4}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;V_{5}=s_{2}\\left(U_{4}.x,U_{4}.y,V_{4}.x,V_{4}.y,5\\right)U_{4}+s_{3}\\left(U_{4}.x,U_{4}.y,V_{4}.x,V_{4}.y,5\\right)V_{4}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;U_{6}=s_{1}\\left(U_{5}.x,U_{5}.y,V_{5}.x,V_{5}.y,6\\right)U_{5}+s_{2}\\left(U_{5}.x,U_{5}.y,V_{5}.x,V_{5}.y,6\\right)V_{5}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;V_{6}=s_{2}\\left(U_{5}.x,U_{5}.y,V_{5}.x,V_{5}.y,6\\right)U_{5}+s_{3}\\left(U_{5}.x,U_{5}.y,V_{5}.x,V_{5}.y,6\\right)V_{5}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;U_{7}=s_{1}\\left(U_{6}.x,U_{6}.y,V_{6}.x,V_{6}.y,7\\right)U_{6}+s_{2}\\left(U_{6}.x,U_{6}.y,V_{6}.x,V_{6}.y,7\\right)V_{6}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;V_{7}=s_{2}\\left(U_{6}.x,U_{6}.y,V_{6}.x,V_{6}.y,7\\right)U_{6}+s_{3}\\left(U_{6}.x,U_{6}.y,V_{6}.x,V_{6}.y,7\\right)V_{6}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;U_{8}=s_{1}\\left(U_{7}.x,U_{7}.y,V_{7}.x,V_{7}.y,8\\right)U_{7}+s_{2}\\left(U_{7}.x,U_{7}.y,V_{7}.x,V_{7}.y,8\\right)V_{7}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;V_{8}=s_{2}\\left(U_{7}.x,U_{7}.y,V_{7}.x,V_{7}.y,8\\right)U_{7}+s_{3}\\left(U_{7}.x,U_{7}.y,V_{7}.x,V_{7}.y,8\\right)V_{7}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;U_{9}=s_{1}\\left(U_{8}.x,U_{8}.y,V_{8}.x,V_{8}.y,9\\right)U_{8}+s_{2}\\left(U_{8}.x,U_{8}.y,V_{8}.x,V_{8}.y,9\\right)V_{8}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;V_{9}=s_{2}\\left(U_{8}.x,U_{8}.y,V_{8}.x,V_{8}.y,9\\right)U_{8}+s_{3}\\left(U_{8}.x,U_{8}.y,V_{8}.x,V_{8}.y,9\\right)V_{8}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;U_{10}=s_{1}\\left(U_{9}.x,U_{9}.y,V_{9}.x,V_{9}.y,10\\right)U_{9}+s_{2}\\left(U_{9}.x,U_{9}.y,V_{9}.x,V_{9}.y,10\\right)V_{9}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;V_{10}=s_{2}\\left(U_{9}.x,U_{9}.y,V_{9}.x,V_{9}.y,10\\right)U_{9}+s_{3}\\left(U_{9}.x,U_{9}.y,V_{9}.x,V_{9}.y,10\\right)V_{9}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;W_{1}=\\left[U_{0},U_{1},U_{2},U_{3},U_{4},U_{5},U_{6},U_{7},U_{8},U_{9},U_{10}\\right]\\left[k+1\\right]&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;W_{2}=\\left[V_{0},V_{1},V_{2},V_{3},V_{4},V_{5},V_{6},V_{7},V_{8},V_{9},V_{10}\\right]\\left[k+1\\right]&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;Z_{1}=\\frac{1}{2}\\left(\\left(A_{11},A_{12}\\right)+W_{1}.x\\left(A_{11},A_{12}\\right)+W_{1}.y\\left(A_{12},A_{22}\\right)\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;Z_{2}=\\frac{1}{2}\\left(\\left(A_{12},A_{22}\\right)+W_{2}.x\\left(A_{11},A_{12}\\right)+W_{2}.y\\left(A_{12},A_{22}\\right)\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;e_{1}=\\max\\left(l_{1},0\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;e_{2}=\\max\\left(l_{2},0\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;\\Pi_{11}=e_{1}\\cos^{2}\\left(m\\right)+e_{2}\\sin^{2}\\left(m\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;\\Pi_{12}=\\left(e_{1}-e_{2}\\right)\\cos\\left(m\\right)\\sin\\left(m\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;\\Pi_{22}=e_{1}\\sin^{2}\\left(m\\right)+e_{2}\\cos^{2}\\left(m\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;f_{A}\\left(\\theta\\right)=A_{11}\\cos^{2}\\left(\\theta\\right)+2A_{12}\\cos\\left(\\theta\\right)\\sin\\left(\\theta\\right)+A_{22}\\sin^{2}\\left(\\theta\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;f_{S}\\left(\\theta\\right)=\\Pi_{11}\\cos^{2}\\left(\\theta\\right)+2\\Pi_{12}\\cos\\left(\\theta\\right)\\sin\\left(\\theta\\right)+\\Pi_{22}\\sin^{2}\\left(\\theta\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;f_{R}\\left(\\theta\\right)=Z_{1}.x\\cos^{2}\\left(\\theta\\right)+\\left(Z_{1}.y+Z_{2}.x\\right)\\cos\\left(\\theta\\right)\\sin\\left(\\theta\\right)+Z_{2}.y\\sin^{2}\\left(\\theta\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;x^{2}+y^{2}=1&quot;,
+    &quot;color&quot;: &quot;#000000&quot;,
+    &quot;lineOpacity&quot;: &quot;0.2&quot;,
+    &quot;lineWidth&quot;: &quot;1&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;r=f_{S}\\left(\\theta\\right)&quot;,
+    &quot;color&quot;: &quot;#000000&quot;,
+    &quot;lineStyle&quot;: &quot;DOTTED&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;r=\\max\\left(f_{A}\\left(\\theta\\right),0\\right)&quot;,
+    &quot;color&quot;: &quot;#c74440&quot;,
+    &quot;lineOpacity&quot;: &quot;0.4&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;r=\\max\\left(-f_{A}\\left(\\theta\\right),0\\right)&quot;,
+    &quot;color&quot;: &quot;#c74440&quot;,
+    &quot;lineOpacity&quot;: &quot;0.4&quot;,
+    &quot;lineStyle&quot;: &quot;DASHED&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;r=\\max\\left(f_{R}\\left(\\theta\\right),0\\right)&quot;,
+    &quot;color&quot;: &quot;#6042a6&quot;,
+    &quot;lineWidth&quot;: &quot;3&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;r=\\max\\left(-f_{R}\\left(\\theta\\right),0\\right)&quot;,
+    &quot;color&quot;: &quot;#6042a6&quot;,
+    &quot;lineWidth&quot;: &quot;3&quot;,
+    &quot;lineStyle&quot;: &quot;DASHED&quot;
+  }
+]" data-options="{
+  &quot;expressions&quot;: false,
+  &quot;settingsMenu&quot;: false,
+  &quot;zoomButtons&quot;: false,
+  &quot;keypad&quot;: false
+}" id="graph-psd-matrix" data-img="figures/psd-matrix.png" data-bounds="{
+  &quot;left&quot;: -1.1,
+  &quot;right&quot;: 1.1,
+  &quot;bottom&quot;: -1.1,
+  &quot;top&quot;: 1.1
+}"><div class="desmos-graph" style="height:450px;"></div><div class="desmos-controls"><label><span class="desmos-control-label"><math><msub><mi>𝜆</mi><mn>1</mn></msub></math></span><input type="range" data-name="l_{1}" value="0.8" min="-1" max="1" step="0.01"><output>0.8</output></label><label><span class="desmos-control-label"><math><msub><mi>𝜆</mi><mn>2</mn></msub></math></span><input type="range" data-name="l_{2}" value="-0.5" min="-1" max="1" step="0.01"><output>-0.5</output></label><label><span class="desmos-control-label"><math><mi>𝜑</mi></math></span><input type="range" data-name="w" value="30" min="0" max="180" step="1"><output>30</output></label><label><span class="desmos-control-label"><math><mi>𝑘</mi></math></span><input type="range" data-name="k" value="3" min="0" max="10" step="1"><output>3</output></label></div></div><p><span class="desmos-readout">After <math><mi>𝑘</mi></math> steps:<span data-entries="[
+  [
+    &quot;Z_{1}.x&quot;,
+    &quot;Z_{2}.x&quot;
+  ],
+  [
+    &quot;Z_{1}.y&quot;,
+    &quot;Z_{2}.y&quot;
+  ]
+]"></span></span><span class="desmos-readout">True projection:<span data-entries="[
+  [
+    &quot;\\Pi_{11}&quot;,
+    &quot;\\Pi_{12}&quot;
+  ],
+  [
+    &quot;\\Pi_{12}&quot;,
+    &quot;\\Pi_{22}&quot;
+  ]
+]"></span></span></p></div></div></figure><section class="post-citation"><h2>Cite this post</h2><div class="expressive-code" style="--ec-borderRad:0.34em;--ec-codePadBlk:0.34em;--ec-codePadInl:0.34em;--ec-codeFg:#000000;--ec-codeBg:#f5f5f5;--ec-langBg:#effbf9;--ec-langFg:#000000;--ec-copyBg:#f7f7f7;--ec-copyFg:#000000;--ec-gutterBg:#f5f5f5;--ec-gutterGap:0.25rem;--ec-gutterPadLeft:0.5rem;--ec-codeFontSize:0.85em;--ec-codeLineHeight:1.5;--ec-copyBgHover:#f8f8f8;--ec-copyBgFocus:#f8f8f8;--ec-copyFgHover:#000000;--ec-copyFgFocus:#000000;--ec-hlBg:#dff6f2;--ec-commentBg:#effbf9"><div class="code-lang" translate="no">bibtex</div><button type="button" class="copy-button" title="Copy code" data-state="idle" aria-label="Copy code"><span class="sr-only">Copy code</span><span class="copy-label" aria-hidden="true">Copy</span><span class="copy-feedback" aria-hidden="true">Copied!</span></button><pre data-language="bibtex"><code class="language-bibtex"><div class="ec-header ec-ext" style="background:#f5f5f5"></div><div class="ec-line"><div class="code" data-indent>@misc{paltorp2026polarexpress,</div></div><div class="ec-line" style="--ecIndent:2ch"><div class="code" data-indent="  ">  author = {Paltorp, Mikkel},</div></div><div class="ec-line" style="--ecIndent:2ch"><div class="code" data-indent="  ">  title = {{The Polar Express Algorithm}},</div></div><div class="ec-line" style="--ecIndent:2ch"><div class="code" data-indent="  ">  year = {2026},</div></div><div class="ec-line" style="--ecIndent:2ch"><div class="code" data-indent="  ">  month = oct,</div></div><div class="ec-line" style="--ecIndent:2ch"><div class="code" data-indent="  ">  url = {https://mipals.github.io/pdf/2026/01-03-polar-express/polar-express.pdf},</div></div><div class="ec-line" style="--ecIndent:2ch"><div class="code" data-indent="  ">  note = {Blog post}</div></div><div class="ec-line"><div class="code" data-indent>}</div></div><div class="ec-footer ec-ext" style="background:#f5f5f5"></div></code></pre></div></section><section role="doc-bibliography"><h2 id="loc-10">Bibliography</h2><ul style="list-style-type: none"><li id="loc-11"><span class="prefix"><a href="#loc-1" role="doc-backlink">[1]</a></span> N. Amsel, D. Persson, C. Musco, and R. M. Gower, “The Polar Express: Optimal Matrix Sign Methods and Their Application to the Muon Algorithm.” [Online]. Available: <a href="https://arxiv.org/abs/2505.16932">https://arxiv.org/abs/2505.16932</a></li><li id="loc-12"><span class="prefix"><a href="#loc-2" role="doc-backlink">[2]</a></span> K. Jordan <em>et al.</em>, “Muon: An optimizer for hidden layers in neural networks.” [Online]. Available: <a href="https://kellerjordan.github.io/posts/muon/">https://kellerjordan.github.io/posts/muon/</a></li><li id="loc-13"><span class="prefix"><a href="#loc-6" role="doc-backlink">[3]</a></span> L. N. Trefethen, <em>Approximation Theory and Approximation Practice, Extended Edition</em>. Society for Industrial, Applied Mathematics, 2019. doi: <a href="https://doi.org/10.1137/1.9781611975949">10.1137/1.9781611975949</a>.</li><li id="loc-14"><span class="prefix"><a href="#loc-8" role="doc-backlink">[4]</a></span> J. B. Francisco and D. S. Gonçalves, “A fixed-point method for approximate projection onto the positive semidefinite cone,” <em>Linear Algebra and its Applications</em>, vol. 523, pp. 59–78, 2017, doi: <a href="https://doi.org/10.1016/j.laa.2017.02.014">10.1016/j.laa.2017.02.014</a>.</li><li id="loc-15"><span class="prefix"><a href="#loc-9" role="doc-backlink">[5]</a></span> S. Kang, H. Han, A. Groudiev, and H. Yang, “Factorization-free Orthogonal Projection onto the Positive Semidefinite Cone with Composite Polynomial Filtering.” [Online]. Available: <a href="https://arxiv.org/abs/2507.09165">https://arxiv.org/abs/2507.09165</a></li></ul></section><script>document.querySelectorAll('.ec-line .code[data-indent]').forEach((line) => line.removeAttribute('data-indent'));</script></section></article></body></html>

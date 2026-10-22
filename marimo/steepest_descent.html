@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="./favicon.ico" />
+    <!-- Preload is necessary because we show these images when we disconnect from the server,
+    but at that point we cannot load these images from the server -->
+    <link rel="preload" href="./assets/gradient-yHQUC_QB.png" as="image" />
+    <link rel="preload" href="./assets/noise-60BoTA8O.png" as="image" />
+    <!-- Preload the fonts -->
+    <link rel="preload" href="./assets/Lora-VariableFont_wght-CZceb_kH.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Regular-Bam3NpBI.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Bold-C_DwAp7Z.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Regular-CEsLFVD9.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Medium-D5MAsWEG.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Bold-C6PDArdf.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="a marimo app" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.json" />
+
+    <script data-marimo="true">
+      function __resizeIframe(obj) {
+        const scrollbarHeight = 20; // Max between windows, mac, and linux
+
+        function setHeight() {
+          // Guard against race condition where iframe isn't ready
+          if (!obj.contentWindow?.document?.documentElement) {
+            return;
+          }
+          const element = obj.contentWindow.document.documentElement;
+          // If there is no vertical scrollbar, we don't need to resize the iframe
+          if (element.scrollHeight === element.clientHeight) {
+            return;
+          }
+
+          // Create a new height that includes the scrollbar height if it's visible
+          const hasHorizontalScrollbar = element.scrollWidth > element.clientWidth;
+          const newHeight = element.scrollHeight + (hasHorizontalScrollbar ? scrollbarHeight : 0);
+
+          // Only update the height if it's different from the current height
+          if (obj.style.height !== `${newHeight}px`) {
+            obj.style.height = `${newHeight}px`;
+          }
+        }
+
+        // Resize the iframe to the height of the content and bottom scrollbar height
+        setHeight();
+
+        // Resize the iframe when the content changes
+        const resizeObserver = new ResizeObserver((_entries) => {
+          setHeight();
+        });
+        // Only observe if iframe content is ready
+        if (obj.contentWindow?.document?.body) {
+          resizeObserver.observe(obj.contentWindow.document.body);
+        }
+      }
+    </script>
+    <marimo-filename hidden>notebook.py</marimo-filename>
+    <!-- TODO(Trevor): Legacy, required by VS Code plugin. Remove when plugin is updated (see marimo/server/_templates/template.py) -->
+    <marimo-version data-version="{{ version }}" hidden></marimo-version>
+    <marimo-user-config data-config="{{ user_config }}" hidden></marimo-user-config>
+    <marimo-server-token data-token="{{ server_token }}" hidden></marimo-server-token>
+    <!-- /TODO -->
+    <title>steepest descent</title>
+    <script type="module" crossorigin src="./assets/index-4n22QjCD.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/rolldown-runtime-B0Z9INg1.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-CBDbhulC.js">
+    <link rel="modulepreload" crossorigin href="./assets/compiler-runtime-CYIjoINj.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEvent-xfs0Sn4r.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-dom-BQrReHnR.js">
+    <link rel="modulepreload" crossorigin href="./assets/schemas-aTUejmFi.js">
+    <link rel="modulepreload" crossorigin href="./assets/isObject-BCaOs5rp.js">
+    <link rel="modulepreload" crossorigin href="./assets/isSymbol-oX0TOjjx.js">
+    <link rel="modulepreload" crossorigin href="./assets/now-Cmx0b_zA.js">
+    <link rel="modulepreload" crossorigin href="./assets/debounce-aFmHgJZY.js">
+    <link rel="modulepreload" crossorigin href="./assets/isArrayLikeObject-DnwgSs_Z.js">
+    <link rel="modulepreload" crossorigin href="./assets/_initCloneObject-CM3WilQg.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseMerge-DLqSVasz.js">
+    <link rel="modulepreload" crossorigin href="./assets/objects-snlMn4yk.js">
+    <link rel="modulepreload" crossorigin href="./assets/jsx-runtime-B74pBk57.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEventListener-92uWqz-P.js">
+    <link rel="modulepreload" crossorigin href="./assets/invariant-Ci2dTZ72.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-D5Ywm7-q.js">
+    <link rel="modulepreload" crossorigin href="./assets/constants-BDbGiS7O.js">
+    <link rel="modulepreload" crossorigin href="./assets/Deferred-CrTnjj37.js">
+    <link rel="modulepreload" crossorigin href="./assets/session-Sz5nSFku.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-BlNM0caL.js">
+    <link rel="modulepreload" crossorigin href="./assets/clsx-DB0hHKMi.js">
+    <link rel="modulepreload" crossorigin href="./assets/cn-ldLVeaqm.js">
+    <link rel="modulepreload" crossorigin href="./assets/fullscreen-BH2jz-F4.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DzCQtGkt.js">
+    <link rel="modulepreload" crossorigin href="./assets/menu-items-BSRA2YI9.js">
+    <link rel="modulepreload" crossorigin href="./assets/button-Dh8EwhsF.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-dialog-CA-2mBs3.js">
+    <link rel="modulepreload" crossorigin href="./assets/createLucideIcon-B7HeEoG2.js">
+    <link rel="modulepreload" crossorigin href="./assets/check-BoA6XBpj.js">
+    <link rel="modulepreload" crossorigin href="./assets/context-Do8M9TDF.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNumberFormatter-DHJ9s6Vk.js">
+    <link rel="modulepreload" crossorigin href="./assets/select-nLt2y0Sw.js">
+    <link rel="modulepreload" crossorigin href="./assets/circle-ByJdIf5p.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-BUtPzKB4.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BtC9ym6k.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CZNULd6Z.js">
+    <link rel="modulepreload" crossorigin href="./assets/arrays-BqUx5USx.js">
+    <link rel="modulepreload" crossorigin href="./assets/once-Haz_uxEL.js">
+    <link rel="modulepreload" crossorigin href="./assets/capabilities-D8kPgMKr.js">
+    <link rel="modulepreload" crossorigin href="./assets/cjs-C49f7GXV.js">
+    <link rel="modulepreload" crossorigin href="./assets/createReducer-B_XmHROl.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DiYjQAhI.js">
+    <link rel="modulepreload" crossorigin href="./assets/marked.esm-B_3iMIUq.js">
+    <link rel="modulepreload" crossorigin href="./assets/strings-CReV1AYG.js">
+    <link rel="modulepreload" crossorigin href="./assets/requests-C6_IaFh7.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-B8pdsUrS.js">
+    <link rel="modulepreload" crossorigin href="./assets/useLifecycle-BUaJcygz.js">
+    <link rel="modulepreload" crossorigin href="./assets/toDate-hGYJX0Ha.js">
+    <link rel="modulepreload" crossorigin href="./assets/database-zap-CloO6gbw.js">
+    <link rel="modulepreload" crossorigin href="./assets/numbers-Bc-r3jsC.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDebounce-DgpSQhrP.js">
+    <link rel="modulepreload" crossorigin href="./assets/input-DEbY281O.js">
+    <link rel="modulepreload" crossorigin href="./assets/uuid-k9DpjH68.js">
+    <link rel="modulepreload" crossorigin href="./assets/use-toast-DpWHUGuF.js">
+    <link rel="modulepreload" crossorigin href="./assets/write-secret-modal-D6zoZgLY.js">
+    <link rel="modulepreload" crossorigin href="./assets/plus-C4J9gIE1.js">
+    <link rel="modulepreload" crossorigin href="./assets/trash-2-D_HX-0qx.js">
+    <link rel="modulepreload" crossorigin href="./assets/badge-BSgtkC2e.js">
+    <link rel="modulepreload" crossorigin href="./assets/preload-helper-HclGiUj8.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DkPPv0FB.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-Dw9YRsCU.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-B0RXffUm.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-Cx4BE7jC.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CKUpxYGQ.js">
+    <link rel="modulepreload" crossorigin href="./assets/stex-Dc5bKD4z.js">
+    <link rel="modulepreload" crossorigin href="./assets/paths-zcL04qUW.js">
+    <link rel="modulepreload" crossorigin href="./assets/useTheme-C-ri8BtY.js">
+    <link rel="modulepreload" crossorigin href="./assets/useAsyncData-Buhk-UgR.js">
+    <link rel="modulepreload" crossorigin href="./assets/purify.es-DrVcFY1Q.js">
+    <link rel="modulepreload" crossorigin href="./assets/cells-Cp-G34Rz.js">
+    <link rel="modulepreload" crossorigin href="./assets/get-DjNf4SIX.js">
+    <link rel="modulepreload" crossorigin href="./assets/_hasPath-BmRQipI0.js">
+    <link rel="modulepreload" crossorigin href="./assets/hasIn-yw4sIeJR.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseSet-gX6o3Pih.js">
+    <link rel="modulepreload" crossorigin href="./assets/pick-Bs4cJfJU.js">
+    <link rel="modulepreload" crossorigin href="./assets/errors-DzO-nXy-.js">
+    <link rel="modulepreload" crossorigin href="./assets/switch-DjXr9Y9D.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-BMXKNElG.js">
+    <link rel="modulepreload" crossorigin href="./assets/eye-off-CFuPxa9F.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-DlEomWzI.js">
+    <link rel="modulepreload" crossorigin href="./assets/extends-CvVTau-c.js">
+    <link rel="modulepreload" crossorigin href="./assets/esm-BHMOvJzM.js">
+    <link rel="modulepreload" crossorigin href="./assets/useAddCell-DdB_uBif.js">
+    <link rel="modulepreload" crossorigin href="./assets/readonly-python-code-DpIyjHqY.js">
+    <link rel="modulepreload" crossorigin href="./assets/LazyAnyLanguageCodeMirror-LboTfNDv.js">
+    <link rel="modulepreload" crossorigin href="./assets/micromark-factory-space-D9Dr-k4J.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-5FQGJX7Z-CRg4xQWg.js">
+    <link rel="modulepreload" crossorigin href="./assets/markdown-renderer-BZKlbm2Q.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-icon-z8fuTE3w.js">
+    <link rel="modulepreload" crossorigin href="./assets/useRunCells-CX7oW5zy.js">
+    <link rel="modulepreload" crossorigin href="./assets/RenderHTML-DwhMAd9l.js">
+    <link rel="modulepreload" crossorigin href="./assets/blob-B2d_dHwI.js">
+    <link rel="modulepreload" crossorigin href="./assets/share-CPtBiNgr.js">
+    <link rel="modulepreload" crossorigin href="./assets/events-CbeVJ6OD.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-Di9TbuV9.js">
+    <link rel="modulepreload" crossorigin href="./assets/ErrorBoundary-CDVGFYfr.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-B-r81uZ6.js">
+    <link rel="modulepreload" crossorigin href="./assets/tabs-Cy1qXLzH.js">
+    <link rel="modulepreload" crossorigin href="./assets/chevron-right-CKA5zVsM.js">
+    <link rel="modulepreload" crossorigin href="./assets/dropdown-menu-C40jM9o4.js">
+    <link rel="modulepreload" crossorigin href="./assets/html-to-image-D6GUC5q6.js">
+    <link rel="modulepreload" crossorigin href="./assets/download-DMxOzI7b.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-CUK1W5bI.js">
+    <link rel="modulepreload" crossorigin href="./assets/refresh-cw-Bf-rx_aV.js">
+    <link rel="modulepreload" crossorigin href="./assets/tree-actions-CG5g7aUQ.js">
+    <link rel="modulepreload" crossorigin href="./assets/ellipsis-Dfik_tuW.js">
+    <link rel="modulepreload" crossorigin href="./assets/external-link-Bp3BxyRA.js">
+    <link rel="modulepreload" crossorigin href="./assets/spinner-Ck-Hgfvj.js">
+    <link rel="modulepreload" crossorigin href="./assets/message-circle-BQB1AIAg.js">
+    <link rel="modulepreload" crossorigin href="./assets/hat-glasses-C8LSY3HT.js">
+    <link rel="modulepreload" crossorigin href="./assets/package-DPlscLzt.js">
+    <link rel="modulepreload" crossorigin href="./assets/datasource-DrODSIs0.js">
+    <link rel="modulepreload" crossorigin href="./assets/kbd-Cwh96ZBE.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-dmKwNsrp.js">
+    <link rel="modulepreload" crossorigin href="./assets/useInstallPackage-DsD08SLK.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-B6AklCzD.js">
+    <link rel="modulepreload" crossorigin href="./assets/cell-link-6burT2XF.js">
+    <link rel="modulepreload" crossorigin href="./assets/MarimoErrorOutput-DqpoYOvw.js">
+    <link rel="modulepreload" crossorigin href="./assets/VisuallyHidden-CBMDmozt.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDateFormatter-BiqAQ-zI.js">
+    <link rel="modulepreload" crossorigin href="./assets/en-US-yTIMUO13.js">
+    <link rel="modulepreload" crossorigin href="./assets/isValid-nQ3Iam8J.js">
+    <link rel="modulepreload" crossorigin href="./assets/dates-B58T85Jq.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-CNPGWpMu.js">
+    <link rel="modulepreload" crossorigin href="./assets/precisionRound-Bq_nmf5u.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-Dm4DaIgg.js">
+    <link rel="modulepreload" crossorigin href="./assets/vega-loader.browser-AQmjV9CX.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-BG35uS_N.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-icons.esm-hr79-MCS.js">
+    <link rel="modulepreload" crossorigin href="./assets/emotion-is-prop-valid.esm-nLO-SoUf.js">
+    <link rel="modulepreload" crossorigin href="./assets/useIframeCapabilities-C7Di8f2y.js">
+    <link rel="modulepreload" crossorigin href="./assets/error-banner-Dw5YY9wq.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-49LGK4zG.js">
+    <link rel="modulepreload" crossorigin href="./assets/formats-C6s96nu2.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-DmqOOjfe.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-resizable-panels.browser.esm-BSRAHC4P.js">
+    <link rel="modulepreload" crossorigin href="./assets/JsonOutput-CzIGPEZQ.js">
+    <link rel="modulepreload" crossorigin href="./assets/chart-no-axes-column-ChZdjJhj.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-function-DkZweMAs.js">
+    <link rel="modulepreload" crossorigin href="./assets/spec-DKsAmLTi.js">
+    <link rel="modulepreload" crossorigin href="./assets/semaphore-BjoL5P0h.js">
+    <link rel="modulepreload" crossorigin href="./assets/fileToBase64-NhpNrK5l.js">
+    <link rel="modulepreload" crossorigin href="./assets/useBoolean-BXC4CItZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/code-xml-B7x62Eeh.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-headphone-rFCxFRI8.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-DF8n85RA.js">
+    <link rel="modulepreload" crossorigin href="./assets/image-ab13yGv4.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-icons-DdGYuADJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/globe-BQf75qV_.js">
+    <link rel="modulepreload" crossorigin href="./assets/markdown-export-0rLbaq8b.js">
+    <link rel="modulepreload" crossorigin href="./assets/data-grid-types-DgHVN_Zz.js">
+    <link rel="modulepreload" crossorigin href="./assets/glide-utils-UGsrRHYj.js">
+    <link rel="modulepreload" crossorigin href="./assets/column-preview-riSXbYe_.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-B58Ib8Ir.js">
+    <link rel="modulepreload" crossorigin href="./assets/triangle-alert-MihykDYG.js">
+    <link rel="modulepreload" crossorigin href="./assets/prop-types-Djf4O40e.js">
+    <link rel="modulepreload" crossorigin href="./assets/es-CrFhA96G.js">
+    <link rel="modulepreload" crossorigin href="./assets/renderShortcut-X-CJUSM8.js">
+    <link rel="modulepreload" crossorigin href="./assets/bundle.esm-DzY74mzC.js">
+    <link rel="modulepreload" crossorigin href="./assets/icons-CjLa9BiH.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDeepCompareMemoize-CLytDdMl.js">
+    <link rel="modulepreload" crossorigin href="./assets/pathUtils-Cryrlpma.js">
+    <link rel="modulepreload" crossorigin href="./assets/floating-outline-DaUHnl_e.js">
+    <link rel="stylesheet" crossorigin href="./assets/cells-D-c15Ks-.css">
+    <link rel="stylesheet" crossorigin href="./assets/markdown-renderer-B7zTpxjS.css">
+    <link rel="stylesheet" crossorigin href="./assets/JsonOutput-BQtz7-np.css">
+    <link rel="stylesheet" crossorigin href="./assets/index-C7yAojRA.css">
+  <marimo-wasm hidden=""></marimo-wasm>
+    <script>
+        if (window.location.protocol === 'file:') {
+            alert('Warning: This file must be served by an HTTP server to function correctly.');
+        }
+    </script>
+    
+    <style>
+        #save-button {
+            display: none !important;
+        }
+        #filename-input {
+            display: none !important;
+        }
+    </style>
+    <style title='marimo-custom'>/* Tufte-inspired theme for marimo notebooks
+ *
+ * Based on the design principles of Edward Tufte and tufte.css
+ * (https://edwardtufte.github.io/tufte-css/)
+ *
+ * Usage:
+ *   app = marimo.App(css_file="tufte.css")
+ */
+
+/* Load ET Book font (the Tufte canonical font) */
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,300;0,400;0,600;1,400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;500&display=swap");
+
+:root,
+.marimo {
+  /* Tufte fonts */
+  --marimo-heading-font: "Playfair Display", "Palatino Linotype",
+    "Book Antiqua", Palatino, serif;
+  --marimo-text-font: "Source Sans 3", "Gill Sans", "Gill Sans MT", Calibri,
+    sans-serif;
+  --marimo-monospace-font: "Source Code Pro", Consolas, "Liberation Mono", Menlo,
+    monospace;
+
+  /* Tufte cream background */
+  --background: light-dark(#fffff8, #1a1a1a) !important;
+  --foreground: light-dark(#111, #ddd) !important;
+  --card: light-dark(#fffff8, #1a1a1a) !important;
+  --card-foreground: light-dark(#111, #ddd) !important;
+  --muted: light-dark(#f4f4ec, #222) !important;
+  --muted-foreground: light-dark(#555, #aaa) !important;
+
+  /* Wider readable measure */
+  --markdown-max-width: 65ch;
+}
+
+/* Body text: generous line-height for readability */
+.paragraph,
+.markdown p,
+.markdown li {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  letter-spacing: 0.01em;
+}
+
+/* Headings: classic Tufte style with generous spacing
+ * # (h1) = large title
+ * ## (h2) = section heading (styled like traditional h1)
+ * ### (h3) = subsection heading (styled like traditional h2)
+ */
+h1 {
+  font-weight: 400 !important;
+  font-style: normal;
+  margin-top: 3rem !important;
+  margin-bottom: 1.5rem !important;
+  font-size: 3rem !important;
+  line-height: 1.1 !important;
+}
+
+h2 {
+  font-weight: 400 !important;
+  font-style: italic;
+  margin-top: 2rem !important;
+  margin-bottom: 1rem !important;
+  font-size: 2.2rem !important;
+  line-height: 1.2 !important;
+}
+
+h3 {
+  font-weight: 400 !important;
+  font-style: italic;
+  margin-top: 1.8rem !important;
+  margin-bottom: 0.8rem !important;
+  font-size: 1.6rem !important;
+  line-height: 1.3 !important;
+}
+
+h4 {
+  font-weight: 400 !important;
+  font-style: italic;
+  margin-top: 1.4rem !important;
+  margin-bottom: 0.6rem !important;
+  font-size: 1.3rem !important;
+}
+
+/* Blockquotes as epigraphs */
+.markdown blockquote {
+  font-style: italic;
+  border-left: none !important;
+  padding-left: 1.5em !important;
+  margin: 2em 0 !important;
+  color: light-dark(#333, #bbb);
+}
+
+.markdown blockquote footer,
+.markdown blockquote cite {
+  font-style: normal;
+  font-size: 0.9em;
+}
+
+/* Links: subtle, no underline until hover */
+.markdown a {
+  color: inherit;
+  text-decoration: none;
+  background-image: linear-gradient(
+    light-dark(#999, #666),
+    light-dark(#999, #666)
+  );
+  background-position: 0% 93%;
+  background-repeat: no-repeat;
+  background-size: 100% 1px;
+}
+
+.markdown a:hover {
+  background-size: 100% 2px;
+  color: light-dark(#111, #fff);
+}
+
+/* Code: understated */
+.markdown code {
+  font-size: 0.9em;
+  background: light-dark(#f4f4ec, #252525) !important;
+  padding: 0.1em 0.3em;
+  border-radius: 2px;
+}
+
+/* Tables: Tufte-style minimal tables */
+.markdown table {
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  width: auto;
+}
+
+.markdown table thead {
+  border-bottom: 2px solid light-dark(#111, #ddd);
+}
+
+.markdown table th {
+  font-weight: 600;
+  padding: 0.5em 1em 0.3em 0;
+  text-align: left;
+  border: none !important;
+}
+
+.markdown table td {
+  padding: 0.3em 1em 0.3em 0;
+  border: none !important;
+  border-bottom: 1px solid light-dark(#eee, #333) !important;
+}
+
+.markdown table tbody tr:last-child td {
+  border-bottom: 2px solid light-dark(#111, #ddd) !important;
+}
+
+/* Horizontal rules: subtle */
+.markdown hr {
+  border: none;
+  border-top: 1px solid light-dark(#ccc, #444);
+  margin: 2em 0;
+}
+
+/* Images: full-width with subtle styling */
+.markdown img {
+  max-width: 100%;
+}
+
+/* Lists: proper spacing */
+.markdown ul,
+.markdown ol {
+  padding-left: 1.5em;
+}
+
+.markdown li {
+  margin-bottom: 0.4em;
+}
+
+/* Cells: no border, no divider between code and output, orange shadow on focus */
+.marimo-cell {
+  border-color: transparent !important;
+  outline-color: transparent !important;
+}
+.marimo-cell > * {
+  border-color: transparent !important;
+}
+.marimo-cell.needs-run {
+  border-color: transparent !important;
+  outline-color: transparent !important;
+  box-shadow: none !important;
+}
+.marimo-cell:focus-within {
+  box-shadow: 0px 0px 10px 0px light-dark(#e8a04080, #e8a04060) !important;
+}
+
+/* Show tall outputs, such as stacked charts, in full rather than in a
+   scroll box. Marimo limits each output to 610px by default. */
+.output-area {
+  max-height: none !important;
+}
+
+/* Code editor: match page background, hide line numbers and gutter border */
+.cm-editor {
+  background-color: var(--background) !important;
+  border: none !important;
+}
+.cm-gutters {
+  background-color: var(--background) !important;
+  border-right: none !important;
+  display: none !important;
+}
+
+/* Site navigation, matching assets/tufted.css. */
+#site-nav-header {
+  width: 87.5%;
+  margin-left: 12.5%;
+  box-sizing: border-box;
+  display: block !important;
+  position: relative;
+  z-index: 1000;
+}
+#site-nav-header nav {
+  display: flex;
+  gap: 1em;
+}
+#site-nav-header nav a,
+#site-nav-header nav a:link,
+#site-nav-header nav a:visited {
+  color: inherit;
+  text-decoration: none !important;
+  background-image: none !important;
+  border-bottom: 0 !important;
+  box-shadow: none !important;
+  text-shadow: none;
+  font-size: 1.25rem;
+  padding: 0.2em 0.4em;
+  margin-top: 1em;
+  border-radius: 0.2rem;
+  transition: background-color 120ms ease;
+}
+#site-nav-header nav a:hover,
+#site-nav-header nav a:focus-visible {
+  background: rgba(128, 128, 128, 0.2);
+  outline: none;
+}
+@media (max-width: 760px) {
+  #site-nav-header { width: 100%; margin-left: 0; }
+}
+</style>
+<script data-marimo="true">
+    Object.defineProperty(window, "__MARIMO_EXPORT_CONTEXT__", {
+        value: Object.freeze({
+            trusted: true,
+            notebookCode: "# /// script\n# dependencies = [\n#     \"marimo==0.24.2\",\n#     \"numpy\",\n#     \"altair\",\n#     \"pandas\",\n# ]\n#\n# [tool.marimo.display]\n# theme = \"system\"\n#\n# [tool.marimo.runtime]\n# auto_instantiate = true\n# ///\n\nimport marimo\n\n__generated_with = \"0.24.2\"\napp = marimo.App(css_file=\"tufte.css\")\n\n\n@app.cell(hide_code=True)\ndef _():\n    import marimo as mo\n\n    # BEGIN GENERATED SITE NAV\n    mo.nav_menu({\n        \"/\": \"home\",\n        \"/blog/\": \"blog\",\n        \"/publications/\": \"publications\",\n        \"/repositories/\": \"repositories\",\n        \"/about/\": \"about\",\n        \"/solver/\": \"conic solver\",\n        \"marimo\": {\n            \"/marimo/conic_programs.html\": \"Conic programs\",\n            \"/marimo/steepest_descent.html\": \"Which way is down?\",\n        },\n    })\n    # END GENERATED SITE NAV\n    return (mo,)\n\n\n@app.cell(hide_code=True)\ndef _(mo):\n    mo.md(r\"\"\"\n    # Which way is down?\n\n    This notebook accompanies the post\n    [Which Way Is Down? First-Order Optimizers as a Choice of Norm](/blog/2026/10-13-steepest-descent/).\n    The post views each first-order optimizer as a choice of norm on the\n    parameters $\\Theta$. Given the derivative $g = D\\mathcal{J}(\\theta)$, the\n    norm fixes the dual norm and the sharp operator,\n\n    $$\n    \\|g\\|_* = \\max_{\\|h\\| \\le 1} \\langle g, h \\rangle,\n    \\qquad\n    g^\\sharp = -\\operatorname*{arg\\,min}_{h \\in \\Theta}\\;\n    \\langle g, h \\rangle + \\tfrac{1}{2}\\|h\\|^2,\n    $$\n\n    and with them the constrained step $h_C = -\\eta\\, g^\\sharp / \\|g\\|_*$ and\n    the penalized step $h_P = -g^\\sharp / \\lambda$. The graphs in the post show\n    this in one and two dimensions. Here the parameters are matrices: the\n    first section races seven optimizers on one problem, and the second shows\n    why Muon averages the derivatives before it orthogonalizes them.\n    Everything is computed in Python running in your browser.\n    \"\"\")\n    return\n\n\n@app.cell(hide_code=True)\ndef _():\n    import altair as alt\n    import numpy as np\n    import pandas as pd\n\n    return alt, np, pd\n\n\n@app.cell(hide_code=True)\ndef _(mo):\n    mo.md(r\"\"\"\n    ## 1. The methods on one problem\n\n    The table at the end of the post lists seven methods. Here they all train\n    the same network of two linear layers, $Z = W_2 W_1 X$, with\n    $W_1 \\in \\mathbf{R}^{10 \\times 10}$ and $W_2 \\in \\mathbf{R}^{20 \\times 10}$,\n    on the least-squares loss\n\n    $$\n    \\mathcal{J}(W_1, W_2) = \\frac{1}{2m} \\|W_2 W_1 X - Y\\|_F^2,\n    \\qquad\n    G_2 = E\\, (W_1 X_b)^\\top,\n    \\quad\n    G_1 = W_2^\\top E\\, X_b^\\top,\n    $$\n\n    with $E = (W_2 W_1 X_b - Y_b) / b$, where each derivative is computed from\n    a random minibatch $(X_b, Y_b)$ of $b$ of the $m = 400$ samples. The inputs\n    are generated so that $X X^\\top$ has the condition number $\\kappa$. The\n    targets come from a layer whose singular values fall from $1$ to $0.01$,\n    plus a little noise, and both layers start from small random weights.\n    Gradient descent then learns the strong directions of the target first\n    and the weak ones much later, while the orthogonalized step of Muon moves\n    all of them at the same speed. Each method updates both layers with its\n    own rule:\n\n    | Method | Step |\n    |---|---|\n    | Gradient descent | $-\\eta\\, G$ |\n    | Sign descent | $-\\eta \\operatorname{sign}(G)$ |\n    | AdaGrad | $-\\eta\\, G / (\\sqrt{v} + \\epsilon)$, $\\; v \\leftarrow v + G^2$ |\n    | Adam | $-\\eta\\, \\hat{G} / (\\sqrt{v} + \\epsilon)$, with averages $\\hat{G}$ and $v$ and bias correction |\n    | Muon | $-\\eta\\, U V^\\top$ of the average $\\hat{G} = U \\Sigma V^\\top$ |\n    | Shampoo | $-\\eta\\, L^{-1/4} G R^{-1/4}$, $\\; L \\leftarrow L + G G^\\top$, $\\; R \\leftarrow R + G^\\top G$ |\n    | K-FAC | $-\\eta\\, L^{-1} G R^{-1}$, with averages of $X_b X_b^\\top / b$ in $R$ and of $\\Delta \\Delta^\\top / b$ in $L$ |\n\n    For K-FAC, $X_b$ stands for the inputs of the layer, $W_1 X_b$ for the\n    second layer, and $\\Delta$ for the sampled output errors carried back to\n    the layer's outputs. The errors are sampled from the model's predictive\n    distribution, a standard normal for the squared loss, and only the basic\n    step is used, with a small damping and without its adaptive momentum.\n    K-FAC treats the two layers as independent, so it is no longer Newton's\n    method, as it would be for a single layer.\n\n    Each method has its own step size $\\eta$, since the steps have very\n    different lengths. Either set them by hand, or let the notebook pick the\n    best $\\eta$ for each method from a grid, which takes a few seconds.\n    \"\"\")\n    return\n\n\n@app.cell(hide_code=True)\ndef _(mo, np):\n    METHODS = [\"Gradient descent\", \"Sign descent\", \"AdaGrad\", \"Adam\", \"Muon\", \"Shampoo\", \"K-FAC\"]\n    ETA_GRID = [float(f\"{_e:.3g}\") for _e in np.logspace(-4, 1.5, 23)]\n\n    def nearest_eta(value):\n        return min(ETA_GRID, key=lambda _e: abs(np.log(_e / value)))\n\n    # The best values on the grid for \u03ba = 1000, a batch of 32, and 300 decaying steps.\n    _defaults = {\n        \"Gradient descent\": 3.16,\n        \"Sign descent\": 0.0316,\n        \"AdaGrad\": 0.0562,\n        \"Adam\": 0.0316,\n        \"Muon\": 0.01,\n        \"Shampoo\": 0.562,\n        \"K-FAC\": 0.0316,\n    }\n    eta_sliders = mo.ui.dictionary({\n        _name: mo.ui.slider(steps=ETA_GRID, value=nearest_eta(_defaults[_name]), show_value=True)\n        for _name in METHODS\n    })\n    kappa = mo.ui.slider(\n        steps=[1, 3, 10, 30, 100, 300, 1000, 3000, 10000], value=1000,\n        label=r\"condition number $\\kappa$\", show_value=True,\n    )\n    batch = mo.ui.slider(\n        steps=[4, 8, 16, 32, 64, 128, 400], value=32,\n        label=\"batch size $b$\", show_value=True,\n    )\n    n_steps = mo.ui.slider(start=50, stop=600, step=50, value=300, label=\"steps\", show_value=True)\n    decay = mo.ui.checkbox(value=True, label=r\"let $\\eta$ decay linearly to zero\")\n    eta_mode = mo.ui.radio(\n        options=[\"set by hand\", \"best on a grid\"], value=\"set by hand\", label=r\"step sizes $\\eta$\",\n    )\n    return (\n        ETA_GRID,\n        METHODS,\n        batch,\n        decay,\n        eta_mode,\n        eta_sliders,\n        kappa,\n        n_steps,\n    )\n\n\n@app.cell(hide_code=True)\ndef _(METHODS, batch, decay, eta_mode, eta_sliders, kappa, mo, n_steps):\n    _problem = mo.vstack([kappa, batch, n_steps, decay, eta_mode])\n    _etas = mo.vstack(\n        [mo.hstack([mo.md(_name), eta_sliders[_name]], justify=\"space-between\") for _name in METHODS],\n    )\n    mo.hstack([_problem, _etas], widths=[1, 1], gap=3, align=\"start\")\n    return\n\n\n@app.cell(hide_code=True)\ndef _(np):\n    def make_problem(kappa, p=20, q=10, m=400, noise=0.05, spread=100.0, seed=0):\n        \"\"\"Inputs X with cond(X X\u1d40) = \u03ba, and noisy targets of a random layer\n        whose singular values fall from 1 to 1/spread.\"\"\"\n        rng = np.random.default_rng(seed)\n        U, _ = np.linalg.qr(rng.standard_normal((q, q)))\n        V, _ = np.linalg.qr(rng.standard_normal((m, q)))\n        s = np.sqrt(m) * kappa ** (-0.5 * np.linspace(0, 1, q))\n        X = U @ np.diag(s) @ V.T\n        P, _ = np.linalg.qr(rng.standard_normal((p, q)))\n        Q, _ = np.linalg.qr(rng.standard_normal((q, q)))\n        W = P @ np.diag(spread ** (-np.linspace(0, 1, q))) @ Q.T\n        Y = W @ X + noise * rng.standard_normal((p, m))\n        theta_best = np.linalg.lstsq(X.T, Y.T, rcond=None)[0].T\n        return X, Y, theta_best\n\n    def loss(theta, X, Y):\n        return 0.5 * np.sum((theta @ X - Y) ** 2) / X.shape[1]\n\n    def orthogonalize(M):\n        U, _, Vt = np.linalg.svd(M, full_matrices=False)\n        return U @ Vt\n\n    def inverse_root(S, r):\n        w, Q = np.linalg.eigh(S)\n        return (Q * w ** (-1 / r)) @ Q.T\n\n    def train(method, eta, X, Y, steps, batch, decay, hidden=10, init=0.01, seed=1,\n              beta1=0.9, beta2=0.999, rho=0.95):\n        \"\"\"Run one method from small random weights and return the loss at every iterate.\"\"\"\n        rng = np.random.default_rng(seed)\n        q, m = X.shape\n        p = Y.shape[0]\n        weights = [\n            init * np.random.default_rng(0).standard_normal((hidden, q)),\n            init * np.random.default_rng(1).standard_normal((p, hidden)),\n        ]\n        # The running averages and Kronecker factors of each layer.\n        states = [\n            dict(G_avg=np.zeros_like(W), v=np.zeros_like(W),\n                 L=1e-6 * np.eye(W.shape[0]), R=1e-6 * np.eye(W.shape[1]))\n            for W in weights\n        ]\n        losses = [loss(weights[1] @ weights[0], X, Y)]\n        for t in range(1, steps + 1):\n            idx = rng.choice(m, batch, replace=False)\n            Xb, Yb = X[:, idx], Y[:, idx]\n            hidden_out = weights[0] @ Xb\n            E = (weights[1] @ hidden_out - Yb) / batch\n            derivatives = [weights[1].T @ E @ Xb.T, E @ hidden_out.T]\n            layer_inputs = [Xb, hidden_out]\n            Delta = rng.standard_normal((p, batch))\n            layer_errors = [weights[1].T @ Delta, Delta]\n            step_size = eta * (1 - (t - 1) / steps) if decay else eta\n            try:\n                for layer, (G, state) in enumerate(zip(derivatives, states)):\n                    if method == \"Gradient descent\":\n                        h = G\n                    elif method == \"Sign descent\":\n                        h = np.sign(G)\n                    elif method == \"AdaGrad\":\n                        state[\"v\"] += G**2\n                        h = G / (np.sqrt(state[\"v\"]) + 1e-8)\n                    elif method == \"Adam\":\n                        state[\"G_avg\"] = beta1 * state[\"G_avg\"] + (1 - beta1) * G\n                        state[\"v\"] = beta2 * state[\"v\"] + (1 - beta2) * G**2\n                        h = (state[\"G_avg\"] / (1 - beta1**t)) / (np.sqrt(state[\"v\"] / (1 - beta2**t)) + 1e-8)\n                    elif method == \"Muon\":\n                        state[\"G_avg\"] = beta1 * state[\"G_avg\"] + (1 - beta1) * G\n                        h = orthogonalize(state[\"G_avg\"])\n                    elif method == \"Shampoo\":\n                        state[\"L\"] += G @ G.T\n                        state[\"R\"] += G.T @ G\n                        h = inverse_root(state[\"L\"], 4) @ G @ inverse_root(state[\"R\"], 4)\n                    elif method == \"K-FAC\":\n                        weight = 1.0 if t == 1 else 1 - rho\n                        a, d = layer_inputs[layer], layer_errors[layer]\n                        state[\"R\"] = (1 - weight) * state[\"R\"] + weight * a @ a.T / batch\n                        state[\"L\"] = (1 - weight) * state[\"L\"] + weight * d @ d.T / batch\n                        damping = 1e-3\n                        h = np.linalg.solve(state[\"L\"] + damping * np.eye(len(state[\"L\"])), G) @ np.linalg.inv(\n                            state[\"R\"] + damping * np.eye(len(state[\"R\"]))\n                        )\n                    else:\n                        raise ValueError(f\"Unknown method {method!r}\")\n                    weights[layer] = weights[layer] - step_size * h\n            except np.linalg.LinAlgError:\n                # A diverging run can leave the Kronecker factors singular.\n                losses.append(np.inf)\n                break\n            losses.append(loss(weights[1] @ weights[0], X, Y))\n            if not np.isfinite(losses[-1]):\n                break\n        return np.array(losses)\n\n    return loss, make_problem, train\n\n\n@app.cell(hide_code=True)\ndef _(kappa, loss, make_problem):\n    X, Y, theta_best = make_problem(kappa.value)\n    best_loss = loss(theta_best, X, Y)\n    return X, Y, best_loss\n\n\n@app.cell(hide_code=True)\ndef _(\n    ETA_GRID,\n    METHODS,\n    X,\n    Y,\n    batch,\n    best_loss,\n    decay,\n    eta_mode,\n    mo,\n    n_steps,\n    np,\n    train,\n):\n    def _final_gap(method, eta):\n        with np.errstate(all=\"ignore\"):\n            _losses = train(method, eta, X, Y, n_steps.value, batch.value, decay.value)\n        _gap = _losses[-1] - best_loss\n        return _gap if len(_losses) == n_steps.value + 1 and np.isfinite(_gap) else np.inf\n\n    tuned_etas = None\n    if eta_mode.value == \"best on a grid\":\n        tuned_etas = {}\n        for _name in mo.status.progress_bar(METHODS, title=\"Searching the grid of step sizes\"):\n            tuned_etas[_name] = min(ETA_GRID[::2], key=lambda _e: _final_gap(_name, _e))\n    return (tuned_etas,)\n\n\n@app.cell(hide_code=True)\ndef _(\n    METHODS,\n    X,\n    Y,\n    batch,\n    best_loss,\n    decay,\n    eta_sliders,\n    n_steps,\n    np,\n    pd,\n    train,\n    tuned_etas,\n):\n    etas_used = tuned_etas if tuned_etas is not None else dict(eta_sliders.value)\n    _frames = []\n    for _name in METHODS:\n        with np.errstate(all=\"ignore\"):\n            _losses = train(_name, etas_used[_name], X, Y, n_steps.value, batch.value, decay.value)\n        _frames.append(pd.DataFrame({\n            \"method\": _name,\n            \"iteration\": np.arange(len(_losses)),\n            \"J \u2212 J*\": np.maximum(_losses - best_loss, 1e-10),\n        }))\n    race = pd.concat(_frames, ignore_index=True)\n    return etas_used, race\n\n\n@app.cell(hide_code=True)\ndef _(METHODS, alt, etas_used, mo, pd, race):\n    _finite = race[race[\"J \u2212 J*\"] \u003C 1e6]\n    _chart = alt.Chart(_finite).mark_line(strokeWidth=2).encode(\n        x=alt.X(\"iteration:Q\"),\n        y=alt.Y(\"J \u2212 J*:Q\", scale=alt.Scale(type=\"log\"), title=\"J(\u03b8) \u2212 J*\"),\n        color=alt.Color(\"method:N\", sort=METHODS, scale=alt.Scale(scheme=\"tableau10\")),\n        tooltip=[\"method\", \"iteration\", alt.Tooltip(\"J \u2212 J*:Q\", format=\".2e\")],\n    ).properties(width=560, height=340, title=\"Loss above its minimum\")\n\n    _last = race.groupby(\"method\", sort=False).tail(1).set_index(\"method\")\n    _summary = pd.DataFrame({\n        \"Method\": METHODS,\n        \"\u03b7\": [etas_used[_name] for _name in METHODS],\n        \"final J \u2212 J*\": [f\"{_last.loc[_name, 'J \u2212 J*']:.2e}\" for _name in METHODS],\n    })\n    mo.hstack([_chart, mo.ui.table(_summary, selection=None, pagination=False)], align=\"start\", gap=2)\n    return\n\n\n@app.cell(hide_code=True)\ndef _(mo):\n    mo.md(r\"\"\"\n    The loss is shown above its smallest value $\\mathcal{J}^\\star$ on a\n    logarithmic scale. A method that diverges stops where its loss is no\n    longer finite. Things to try:\n\n    - Compare gradient descent with Muon. Gradient descent drops quickly at\n      first, as it learns the strong directions of the target, and then crawls\n      through the weak ones. Muon starts slower, since its steps have a fixed\n      length, but it learns all directions at once and overtakes it.\n    - Use the full batch, $b = 400$. Without noise in the derivatives, Muon\n      gets much closer to the minimum than the other methods.\n    - Turn off the decay of $\\eta$. The constrained steps of sign descent and\n      Muon have a fixed length, so they stop at a distance from the minimum\n      set by $\\eta$, like the constrained step in the post's first graph.\n    - Shrink the batch. Every method then stops at a level set by the noise of\n      the derivatives, and the averages of Adam and Muon help.\n    \"\"\")\n    return\n\n\n@app.cell(hide_code=True)\ndef _(mo):\n    mo.md(r\"\"\"\n    ## 2. Average first, then take the sharp\n\n    Momentum averages the derivatives *before* the sharp operator, in\n    $\\Theta^*$. For a norm from an inner product the order does not matter,\n    since the sharp operator is linear, but for the spectral norm it does:\n    orthogonalizing the average of noisy derivatives is not the same as\n    averaging the orthogonalized derivatives.\n\n    Below, $n$ noisy derivatives $G_k = G + \\sigma N_k$ of a fixed $8 \\times 4$\n    matrix $G$ are combined in both orders, and each result is compared with\n    the step $U V^\\top$ of the noise-free $G$ by the cosine\n    $\\langle M, UV^\\top \\rangle_F / (\\|M\\|_F \\|UV^\\top\\|_F)$.\n\n    In both plots higher is better, and $1$ is ideal. On the left, a cosine of\n    $1$ means that the step points exactly the way of the noise-free step. On\n    the right, $\\sigma_{\\min} / \\sigma_{\\max} = 1$ means that all singular\n    values of the step are equal, as they must be for a step of the spectral\n    norm.\n    \"\"\")\n    return\n\n\n@app.cell(hide_code=True)\ndef _(mo):\n    n_samples = mo.ui.slider(start=2, stop=64, value=16, label=\"derivatives averaged $n$\", show_value=True)\n    n_samples\n    return (n_samples,)\n\n\n@app.cell(hide_code=True)\ndef _(alt, mo, n_samples, np, pd):\n    def _orth(M):\n        _U, _, _Vt = np.linalg.svd(M, full_matrices=False)\n        return _U @ _Vt\n\n    def _cosine(M, T):\n        return np.sum(M * T) / (np.linalg.norm(M) * np.linalg.norm(T))\n\n    _rng = np.random.default_rng(0)\n    _G = _rng.standard_normal((8, 4))\n    _target = _orth(_G)\n    _rows = []\n    for _sigma in np.logspace(-1, 1.5, 26):\n        for _trial in range(20):\n            _samples = _G + _sigma * _rng.standard_normal((n_samples.value, 8, 4))\n            _before = _orth(_samples.mean(axis=0))\n            _after = np.mean([_orth(_S) for _S in _samples], axis=0)\n            _rows.append({\"\u03c3\": _sigma, \"order\": \"average, then orthogonalize (Muon)\",\n                          \"cosine\": _cosine(_before, _target),\n                          \"\u03c3_min / \u03c3_max\": 1.0})\n            _sv = np.linalg.svd(_after, compute_uv=False)\n            _rows.append({\"\u03c3\": _sigma, \"order\": \"orthogonalize, then average\",\n                          \"cosine\": _cosine(_after, _target),\n                          \"\u03c3_min / \u03c3_max\": _sv[-1] / _sv[0]})\n    _df = pd.DataFrame(_rows).groupby([\"\u03c3\", \"order\"], as_index=False).mean()\n\n    _base = alt.Chart(_df).encode(\n        x=alt.X(\"\u03c3:Q\", scale=alt.Scale(type=\"log\"), title=\"noise level \u03c3\"),\n        color=alt.Color(\"order:N\", title=None, legend=alt.Legend(orient=\"bottom\")),\n    )\n    _cos = _base.mark_line(strokeWidth=2).encode(\n        y=alt.Y(\"cosine:Q\", scale=alt.Scale(domain=[0, 1]), title=\"cosine with UV\u1d40 of G\"),\n    ).properties(width=300, height=240, title=\"Direction\")\n    _spread = _base.mark_line(strokeWidth=2).encode(\n        y=alt.Y(\"\u03c3_min / \u03c3_max:Q\", scale=alt.Scale(domain=[0, 1]), title=\"\u03c3_min / \u03c3_max of the step\"),\n    ).properties(width=300, height=240, title=\"Shape\")\n    mo.vstack([\n        alt.hconcat(_cos, _spread),\n        mo.md(r\"\"\"\n        Averaging first gives a direction closer to the noise-free step, and\n        the result is still orthogonal, with all singular values equal.\n        Averaging the orthogonalized derivatives instead gives a matrix whose\n        singular values are no longer equal, so it is not a step of the\n        spectral norm at all.\n        \"\"\"),\n    ])\n    return\n\n\nif __name__ == \"__main__\":\n    app.run()\n",
+        }),
+        writable: false,
+        configurable: false,
+    });
+</script>
+<marimo-code hidden="">%23%20%2F%2F%2F%20script%0A%23%20dependencies%20%3D%20%5B%0A%23%20%20%20%20%20%22marimo%3D%3D0.24.2%22%2C%0A%23%20%20%20%20%20%22numpy%22%2C%0A%23%20%20%20%20%20%22altair%22%2C%0A%23%20%20%20%20%20%22pandas%22%2C%0A%23%20%5D%0A%23%0A%23%20%5Btool.marimo.display%5D%0A%23%20theme%20%3D%20%22system%22%0A%23%0A%23%20%5Btool.marimo.runtime%5D%0A%23%20auto_instantiate%20%3D%20true%0A%23%20%2F%2F%2F%0A%0Aimport%20marimo%0A%0A__generated_with%20%3D%20%220.24.2%22%0Aapp%20%3D%20marimo.App(css_file%3D%22tufte.css%22)%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_()%3A%0A%20%20%20%20import%20marimo%20as%20mo%0A%0A%20%20%20%20%23%20BEGIN%20GENERATED%20SITE%20NAV%0A%20%20%20%20mo.nav_menu(%7B%0A%20%20%20%20%20%20%20%20%22%2F%22%3A%20%22home%22%2C%0A%20%20%20%20%20%20%20%20%22%2Fblog%2F%22%3A%20%22blog%22%2C%0A%20%20%20%20%20%20%20%20%22%2Fpublications%2F%22%3A%20%22publications%22%2C%0A%20%20%20%20%20%20%20%20%22%2Frepositories%2F%22%3A%20%22repositories%22%2C%0A%20%20%20%20%20%20%20%20%22%2Fabout%2F%22%3A%20%22about%22%2C%0A%20%20%20%20%20%20%20%20%22%2Fsolver%2F%22%3A%20%22conic%20solver%22%2C%0A%20%20%20%20%20%20%20%20%22marimo%22%3A%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%22%2Fmarimo%2Fconic_programs.html%22%3A%20%22Conic%20programs%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%22%2Fmarimo%2Fsteepest_descent.html%22%3A%20%22Which%20way%20is%20down%3F%22%2C%0A%20%20%20%20%20%20%20%20%7D%2C%0A%20%20%20%20%7D)%0A%20%20%20%20%23%20END%20GENERATED%20SITE%20NAV%0A%20%20%20%20return%20(mo%2C)%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(mo)%3A%0A%20%20%20%20mo.md(r%22%22%22%0A%20%20%20%20%23%20Which%20way%20is%20down%3F%0A%0A%20%20%20%20This%20notebook%20accompanies%20the%20post%0A%20%20%20%20%5BWhich%20Way%20Is%20Down%3F%20First-Order%20Optimizers%20as%20a%20Choice%20of%20Norm%5D(%2Fblog%2F2026%2F10-13-steepest-descent%2F).%0A%20%20%20%20The%20post%20views%20each%20first-order%20optimizer%20as%20a%20choice%20of%20norm%20on%20the%0A%20%20%20%20parameters%20%24%5CTheta%24.%20Given%20the%20derivative%20%24g%20%3D%20D%5Cmathcal%7BJ%7D(%5Ctheta)%24%2C%20the%0A%20%20%20%20norm%20fixes%20the%20dual%20norm%20and%20the%20sharp%20operator%2C%0A%0A%20%20%20%20%24%24%0A%20%20%20%20%5C%7Cg%5C%7C_*%20%3D%20%5Cmax_%7B%5C%7Ch%5C%7C%20%5Cle%201%7D%20%5Clangle%20g%2C%20h%20%5Crangle%2C%0A%20%20%20%20%5Cqquad%0A%20%20%20%20g%5E%5Csharp%20%3D%20-%5Coperatorname*%7Barg%5C%2Cmin%7D_%7Bh%20%5Cin%20%5CTheta%7D%5C%3B%0A%20%20%20%20%5Clangle%20g%2C%20h%20%5Crangle%20%2B%20%5Ctfrac%7B1%7D%7B2%7D%5C%7Ch%5C%7C%5E2%2C%0A%20%20%20%20%24%24%0A%0A%20%20%20%20and%20with%20them%20the%20constrained%20step%20%24h_C%20%3D%20-%5Ceta%5C%2C%20g%5E%5Csharp%20%2F%20%5C%7Cg%5C%7C_*%24%20and%0A%20%20%20%20the%20penalized%20step%20%24h_P%20%3D%20-g%5E%5Csharp%20%2F%20%5Clambda%24.%20The%20graphs%20in%20the%20post%20show%0A%20%20%20%20this%20in%20one%20and%20two%20dimensions.%20Here%20the%20parameters%20are%20matrices%3A%20the%0A%20%20%20%20first%20section%20races%20seven%20optimizers%20on%20one%20problem%2C%20and%20the%20second%20shows%0A%20%20%20%20why%20Muon%20averages%20the%20derivatives%20before%20it%20orthogonalizes%20them.%0A%20%20%20%20Everything%20is%20computed%20in%20Python%20running%20in%20your%20browser.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_()%3A%0A%20%20%20%20import%20altair%20as%20alt%0A%20%20%20%20import%20numpy%20as%20np%0A%20%20%20%20import%20pandas%20as%20pd%0A%0A%20%20%20%20return%20alt%2C%20np%2C%20pd%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(mo)%3A%0A%20%20%20%20mo.md(r%22%22%22%0A%20%20%20%20%23%23%201.%20The%20methods%20on%20one%20problem%0A%0A%20%20%20%20The%20table%20at%20the%20end%20of%20the%20post%20lists%20seven%20methods.%20Here%20they%20all%20train%0A%20%20%20%20the%20same%20network%20of%20two%20linear%20layers%2C%20%24Z%20%3D%20W_2%20W_1%20X%24%2C%20with%0A%20%20%20%20%24W_1%20%5Cin%20%5Cmathbf%7BR%7D%5E%7B10%20%5Ctimes%2010%7D%24%20and%20%24W_2%20%5Cin%20%5Cmathbf%7BR%7D%5E%7B20%20%5Ctimes%2010%7D%24%2C%0A%20%20%20%20on%20the%20least-squares%20loss%0A%0A%20%20%20%20%24%24%0A%20%20%20%20%5Cmathcal%7BJ%7D(W_1%2C%20W_2)%20%3D%20%5Cfrac%7B1%7D%7B2m%7D%20%5C%7CW_2%20W_1%20X%20-%20Y%5C%7C_F%5E2%2C%0A%20%20%20%20%5Cqquad%0A%20%20%20%20G_2%20%3D%20E%5C%2C%20(W_1%20X_b)%5E%5Ctop%2C%0A%20%20%20%20%5Cquad%0A%20%20%20%20G_1%20%3D%20W_2%5E%5Ctop%20E%5C%2C%20X_b%5E%5Ctop%2C%0A%20%20%20%20%24%24%0A%0A%20%20%20%20with%20%24E%20%3D%20(W_2%20W_1%20X_b%20-%20Y_b)%20%2F%20b%24%2C%20where%20each%20derivative%20is%20computed%20from%0A%20%20%20%20a%20random%20minibatch%20%24(X_b%2C%20Y_b)%24%20of%20%24b%24%20of%20the%20%24m%20%3D%20400%24%20samples.%20The%20inputs%0A%20%20%20%20are%20generated%20so%20that%20%24X%20X%5E%5Ctop%24%20has%20the%20condition%20number%20%24%5Ckappa%24.%20The%0A%20%20%20%20targets%20come%20from%20a%20layer%20whose%20singular%20values%20fall%20from%20%241%24%20to%20%240.01%24%2C%0A%20%20%20%20plus%20a%20little%20noise%2C%20and%20both%20layers%20start%20from%20small%20random%20weights.%0A%20%20%20%20Gradient%20descent%20then%20learns%20the%20strong%20directions%20of%20the%20target%20first%0A%20%20%20%20and%20the%20weak%20ones%20much%20later%2C%20while%20the%20orthogonalized%20step%20of%20Muon%20moves%0A%20%20%20%20all%20of%20them%20at%20the%20same%20speed.%20Each%20method%20updates%20both%20layers%20with%20its%0A%20%20%20%20own%20rule%3A%0A%0A%20%20%20%20%7C%20Method%20%7C%20Step%20%7C%0A%20%20%20%20%7C---%7C---%7C%0A%20%20%20%20%7C%20Gradient%20descent%20%7C%20%24-%5Ceta%5C%2C%20G%24%20%7C%0A%20%20%20%20%7C%20Sign%20descent%20%7C%20%24-%5Ceta%20%5Coperatorname%7Bsign%7D(G)%24%20%7C%0A%20%20%20%20%7C%20AdaGrad%20%7C%20%24-%5Ceta%5C%2C%20G%20%2F%20(%5Csqrt%7Bv%7D%20%2B%20%5Cepsilon)%24%2C%20%24%5C%3B%20v%20%5Cleftarrow%20v%20%2B%20G%5E2%24%20%7C%0A%20%20%20%20%7C%20Adam%20%7C%20%24-%5Ceta%5C%2C%20%5Chat%7BG%7D%20%2F%20(%5Csqrt%7Bv%7D%20%2B%20%5Cepsilon)%24%2C%20with%20averages%20%24%5Chat%7BG%7D%24%20and%20%24v%24%20and%20bias%20correction%20%7C%0A%20%20%20%20%7C%20Muon%20%7C%20%24-%5Ceta%5C%2C%20U%20V%5E%5Ctop%24%20of%20the%20average%20%24%5Chat%7BG%7D%20%3D%20U%20%5CSigma%20V%5E%5Ctop%24%20%7C%0A%20%20%20%20%7C%20Shampoo%20%7C%20%24-%5Ceta%5C%2C%20L%5E%7B-1%2F4%7D%20G%20R%5E%7B-1%2F4%7D%24%2C%20%24%5C%3B%20L%20%5Cleftarrow%20L%20%2B%20G%20G%5E%5Ctop%24%2C%20%24%5C%3B%20R%20%5Cleftarrow%20R%20%2B%20G%5E%5Ctop%20G%24%20%7C%0A%20%20%20%20%7C%20K-FAC%20%7C%20%24-%5Ceta%5C%2C%20L%5E%7B-1%7D%20G%20R%5E%7B-1%7D%24%2C%20with%20averages%20of%20%24X_b%20X_b%5E%5Ctop%20%2F%20b%24%20in%20%24R%24%20and%20of%20%24%5CDelta%20%5CDelta%5E%5Ctop%20%2F%20b%24%20in%20%24L%24%20%7C%0A%0A%20%20%20%20For%20K-FAC%2C%20%24X_b%24%20stands%20for%20the%20inputs%20of%20the%20layer%2C%20%24W_1%20X_b%24%20for%20the%0A%20%20%20%20second%20layer%2C%20and%20%24%5CDelta%24%20for%20the%20sampled%20output%20errors%20carried%20back%20to%0A%20%20%20%20the%20layer's%20outputs.%20The%20errors%20are%20sampled%20from%20the%20model's%20predictive%0A%20%20%20%20distribution%2C%20a%20standard%20normal%20for%20the%20squared%20loss%2C%20and%20only%20the%20basic%0A%20%20%20%20step%20is%20used%2C%20with%20a%20small%20damping%20and%20without%20its%20adaptive%20momentum.%0A%20%20%20%20K-FAC%20treats%20the%20two%20layers%20as%20independent%2C%20so%20it%20is%20no%20longer%20Newton's%0A%20%20%20%20method%2C%20as%20it%20would%20be%20for%20a%20single%20layer.%0A%0A%20%20%20%20Each%20method%20has%20its%20own%20step%20size%20%24%5Ceta%24%2C%20since%20the%20steps%20have%20very%0A%20%20%20%20different%20lengths.%20Either%20set%20them%20by%20hand%2C%20or%20let%20the%20notebook%20pick%20the%0A%20%20%20%20best%20%24%5Ceta%24%20for%20each%20method%20from%20a%20grid%2C%20which%20takes%20a%20few%20seconds.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(mo%2C%20np)%3A%0A%20%20%20%20METHODS%20%3D%20%5B%22Gradient%20descent%22%2C%20%22Sign%20descent%22%2C%20%22AdaGrad%22%2C%20%22Adam%22%2C%20%22Muon%22%2C%20%22Shampoo%22%2C%20%22K-FAC%22%5D%0A%20%20%20%20ETA_GRID%20%3D%20%5Bfloat(f%22%7B_e%3A.3g%7D%22)%20for%20_e%20in%20np.logspace(-4%2C%201.5%2C%2023)%5D%0A%0A%20%20%20%20def%20nearest_eta(value)%3A%0A%20%20%20%20%20%20%20%20return%20min(ETA_GRID%2C%20key%3Dlambda%20_e%3A%20abs(np.log(_e%20%2F%20value)))%0A%0A%20%20%20%20%23%20The%20best%20values%20on%20the%20grid%20for%20%CE%BA%20%3D%201000%2C%20a%20batch%20of%2032%2C%20and%20300%20decaying%20steps.%0A%20%20%20%20_defaults%20%3D%20%7B%0A%20%20%20%20%20%20%20%20%22Gradient%20descent%22%3A%203.16%2C%0A%20%20%20%20%20%20%20%20%22Sign%20descent%22%3A%200.0316%2C%0A%20%20%20%20%20%20%20%20%22AdaGrad%22%3A%200.0562%2C%0A%20%20%20%20%20%20%20%20%22Adam%22%3A%200.0316%2C%0A%20%20%20%20%20%20%20%20%22Muon%22%3A%200.01%2C%0A%20%20%20%20%20%20%20%20%22Shampoo%22%3A%200.562%2C%0A%20%20%20%20%20%20%20%20%22K-FAC%22%3A%200.0316%2C%0A%20%20%20%20%7D%0A%20%20%20%20eta_sliders%20%3D%20mo.ui.dictionary(%7B%0A%20%20%20%20%20%20%20%20_name%3A%20mo.ui.slider(steps%3DETA_GRID%2C%20value%3Dnearest_eta(_defaults%5B_name%5D)%2C%20show_value%3DTrue)%0A%20%20%20%20%20%20%20%20for%20_name%20in%20METHODS%0A%20%20%20%20%7D)%0A%20%20%20%20kappa%20%3D%20mo.ui.slider(%0A%20%20%20%20%20%20%20%20steps%3D%5B1%2C%203%2C%2010%2C%2030%2C%20100%2C%20300%2C%201000%2C%203000%2C%2010000%5D%2C%20value%3D1000%2C%0A%20%20%20%20%20%20%20%20label%3Dr%22condition%20number%20%24%5Ckappa%24%22%2C%20show_value%3DTrue%2C%0A%20%20%20%20)%0A%20%20%20%20batch%20%3D%20mo.ui.slider(%0A%20%20%20%20%20%20%20%20steps%3D%5B4%2C%208%2C%2016%2C%2032%2C%2064%2C%20128%2C%20400%5D%2C%20value%3D32%2C%0A%20%20%20%20%20%20%20%20label%3D%22batch%20size%20%24b%24%22%2C%20show_value%3DTrue%2C%0A%20%20%20%20)%0A%20%20%20%20n_steps%20%3D%20mo.ui.slider(start%3D50%2C%20stop%3D600%2C%20step%3D50%2C%20value%3D300%2C%20label%3D%22steps%22%2C%20show_value%3DTrue)%0A%20%20%20%20decay%20%3D%20mo.ui.checkbox(value%3DTrue%2C%20label%3Dr%22let%20%24%5Ceta%24%20decay%20linearly%20to%20zero%22)%0A%20%20%20%20eta_mode%20%3D%20mo.ui.radio(%0A%20%20%20%20%20%20%20%20options%3D%5B%22set%20by%20hand%22%2C%20%22best%20on%20a%20grid%22%5D%2C%20value%3D%22set%20by%20hand%22%2C%20label%3Dr%22step%20sizes%20%24%5Ceta%24%22%2C%0A%20%20%20%20)%0A%20%20%20%20return%20(%0A%20%20%20%20%20%20%20%20ETA_GRID%2C%0A%20%20%20%20%20%20%20%20METHODS%2C%0A%20%20%20%20%20%20%20%20batch%2C%0A%20%20%20%20%20%20%20%20decay%2C%0A%20%20%20%20%20%20%20%20eta_mode%2C%0A%20%20%20%20%20%20%20%20eta_sliders%2C%0A%20%20%20%20%20%20%20%20kappa%2C%0A%20%20%20%20%20%20%20%20n_steps%2C%0A%20%20%20%20)%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(METHODS%2C%20batch%2C%20decay%2C%20eta_mode%2C%20eta_sliders%2C%20kappa%2C%20mo%2C%20n_steps)%3A%0A%20%20%20%20_problem%20%3D%20mo.vstack(%5Bkappa%2C%20batch%2C%20n_steps%2C%20decay%2C%20eta_mode%5D)%0A%20%20%20%20_etas%20%3D%20mo.vstack(%0A%20%20%20%20%20%20%20%20%5Bmo.hstack(%5Bmo.md(_name)%2C%20eta_sliders%5B_name%5D%5D%2C%20justify%3D%22space-between%22)%20for%20_name%20in%20METHODS%5D%2C%0A%20%20%20%20)%0A%20%20%20%20mo.hstack(%5B_problem%2C%20_etas%5D%2C%20widths%3D%5B1%2C%201%5D%2C%20gap%3D3%2C%20align%3D%22start%22)%0A%20%20%20%20return%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(np)%3A%0A%20%20%20%20def%20make_problem(kappa%2C%20p%3D20%2C%20q%3D10%2C%20m%3D400%2C%20noise%3D0.05%2C%20spread%3D100.0%2C%20seed%3D0)%3A%0A%20%20%20%20%20%20%20%20%22%22%22Inputs%20X%20with%20cond(X%20X%E1%B5%80)%20%3D%20%CE%BA%2C%20and%20noisy%20targets%20of%20a%20random%20layer%0A%20%20%20%20%20%20%20%20whose%20singular%20values%20fall%20from%201%20to%201%2Fspread.%22%22%22%0A%20%20%20%20%20%20%20%20rng%20%3D%20np.random.default_rng(seed)%0A%20%20%20%20%20%20%20%20U%2C%20_%20%3D%20np.linalg.qr(rng.standard_normal((q%2C%20q)))%0A%20%20%20%20%20%20%20%20V%2C%20_%20%3D%20np.linalg.qr(rng.standard_normal((m%2C%20q)))%0A%20%20%20%20%20%20%20%20s%20%3D%20np.sqrt(m)%20*%20kappa%20**%20(-0.5%20*%20np.linspace(0%2C%201%2C%20q))%0A%20%20%20%20%20%20%20%20X%20%3D%20U%20%40%20np.diag(s)%20%40%20V.T%0A%20%20%20%20%20%20%20%20P%2C%20_%20%3D%20np.linalg.qr(rng.standard_normal((p%2C%20q)))%0A%20%20%20%20%20%20%20%20Q%2C%20_%20%3D%20np.linalg.qr(rng.standard_normal((q%2C%20q)))%0A%20%20%20%20%20%20%20%20W%20%3D%20P%20%40%20np.diag(spread%20**%20(-np.linspace(0%2C%201%2C%20q)))%20%40%20Q.T%0A%20%20%20%20%20%20%20%20Y%20%3D%20W%20%40%20X%20%2B%20noise%20*%20rng.standard_normal((p%2C%20m))%0A%20%20%20%20%20%20%20%20theta_best%20%3D%20np.linalg.lstsq(X.T%2C%20Y.T%2C%20rcond%3DNone)%5B0%5D.T%0A%20%20%20%20%20%20%20%20return%20X%2C%20Y%2C%20theta_best%0A%0A%20%20%20%20def%20loss(theta%2C%20X%2C%20Y)%3A%0A%20%20%20%20%20%20%20%20return%200.5%20*%20np.sum((theta%20%40%20X%20-%20Y)%20**%202)%20%2F%20X.shape%5B1%5D%0A%0A%20%20%20%20def%20orthogonalize(M)%3A%0A%20%20%20%20%20%20%20%20U%2C%20_%2C%20Vt%20%3D%20np.linalg.svd(M%2C%20full_matrices%3DFalse)%0A%20%20%20%20%20%20%20%20return%20U%20%40%20Vt%0A%0A%20%20%20%20def%20inverse_root(S%2C%20r)%3A%0A%20%20%20%20%20%20%20%20w%2C%20Q%20%3D%20np.linalg.eigh(S)%0A%20%20%20%20%20%20%20%20return%20(Q%20*%20w%20**%20(-1%20%2F%20r))%20%40%20Q.T%0A%0A%20%20%20%20def%20train(method%2C%20eta%2C%20X%2C%20Y%2C%20steps%2C%20batch%2C%20decay%2C%20hidden%3D10%2C%20init%3D0.01%2C%20seed%3D1%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20beta1%3D0.9%2C%20beta2%3D0.999%2C%20rho%3D0.95)%3A%0A%20%20%20%20%20%20%20%20%22%22%22Run%20one%20method%20from%20small%20random%20weights%20and%20return%20the%20loss%20at%20every%20iterate.%22%22%22%0A%20%20%20%20%20%20%20%20rng%20%3D%20np.random.default_rng(seed)%0A%20%20%20%20%20%20%20%20q%2C%20m%20%3D%20X.shape%0A%20%20%20%20%20%20%20%20p%20%3D%20Y.shape%5B0%5D%0A%20%20%20%20%20%20%20%20weights%20%3D%20%5B%0A%20%20%20%20%20%20%20%20%20%20%20%20init%20*%20np.random.default_rng(0).standard_normal((hidden%2C%20q))%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20init%20*%20np.random.default_rng(1).standard_normal((p%2C%20hidden))%2C%0A%20%20%20%20%20%20%20%20%5D%0A%20%20%20%20%20%20%20%20%23%20The%20running%20averages%20and%20Kronecker%20factors%20of%20each%20layer.%0A%20%20%20%20%20%20%20%20states%20%3D%20%5B%0A%20%20%20%20%20%20%20%20%20%20%20%20dict(G_avg%3Dnp.zeros_like(W)%2C%20v%3Dnp.zeros_like(W)%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20L%3D1e-6%20*%20np.eye(W.shape%5B0%5D)%2C%20R%3D1e-6%20*%20np.eye(W.shape%5B1%5D))%0A%20%20%20%20%20%20%20%20%20%20%20%20for%20W%20in%20weights%0A%20%20%20%20%20%20%20%20%5D%0A%20%20%20%20%20%20%20%20losses%20%3D%20%5Bloss(weights%5B1%5D%20%40%20weights%5B0%5D%2C%20X%2C%20Y)%5D%0A%20%20%20%20%20%20%20%20for%20t%20in%20range(1%2C%20steps%20%2B%201)%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20idx%20%3D%20rng.choice(m%2C%20batch%2C%20replace%3DFalse)%0A%20%20%20%20%20%20%20%20%20%20%20%20Xb%2C%20Yb%20%3D%20X%5B%3A%2C%20idx%5D%2C%20Y%5B%3A%2C%20idx%5D%0A%20%20%20%20%20%20%20%20%20%20%20%20hidden_out%20%3D%20weights%5B0%5D%20%40%20Xb%0A%20%20%20%20%20%20%20%20%20%20%20%20E%20%3D%20(weights%5B1%5D%20%40%20hidden_out%20-%20Yb)%20%2F%20batch%0A%20%20%20%20%20%20%20%20%20%20%20%20derivatives%20%3D%20%5Bweights%5B1%5D.T%20%40%20E%20%40%20Xb.T%2C%20E%20%40%20hidden_out.T%5D%0A%20%20%20%20%20%20%20%20%20%20%20%20layer_inputs%20%3D%20%5BXb%2C%20hidden_out%5D%0A%20%20%20%20%20%20%20%20%20%20%20%20Delta%20%3D%20rng.standard_normal((p%2C%20batch))%0A%20%20%20%20%20%20%20%20%20%20%20%20layer_errors%20%3D%20%5Bweights%5B1%5D.T%20%40%20Delta%2C%20Delta%5D%0A%20%20%20%20%20%20%20%20%20%20%20%20step_size%20%3D%20eta%20*%20(1%20-%20(t%20-%201)%20%2F%20steps)%20if%20decay%20else%20eta%0A%20%20%20%20%20%20%20%20%20%20%20%20try%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20for%20layer%2C%20(G%2C%20state)%20in%20enumerate(zip(derivatives%2C%20states))%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20if%20method%20%3D%3D%20%22Gradient%20descent%22%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20h%20%3D%20G%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20elif%20method%20%3D%3D%20%22Sign%20descent%22%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20h%20%3D%20np.sign(G)%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20elif%20method%20%3D%3D%20%22AdaGrad%22%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20state%5B%22v%22%5D%20%2B%3D%20G**2%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20h%20%3D%20G%20%2F%20(np.sqrt(state%5B%22v%22%5D)%20%2B%201e-8)%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20elif%20method%20%3D%3D%20%22Adam%22%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20state%5B%22G_avg%22%5D%20%3D%20beta1%20*%20state%5B%22G_avg%22%5D%20%2B%20(1%20-%20beta1)%20*%20G%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20state%5B%22v%22%5D%20%3D%20beta2%20*%20state%5B%22v%22%5D%20%2B%20(1%20-%20beta2)%20*%20G**2%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20h%20%3D%20(state%5B%22G_avg%22%5D%20%2F%20(1%20-%20beta1**t))%20%2F%20(np.sqrt(state%5B%22v%22%5D%20%2F%20(1%20-%20beta2**t))%20%2B%201e-8)%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20elif%20method%20%3D%3D%20%22Muon%22%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20state%5B%22G_avg%22%5D%20%3D%20beta1%20*%20state%5B%22G_avg%22%5D%20%2B%20(1%20-%20beta1)%20*%20G%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20h%20%3D%20orthogonalize(state%5B%22G_avg%22%5D)%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20elif%20method%20%3D%3D%20%22Shampoo%22%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20state%5B%22L%22%5D%20%2B%3D%20G%20%40%20G.T%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20state%5B%22R%22%5D%20%2B%3D%20G.T%20%40%20G%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20h%20%3D%20inverse_root(state%5B%22L%22%5D%2C%204)%20%40%20G%20%40%20inverse_root(state%5B%22R%22%5D%2C%204)%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20elif%20method%20%3D%3D%20%22K-FAC%22%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20weight%20%3D%201.0%20if%20t%20%3D%3D%201%20else%201%20-%20rho%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20a%2C%20d%20%3D%20layer_inputs%5Blayer%5D%2C%20layer_errors%5Blayer%5D%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20state%5B%22R%22%5D%20%3D%20(1%20-%20weight)%20*%20state%5B%22R%22%5D%20%2B%20weight%20*%20a%20%40%20a.T%20%2F%20batch%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20state%5B%22L%22%5D%20%3D%20(1%20-%20weight)%20*%20state%5B%22L%22%5D%20%2B%20weight%20*%20d%20%40%20d.T%20%2F%20batch%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20damping%20%3D%201e-3%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20h%20%3D%20np.linalg.solve(state%5B%22L%22%5D%20%2B%20damping%20*%20np.eye(len(state%5B%22L%22%5D))%2C%20G)%20%40%20np.linalg.inv(%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20state%5B%22R%22%5D%20%2B%20damping%20*%20np.eye(len(state%5B%22R%22%5D))%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20)%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20else%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20raise%20ValueError(f%22Unknown%20method%20%7Bmethod!r%7D%22)%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20weights%5Blayer%5D%20%3D%20weights%5Blayer%5D%20-%20step_size%20*%20h%0A%20%20%20%20%20%20%20%20%20%20%20%20except%20np.linalg.LinAlgError%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%23%20A%20diverging%20run%20can%20leave%20the%20Kronecker%20factors%20singular.%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20losses.append(np.inf)%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20break%0A%20%20%20%20%20%20%20%20%20%20%20%20losses.append(loss(weights%5B1%5D%20%40%20weights%5B0%5D%2C%20X%2C%20Y))%0A%20%20%20%20%20%20%20%20%20%20%20%20if%20not%20np.isfinite(losses%5B-1%5D)%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20break%0A%20%20%20%20%20%20%20%20return%20np.array(losses)%0A%0A%20%20%20%20return%20loss%2C%20make_problem%2C%20train%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(kappa%2C%20loss%2C%20make_problem)%3A%0A%20%20%20%20X%2C%20Y%2C%20theta_best%20%3D%20make_problem(kappa.value)%0A%20%20%20%20best_loss%20%3D%20loss(theta_best%2C%20X%2C%20Y)%0A%20%20%20%20return%20X%2C%20Y%2C%20best_loss%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(%0A%20%20%20%20ETA_GRID%2C%0A%20%20%20%20METHODS%2C%0A%20%20%20%20X%2C%0A%20%20%20%20Y%2C%0A%20%20%20%20batch%2C%0A%20%20%20%20best_loss%2C%0A%20%20%20%20decay%2C%0A%20%20%20%20eta_mode%2C%0A%20%20%20%20mo%2C%0A%20%20%20%20n_steps%2C%0A%20%20%20%20np%2C%0A%20%20%20%20train%2C%0A)%3A%0A%20%20%20%20def%20_final_gap(method%2C%20eta)%3A%0A%20%20%20%20%20%20%20%20with%20np.errstate(all%3D%22ignore%22)%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20_losses%20%3D%20train(method%2C%20eta%2C%20X%2C%20Y%2C%20n_steps.value%2C%20batch.value%2C%20decay.value)%0A%20%20%20%20%20%20%20%20_gap%20%3D%20_losses%5B-1%5D%20-%20best_loss%0A%20%20%20%20%20%20%20%20return%20_gap%20if%20len(_losses)%20%3D%3D%20n_steps.value%20%2B%201%20and%20np.isfinite(_gap)%20else%20np.inf%0A%0A%20%20%20%20tuned_etas%20%3D%20None%0A%20%20%20%20if%20eta_mode.value%20%3D%3D%20%22best%20on%20a%20grid%22%3A%0A%20%20%20%20%20%20%20%20tuned_etas%20%3D%20%7B%7D%0A%20%20%20%20%20%20%20%20for%20_name%20in%20mo.status.progress_bar(METHODS%2C%20title%3D%22Searching%20the%20grid%20of%20step%20sizes%22)%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20tuned_etas%5B_name%5D%20%3D%20min(ETA_GRID%5B%3A%3A2%5D%2C%20key%3Dlambda%20_e%3A%20_final_gap(_name%2C%20_e))%0A%20%20%20%20return%20(tuned_etas%2C)%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(%0A%20%20%20%20METHODS%2C%0A%20%20%20%20X%2C%0A%20%20%20%20Y%2C%0A%20%20%20%20batch%2C%0A%20%20%20%20best_loss%2C%0A%20%20%20%20decay%2C%0A%20%20%20%20eta_sliders%2C%0A%20%20%20%20n_steps%2C%0A%20%20%20%20np%2C%0A%20%20%20%20pd%2C%0A%20%20%20%20train%2C%0A%20%20%20%20tuned_etas%2C%0A)%3A%0A%20%20%20%20etas_used%20%3D%20tuned_etas%20if%20tuned_etas%20is%20not%20None%20else%20dict(eta_sliders.value)%0A%20%20%20%20_frames%20%3D%20%5B%5D%0A%20%20%20%20for%20_name%20in%20METHODS%3A%0A%20%20%20%20%20%20%20%20with%20np.errstate(all%3D%22ignore%22)%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20_losses%20%3D%20train(_name%2C%20etas_used%5B_name%5D%2C%20X%2C%20Y%2C%20n_steps.value%2C%20batch.value%2C%20decay.value)%0A%20%20%20%20%20%20%20%20_frames.append(pd.DataFrame(%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%22method%22%3A%20_name%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%22iteration%22%3A%20np.arange(len(_losses))%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%22J%20%E2%88%92%20J*%22%3A%20np.maximum(_losses%20-%20best_loss%2C%201e-10)%2C%0A%20%20%20%20%20%20%20%20%7D))%0A%20%20%20%20race%20%3D%20pd.concat(_frames%2C%20ignore_index%3DTrue)%0A%20%20%20%20return%20etas_used%2C%20race%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(METHODS%2C%20alt%2C%20etas_used%2C%20mo%2C%20pd%2C%20race)%3A%0A%20%20%20%20_finite%20%3D%20race%5Brace%5B%22J%20%E2%88%92%20J*%22%5D%20%3C%201e6%5D%0A%20%20%20%20_chart%20%3D%20alt.Chart(_finite).mark_line(strokeWidth%3D2).encode(%0A%20%20%20%20%20%20%20%20x%3Dalt.X(%22iteration%3AQ%22)%2C%0A%20%20%20%20%20%20%20%20y%3Dalt.Y(%22J%20%E2%88%92%20J*%3AQ%22%2C%20scale%3Dalt.Scale(type%3D%22log%22)%2C%20title%3D%22J(%CE%B8)%20%E2%88%92%20J*%22)%2C%0A%20%20%20%20%20%20%20%20color%3Dalt.Color(%22method%3AN%22%2C%20sort%3DMETHODS%2C%20scale%3Dalt.Scale(scheme%3D%22tableau10%22))%2C%0A%20%20%20%20%20%20%20%20tooltip%3D%5B%22method%22%2C%20%22iteration%22%2C%20alt.Tooltip(%22J%20%E2%88%92%20J*%3AQ%22%2C%20format%3D%22.2e%22)%5D%2C%0A%20%20%20%20).properties(width%3D560%2C%20height%3D340%2C%20title%3D%22Loss%20above%20its%20minimum%22)%0A%0A%20%20%20%20_last%20%3D%20race.groupby(%22method%22%2C%20sort%3DFalse).tail(1).set_index(%22method%22)%0A%20%20%20%20_summary%20%3D%20pd.DataFrame(%7B%0A%20%20%20%20%20%20%20%20%22Method%22%3A%20METHODS%2C%0A%20%20%20%20%20%20%20%20%22%CE%B7%22%3A%20%5Betas_used%5B_name%5D%20for%20_name%20in%20METHODS%5D%2C%0A%20%20%20%20%20%20%20%20%22final%20J%20%E2%88%92%20J*%22%3A%20%5Bf%22%7B_last.loc%5B_name%2C%20'J%20%E2%88%92%20J*'%5D%3A.2e%7D%22%20for%20_name%20in%20METHODS%5D%2C%0A%20%20%20%20%7D)%0A%20%20%20%20mo.hstack(%5B_chart%2C%20mo.ui.table(_summary%2C%20selection%3DNone%2C%20pagination%3DFalse)%5D%2C%20align%3D%22start%22%2C%20gap%3D2)%0A%20%20%20%20return%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(mo)%3A%0A%20%20%20%20mo.md(r%22%22%22%0A%20%20%20%20The%20loss%20is%20shown%20above%20its%20smallest%20value%20%24%5Cmathcal%7BJ%7D%5E%5Cstar%24%20on%20a%0A%20%20%20%20logarithmic%20scale.%20A%20method%20that%20diverges%20stops%20where%20its%20loss%20is%20no%0A%20%20%20%20longer%20finite.%20Things%20to%20try%3A%0A%0A%20%20%20%20-%20Compare%20gradient%20descent%20with%20Muon.%20Gradient%20descent%20drops%20quickly%20at%0A%20%20%20%20%20%20first%2C%20as%20it%20learns%20the%20strong%20directions%20of%20the%20target%2C%20and%20then%20crawls%0A%20%20%20%20%20%20through%20the%20weak%20ones.%20Muon%20starts%20slower%2C%20since%20its%20steps%20have%20a%20fixed%0A%20%20%20%20%20%20length%2C%20but%20it%20learns%20all%20directions%20at%20once%20and%20overtakes%20it.%0A%20%20%20%20-%20Use%20the%20full%20batch%2C%20%24b%20%3D%20400%24.%20Without%20noise%20in%20the%20derivatives%2C%20Muon%0A%20%20%20%20%20%20gets%20much%20closer%20to%20the%20minimum%20than%20the%20other%20methods.%0A%20%20%20%20-%20Turn%20off%20the%20decay%20of%20%24%5Ceta%24.%20The%20constrained%20steps%20of%20sign%20descent%20and%0A%20%20%20%20%20%20Muon%20have%20a%20fixed%20length%2C%20so%20they%20stop%20at%20a%20distance%20from%20the%20minimum%0A%20%20%20%20%20%20set%20by%20%24%5Ceta%24%2C%20like%20the%20constrained%20step%20in%20the%20post's%20first%20graph.%0A%20%20%20%20-%20Shrink%20the%20batch.%20Every%20method%20then%20stops%20at%20a%20level%20set%20by%20the%20noise%20of%0A%20%20%20%20%20%20the%20derivatives%2C%20and%20the%20averages%20of%20Adam%20and%20Muon%20help.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(mo)%3A%0A%20%20%20%20mo.md(r%22%22%22%0A%20%20%20%20%23%23%202.%20Average%20first%2C%20then%20take%20the%20sharp%0A%0A%20%20%20%20Momentum%20averages%20the%20derivatives%20*before*%20the%20sharp%20operator%2C%20in%0A%20%20%20%20%24%5CTheta%5E*%24.%20For%20a%20norm%20from%20an%20inner%20product%20the%20order%20does%20not%20matter%2C%0A%20%20%20%20since%20the%20sharp%20operator%20is%20linear%2C%20but%20for%20the%20spectral%20norm%20it%20does%3A%0A%20%20%20%20orthogonalizing%20the%20average%20of%20noisy%20derivatives%20is%20not%20the%20same%20as%0A%20%20%20%20averaging%20the%20orthogonalized%20derivatives.%0A%0A%20%20%20%20Below%2C%20%24n%24%20noisy%20derivatives%20%24G_k%20%3D%20G%20%2B%20%5Csigma%20N_k%24%20of%20a%20fixed%20%248%20%5Ctimes%204%24%0A%20%20%20%20matrix%20%24G%24%20are%20combined%20in%20both%20orders%2C%20and%20each%20result%20is%20compared%20with%0A%20%20%20%20the%20step%20%24U%20V%5E%5Ctop%24%20of%20the%20noise-free%20%24G%24%20by%20the%20cosine%0A%20%20%20%20%24%5Clangle%20M%2C%20UV%5E%5Ctop%20%5Crangle_F%20%2F%20(%5C%7CM%5C%7C_F%20%5C%7CUV%5E%5Ctop%5C%7C_F)%24.%0A%0A%20%20%20%20In%20both%20plots%20higher%20is%20better%2C%20and%20%241%24%20is%20ideal.%20On%20the%20left%2C%20a%20cosine%20of%0A%20%20%20%20%241%24%20means%20that%20the%20step%20points%20exactly%20the%20way%20of%20the%20noise-free%20step.%20On%0A%20%20%20%20the%20right%2C%20%24%5Csigma_%7B%5Cmin%7D%20%2F%20%5Csigma_%7B%5Cmax%7D%20%3D%201%24%20means%20that%20all%20singular%0A%20%20%20%20values%20of%20the%20step%20are%20equal%2C%20as%20they%20must%20be%20for%20a%20step%20of%20the%20spectral%0A%20%20%20%20norm.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(mo)%3A%0A%20%20%20%20n_samples%20%3D%20mo.ui.slider(start%3D2%2C%20stop%3D64%2C%20value%3D16%2C%20label%3D%22derivatives%20averaged%20%24n%24%22%2C%20show_value%3DTrue)%0A%20%20%20%20n_samples%0A%20%20%20%20return%20(n_samples%2C)%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(alt%2C%20mo%2C%20n_samples%2C%20np%2C%20pd)%3A%0A%20%20%20%20def%20_orth(M)%3A%0A%20%20%20%20%20%20%20%20_U%2C%20_%2C%20_Vt%20%3D%20np.linalg.svd(M%2C%20full_matrices%3DFalse)%0A%20%20%20%20%20%20%20%20return%20_U%20%40%20_Vt%0A%0A%20%20%20%20def%20_cosine(M%2C%20T)%3A%0A%20%20%20%20%20%20%20%20return%20np.sum(M%20*%20T)%20%2F%20(np.linalg.norm(M)%20*%20np.linalg.norm(T))%0A%0A%20%20%20%20_rng%20%3D%20np.random.default_rng(0)%0A%20%20%20%20_G%20%3D%20_rng.standard_normal((8%2C%204))%0A%20%20%20%20_target%20%3D%20_orth(_G)%0A%20%20%20%20_rows%20%3D%20%5B%5D%0A%20%20%20%20for%20_sigma%20in%20np.logspace(-1%2C%201.5%2C%2026)%3A%0A%20%20%20%20%20%20%20%20for%20_trial%20in%20range(20)%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20_samples%20%3D%20_G%20%2B%20_sigma%20*%20_rng.standard_normal((n_samples.value%2C%208%2C%204))%0A%20%20%20%20%20%20%20%20%20%20%20%20_before%20%3D%20_orth(_samples.mean(axis%3D0))%0A%20%20%20%20%20%20%20%20%20%20%20%20_after%20%3D%20np.mean(%5B_orth(_S)%20for%20_S%20in%20_samples%5D%2C%20axis%3D0)%0A%20%20%20%20%20%20%20%20%20%20%20%20_rows.append(%7B%22%CF%83%22%3A%20_sigma%2C%20%22order%22%3A%20%22average%2C%20then%20orthogonalize%20(Muon)%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22cosine%22%3A%20_cosine(_before%2C%20_target)%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22%CF%83_min%20%2F%20%CF%83_max%22%3A%201.0%7D)%0A%20%20%20%20%20%20%20%20%20%20%20%20_sv%20%3D%20np.linalg.svd(_after%2C%20compute_uv%3DFalse)%0A%20%20%20%20%20%20%20%20%20%20%20%20_rows.append(%7B%22%CF%83%22%3A%20_sigma%2C%20%22order%22%3A%20%22orthogonalize%2C%20then%20average%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22cosine%22%3A%20_cosine(_after%2C%20_target)%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22%CF%83_min%20%2F%20%CF%83_max%22%3A%20_sv%5B-1%5D%20%2F%20_sv%5B0%5D%7D)%0A%20%20%20%20_df%20%3D%20pd.DataFrame(_rows).groupby(%5B%22%CF%83%22%2C%20%22order%22%5D%2C%20as_index%3DFalse).mean()%0A%0A%20%20%20%20_base%20%3D%20alt.Chart(_df).encode(%0A%20%20%20%20%20%20%20%20x%3Dalt.X(%22%CF%83%3AQ%22%2C%20scale%3Dalt.Scale(type%3D%22log%22)%2C%20title%3D%22noise%20level%20%CF%83%22)%2C%0A%20%20%20%20%20%20%20%20color%3Dalt.Color(%22order%3AN%22%2C%20title%3DNone%2C%20legend%3Dalt.Legend(orient%3D%22bottom%22))%2C%0A%20%20%20%20)%0A%20%20%20%20_cos%20%3D%20_base.mark_line(strokeWidth%3D2).encode(%0A%20%20%20%20%20%20%20%20y%3Dalt.Y(%22cosine%3AQ%22%2C%20scale%3Dalt.Scale(domain%3D%5B0%2C%201%5D)%2C%20title%3D%22cosine%20with%20UV%E1%B5%80%20of%20G%22)%2C%0A%20%20%20%20).properties(width%3D300%2C%20height%3D240%2C%20title%3D%22Direction%22)%0A%20%20%20%20_spread%20%3D%20_base.mark_line(strokeWidth%3D2).encode(%0A%20%20%20%20%20%20%20%20y%3Dalt.Y(%22%CF%83_min%20%2F%20%CF%83_max%3AQ%22%2C%20scale%3Dalt.Scale(domain%3D%5B0%2C%201%5D)%2C%20title%3D%22%CF%83_min%20%2F%20%CF%83_max%20of%20the%20step%22)%2C%0A%20%20%20%20).properties(width%3D300%2C%20height%3D240%2C%20title%3D%22Shape%22)%0A%20%20%20%20mo.vstack(%5B%0A%20%20%20%20%20%20%20%20alt.hconcat(_cos%2C%20_spread)%2C%0A%20%20%20%20%20%20%20%20mo.md(r%22%22%22%0A%20%20%20%20%20%20%20%20Averaging%20first%20gives%20a%20direction%20closer%20to%20the%20noise-free%20step%2C%20and%0A%20%20%20%20%20%20%20%20the%20result%20is%20still%20orthogonal%2C%20with%20all%20singular%20values%20equal.%0A%20%20%20%20%20%20%20%20Averaging%20the%20orthogonalized%20derivatives%20instead%20gives%20a%20matrix%20whose%0A%20%20%20%20%20%20%20%20singular%20values%20are%20no%20longer%20equal%2C%20so%20it%20is%20not%20a%20step%20of%20the%0A%20%20%20%20%20%20%20%20spectral%20norm%20at%20all.%0A%20%20%20%20%20%20%20%20%22%22%22)%2C%0A%20%20%20%20%5D)%0A%20%20%20%20return%0A%0A%0Aif%20__name__%20%3D%3D%20%22__main__%22%3A%0A%20%20%20%20app.run()%0A</marimo-code></head>
+  <body>
+    <div id="root"></div>
+    <script data-marimo="true">
+      Object.defineProperty(window, "__MARIMO_MOUNT_CONFIG__", {
+        value: Object.freeze({
+            "filename": "notebook.py",
+            "cwd": "",
+            "lspWorkspace": null,
+            "mode": "edit",
+            "version": "0.24.2",
+            "serverToken": "unused",
+            "config": {"ai": {"allow_provider_config": true, "custom_providers": {}, "enabled": true, "models": {"custom_models": [], "displayed_models": []}}, "completion": {"activate_on_typing": true, "auto_close_pairs": true, "copilot": false, "signature_hint_on_typing": false}, "diagnostics": {"sql_linter": true}, "display": {"cell_output": "below", "code_editor_font_size": 14, "code_lens": true, "dataframes": "rich", "default_table_max_columns": 50, "default_table_page_size": 10, "default_width": "medium", "reference_highlighting": true, "theme": "system"}, "formatting": {"line_length": 79}, "keymap": {"overrides": {}, "preset": "default"}, "language_servers": {"pylsp": {"enable_flake8": false, "enable_mypy": true, "enable_pydocstyle": false, "enable_pyflakes": false, "enable_pylint": false, "enable_ruff": true, "enabled": false}}, "mcp": {"mcpServers": {}, "presets": []}, "package_management": {"manager": "uv"}, "runtime": {"auto_instantiate": true, "auto_reload": "off", "default_csv_encoding": "utf-8", "default_sql_output": "auto", "on_cell_change": "autorun", "output_max_bytes": 8000000, "reactive_tests": true, "show_tracebacks": false, "std_stream_max_bytes": 1000000, "watcher_on_save": "lazy"}, "save": {"autosave": "off", "autosave_delay": 1000, "format_on_save": false}, "server": {"browser": "default", "follow_symlink": false}, "snippets": {"custom_paths": [], "include_default_snippets": true}},
+            "configOverrides": {},
+            "appConfig": {"css_file": "tufte.css", "sql_output": "auto", "width": "compact"},
+            "layout": null,
+            "view": {"showAppCode": false},
+            "notebook": null,
+            "session": null,
+            "runtimeConfig": null
+        }),
+        writable: false,
+        configurable: false,
+      });
+    </script>
+  </body>
+</html>

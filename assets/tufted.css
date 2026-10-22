@@ -17,13 +17,46 @@ html {
     font-size: 10pt;
 }
 
+/* Calibrate the text measure to the 116 mm PDF column at desktop width. */
+section > p,
+section > footer,
+section > table,
+blockquote p,
+blockquote footer,
+hr {
+    width: 46.5%;
+}
+
+/* Match the justified prose of the PDF while keeping metadata and notes ragged. */
+article section > p:not(.post-meta),
+article blockquote p {
+    text-align: justify;
+    hyphens: auto;
+}
+
+section > dl,
+section > ol,
+section > ul {
+    width: 41.5%;
+}
+
+figure {
+    max-width: 46.5%;
+}
+
 img,
 svg {
     max-height: 80vh;
 }
 
 h1 {
-    font-size: 25pt;
+    font-size: 2.38rem;
+}
+
+/* Keep plain code blocks smaller than the surrounding prose. */
+article pre,
+article pre code {
+    font-size: 0.9rem;
 }
 
 
@@ -65,6 +98,7 @@ NAVBAR
 
 header nav {
     display: flex;
+    flex-wrap: wrap;
     gap: 1em;
 }
 
@@ -116,6 +150,92 @@ FOOTNOTES AND MARGIN NOTES
     transition-delay: 0s;
 }
 
+/* Match the PDF's 60:116 note-to-text width and 7:116 gutter ratios. */
+.marginnote {
+    width: 51.724%;
+    margin-right: -57.759%;
+    font-size: 1.12rem;
+    line-height: 1.175;
+}
+
+.post-toc {
+    float: right;
+    clear: right;
+    width: 24.052%;
+    margin-right: 26.642%;
+    margin-top: 0;
+}
+
+.post-toc-title {
+    font-weight: bold;
+    font-size: 1.4rem;
+    margin-bottom: 4pt;
+}
+
+.post-toc ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: 1.12rem;
+    line-height: 1.175;
+}
+
+.post-toc li {
+    margin: 0;
+}
+
+.post-toc-subsection {
+    padding-left: 3mm;
+}
+
+.post-toc-number {
+    margin-right: 0.1em;
+}
+
+.post-toc a {
+    color: inherit;
+    background-image: none;
+    text-shadow: none;
+    text-decoration: none;
+}
+
+.post-toc a:hover,
+.post-toc a:focus-visible {
+    text-decoration: underline;
+}
+
+@media (max-width: 760px) {
+    section > p,
+    section > footer,
+    section > table,
+    blockquote p,
+    blockquote footer,
+    hr {
+        width: 100%;
+    }
+
+    section > dl,
+    section > ol,
+    section > ul {
+        width: 90%;
+    }
+
+    figure {
+        max-width: 90%;
+    }
+
+    .marginnote {
+        width: 100%;
+        margin-right: 0;
+    }
+
+    .post-toc {
+        float: none;
+        width: 100%;
+        margin: 1em 0;
+    }
+}
+
 a.footnote-ref-link {
     background-image: none;
     text-shadow: none !important;
@@ -126,16 +246,47 @@ a.footnote-ref-link {
 MATH NOTATION
 *******************************************************************************/
 
-/* TODO: Remove hack for math zooming */
-figure[role="math"] {
-    zoom: 1.5;
+/* Typst 0.15 emits accessible MathML. Keep MathML's native layout: in Safari,
+   making the math root an overflow container breaks fractions and matrices. */
+math,
+math * {
+    color: inherit;
 }
 
-@media (prefers-color-scheme: dark) {
+math[display="block"] {
+    width: 46.5%;
+    font-size: 1.25em;
+    margin-block: 1.5rem;
+}
 
-    /* Invert math figures for better contrast */
-    [role="math"] {
-        filter: invert(1) hue-rotate(180deg);
+.numbered-equation {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 1rem;
+    width: 46.5%;
+    margin-block: 1.5rem;
+}
+
+.numbered-equation math[display="block"] {
+    width: 100%;
+    margin: 0;
+}
+
+.numbered-equation > p {
+    margin: 0;
+}
+
+/* Figures already occupy the text column; use their full inner measure. */
+article figure math[display="block"],
+article figure .numbered-equation {
+    width: 100%;
+}
+
+@media (max-width: 760px) {
+    math[display="block"],
+    .numbered-equation {
+        width: 100%;
     }
 }
 
@@ -143,6 +294,12 @@ figure[role="math"] {
 /*******************************************************************************
 POST TILES
 *******************************************************************************/
+
+.post-meta {
+    margin-top: -0.75rem;
+    color: inherit;
+    opacity: 0.75;
+}
 
 .post-tile {
     margin: 0 0 1rem;

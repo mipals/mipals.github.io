@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="./favicon.ico" />
+    <!-- Preload is necessary because we show these images when we disconnect from the server,
+    but at that point we cannot load these images from the server -->
+    <link rel="preload" href="./assets/gradient-yHQUC_QB.png" as="image" />
+    <link rel="preload" href="./assets/noise-60BoTA8O.png" as="image" />
+    <!-- Preload the fonts -->
+    <link rel="preload" href="./assets/Lora-VariableFont_wght-CZceb_kH.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Regular-Bam3NpBI.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Bold-C_DwAp7Z.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Regular-CEsLFVD9.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Medium-D5MAsWEG.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Bold-C6PDArdf.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="a marimo app" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.json" />
+
+    <script data-marimo="true">
+      function __resizeIframe(obj) {
+        const scrollbarHeight = 20; // Max between windows, mac, and linux
+
+        function setHeight() {
+          // Guard against race condition where iframe isn't ready
+          if (!obj.contentWindow?.document?.documentElement) {
+            return;
+          }
+          const element = obj.contentWindow.document.documentElement;
+          // If there is no vertical scrollbar, we don't need to resize the iframe
+          if (element.scrollHeight === element.clientHeight) {
+            return;
+          }
+
+          // Create a new height that includes the scrollbar height if it's visible
+          const hasHorizontalScrollbar = element.scrollWidth > element.clientWidth;
+          const newHeight = element.scrollHeight + (hasHorizontalScrollbar ? scrollbarHeight : 0);
+
+          // Only update the height if it's different from the current height
+          if (obj.style.height !== `${newHeight}px`) {
+            obj.style.height = `${newHeight}px`;
+          }
+        }
+
+        // Resize the iframe to the height of the content and bottom scrollbar height
+        setHeight();
+
+        // Resize the iframe when the content changes
+        const resizeObserver = new ResizeObserver((_entries) => {
+          setHeight();
+        });
+        // Only observe if iframe content is ready
+        if (obj.contentWindow?.document?.body) {
+          resizeObserver.observe(obj.contentWindow.document.body);
+        }
+      }
+    </script>
+    <marimo-filename hidden>notebook.py</marimo-filename>
+    <!-- TODO(Trevor): Legacy, required by VS Code plugin. Remove when plugin is updated (see marimo/server/_templates/template.py) -->
+    <marimo-version data-version="{{ version }}" hidden></marimo-version>
+    <marimo-user-config data-config="{{ user_config }}" hidden></marimo-user-config>
+    <marimo-server-token data-token="{{ server_token }}" hidden></marimo-server-token>
+    <!-- /TODO -->
+    <title>interactive portfolio</title>
+    <script type="module" crossorigin src="./assets/index-4n22QjCD.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/rolldown-runtime-B0Z9INg1.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-CBDbhulC.js">
+    <link rel="modulepreload" crossorigin href="./assets/compiler-runtime-CYIjoINj.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEvent-xfs0Sn4r.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-dom-BQrReHnR.js">
+    <link rel="modulepreload" crossorigin href="./assets/schemas-aTUejmFi.js">
+    <link rel="modulepreload" crossorigin href="./assets/isObject-BCaOs5rp.js">
+    <link rel="modulepreload" crossorigin href="./assets/isSymbol-oX0TOjjx.js">
+    <link rel="modulepreload" crossorigin href="./assets/now-Cmx0b_zA.js">
+    <link rel="modulepreload" crossorigin href="./assets/debounce-aFmHgJZY.js">
+    <link rel="modulepreload" crossorigin href="./assets/isArrayLikeObject-DnwgSs_Z.js">
+    <link rel="modulepreload" crossorigin href="./assets/_initCloneObject-CM3WilQg.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseMerge-DLqSVasz.js">
+    <link rel="modulepreload" crossorigin href="./assets/objects-snlMn4yk.js">
+    <link rel="modulepreload" crossorigin href="./assets/jsx-runtime-B74pBk57.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEventListener-92uWqz-P.js">
+    <link rel="modulepreload" crossorigin href="./assets/invariant-Ci2dTZ72.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-D5Ywm7-q.js">
+    <link rel="modulepreload" crossorigin href="./assets/constants-BDbGiS7O.js">
+    <link rel="modulepreload" crossorigin href="./assets/Deferred-CrTnjj37.js">
+    <link rel="modulepreload" crossorigin href="./assets/session-Sz5nSFku.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-BlNM0caL.js">
+    <link rel="modulepreload" crossorigin href="./assets/clsx-DB0hHKMi.js">
+    <link rel="modulepreload" crossorigin href="./assets/cn-ldLVeaqm.js">
+    <link rel="modulepreload" crossorigin href="./assets/fullscreen-BH2jz-F4.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DzCQtGkt.js">
+    <link rel="modulepreload" crossorigin href="./assets/menu-items-BSRA2YI9.js">
+    <link rel="modulepreload" crossorigin href="./assets/button-Dh8EwhsF.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-dialog-CA-2mBs3.js">
+    <link rel="modulepreload" crossorigin href="./assets/createLucideIcon-B7HeEoG2.js">
+    <link rel="modulepreload" crossorigin href="./assets/check-BoA6XBpj.js">
+    <link rel="modulepreload" crossorigin href="./assets/context-Do8M9TDF.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNumberFormatter-DHJ9s6Vk.js">
+    <link rel="modulepreload" crossorigin href="./assets/select-nLt2y0Sw.js">
+    <link rel="modulepreload" crossorigin href="./assets/circle-ByJdIf5p.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-BUtPzKB4.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BtC9ym6k.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CZNULd6Z.js">
+    <link rel="modulepreload" crossorigin href="./assets/arrays-BqUx5USx.js">
+    <link rel="modulepreload" crossorigin href="./assets/once-Haz_uxEL.js">
+    <link rel="modulepreload" crossorigin href="./assets/capabilities-D8kPgMKr.js">
+    <link rel="modulepreload" crossorigin href="./assets/cjs-C49f7GXV.js">
+    <link rel="modulepreload" crossorigin href="./assets/createReducer-B_XmHROl.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DiYjQAhI.js">
+    <link rel="modulepreload" crossorigin href="./assets/marked.esm-B_3iMIUq.js">
+    <link rel="modulepreload" crossorigin href="./assets/strings-CReV1AYG.js">
+    <link rel="modulepreload" crossorigin href="./assets/requests-C6_IaFh7.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-B8pdsUrS.js">
+    <link rel="modulepreload" crossorigin href="./assets/useLifecycle-BUaJcygz.js">
+    <link rel="modulepreload" crossorigin href="./assets/toDate-hGYJX0Ha.js">
+    <link rel="modulepreload" crossorigin href="./assets/database-zap-CloO6gbw.js">
+    <link rel="modulepreload" crossorigin href="./assets/numbers-Bc-r3jsC.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDebounce-DgpSQhrP.js">
+    <link rel="modulepreload" crossorigin href="./assets/input-DEbY281O.js">
+    <link rel="modulepreload" crossorigin href="./assets/uuid-k9DpjH68.js">
+    <link rel="modulepreload" crossorigin href="./assets/use-toast-DpWHUGuF.js">
+    <link rel="modulepreload" crossorigin href="./assets/write-secret-modal-D6zoZgLY.js">
+    <link rel="modulepreload" crossorigin href="./assets/plus-C4J9gIE1.js">
+    <link rel="modulepreload" crossorigin href="./assets/trash-2-D_HX-0qx.js">
+    <link rel="modulepreload" crossorigin href="./assets/badge-BSgtkC2e.js">
+    <link rel="modulepreload" crossorigin href="./assets/preload-helper-HclGiUj8.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DkPPv0FB.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-Dw9YRsCU.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-B0RXffUm.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-Cx4BE7jC.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CKUpxYGQ.js">
+    <link rel="modulepreload" crossorigin href="./assets/stex-Dc5bKD4z.js">
+    <link rel="modulepreload" crossorigin href="./assets/paths-zcL04qUW.js">
+    <link rel="modulepreload" crossorigin href="./assets/useTheme-C-ri8BtY.js">
+    <link rel="modulepreload" crossorigin href="./assets/useAsyncData-Buhk-UgR.js">
+    <link rel="modulepreload" crossorigin href="./assets/purify.es-DrVcFY1Q.js">
+    <link rel="modulepreload" crossorigin href="./assets/cells-Cp-G34Rz.js">
+    <link rel="modulepreload" crossorigin href="./assets/get-DjNf4SIX.js">
+    <link rel="modulepreload" crossorigin href="./assets/_hasPath-BmRQipI0.js">
+    <link rel="modulepreload" crossorigin href="./assets/hasIn-yw4sIeJR.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseSet-gX6o3Pih.js">
+    <link rel="modulepreload" crossorigin href="./assets/pick-Bs4cJfJU.js">
+    <link rel="modulepreload" crossorigin href="./assets/errors-DzO-nXy-.js">
+    <link rel="modulepreload" crossorigin href="./assets/switch-DjXr9Y9D.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-BMXKNElG.js">
+    <link rel="modulepreload" crossorigin href="./assets/eye-off-CFuPxa9F.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-DlEomWzI.js">
+    <link rel="modulepreload" crossorigin href="./assets/extends-CvVTau-c.js">
+    <link rel="modulepreload" crossorigin href="./assets/esm-BHMOvJzM.js">
+    <link rel="modulepreload" crossorigin href="./assets/useAddCell-DdB_uBif.js">
+    <link rel="modulepreload" crossorigin href="./assets/readonly-python-code-DpIyjHqY.js">
+    <link rel="modulepreload" crossorigin href="./assets/LazyAnyLanguageCodeMirror-LboTfNDv.js">
+    <link rel="modulepreload" crossorigin href="./assets/micromark-factory-space-D9Dr-k4J.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-5FQGJX7Z-CRg4xQWg.js">
+    <link rel="modulepreload" crossorigin href="./assets/markdown-renderer-BZKlbm2Q.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-icon-z8fuTE3w.js">
+    <link rel="modulepreload" crossorigin href="./assets/useRunCells-CX7oW5zy.js">
+    <link rel="modulepreload" crossorigin href="./assets/RenderHTML-DwhMAd9l.js">
+    <link rel="modulepreload" crossorigin href="./assets/blob-B2d_dHwI.js">
+    <link rel="modulepreload" crossorigin href="./assets/share-CPtBiNgr.js">
+    <link rel="modulepreload" crossorigin href="./assets/events-CbeVJ6OD.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-Di9TbuV9.js">
+    <link rel="modulepreload" crossorigin href="./assets/ErrorBoundary-CDVGFYfr.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-B-r81uZ6.js">
+    <link rel="modulepreload" crossorigin href="./assets/tabs-Cy1qXLzH.js">
+    <link rel="modulepreload" crossorigin href="./assets/chevron-right-CKA5zVsM.js">
+    <link rel="modulepreload" crossorigin href="./assets/dropdown-menu-C40jM9o4.js">
+    <link rel="modulepreload" crossorigin href="./assets/html-to-image-D6GUC5q6.js">
+    <link rel="modulepreload" crossorigin href="./assets/download-DMxOzI7b.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-CUK1W5bI.js">
+    <link rel="modulepreload" crossorigin href="./assets/refresh-cw-Bf-rx_aV.js">
+    <link rel="modulepreload" crossorigin href="./assets/tree-actions-CG5g7aUQ.js">
+    <link rel="modulepreload" crossorigin href="./assets/ellipsis-Dfik_tuW.js">
+    <link rel="modulepreload" crossorigin href="./assets/external-link-Bp3BxyRA.js">
+    <link rel="modulepreload" crossorigin href="./assets/spinner-Ck-Hgfvj.js">
+    <link rel="modulepreload" crossorigin href="./assets/message-circle-BQB1AIAg.js">
+    <link rel="modulepreload" crossorigin href="./assets/hat-glasses-C8LSY3HT.js">
+    <link rel="modulepreload" crossorigin href="./assets/package-DPlscLzt.js">
+    <link rel="modulepreload" crossorigin href="./assets/datasource-DrODSIs0.js">
+    <link rel="modulepreload" crossorigin href="./assets/kbd-Cwh96ZBE.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-dmKwNsrp.js">
+    <link rel="modulepreload" crossorigin href="./assets/useInstallPackage-DsD08SLK.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-B6AklCzD.js">
+    <link rel="modulepreload" crossorigin href="./assets/cell-link-6burT2XF.js">
+    <link rel="modulepreload" crossorigin href="./assets/MarimoErrorOutput-DqpoYOvw.js">
+    <link rel="modulepreload" crossorigin href="./assets/VisuallyHidden-CBMDmozt.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDateFormatter-BiqAQ-zI.js">
+    <link rel="modulepreload" crossorigin href="./assets/en-US-yTIMUO13.js">
+    <link rel="modulepreload" crossorigin href="./assets/isValid-nQ3Iam8J.js">
+    <link rel="modulepreload" crossorigin href="./assets/dates-B58T85Jq.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-CNPGWpMu.js">
+    <link rel="modulepreload" crossorigin href="./assets/precisionRound-Bq_nmf5u.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-Dm4DaIgg.js">
+    <link rel="modulepreload" crossorigin href="./assets/vega-loader.browser-AQmjV9CX.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-BG35uS_N.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-icons.esm-hr79-MCS.js">
+    <link rel="modulepreload" crossorigin href="./assets/emotion-is-prop-valid.esm-nLO-SoUf.js">
+    <link rel="modulepreload" crossorigin href="./assets/useIframeCapabilities-C7Di8f2y.js">
+    <link rel="modulepreload" crossorigin href="./assets/error-banner-Dw5YY9wq.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-49LGK4zG.js">
+    <link rel="modulepreload" crossorigin href="./assets/formats-C6s96nu2.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-DmqOOjfe.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-resizable-panels.browser.esm-BSRAHC4P.js">
+    <link rel="modulepreload" crossorigin href="./assets/JsonOutput-CzIGPEZQ.js">
+    <link rel="modulepreload" crossorigin href="./assets/chart-no-axes-column-ChZdjJhj.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-function-DkZweMAs.js">
+    <link rel="modulepreload" crossorigin href="./assets/spec-DKsAmLTi.js">
+    <link rel="modulepreload" crossorigin href="./assets/semaphore-BjoL5P0h.js">
+    <link rel="modulepreload" crossorigin href="./assets/fileToBase64-NhpNrK5l.js">
+    <link rel="modulepreload" crossorigin href="./assets/useBoolean-BXC4CItZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/code-xml-B7x62Eeh.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-headphone-rFCxFRI8.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-DF8n85RA.js">
+    <link rel="modulepreload" crossorigin href="./assets/image-ab13yGv4.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-icons-DdGYuADJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/globe-BQf75qV_.js">
+    <link rel="modulepreload" crossorigin href="./assets/markdown-export-0rLbaq8b.js">
+    <link rel="modulepreload" crossorigin href="./assets/data-grid-types-DgHVN_Zz.js">
+    <link rel="modulepreload" crossorigin href="./assets/glide-utils-UGsrRHYj.js">
+    <link rel="modulepreload" crossorigin href="./assets/column-preview-riSXbYe_.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-B58Ib8Ir.js">
+    <link rel="modulepreload" crossorigin href="./assets/triangle-alert-MihykDYG.js">
+    <link rel="modulepreload" crossorigin href="./assets/prop-types-Djf4O40e.js">
+    <link rel="modulepreload" crossorigin href="./assets/es-CrFhA96G.js">
+    <link rel="modulepreload" crossorigin href="./assets/renderShortcut-X-CJUSM8.js">
+    <link rel="modulepreload" crossorigin href="./assets/bundle.esm-DzY74mzC.js">
+    <link rel="modulepreload" crossorigin href="./assets/icons-CjLa9BiH.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDeepCompareMemoize-CLytDdMl.js">
+    <link rel="modulepreload" crossorigin href="./assets/pathUtils-Cryrlpma.js">
+    <link rel="modulepreload" crossorigin href="./assets/floating-outline-DaUHnl_e.js">
+    <link rel="stylesheet" crossorigin href="./assets/cells-D-c15Ks-.css">
+    <link rel="stylesheet" crossorigin href="./assets/markdown-renderer-B7zTpxjS.css">
+    <link rel="stylesheet" crossorigin href="./assets/JsonOutput-BQtz7-np.css">
+    <link rel="stylesheet" crossorigin href="./assets/index-C7yAojRA.css">
+  <marimo-wasm hidden=""></marimo-wasm>
+    <script>
+        if (window.location.protocol === 'file:') {
+            alert('Warning: This file must be served by an HTTP server to function correctly.');
+        }
+    </script>
+    
+    <style>
+        #save-button {
+            display: none !important;
+        }
+        #filename-input {
+            display: none !important;
+        }
+    </style>
+    <style title='marimo-custom'>/* Tufte-inspired theme for marimo notebooks
+ *
+ * Based on the design principles of Edward Tufte and tufte.css
+ * (https://edwardtufte.github.io/tufte-css/)
+ *
+ * Usage:
+ *   app = marimo.App(css_file="tufte.css")
+ */
+
+/* Load ET Book font (the Tufte canonical font) */
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,300;0,400;0,600;1,400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;500&display=swap");
+
+:root,
+.marimo {
+  /* Tufte fonts */
+  --marimo-heading-font: "Playfair Display", "Palatino Linotype",
+    "Book Antiqua", Palatino, serif;
+  --marimo-text-font: "Source Sans 3", "Gill Sans", "Gill Sans MT", Calibri,
+    sans-serif;
+  --marimo-monospace-font: "Source Code Pro", Consolas, "Liberation Mono", Menlo,
+    monospace;
+
+  /* Tufte cream background */
+  --background: light-dark(#fffff8, #1a1a1a) !important;
+  --foreground: light-dark(#111, #ddd) !important;
+  --card: light-dark(#fffff8, #1a1a1a) !important;
+  --card-foreground: light-dark(#111, #ddd) !important;
+  --muted: light-dark(#f4f4ec, #222) !important;
+  --muted-foreground: light-dark(#555, #aaa) !important;
+
+  /* Wider readable measure */
+  --markdown-max-width: 65ch;
+}
+
+/* Body text: generous line-height for readability */
+.paragraph,
+.markdown p,
+.markdown li {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  letter-spacing: 0.01em;
+}
+
+/* Headings: classic Tufte style with generous spacing
+ * # (h1) = large title
+ * ## (h2) = section heading (styled like traditional h1)
+ * ### (h3) = subsection heading (styled like traditional h2)
+ */
+h1 {
+  font-weight: 400 !important;
+  font-style: normal;
+  margin-top: 3rem !important;
+  margin-bottom: 1.5rem !important;
+  font-size: 3rem !important;
+  line-height: 1.1 !important;
+}
+
+h2 {
+  font-weight: 400 !important;
+  font-style: italic;
+  margin-top: 2rem !important;
+  margin-bottom: 1rem !important;
+  font-size: 2.2rem !important;
+  line-height: 1.2 !important;
+}
+
+h3 {
+  font-weight: 400 !important;
+  font-style: italic;
+  margin-top: 1.8rem !important;
+  margin-bottom: 0.8rem !important;
+  font-size: 1.6rem !important;
+  line-height: 1.3 !important;
+}
+
+h4 {
+  font-weight: 400 !important;
+  font-style: italic;
+  margin-top: 1.4rem !important;
+  margin-bottom: 0.6rem !important;
+  font-size: 1.3rem !important;
+}
+
+/* Blockquotes as epigraphs */
+.markdown blockquote {
+  font-style: italic;
+  border-left: none !important;
+  padding-left: 1.5em !important;
+  margin: 2em 0 !important;
+  color: light-dark(#333, #bbb);
+}
+
+.markdown blockquote footer,
+.markdown blockquote cite {
+  font-style: normal;
+  font-size: 0.9em;
+}
+
+/* Links: subtle, no underline until hover */
+.markdown a {
+  color: inherit;
+  text-decoration: none;
+  background-image: linear-gradient(
+    light-dark(#999, #666),
+    light-dark(#999, #666)
+  );
+  background-position: 0% 93%;
+  background-repeat: no-repeat;
+  background-size: 100% 1px;
+}
+
+.markdown a:hover {
+  background-size: 100% 2px;
+  color: light-dark(#111, #fff);
+}
+
+/* Code: understated */
+.markdown code {
+  font-size: 0.9em;
+  background: light-dark(#f4f4ec, #252525) !important;
+  padding: 0.1em 0.3em;
+  border-radius: 2px;
+}
+
+/* Tables: Tufte-style minimal tables */
+.markdown table {
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  width: auto;
+}
+
+.markdown table thead {
+  border-bottom: 2px solid light-dark(#111, #ddd);
+}
+
+.markdown table th {
+  font-weight: 600;
+  padding: 0.5em 1em 0.3em 0;
+  text-align: left;
+  border: none !important;
+}
+
+.markdown table td {
+  padding: 0.3em 1em 0.3em 0;
+  border: none !important;
+  border-bottom: 1px solid light-dark(#eee, #333) !important;
+}
+
+.markdown table tbody tr:last-child td {
+  border-bottom: 2px solid light-dark(#111, #ddd) !important;
+}
+
+/* Horizontal rules: subtle */
+.markdown hr {
+  border: none;
+  border-top: 1px solid light-dark(#ccc, #444);
+  margin: 2em 0;
+}
+
+/* Images: full-width with subtle styling */
+.markdown img {
+  max-width: 100%;
+}
+
+/* Lists: proper spacing */
+.markdown ul,
+.markdown ol {
+  padding-left: 1.5em;
+}
+
+.markdown li {
+  margin-bottom: 0.4em;
+}
+
+/* Cells: no border, no divider between code and output, orange shadow on focus */
+.marimo-cell {
+  border-color: transparent !important;
+  outline-color: transparent !important;
+}
+.marimo-cell > * {
+  border-color: transparent !important;
+}
+.marimo-cell.needs-run {
+  border-color: transparent !important;
+  outline-color: transparent !important;
+  box-shadow: none !important;
+}
+.marimo-cell:focus-within {
+  box-shadow: 0px 0px 10px 0px light-dark(#e8a04080, #e8a04060) !important;
+}
+
+/* Show tall outputs, such as stacked charts, in full rather than in a
+   scroll box. Marimo limits each output to 610px by default. */
+.output-area {
+  max-height: none !important;
+}
+
+/* Code editor: match page background, hide line numbers and gutter border */
+.cm-editor {
+  background-color: var(--background) !important;
+  border: none !important;
+}
+.cm-gutters {
+  background-color: var(--background) !important;
+  border-right: none !important;
+  display: none !important;
+}
+
+/* Site navigation, matching assets/tufted.css. */
+#site-nav-header {
+  width: 87.5%;
+  margin-left: 12.5%;
+  box-sizing: border-box;
+  display: block !important;
+  position: relative;
+  z-index: 1000;
+}
+#site-nav-header nav {
+  display: flex;
+  gap: 1em;
+}
+#site-nav-header nav a,
+#site-nav-header nav a:link,
+#site-nav-header nav a:visited {
+  color: inherit;
+  text-decoration: none !important;
+  background-image: none !important;
+  border-bottom: 0 !important;
+  box-shadow: none !important;
+  text-shadow: none;
+  font-size: 1.25rem;
+  padding: 0.2em 0.4em;
+  margin-top: 1em;
+  border-radius: 0.2rem;
+  transition: background-color 120ms ease;
+}
+#site-nav-header nav a:hover,
+#site-nav-header nav a:focus-visible {
+  background: rgba(128, 128, 128, 0.2);
+  outline: none;
+}
+@media (max-width: 760px) {
+  #site-nav-header { width: 100%; margin-left: 0; }
+}
+</style>
+<script data-marimo="true">
+    Object.defineProperty(window, "__MARIMO_EXPORT_CONTEXT__", {
+        value: Object.freeze({
+            trusted: true,
+            notebookCode: "# /// script\n# dependencies = [\n#     \"marimo==0.24.2\",\n#     \"clarabel\",\n#     \"numpy\",\n#     \"scipy\",\n#     \"altair\",\n#     \"pandas\",\n# ]\n#\n# [tool.marimo.display]\n# theme = \"system\"\n#\n# [tool.marimo.runtime]\n# auto_instantiate = true\n# ///\n\nimport marimo\n\n__generated_with = \"0.24.2\"\napp = marimo.App(css_file=\"tufte.css\")\n\n\n@app.cell(hide_code=True)\ndef _():\n    import marimo as mo\n\n    # BEGIN GENERATED SITE NAV\n    mo.nav_menu({\n        \"/\": \"home\",\n        \"/blog/\": \"blog\",\n        \"/publications/\": \"publications\",\n        \"/repositories/\": \"repositories\",\n        \"/about/\": \"about\",\n        \"/solver/\": \"conic solver\",\n        \"marimo\": {\n            \"/marimo/conic_programs.html\": \"Conic programs\",\n            \"/marimo/steepest_descent.html\": \"Which way is down?\",\n        },\n    })\n    # END GENERATED SITE NAV\n    return (mo,)\n\n\n@app.cell(hide_code=True)\ndef _(mo):\n    mo.md(r\"\"\"\n    # Build a portfolio with Clarabel\n\n    You have money to split between four assets: government bonds, corporate\n    bonds, domestic stocks and international stocks. Each has an expected\n    yearly return and a risk, which is how much its return typically swings\n    around that expectation (its standard deviation). Assets with higher\n    returns are riskier. Because the assets do not move in lockstep, a mix of\n    them can be less risky than the assets on their own.\n\n    Choose the return you want and the largest share of your money that may go\n    into any one asset. The [Clarabel](https://clarabel.org) solver then finds\n    the mix with the least risk. The numbers are made up for illustration.\n    \"\"\")\n    return\n\n\n@app.cell(hide_code=True)\ndef _():\n    import altair as alt\n    import clarabel\n    import numpy as np\n    import pandas as pd\n    from scipy import sparse\n\n    return alt, clarabel, np, pd, sparse\n\n\n@app.cell(hide_code=True)\ndef _(np, pd):\n    asset_names = np.array([\n        \"Government bonds\",\n        \"Corporate bonds\",\n        \"Domestic stocks\",\n        \"International stocks\",\n    ])\n    expected_returns = np.array([0.03, 0.05, 0.085, 0.12])\n    volatilities = np.array([0.04, 0.07, 0.16, 0.21])\n    correlation = np.array([\n        [1.00, 0.35, -0.10, -0.05],\n        [0.35, 1.00, 0.20, 0.25],\n        [-0.10, 0.20, 1.00, 0.70],\n        [-0.05, 0.25, 0.70, 1.00],\n    ])\n    covariance = np.outer(volatilities, volatilities) * correlation\n\n    asset_data = pd.DataFrame({\n        \"Asset\": asset_names,\n        \"Expected return\": expected_returns,\n        \"Risk\": volatilities,\n    })\n    return asset_data, asset_names, covariance, expected_returns\n\n\n@app.cell(hide_code=True)\ndef _(mo):\n    target_slider = mo.ui.slider(\n        start=3, stop=12, step=0.5, value=7,\n        label=\"Target return (% per year)\", show_value=True,\n    )\n    cap_slider = mo.ui.slider(\n        start=25, stop=100, step=5, value=60,\n        label=\"Most in one asset (%)\", show_value=True,\n    )\n    mo.vstack([target_slider, cap_slider])\n    return cap_slider, target_slider\n\n\n@app.cell(hide_code=True)\ndef _(clarabel, covariance, expected_returns, np, sparse):\n    def solve_portfolio(required_return, weight_limit):\n        \"\"\"Solve the long-only minimum-variance portfolio problem.\"\"\"\n        _n = len(expected_returns)\n        _P = sparse.csc_matrix(2 * covariance)\n        _q = np.zeros(_n)\n\n        # Clarabel uses A w + s = b, with s in the listed cones.\n        _A = sparse.vstack([\n            np.ones((1, _n)),\n            -expected_returns.reshape(1, -1),\n            -sparse.eye(_n),\n            sparse.eye(_n),\n        ], format=\"csc\")\n        _b = np.concatenate((\n            [1.0, -required_return],\n            np.zeros(_n),\n            np.full(_n, weight_limit),\n        ))\n        _cones = [\n            clarabel.ZeroConeT(1),\n            clarabel.NonnegativeConeT(1 + 2 * _n),\n        ]\n        _settings = clarabel.DefaultSettings()\n        _settings.verbose = False\n        _solver = clarabel.DefaultSolver(_P, _q, _A, _b, _cones, _settings)\n        _solution = _solver.solve()\n\n        if \"Solved\" not in str(_solution.status):\n            return None\n\n        _weights = np.asarray(_solution.x)\n        _portfolio_return = float(expected_returns @ _weights)\n        _portfolio_risk = float(np.sqrt(_weights @ covariance @ _weights))\n        return _weights, _portfolio_return, _portfolio_risk, _solution\n\n    def maximum_return(weight_limit):\n        \"\"\"Maximum return possible under the long-only concentration limit.\"\"\"\n        _remaining = 1.0\n        _value = 0.0\n        for _index in np.argsort(expected_returns)[::-1]:\n            _weight = min(weight_limit, _remaining)\n            _value += _weight * expected_returns[_index]\n            _remaining -= _weight\n            if _remaining \u003C= 1e-12:\n                break\n        return _value\n\n    return maximum_return, solve_portfolio\n\n\n@app.cell(hide_code=True)\ndef _(cap_slider, solve_portfolio, target_slider):\n    selected_target = target_slider.value / 100\n    selected_limit = cap_slider.value / 100\n    selected_solution = solve_portfolio(selected_target, selected_limit)\n    return selected_limit, selected_solution, selected_target\n\n\n@app.cell(hide_code=True)\ndef _(maximum_return, np, selected_limit, solve_portfolio):\n    minimum_variance_solution = solve_portfolio(0.0, selected_limit)\n    minimum_variance_return = minimum_variance_solution[1]\n    maximum_feasible_return = maximum_return(selected_limit)\n    frontier_targets = np.linspace(\n        minimum_variance_return,\n        maximum_feasible_return - 1e-7,\n        25,\n    )\n    frontier_solutions = [\n        solve_portfolio(_target, selected_limit) for _target in frontier_targets\n    ]\n    return frontier_solutions, maximum_feasible_return, minimum_variance_return\n\n\n@app.cell(hide_code=True)\ndef _(\n    asset_names,\n    maximum_feasible_return,\n    minimum_variance_return,\n    mo,\n    np,\n    selected_limit,\n    selected_solution,\n    selected_target,\n):\n    if selected_solution is None:\n        _result = mo.callout(\n            mo.md(\n                f\"\"\"\n                **No portfolio reaches {selected_target:.1%}.** With at most\n                {selected_limit:.0%} in one asset, the highest possible return is\n                {maximum_feasible_return:.2%}. Lower the target or allow more in\n                one asset.\n                \"\"\"\n            ),\n            kind=\"warn\",\n        )\n    else:\n        _weights, _return, _risk, _solution = selected_solution\n        _holdings = \", \".join(\n            f\"{_weights[_i]:.0%} in {asset_names[_i].lower()}\"\n            for _i in np.argsort(_weights)[::-1]\n            if _weights[_i] \u003E= 0.005\n        )\n        _note = \"\"\n        if minimum_variance_return \u003E selected_target + 1e-4:\n            _note = (\n                f\" The least risky mix already earns {minimum_variance_return:.2%},\"\n                \" more than the target, so lowering the target changes nothing.\"\n            )\n        _result = mo.md(\n            f\"\"\"\n            **The least risky portfolio:** {_holdings}.\n\n            It has an expected return of {_return:.2%} and a risk of {_risk:.2%}\n            per year.{_note}\n            \"\"\"\n        )\n    _result\n    return\n\n\n@app.cell(hide_code=True)\ndef _(alt, asset_names, pd, selected_solution):\n    _weights = [0.0] * len(asset_names) if selected_solution is None else selected_solution[0]\n    _weights_df = pd.DataFrame({\"Asset\": asset_names, \"Share\": _weights})\n    _bars = alt.Chart(_weights_df).mark_bar(color=\"#457b9d\").encode(\n        x=alt.X(\"Share:Q\", axis=alt.Axis(format=\"%\"), scale=alt.Scale(domain=[0, 1]), title=\"Share of the money\"),\n        y=alt.Y(\"Asset:N\", sort=list(asset_names), title=None),\n        tooltip=[\"Asset:N\", alt.Tooltip(\"Share:Q\", format=\".1%\")],\n    )\n    _labels = _bars.mark_text(align=\"left\", dx=4, color=\"#888888\").encode(\n        text=alt.Text(\"Share:Q\", format=\".0%\"),\n    )\n    (_bars + _labels).properties(width=\"container\", height=160, title=\"Your portfolio\")\n    return\n\n\n@app.cell(hide_code=True)\ndef _(mo):\n    mo.md(r\"\"\"\n    The chart below puts risk on the horizontal axis and return on the vertical\n    axis. The red dots are the four assets on their own. The green curve is the\n    lowest risk that any mix can have for each return, given your limit on one\n    asset, and the blue dot is the portfolio above. Mixes on the curve beat the\n    single assets: they earn the same return for less risk. Allowing less in\n    one asset shortens the curve and pushes it to the right.\n    \"\"\")\n    return\n\n\n@app.cell(hide_code=True)\ndef _(alt, asset_data, frontier_solutions, pd, selected_solution):\n    _x = alt.X(\"Risk:Q\", axis=alt.Axis(format=\"%\"), scale=alt.Scale(domain=[0, 0.24]), title=\"Risk per year\")\n    _y = alt.Y(\"Expected return:Q\", axis=alt.Axis(format=\"%\"), scale=alt.Scale(domain=[0, 0.13]), title=\"Expected return per year\")\n    _tooltip = [alt.Tooltip(\"Risk:Q\", format=\".2%\"), alt.Tooltip(\"Expected return:Q\", format=\".2%\")]\n\n    _frontier_df = pd.DataFrame({\n        \"Risk\": [_solution[2] for _solution in frontier_solutions],\n        \"Expected return\": [_solution[1] for _solution in frontier_solutions],\n    })\n    _frontier = alt.Chart(_frontier_df).mark_line(color=\"#2a9d8f\", strokeWidth=3).encode(\n        x=_x, y=_y, tooltip=_tooltip,\n    )\n\n    _assets = alt.Chart(asset_data).mark_circle(color=\"#e76f51\", size=80, opacity=1).encode(\n        x=_x, y=_y, tooltip=[\"Asset:N\", *_tooltip],\n    )\n    # Bonds are labeled to their right and stocks to their left, so that every\n    # label stays inside the chart at phone width.\n    _label = dict(dy=-10, color=\"#e76f51\", fontWeight=\"bold\")\n    _bond_labels = _assets.mark_text(align=\"left\", dx=6, **_label).encode(text=\"Asset:N\").transform_filter(\n        alt.datum.Risk \u003C 0.1\n    )\n    _stock_labels = _assets.mark_text(align=\"right\", dx=-6, **_label).encode(text=\"Asset:N\").transform_filter(\n        alt.datum.Risk \u003E= 0.1\n    )\n\n    _layers = _frontier + _assets + _bond_labels + _stock_labels\n    if selected_solution is not None:\n        _selected_df = pd.DataFrame({\n            \"Risk\": [selected_solution[2]],\n            \"Expected return\": [selected_solution[1]],\n        })\n        _layers += alt.Chart(_selected_df).mark_circle(color=\"#457b9d\", size=180, opacity=1).encode(\n            x=_x, y=_y, tooltip=_tooltip,\n        )\n\n    _layers.properties(width=\"container\", height=320, title=\"Risk against return\")\n    return\n\n\n@app.cell(hide_code=True)\ndef _(mo):\n    mo.md(r\"\"\"\n    ## The optimization problem\n\n    With $w_i$ the share in asset $i$, $\\mu$ the expected returns and $\\Sigma$\n    the covariance matrix of the returns, the risk is $\\sqrt{w^T \\Sigma w}$,\n    and the notebook solves\n\n    $$\n    \\begin{array}{ll}\n    \\text{minimize} \u0026 w^T \\Sigma w \\\\\n    \\text{subject to} \u0026 \\mu^T w \\geq r_{\\mathrm{target}}, \\\\\n                      \u0026 {\\bf 1}^T w = 1, \\\\\n                      \u0026 0 \\leq w_i \\leq w_{\\max},\n    \\end{array}\n    $$\n\n    where $r_{\\mathrm{target}}$ is the target return and $w_{\\max}$ the most in\n    one asset. The shares add up to one, and none is negative, so the\n    portfolio cannot borrow or short-sell.\n\n    Clarabel takes the constraints in the form $Aw + s = b$, where each part of\n    the slack vector $s$ belongs to a cone. The budget ${\\bf 1}^T w = 1$ uses a\n    zero cone, so its slack is zero. The return target and the bounds on $w_i$\n    use a nonnegative cone. The covariance matrix enters Clarabel's quadratic\n    objective directly. The curve in the chart is found by solving the same\n    problem for 25 targets between the return of the least risky mix and the\n    highest possible return.\n    \"\"\")\n    return\n\n\nif __name__ == \"__main__\":\n    app.run()\n",
+        }),
+        writable: false,
+        configurable: false,
+    });
+</script>
+<marimo-code hidden="">%23%20%2F%2F%2F%20script%0A%23%20dependencies%20%3D%20%5B%0A%23%20%20%20%20%20%22marimo%3D%3D0.24.2%22%2C%0A%23%20%20%20%20%20%22clarabel%22%2C%0A%23%20%20%20%20%20%22numpy%22%2C%0A%23%20%20%20%20%20%22scipy%22%2C%0A%23%20%20%20%20%20%22altair%22%2C%0A%23%20%20%20%20%20%22pandas%22%2C%0A%23%20%5D%0A%23%0A%23%20%5Btool.marimo.display%5D%0A%23%20theme%20%3D%20%22system%22%0A%23%0A%23%20%5Btool.marimo.runtime%5D%0A%23%20auto_instantiate%20%3D%20true%0A%23%20%2F%2F%2F%0A%0Aimport%20marimo%0A%0A__generated_with%20%3D%20%220.24.2%22%0Aapp%20%3D%20marimo.App(css_file%3D%22tufte.css%22)%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_()%3A%0A%20%20%20%20import%20marimo%20as%20mo%0A%0A%20%20%20%20%23%20BEGIN%20GENERATED%20SITE%20NAV%0A%20%20%20%20mo.nav_menu(%7B%0A%20%20%20%20%20%20%20%20%22%2F%22%3A%20%22home%22%2C%0A%20%20%20%20%20%20%20%20%22%2Fblog%2F%22%3A%20%22blog%22%2C%0A%20%20%20%20%20%20%20%20%22%2Fpublications%2F%22%3A%20%22publications%22%2C%0A%20%20%20%20%20%20%20%20%22%2Frepositories%2F%22%3A%20%22repositories%22%2C%0A%20%20%20%20%20%20%20%20%22%2Fabout%2F%22%3A%20%22about%22%2C%0A%20%20%20%20%20%20%20%20%22%2Fsolver%2F%22%3A%20%22conic%20solver%22%2C%0A%20%20%20%20%20%20%20%20%22marimo%22%3A%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%22%2Fmarimo%2Fconic_programs.html%22%3A%20%22Conic%20programs%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%22%2Fmarimo%2Fsteepest_descent.html%22%3A%20%22Which%20way%20is%20down%3F%22%2C%0A%20%20%20%20%20%20%20%20%7D%2C%0A%20%20%20%20%7D)%0A%20%20%20%20%23%20END%20GENERATED%20SITE%20NAV%0A%20%20%20%20return%20(mo%2C)%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(mo)%3A%0A%20%20%20%20mo.md(r%22%22%22%0A%20%20%20%20%23%20Build%20a%20portfolio%20with%20Clarabel%0A%0A%20%20%20%20You%20have%20money%20to%20split%20between%20four%20assets%3A%20government%20bonds%2C%20corporate%0A%20%20%20%20bonds%2C%20domestic%20stocks%20and%20international%20stocks.%20Each%20has%20an%20expected%0A%20%20%20%20yearly%20return%20and%20a%20risk%2C%20which%20is%20how%20much%20its%20return%20typically%20swings%0A%20%20%20%20around%20that%20expectation%20(its%20standard%20deviation).%20Assets%20with%20higher%0A%20%20%20%20returns%20are%20riskier.%20Because%20the%20assets%20do%20not%20move%20in%20lockstep%2C%20a%20mix%20of%0A%20%20%20%20them%20can%20be%20less%20risky%20than%20the%20assets%20on%20their%20own.%0A%0A%20%20%20%20Choose%20the%20return%20you%20want%20and%20the%20largest%20share%20of%20your%20money%20that%20may%20go%0A%20%20%20%20into%20any%20one%20asset.%20The%20%5BClarabel%5D(https%3A%2F%2Fclarabel.org)%20solver%20then%20finds%0A%20%20%20%20the%20mix%20with%20the%20least%20risk.%20The%20numbers%20are%20made%20up%20for%20illustration.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_()%3A%0A%20%20%20%20import%20altair%20as%20alt%0A%20%20%20%20import%20clarabel%0A%20%20%20%20import%20numpy%20as%20np%0A%20%20%20%20import%20pandas%20as%20pd%0A%20%20%20%20from%20scipy%20import%20sparse%0A%0A%20%20%20%20return%20alt%2C%20clarabel%2C%20np%2C%20pd%2C%20sparse%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(np%2C%20pd)%3A%0A%20%20%20%20asset_names%20%3D%20np.array(%5B%0A%20%20%20%20%20%20%20%20%22Government%20bonds%22%2C%0A%20%20%20%20%20%20%20%20%22Corporate%20bonds%22%2C%0A%20%20%20%20%20%20%20%20%22Domestic%20stocks%22%2C%0A%20%20%20%20%20%20%20%20%22International%20stocks%22%2C%0A%20%20%20%20%5D)%0A%20%20%20%20expected_returns%20%3D%20np.array(%5B0.03%2C%200.05%2C%200.085%2C%200.12%5D)%0A%20%20%20%20volatilities%20%3D%20np.array(%5B0.04%2C%200.07%2C%200.16%2C%200.21%5D)%0A%20%20%20%20correlation%20%3D%20np.array(%5B%0A%20%20%20%20%20%20%20%20%5B1.00%2C%200.35%2C%20-0.10%2C%20-0.05%5D%2C%0A%20%20%20%20%20%20%20%20%5B0.35%2C%201.00%2C%200.20%2C%200.25%5D%2C%0A%20%20%20%20%20%20%20%20%5B-0.10%2C%200.20%2C%201.00%2C%200.70%5D%2C%0A%20%20%20%20%20%20%20%20%5B-0.05%2C%200.25%2C%200.70%2C%201.00%5D%2C%0A%20%20%20%20%5D)%0A%20%20%20%20covariance%20%3D%20np.outer(volatilities%2C%20volatilities)%20*%20correlation%0A%0A%20%20%20%20asset_data%20%3D%20pd.DataFrame(%7B%0A%20%20%20%20%20%20%20%20%22Asset%22%3A%20asset_names%2C%0A%20%20%20%20%20%20%20%20%22Expected%20return%22%3A%20expected_returns%2C%0A%20%20%20%20%20%20%20%20%22Risk%22%3A%20volatilities%2C%0A%20%20%20%20%7D)%0A%20%20%20%20return%20asset_data%2C%20asset_names%2C%20covariance%2C%20expected_returns%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(mo)%3A%0A%20%20%20%20target_slider%20%3D%20mo.ui.slider(%0A%20%20%20%20%20%20%20%20start%3D3%2C%20stop%3D12%2C%20step%3D0.5%2C%20value%3D7%2C%0A%20%20%20%20%20%20%20%20label%3D%22Target%20return%20(%25%20per%20year)%22%2C%20show_value%3DTrue%2C%0A%20%20%20%20)%0A%20%20%20%20cap_slider%20%3D%20mo.ui.slider(%0A%20%20%20%20%20%20%20%20start%3D25%2C%20stop%3D100%2C%20step%3D5%2C%20value%3D60%2C%0A%20%20%20%20%20%20%20%20label%3D%22Most%20in%20one%20asset%20(%25)%22%2C%20show_value%3DTrue%2C%0A%20%20%20%20)%0A%20%20%20%20mo.vstack(%5Btarget_slider%2C%20cap_slider%5D)%0A%20%20%20%20return%20cap_slider%2C%20target_slider%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(clarabel%2C%20covariance%2C%20expected_returns%2C%20np%2C%20sparse)%3A%0A%20%20%20%20def%20solve_portfolio(required_return%2C%20weight_limit)%3A%0A%20%20%20%20%20%20%20%20%22%22%22Solve%20the%20long-only%20minimum-variance%20portfolio%20problem.%22%22%22%0A%20%20%20%20%20%20%20%20_n%20%3D%20len(expected_returns)%0A%20%20%20%20%20%20%20%20_P%20%3D%20sparse.csc_matrix(2%20*%20covariance)%0A%20%20%20%20%20%20%20%20_q%20%3D%20np.zeros(_n)%0A%0A%20%20%20%20%20%20%20%20%23%20Clarabel%20uses%20A%20w%20%2B%20s%20%3D%20b%2C%20with%20s%20in%20the%20listed%20cones.%0A%20%20%20%20%20%20%20%20_A%20%3D%20sparse.vstack(%5B%0A%20%20%20%20%20%20%20%20%20%20%20%20np.ones((1%2C%20_n))%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20-expected_returns.reshape(1%2C%20-1)%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20-sparse.eye(_n)%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20sparse.eye(_n)%2C%0A%20%20%20%20%20%20%20%20%5D%2C%20format%3D%22csc%22)%0A%20%20%20%20%20%20%20%20_b%20%3D%20np.concatenate((%0A%20%20%20%20%20%20%20%20%20%20%20%20%5B1.0%2C%20-required_return%5D%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20np.zeros(_n)%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20np.full(_n%2C%20weight_limit)%2C%0A%20%20%20%20%20%20%20%20))%0A%20%20%20%20%20%20%20%20_cones%20%3D%20%5B%0A%20%20%20%20%20%20%20%20%20%20%20%20clarabel.ZeroConeT(1)%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20clarabel.NonnegativeConeT(1%20%2B%202%20*%20_n)%2C%0A%20%20%20%20%20%20%20%20%5D%0A%20%20%20%20%20%20%20%20_settings%20%3D%20clarabel.DefaultSettings()%0A%20%20%20%20%20%20%20%20_settings.verbose%20%3D%20False%0A%20%20%20%20%20%20%20%20_solver%20%3D%20clarabel.DefaultSolver(_P%2C%20_q%2C%20_A%2C%20_b%2C%20_cones%2C%20_settings)%0A%20%20%20%20%20%20%20%20_solution%20%3D%20_solver.solve()%0A%0A%20%20%20%20%20%20%20%20if%20%22Solved%22%20not%20in%20str(_solution.status)%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20return%20None%0A%0A%20%20%20%20%20%20%20%20_weights%20%3D%20np.asarray(_solution.x)%0A%20%20%20%20%20%20%20%20_portfolio_return%20%3D%20float(expected_returns%20%40%20_weights)%0A%20%20%20%20%20%20%20%20_portfolio_risk%20%3D%20float(np.sqrt(_weights%20%40%20covariance%20%40%20_weights))%0A%20%20%20%20%20%20%20%20return%20_weights%2C%20_portfolio_return%2C%20_portfolio_risk%2C%20_solution%0A%0A%20%20%20%20def%20maximum_return(weight_limit)%3A%0A%20%20%20%20%20%20%20%20%22%22%22Maximum%20return%20possible%20under%20the%20long-only%20concentration%20limit.%22%22%22%0A%20%20%20%20%20%20%20%20_remaining%20%3D%201.0%0A%20%20%20%20%20%20%20%20_value%20%3D%200.0%0A%20%20%20%20%20%20%20%20for%20_index%20in%20np.argsort(expected_returns)%5B%3A%3A-1%5D%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20_weight%20%3D%20min(weight_limit%2C%20_remaining)%0A%20%20%20%20%20%20%20%20%20%20%20%20_value%20%2B%3D%20_weight%20*%20expected_returns%5B_index%5D%0A%20%20%20%20%20%20%20%20%20%20%20%20_remaining%20-%3D%20_weight%0A%20%20%20%20%20%20%20%20%20%20%20%20if%20_remaining%20%3C%3D%201e-12%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20break%0A%20%20%20%20%20%20%20%20return%20_value%0A%0A%20%20%20%20return%20maximum_return%2C%20solve_portfolio%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(cap_slider%2C%20solve_portfolio%2C%20target_slider)%3A%0A%20%20%20%20selected_target%20%3D%20target_slider.value%20%2F%20100%0A%20%20%20%20selected_limit%20%3D%20cap_slider.value%20%2F%20100%0A%20%20%20%20selected_solution%20%3D%20solve_portfolio(selected_target%2C%20selected_limit)%0A%20%20%20%20return%20selected_limit%2C%20selected_solution%2C%20selected_target%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(maximum_return%2C%20np%2C%20selected_limit%2C%20solve_portfolio)%3A%0A%20%20%20%20minimum_variance_solution%20%3D%20solve_portfolio(0.0%2C%20selected_limit)%0A%20%20%20%20minimum_variance_return%20%3D%20minimum_variance_solution%5B1%5D%0A%20%20%20%20maximum_feasible_return%20%3D%20maximum_return(selected_limit)%0A%20%20%20%20frontier_targets%20%3D%20np.linspace(%0A%20%20%20%20%20%20%20%20minimum_variance_return%2C%0A%20%20%20%20%20%20%20%20maximum_feasible_return%20-%201e-7%2C%0A%20%20%20%20%20%20%20%2025%2C%0A%20%20%20%20)%0A%20%20%20%20frontier_solutions%20%3D%20%5B%0A%20%20%20%20%20%20%20%20solve_portfolio(_target%2C%20selected_limit)%20for%20_target%20in%20frontier_targets%0A%20%20%20%20%5D%0A%20%20%20%20return%20frontier_solutions%2C%20maximum_feasible_return%2C%20minimum_variance_return%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(%0A%20%20%20%20asset_names%2C%0A%20%20%20%20maximum_feasible_return%2C%0A%20%20%20%20minimum_variance_return%2C%0A%20%20%20%20mo%2C%0A%20%20%20%20np%2C%0A%20%20%20%20selected_limit%2C%0A%20%20%20%20selected_solution%2C%0A%20%20%20%20selected_target%2C%0A)%3A%0A%20%20%20%20if%20selected_solution%20is%20None%3A%0A%20%20%20%20%20%20%20%20_result%20%3D%20mo.callout(%0A%20%20%20%20%20%20%20%20%20%20%20%20mo.md(%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20f%22%22%22%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20**No%20portfolio%20reaches%20%7Bselected_target%3A.1%25%7D.**%20With%20at%20most%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7Bselected_limit%3A.0%25%7D%20in%20one%20asset%2C%20the%20highest%20possible%20return%20is%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7Bmaximum_feasible_return%3A.2%25%7D.%20Lower%20the%20target%20or%20allow%20more%20in%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20one%20asset.%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22%22%22%0A%20%20%20%20%20%20%20%20%20%20%20%20)%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20kind%3D%22warn%22%2C%0A%20%20%20%20%20%20%20%20)%0A%20%20%20%20else%3A%0A%20%20%20%20%20%20%20%20_weights%2C%20_return%2C%20_risk%2C%20_solution%20%3D%20selected_solution%0A%20%20%20%20%20%20%20%20_holdings%20%3D%20%22%2C%20%22.join(%0A%20%20%20%20%20%20%20%20%20%20%20%20f%22%7B_weights%5B_i%5D%3A.0%25%7D%20in%20%7Basset_names%5B_i%5D.lower()%7D%22%0A%20%20%20%20%20%20%20%20%20%20%20%20for%20_i%20in%20np.argsort(_weights)%5B%3A%3A-1%5D%0A%20%20%20%20%20%20%20%20%20%20%20%20if%20_weights%5B_i%5D%20%3E%3D%200.005%0A%20%20%20%20%20%20%20%20)%0A%20%20%20%20%20%20%20%20_note%20%3D%20%22%22%0A%20%20%20%20%20%20%20%20if%20minimum_variance_return%20%3E%20selected_target%20%2B%201e-4%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20_note%20%3D%20(%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20f%22%20The%20least%20risky%20mix%20already%20earns%20%7Bminimum_variance_return%3A.2%25%7D%2C%22%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22%20more%20than%20the%20target%2C%20so%20lowering%20the%20target%20changes%20nothing.%22%0A%20%20%20%20%20%20%20%20%20%20%20%20)%0A%20%20%20%20%20%20%20%20_result%20%3D%20mo.md(%0A%20%20%20%20%20%20%20%20%20%20%20%20f%22%22%22%0A%20%20%20%20%20%20%20%20%20%20%20%20**The%20least%20risky%20portfolio%3A**%20%7B_holdings%7D.%0A%0A%20%20%20%20%20%20%20%20%20%20%20%20It%20has%20an%20expected%20return%20of%20%7B_return%3A.2%25%7D%20and%20a%20risk%20of%20%7B_risk%3A.2%25%7D%0A%20%20%20%20%20%20%20%20%20%20%20%20per%20year.%7B_note%7D%0A%20%20%20%20%20%20%20%20%20%20%20%20%22%22%22%0A%20%20%20%20%20%20%20%20)%0A%20%20%20%20_result%0A%20%20%20%20return%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(alt%2C%20asset_names%2C%20pd%2C%20selected_solution)%3A%0A%20%20%20%20_weights%20%3D%20%5B0.0%5D%20*%20len(asset_names)%20if%20selected_solution%20is%20None%20else%20selected_solution%5B0%5D%0A%20%20%20%20_weights_df%20%3D%20pd.DataFrame(%7B%22Asset%22%3A%20asset_names%2C%20%22Share%22%3A%20_weights%7D)%0A%20%20%20%20_bars%20%3D%20alt.Chart(_weights_df).mark_bar(color%3D%22%23457b9d%22).encode(%0A%20%20%20%20%20%20%20%20x%3Dalt.X(%22Share%3AQ%22%2C%20axis%3Dalt.Axis(format%3D%22%25%22)%2C%20scale%3Dalt.Scale(domain%3D%5B0%2C%201%5D)%2C%20title%3D%22Share%20of%20the%20money%22)%2C%0A%20%20%20%20%20%20%20%20y%3Dalt.Y(%22Asset%3AN%22%2C%20sort%3Dlist(asset_names)%2C%20title%3DNone)%2C%0A%20%20%20%20%20%20%20%20tooltip%3D%5B%22Asset%3AN%22%2C%20alt.Tooltip(%22Share%3AQ%22%2C%20format%3D%22.1%25%22)%5D%2C%0A%20%20%20%20)%0A%20%20%20%20_labels%20%3D%20_bars.mark_text(align%3D%22left%22%2C%20dx%3D4%2C%20color%3D%22%23888888%22).encode(%0A%20%20%20%20%20%20%20%20text%3Dalt.Text(%22Share%3AQ%22%2C%20format%3D%22.0%25%22)%2C%0A%20%20%20%20)%0A%20%20%20%20(_bars%20%2B%20_labels).properties(width%3D%22container%22%2C%20height%3D160%2C%20title%3D%22Your%20portfolio%22)%0A%20%20%20%20return%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(mo)%3A%0A%20%20%20%20mo.md(r%22%22%22%0A%20%20%20%20The%20chart%20below%20puts%20risk%20on%20the%20horizontal%20axis%20and%20return%20on%20the%20vertical%0A%20%20%20%20axis.%20The%20red%20dots%20are%20the%20four%20assets%20on%20their%20own.%20The%20green%20curve%20is%20the%0A%20%20%20%20lowest%20risk%20that%20any%20mix%20can%20have%20for%20each%20return%2C%20given%20your%20limit%20on%20one%0A%20%20%20%20asset%2C%20and%20the%20blue%20dot%20is%20the%20portfolio%20above.%20Mixes%20on%20the%20curve%20beat%20the%0A%20%20%20%20single%20assets%3A%20they%20earn%20the%20same%20return%20for%20less%20risk.%20Allowing%20less%20in%0A%20%20%20%20one%20asset%20shortens%20the%20curve%20and%20pushes%20it%20to%20the%20right.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(alt%2C%20asset_data%2C%20frontier_solutions%2C%20pd%2C%20selected_solution)%3A%0A%20%20%20%20_x%20%3D%20alt.X(%22Risk%3AQ%22%2C%20axis%3Dalt.Axis(format%3D%22%25%22)%2C%20scale%3Dalt.Scale(domain%3D%5B0%2C%200.24%5D)%2C%20title%3D%22Risk%20per%20year%22)%0A%20%20%20%20_y%20%3D%20alt.Y(%22Expected%20return%3AQ%22%2C%20axis%3Dalt.Axis(format%3D%22%25%22)%2C%20scale%3Dalt.Scale(domain%3D%5B0%2C%200.13%5D)%2C%20title%3D%22Expected%20return%20per%20year%22)%0A%20%20%20%20_tooltip%20%3D%20%5Balt.Tooltip(%22Risk%3AQ%22%2C%20format%3D%22.2%25%22)%2C%20alt.Tooltip(%22Expected%20return%3AQ%22%2C%20format%3D%22.2%25%22)%5D%0A%0A%20%20%20%20_frontier_df%20%3D%20pd.DataFrame(%7B%0A%20%20%20%20%20%20%20%20%22Risk%22%3A%20%5B_solution%5B2%5D%20for%20_solution%20in%20frontier_solutions%5D%2C%0A%20%20%20%20%20%20%20%20%22Expected%20return%22%3A%20%5B_solution%5B1%5D%20for%20_solution%20in%20frontier_solutions%5D%2C%0A%20%20%20%20%7D)%0A%20%20%20%20_frontier%20%3D%20alt.Chart(_frontier_df).mark_line(color%3D%22%232a9d8f%22%2C%20strokeWidth%3D3).encode(%0A%20%20%20%20%20%20%20%20x%3D_x%2C%20y%3D_y%2C%20tooltip%3D_tooltip%2C%0A%20%20%20%20)%0A%0A%20%20%20%20_assets%20%3D%20alt.Chart(asset_data).mark_circle(color%3D%22%23e76f51%22%2C%20size%3D80%2C%20opacity%3D1).encode(%0A%20%20%20%20%20%20%20%20x%3D_x%2C%20y%3D_y%2C%20tooltip%3D%5B%22Asset%3AN%22%2C%20*_tooltip%5D%2C%0A%20%20%20%20)%0A%20%20%20%20%23%20Bonds%20are%20labeled%20to%20their%20right%20and%20stocks%20to%20their%20left%2C%20so%20that%20every%0A%20%20%20%20%23%20label%20stays%20inside%20the%20chart%20at%20phone%20width.%0A%20%20%20%20_label%20%3D%20dict(dy%3D-10%2C%20color%3D%22%23e76f51%22%2C%20fontWeight%3D%22bold%22)%0A%20%20%20%20_bond_labels%20%3D%20_assets.mark_text(align%3D%22left%22%2C%20dx%3D6%2C%20**_label).encode(text%3D%22Asset%3AN%22).transform_filter(%0A%20%20%20%20%20%20%20%20alt.datum.Risk%20%3C%200.1%0A%20%20%20%20)%0A%20%20%20%20_stock_labels%20%3D%20_assets.mark_text(align%3D%22right%22%2C%20dx%3D-6%2C%20**_label).encode(text%3D%22Asset%3AN%22).transform_filter(%0A%20%20%20%20%20%20%20%20alt.datum.Risk%20%3E%3D%200.1%0A%20%20%20%20)%0A%0A%20%20%20%20_layers%20%3D%20_frontier%20%2B%20_assets%20%2B%20_bond_labels%20%2B%20_stock_labels%0A%20%20%20%20if%20selected_solution%20is%20not%20None%3A%0A%20%20%20%20%20%20%20%20_selected_df%20%3D%20pd.DataFrame(%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%22Risk%22%3A%20%5Bselected_solution%5B2%5D%5D%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%22Expected%20return%22%3A%20%5Bselected_solution%5B1%5D%5D%2C%0A%20%20%20%20%20%20%20%20%7D)%0A%20%20%20%20%20%20%20%20_layers%20%2B%3D%20alt.Chart(_selected_df).mark_circle(color%3D%22%23457b9d%22%2C%20size%3D180%2C%20opacity%3D1).encode(%0A%20%20%20%20%20%20%20%20%20%20%20%20x%3D_x%2C%20y%3D_y%2C%20tooltip%3D_tooltip%2C%0A%20%20%20%20%20%20%20%20)%0A%0A%20%20%20%20_layers.properties(width%3D%22container%22%2C%20height%3D320%2C%20title%3D%22Risk%20against%20return%22)%0A%20%20%20%20return%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(mo)%3A%0A%20%20%20%20mo.md(r%22%22%22%0A%20%20%20%20%23%23%20The%20optimization%20problem%0A%0A%20%20%20%20With%20%24w_i%24%20the%20share%20in%20asset%20%24i%24%2C%20%24%5Cmu%24%20the%20expected%20returns%20and%20%24%5CSigma%24%0A%20%20%20%20the%20covariance%20matrix%20of%20the%20returns%2C%20the%20risk%20is%20%24%5Csqrt%7Bw%5ET%20%5CSigma%20w%7D%24%2C%0A%20%20%20%20and%20the%20notebook%20solves%0A%0A%20%20%20%20%24%24%0A%20%20%20%20%5Cbegin%7Barray%7D%7Bll%7D%0A%20%20%20%20%5Ctext%7Bminimize%7D%20%26%20w%5ET%20%5CSigma%20w%20%5C%5C%0A%20%20%20%20%5Ctext%7Bsubject%20to%7D%20%26%20%5Cmu%5ET%20w%20%5Cgeq%20r_%7B%5Cmathrm%7Btarget%7D%7D%2C%20%5C%5C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%26%20%7B%5Cbf%201%7D%5ET%20w%20%3D%201%2C%20%5C%5C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%26%200%20%5Cleq%20w_i%20%5Cleq%20w_%7B%5Cmax%7D%2C%0A%20%20%20%20%5Cend%7Barray%7D%0A%20%20%20%20%24%24%0A%0A%20%20%20%20where%20%24r_%7B%5Cmathrm%7Btarget%7D%7D%24%20is%20the%20target%20return%20and%20%24w_%7B%5Cmax%7D%24%20the%20most%20in%0A%20%20%20%20one%20asset.%20The%20shares%20add%20up%20to%20one%2C%20and%20none%20is%20negative%2C%20so%20the%0A%20%20%20%20portfolio%20cannot%20borrow%20or%20short-sell.%0A%0A%20%20%20%20Clarabel%20takes%20the%20constraints%20in%20the%20form%20%24Aw%20%2B%20s%20%3D%20b%24%2C%20where%20each%20part%20of%0A%20%20%20%20the%20slack%20vector%20%24s%24%20belongs%20to%20a%20cone.%20The%20budget%20%24%7B%5Cbf%201%7D%5ET%20w%20%3D%201%24%20uses%20a%0A%20%20%20%20zero%20cone%2C%20so%20its%20slack%20is%20zero.%20The%20return%20target%20and%20the%20bounds%20on%20%24w_i%24%0A%20%20%20%20use%20a%20nonnegative%20cone.%20The%20covariance%20matrix%20enters%20Clarabel's%20quadratic%0A%20%20%20%20objective%20directly.%20The%20curve%20in%20the%20chart%20is%20found%20by%20solving%20the%20same%0A%20%20%20%20problem%20for%2025%20targets%20between%20the%20return%20of%20the%20least%20risky%20mix%20and%20the%0A%20%20%20%20highest%20possible%20return.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0Aif%20__name__%20%3D%3D%20%22__main__%22%3A%0A%20%20%20%20app.run()%0A</marimo-code></head>
+  <body>
+    <div id="root"></div>
+    <script data-marimo="true">
+      Object.defineProperty(window, "__MARIMO_MOUNT_CONFIG__", {
+        value: Object.freeze({
+            "filename": "notebook.py",
+            "cwd": "",
+            "lspWorkspace": null,
+            "mode": "read",
+            "version": "0.24.2",
+            "serverToken": "unused",
+            "config": {"ai": {"allow_provider_config": true, "custom_providers": {}, "enabled": true, "models": {"custom_models": [], "displayed_models": []}}, "completion": {"activate_on_typing": true, "auto_close_pairs": true, "copilot": false, "signature_hint_on_typing": false}, "diagnostics": {"sql_linter": true}, "display": {"cell_output": "below", "code_editor_font_size": 14, "code_lens": true, "dataframes": "rich", "default_table_max_columns": 50, "default_table_page_size": 10, "default_width": "medium", "reference_highlighting": true, "theme": "system"}, "formatting": {"line_length": 79}, "keymap": {"overrides": {}, "preset": "default"}, "language_servers": {"pylsp": {"enable_flake8": false, "enable_mypy": true, "enable_pydocstyle": false, "enable_pyflakes": false, "enable_pylint": false, "enable_ruff": true, "enabled": false}}, "mcp": {"mcpServers": {}, "presets": []}, "package_management": {"manager": "uv"}, "runtime": {"auto_instantiate": true, "auto_reload": "off", "default_csv_encoding": "utf-8", "default_sql_output": "auto", "on_cell_change": "autorun", "output_max_bytes": 8000000, "reactive_tests": true, "show_tracebacks": false, "std_stream_max_bytes": 1000000, "watcher_on_save": "lazy"}, "save": {"autosave": "off", "autosave_delay": 1000, "format_on_save": false}, "server": {"browser": "default", "follow_symlink": false}, "snippets": {"custom_paths": [], "include_default_snippets": true}},
+            "configOverrides": {},
+            "appConfig": {"css_file": "tufte.css", "sql_output": "auto", "width": "compact"},
+            "layout": null,
+            "view": {"showAppCode": false},
+            "notebook": null,
+            "session": null,
+            "runtimeConfig": null
+        }),
+        writable: false,
+        configurable: false,
+      });
+    </script>
+  </body>
+</html>

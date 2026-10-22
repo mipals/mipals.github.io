@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>solver</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%234a90d9'/><stop offset='100%25' stop-color='%232c5aa0'/></linearGradient></defs><ellipse cx='50' cy='20' rx='35' ry='12' fill='url(%23g)'/><polygon points='15,20 50,95 85,20' fill='url(%23g)'/><ellipse cx='50' cy='20' rx='35' ry='12' fill='none' stroke='%231a3a6e' stroke-width='2'/></svg>" />
+    <link rel="icon" href="/favicon.ico" />
     
 <script type="module">
 import init, * as bindings from '/solver/clarabel-claude-db73efa53ee41b8.js';
@@ -154,9 +154,6 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
         overflow-x: auto;
         overflow-y: hidden;
       }
-      #math-intro {
-        width: 55%;
-      }
       h2 {
         margin-top: 1rem;
         margin-bottom: 0.5rem;
@@ -303,17 +300,17 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
   <link rel="modulepreload" href="/solver/clarabel-claude-db73efa53ee41b8.js" crossorigin="anonymous" integrity="sha384-0jWrrLXDZtbCR1w/+p26pUPI7qp3Q8fz5I++Hnk5mwt+wI77LCWgDS6F8t9QKtYM"><link rel="preload" href="/solver/clarabel-claude-db73efa53ee41b8_bg.wasm" crossorigin="anonymous" integrity="sha384-gRVp1+vPu+UC2lFMSJ4KPdoS7mjsPigPg1HmVvEY1Y2OALqexfV2o5qTc3uwPZ1G" as="fetch" type="application/wasm"></head>
   <body>
     <header>
-      <nav><a href="/">home</a><a href="/blog/">blog</a><a href="/publications/">publications</a><a href="/repositories/">repositories</a><a href="/cv/">cv</a><a href="/solver/">solver</a></nav>
+      <!-- BEGIN GENERATED SITE NAV -->
+<nav><a href="/">home</a><a href="/blog/">blog</a><a href="/publications/">publications</a><a href="/repositories/">repositories</a><a href="/about/">about</a><a href="/solver/">conic solver</a><a href="/marimo/">marimo</a></nav>
+<!-- END GENERATED SITE NAV -->
     </header>
     <article>
-      <section>
+      <section id="math-intro">
         <p><span class="marginnote"><sup>1</sup> The code is running in the browser using <a href="https://rust-lang.org/what/wasm/">WebAssembly</a>.</span></p>
         <h1>Solving Conic Problems using <a href="https://clarabel.org/stable/">Clarabel</a><sup>1</sup></h1>
-        <div id="math-intro">
-          <p>Clarabel can be used to solve conic problems on the form<sup>2</sup> <span class="marginnote"><sup>2</sup> Linear, Quadratic, Semidefinite, Second-order cone, Power cone, and Exponential cone programs are all examples of conic programs..</span></p>
-          <p>$$\begin{array}{rl} \text{minimize} & \frac{1}{2}x^\top P x + q^\top x\\[2ex] \text{subject to} & Ax + s = b, \quad s \in \mathcal{K} \end{array}$$</p>
-          <p>where $\mathcal{K}$ is a composition of convex cones<sup>3</sup>. <span class="marginnote"><sup>3</sup>To read more about cones and the interior point method behind Clarabel <a href = "../blog/2026/2026-01-04-conic-optimization/">look here.</a> </span> Below you can choose an example problem to solve. </p>
-        </div>
+        <p>Clarabel can be used to solve conic problems on the form<sup>2</sup> <span class="marginnote"><sup>2</sup> Linear, Quadratic, Semidefinite, Second-order cone, Power cone, and Exponential cone programs are all examples of conic programs.</span></p>
+        <p>$$\begin{array}{rl} \text{minimize} & \frac{1}{2}x^\top P x + q^\top x\\[2ex] \text{subject to} & Ax + s = b, \quad s \in \mathcal{K} \end{array}$$</p>
+        <p>where $\mathcal{K}$ is a composition of convex cones<sup>3</sup>. <span class="marginnote"><sup>3</sup>To read more about cones and the interior point method behind Clarabel <a href="/blog/2026/01-04-conic-optimization/">look here.</a> </span> Below you can choose an example problem to solve. </p>
       </section>
       <div id="app"></div>
     </article>

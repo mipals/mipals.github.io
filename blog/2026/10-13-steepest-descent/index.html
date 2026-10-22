@@ -1,0 +1,2120 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>which way is down?</title><link rel="icon" href="/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tufte-css/1.8.0/tufte.min.css"><link rel="stylesheet" href="/assets/tufted.css"><link rel="stylesheet" href="/assets/custom.css"><style>/* Alignment */
+mtable.right-align mtd,
+mtable mtd.right-align,
+mtable.left-align mtd.right-align,
+mtable.aligned mtd:nth-child(odd) {
+  justify-items: end;
+  text-align: right;
+}
+mtable.cases mtd,
+mtable.left-align mtd,
+mtable mtd.left-align,
+mtable.aligned mtd:nth-child(even),
+math:is(:not([display])) > mtable.multiline-equation mtd {
+  justify-items: start;
+  text-align: left;
+}
+mtable.cases mtd,
+mtable.aligned mtd,
+mtable mtd.flushed,
+mtable mtd.left-flush {
+  padding-left: 0;
+}
+mtable.cases mtd,
+mtable.aligned mtd,
+mtable mtd.flushed,
+mtable mtd.right-flush {
+  padding-right: 0;
+}
+
+/* Tables */
+mtable {
+  math-style: inherit;
+}
+mtd {
+  math-depth: auto-add;
+  math-style: compact;
+  math-shift: compact;
+}
+
+/* Equations */
+mtable.multiline-equation mtd {
+  math-depth: inherit;
+  math-style: inherit;
+  math-shift: inherit;
+  padding: 0;
+}
+math > mtable.multiline-equation mtr:not(:last-child) mtd {
+  padding-bottom: 0.5em;
+}
+
+/* Fractions */
+mfrac {
+  padding-inline: 0;
+  margin-inline: 0.1em;
+}
+
+/* Accents */
+mover[accent="true" i] > :first-child {
+  font-feature-settings: "dtls";
+}
+mover.dotted[accent="true" i] > :first-child {
+  font-feature-settings: "dtls" 0;
+}
+
+/* Other rules for scriptlevel, displaystyle and math-shift */
+munder > :nth-child(2),
+munderover > :nth-child(2) {
+  math-shift: compact
+}
+munder[accentunder="true" i] > :not(:first-child),
+mover[accent="true" i] > :not(:first-child) {
+  math-depth: inherit;
+  math-style: inherit;
+  math-shift: inherit;
+}</style></head><body><header><nav><a href="/">home</a><a href="/blog/">blog</a><a href="/publications/">publications</a><a href="/repositories/">repositories</a><a href="/about/">about</a><a href="/solver/">conic solver</a><a href="/marimo/">marimo</a></nav></header><article><section><style>@layer components {
+  .expressive-code {
+    position: relative;
+    font-family: var(
+      --ec-uiFontFamily,
+      ui-sans-serif,
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      sans-serif
+    );
+    font-size: var(--ec-uiFontSize, 0.9rem);
+    font-weight: var(--ec-uiFontWeight, 400);
+    line-height: var(--ec-uiLineHeight, 1.65);
+    text-size-adjust: none;
+    -webkit-text-size-adjust: none;
+  }
+
+  .expressive-code *:not(:is(svg, svg *)) {
+    box-sizing: border-box;
+  }
+
+  .expressive-code::selection {
+    background: var(--ec-uiSelBg, var(--ec-codeBg, #0d1117));
+    color: var(--ec-uiSelFg, currentColor);
+  }
+
+  .expressive-code pre {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    border: var(--ec-borderWd, 1.5px) solid
+      var(--ec-borderCol, rgba(148, 163, 184, 0.25));
+    border-radius: calc(
+      var(--ec-borderRad, 0.3rem) + var(--ec-borderWd, 1.5px)
+    );
+    background: var(--ec-codeBg, #0d1117);
+    color: var(--ec-codeFg, #c9d1d9);
+    overflow-x: auto;
+    position: relative;
+    z-index: 1;
+    container-type: inline-size;
+  }
+
+  .expressive-code pre:focus-visible {
+    outline: 3px solid var(--ec-focusBorder, #3b82f6);
+    outline-offset: -3px;
+  }
+
+  .expressive-code pre > code {
+    all: unset;
+    display: block;
+    flex: 1 0 100%;
+    padding: var(--ec-codePadBlk, 0.5rem) 0;
+    color: var(--ec-codeFg, #c9d1d9);
+    font-family: var(
+      --ec-codeFontFamily,
+      ui-monospace,
+      SFMono-Regular,
+      Menlo,
+      Monaco,
+      Consolas,
+      "Liberation Mono",
+      "Courier New",
+      monospace
+    );
+    font-size: var(--ec-codeFontSize, 0.85rem);
+    font-weight: var(--ec-codeFontWeight, 400);
+    line-height: var(--ec-codeLineHeight, 1.35);
+  }
+
+  .expressive-code pre > code::selection {
+    background: var(--ec-codeSelBg, rgba(56, 189, 248, 0.35));
+    color: inherit;
+  }
+
+  .expressive-code pre.wrap .ec-line .code {
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    min-width: min(20ch, var(--ecMaxLine, 20ch));
+  }
+
+  /* When lines are allowed to wrap, the absolute overlay can overlap
+     wrapped text. Disable the overlay in wrap mode and rely on per-slot
+     borders for guides (these are handled by .indent-slot). */
+  .expressive-code pre.wrap .ec-line .code .indent-overlay {
+    display: none;
+  }
+
+  .expressive-code pre.wrap .ec-line .code::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    /* use the code line-height times the element font-size to match one line */
+    height: calc(var(--ec-codeLineHeight, 1.65) * 1em);
+    width: max(0px, calc(var(--ecIndent, 0) - 2px));
+    pointer-events: none;
+    background-image: repeating-linear-gradient(
+      to right,
+      transparent 0,
+      transparent calc(var(--ec-indentStep, 4ch) - 1px),
+      var(--ec-indentGuideCol, rgba(148, 163, 184, 0.35))
+        calc(var(--ec-indentStep, 4ch) - 1px),
+      var(--ec-indentGuideCol, rgba(148, 163, 184, 0.35))
+        var(--ec-indentStep, 4ch)
+    );
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    mix-blend-mode: multiply;
+    opacity: 0.85;
+    z-index: 0;
+  }
+
+  .expressive-code pre.wrap .ec-line .code span.indent {
+    white-space: pre;
+  }
+
+  .expressive-code .ec-line .code .indent {
+    display: inline-flex;
+    white-space: pre;
+  }
+
+  .expressive-code .ec-line .code .indent-slot {
+    display: inline-flex;
+    white-space: pre;
+    position: relative;
+  }
+
+  .expressive-code.has-indent-guides .ec-line .code .indent-slot {
+    border-inline-end: 1px solid
+      var(--ec-indentGuideCol, rgba(148, 163, 184, 0.35));
+  }
+
+  .expressive-code.has-indent-guides
+    .ec-line
+    .code
+    .indent-slot.indent-slot-partial {
+    border-inline-end: none;
+  }
+
+  .expressive-code pre::-webkit-scrollbar,
+  .expressive-code pre::-webkit-scrollbar-track {
+    background-color: inherit;
+    border-radius: calc(
+      var(--ec-borderRad, 0.3rem) + var(--ec-borderWd, 1.5px)
+    );
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+
+  .expressive-code pre::-webkit-scrollbar-thumb {
+    background-color: var(--ec-scrollbarThumbCol, rgba(148, 163, 184, 0.4));
+    border: 4px solid transparent;
+    background-clip: content-box;
+    border-radius: 10px;
+  }
+
+  .expressive-code pre::-webkit-scrollbar-thumb:hover {
+    background-color: var(
+      --ec-scrollbarThumbHoverCol,
+      rgba(148, 163, 184, 0.55)
+    );
+  }
+
+  .expressive-code .code-lang {
+    position: absolute;
+    top: 0.25rem;
+    right: 0.6rem;
+    padding: 0;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.25rem;
+    background: none;
+    color: var(--ec-langFg, var(--ec-codeFg, currentColor));
+    font-size: 0.68em;
+    pointer-events: none;
+    opacity: 0.6;
+    transition: opacity 160ms ease, color 160ms ease;
+    z-index: 2;
+  }
+
+  .expressive-code:focus-within .code-lang,
+  .expressive-code:hover .code-lang {
+    opacity: 1;
+    color: var(--ec-langFg, var(--ec-codeFg, currentColor));
+  }
+
+  .expressive-code .copy-button {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.3rem;
+    height: 2.3rem;
+    border-radius: 0.45rem;
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    background-color: var(--ec-copyBg, rgba(15, 23, 42, 0.04));
+    color: var(--ec-copyFg, rgba(15, 23, 42, 0.7));
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: auto;
+    transition: opacity 160ms ease, transform 160ms ease,
+      background-color 140ms ease, color 140ms ease;
+    transform: translateY(-0.3rem);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns%3D%27http://www.w3.org/2000/svg%27 viewBox%3D%270 0 24 24%27 fill%3D%27none%27 stroke%3D%27currentColor%27 stroke-width%3D%271.75%27 stroke-linecap%3D%27round%27 stroke-linejoin%3D%27round%27%3E%3Cpath d%3D%27M3 19a2 2 0 0 1-1-2V3a2 2 0 0 1 1-1h13a2 2 0 0 1 2 1%27/%3E%3Crect x%3D%276%27 y%3D%275%27 width%3D%2716%27 height%3D%2718%27 rx%3D%271.6%27 ry%3D%271.6%27/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 60%;
+    z-index: 3;
+  }
+
+  .expressive-code .copy-button:is(:hover, :focus-visible, :active) {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .expressive-code .copy-button:focus-visible {
+    outline: 2px solid rgba(148, 163, 184, 0.55);
+    outline-offset: 2px;
+    background-color: var(--ec-copyBgFocus, rgba(15, 23, 42, 0.16));
+    color: var(--ec-copyFgFocus, rgba(15, 23, 42, 1));
+  }
+
+  .expressive-code .copy-button::before {
+    content: "";
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    background: transparent;
+    border: none;
+    pointer-events: none;
+  }
+
+  .expressive-code .copy-button::after {
+    content: none;
+    pointer-events: none;
+  }
+
+  .expressive-code .copy-button .copy-label,
+  .expressive-code .copy-button .copy-feedback {
+    display: none;
+  }
+
+  .expressive-code .copy-button:hover {
+    background-color: var(--ec-copyBgHover, rgba(15, 23, 42, 0.12));
+    color: var(--ec-copyFgHover, rgba(15, 23, 42, 0.9));
+  }
+
+  .expressive-code .copy-button span[aria-hidden="true"] {
+    font-family: var(--ec-uiFontFamily, inherit);
+  }
+
+  .expressive-code .ec-header,
+  .expressive-code .ec-footer {
+    display: block;
+    padding: 0.35rem var(--ec-codePadInl, 1.35rem);
+    color: var(--ec-uiFg, currentColor);
+  }
+
+  .expressive-code .ec-header.ec-ext,
+  .expressive-code .ec-footer.ec-ext {
+    padding: 0.25rem var(--ec-codePadInl, 1.35rem);
+  }
+
+  .expressive-code .ec-line {
+    direction: ltr;
+    unicode-bidi: isolate;
+    display: grid;
+    grid-template-areas: "gutter code";
+    grid-template-columns: auto 1fr;
+    column-gap: var(--ec-gutterGap, 0.25rem);
+    position: relative;
+    --lineBg: var(--ec-codeBg, #0d1117);
+    background: var(--lineBg);
+  }
+
+  .expressive-code:not(.has-gutter) .ec-line {
+    grid-template-columns: 1fr;
+  }
+
+  .expressive-code:not(.has-gutter) .ec-line .code {
+    padding-inline: var(--ec-codePadInl, 1.35rem);
+  }
+
+  .expressive-code .ec-line .gutter {
+    grid-area: gutter;
+    color: var(--ec-gtrFg, rgba(148, 163, 184, 0.8));
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: var(--lineBg, var(--ec-gutterBg, var(--ec-codeBg, #0d1117)));
+    box-shadow: 1px 0 0 var(--ec-gtrBrdCol, rgba(148, 163, 184, 0.2));
+  }
+
+  .expressive-code .ec-line .gutter > * {
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .expressive-code .ec-line .gutter ~ .code {
+    --ecLineBrdCol: var(--ec-gtrBrdCol, rgba(148, 163, 184, 0.2));
+  }
+
+  .expressive-code .ec-line.highlight .gutter {
+    color: var(--ec-gtrHighlightFg, rgba(226, 232, 240, 0.95));
+  }
+
+  .expressive-code .ec-line .gutter .ln {
+    display: inline-flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+    box-sizing: content-box;
+    min-width: var(--lnWidth, 2ch);
+    padding-inline-start: var(--ec-gutterPadLeft, 0.5rem);
+    padding-inline-end: var(--ec-codePadInl, 1.35rem);
+    font-size: var(--ec-codeFontSize, 0.85rem);
+    font-variant-numeric: tabular-nums;
+    color: inherit;
+  }
+
+  .expressive-code .ec-line .gutter .ln > span + span {
+    margin-inline-start: 0.25em;
+  }
+
+  .expressive-code .ec-line .code {
+    position: relative;
+    z-index: 1;
+  }
+
+  .expressive-code .ec-line .code .indent-overlay {
+    display: none;
+  }
+
+  .expressive-code.has-indent-guides .ec-line .code .indent-overlay {
+    position: absolute;
+    inset: 0 auto 0 0;
+    display: block;
+    /* Shrink overlay by 1px to avoid drawing a vertical guide at the very end of
+       the inline area (prevents an extra line appearing at each row end).
+       Use max(...) to avoid negative values when --ecIndent is small. */
+    width: max(0px, calc(var(--ecIndent, 0) - 2px));
+    pointer-events: none;
+    background-image: repeating-linear-gradient(
+      to right,
+      transparent 0,
+      transparent calc(var(--ec-indentStep, 4ch) - 1px),
+      var(--ec-indentGuideCol, rgba(148, 163, 184, 0.35))
+        calc(var(--ec-indentStep, 4ch) - 1px),
+      var(--ec-indentGuideCol, rgba(148, 163, 184, 0.35))
+        var(--ec-indentStep, 4ch)
+    );
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    mix-blend-mode: multiply;
+    opacity: 0.85;
+    z-index: 0;
+  }
+  .expressive-code .ec-comment {
+    grid-column: 1 / -1;
+    padding: 0.55rem calc(var(--ec-codePadInl, 1.35rem) + 0.25rem);
+    font-size: 0.85em;
+    background: var(--ec-commentBg, rgba(56, 189, 248, 0.18));
+    color: var(--ec-commentFg, currentColor);
+    box-shadow: inset 0 1px 0 rgba(15, 23, 42, 0.08),
+      inset 0 -1px 0 rgba(15, 23, 42, 0.06);
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    width: 100cqw;
+    box-sizing: border-box;
+  }
+
+  .expressive-code .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  code.expressive-code-inline {
+    display: inline-block;
+    padding: 0 var(--ec-inlinePadInl, 0.4rem);
+    border-radius: calc(var(--ec-borderRad, 0.3rem) / 1.2);
+    background: var(--ec-inlineBg, rgba(148, 163, 184, 0.2));
+    color: var(--ec-inlineFg, inherit);
+    font-family: var(
+      --ec-codeFontFamily,
+      ui-monospace,
+      SFMono-Regular,
+      Menlo,
+      Monaco,
+      Consolas,
+      "Liberation Mono",
+      "Courier New",
+      monospace
+    );
+    font-size: 0.95em;
+    line-height: 1.2;
+    white-space: pre;
+  }
+}
+</style><script>const CODE_BLOCK_SELECTOR = ".expressive-code";
+const COPY_BUTTON_SELECTOR = ".copy-button";
+
+const selectCodeBlocks = () =>
+  Array.from(document.querySelectorAll(CODE_BLOCK_SELECTOR));
+
+const extractCodeText = (codeBlock) =>
+  Array.from(codeBlock.querySelectorAll(".ec-line .code"))
+    .map((line) => {
+      const indent = line.dataset.indent ?? "";
+      const content = line.textContent
+        .replace(/\u00a0/g, " ")
+        .replace(/\u200b/gi, "");
+      return indent + content;
+    })
+    .join("\n");
+
+const fallbackCopy = (text) => {
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.setAttribute("readonly", "true");
+  textarea.style.position = "absolute";
+  textarea.style.left = "-9999px";
+  document.body.appendChild(textarea);
+  textarea.select();
+  /** @type {any} */ (document).execCommand("copy");
+  document.body.removeChild(textarea);
+};
+
+const setStateWithTimeout = (button, state, delay = 1600) => {
+  button.dataset.state = state;
+  if (state === "copied") {
+    setTimeout(() => {
+      if (button.dataset.state === "copied") {
+        button.dataset.state = "idle";
+      }
+    }, delay);
+  }
+};
+
+const bindCopyButton = (codeBlock) => {
+  if (!codeBlock || codeBlock.dataset.copyBound === "true") return;
+
+  const copyButton = codeBlock.querySelector(COPY_BUTTON_SELECTOR);
+  if (!copyButton) return;
+
+  codeBlock.dataset.copyBound = "true";
+
+  const copyHandler = async () => {
+    const code = extractCodeText(codeBlock);
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(code);
+      } else {
+        fallbackCopy(code);
+      }
+      setStateWithTimeout(copyButton, "copied");
+    } catch (error) {
+      try {
+        fallbackCopy(code);
+        setStateWithTimeout(copyButton, "copied");
+      } catch (fallbackError) {
+        setStateWithTimeout(copyButton, "error", 2200);
+      }
+    }
+  };
+
+  const resetHandler = () => {
+    if (copyButton.dataset.state === "copied") {
+      copyButton.dataset.state = "idle";
+    }
+  };
+
+  copyButton.addEventListener("click", copyHandler);
+  copyButton.addEventListener("blur", resetHandler);
+  copyButton.addEventListener("mouseleave", resetHandler);
+};
+
+selectCodeBlocks().forEach(bindCopyButton);
+
+const observer = new MutationObserver((mutations) => {
+  for (const mutation of mutations) {
+    mutation.addedNodes.forEach((node) => {
+      if (!(node instanceof HTMLElement)) return;
+      if (node.matches?.(CODE_BLOCK_SELECTOR)) {
+        bindCopyButton(node);
+      } else {
+        node
+          .querySelectorAll?.(CODE_BLOCK_SELECTOR)
+          .forEach((block) => bindCopyButton(block));
+      }
+    });
+  }
+});
+
+observer.observe(document.documentElement, {
+  childList: true,
+  subtree: true,
+});
+</script><h1>Which Way Is Down? First-Order Optimizers as a Choice of Norm</h1><p class="post-meta"><time datetime="2026-10-13">13 October 2026</time> · <a href="/pdf/2026/10-13-steepest-descent/steepest-descent.pdf">Download PDF</a> · <a href="julia-examples.zip">Download code</a></p><nav class="post-toc marginnote"><div class="post-toc-title">Contents</div><ol><li class="post-toc-section"><a href="#loc-1"><span class="post-toc-number">1.</span> Derivatives and gradients</a></li><li class="post-toc-section"><a href="#loc-2"><span class="post-toc-number">2.</span> Two surrogates</a></li><li class="post-toc-section"><a href="#loc-4"><span class="post-toc-number">3.</span> The dual norm and the sharp operator</a></li><li class="post-toc-section"><a href="#loc-7"><span class="post-toc-number">4.</span> The effect of the chosen norm</a></li><li class="post-toc-subsection"><a href="#loc-9"><span class="post-toc-number">4.1.</span> Norms from an inner product</a></li><li class="post-toc-subsection"><a href="#loc-10"><span class="post-toc-number">4.2.</span> Norms not from inner products</a></li><li class="post-toc-section"><a href="#loc-12"><span class="post-toc-number">5.</span> Incorporating the past</a></li><li class="post-toc-subsection"><a href="#loc-13"><span class="post-toc-number">5.1.</span> Momentum</a></li><li class="post-toc-subsection"><a href="#loc-14"><span class="post-toc-number">5.2.</span> Adaptive norms</a></li><li class="post-toc-section"><a href="#loc-19"><span class="post-toc-number">6.</span> Summary</a></li><li class="post-toc-section"><a href="#loc-20">Bibliography</a></li></ol></nav><script id="desmos-api" src="https://www.desmos.com/api/v1.12/calculator.js?apiKey=e83ab14005ac45daa83926c3b7056ed7" async onerror="window.__desmosFailed = true"></script><script>(function () {
+  // Show at least the requested region, with equal scales on both axes so
+  // that circles stay round whatever the size of the graph.
+  function fitBounds(calc, b) {
+    var px = calc.graphpaperBounds.pixelCoordinates;
+    var scale = Math.max((b.right - b.left) / px.width, (b.top - b.bottom) / px.height);
+    var cx = (b.left + b.right) / 2, cy = (b.bottom + b.top) / 2;
+    calc.setMathBounds({
+      left: cx - scale * px.width / 2, right: cx + scale * px.width / 2,
+      bottom: cy - scale * px.height / 2, top: cy + scale * px.height / 2,
+    });
+  }
+
+  function boot() {
+    document.querySelectorAll(".desmos-embed").forEach(function (el) {
+      if (el.dataset.ready) return;
+      el.dataset.ready = "1";
+      var dark = window.matchMedia("(prefers-color-scheme: dark)");
+      var options = JSON.parse(el.dataset.options || "{}");
+      options.invertedColors = dark.matches;
+      var calc = Desmos.GraphingCalculator(el.querySelector(".desmos-graph"), options);
+      calc.setExpressions(JSON.parse(el.dataset.state));
+      var bounds = el.dataset.bounds ? JSON.parse(el.dataset.bounds) : null;
+      if (bounds) fitBounds(calc, bounds);
+      // Each slider below the graph sets its variable.
+      el.querySelectorAll(".desmos-controls input").forEach(function (input) {
+        var output = input.parentElement.querySelector("output");
+        var reciprocal = input.dataset.reciprocal === "true";
+        input.addEventListener("input", function () {
+          calc.setExpression({ id: input.dataset.name, latex: input.dataset.name + "=" + input.value });
+          var v = parseFloat(input.value);
+          var shown = reciprocal ? (v === 0 ? Infinity : 1 / v) : v;
+          output.textContent = shown === Infinity ? "∞" : String(+shown.toFixed(2));
+        });
+      });
+      // Each menu below the graph sets its variable to the chosen value.
+      el.querySelectorAll(".desmos-controls select").forEach(function (select) {
+        select.addEventListener("change", function () {
+          calc.setExpression({ id: select.dataset.name, latex: select.dataset.name + "=" + select.value });
+        });
+      });
+      // Each readout shows a matrix of Desmos values, as MathML. It may be in
+      // the caption, outside the graph but in the same figure.
+      (el.closest("figure") || el.parentElement).querySelectorAll(".desmos-readout [data-entries]").forEach(function (span) {
+        var rows = JSON.parse(span.dataset.entries);
+        var helpers = rows.map(function (row) {
+          return row.map(function (latex) { return calc.HelperExpression({ latex: latex }); });
+        });
+        function show() {
+          var cells = helpers.map(function (row) {
+            return "<mtr>" + row.map(function (h) {
+              var v = h.numericValue;
+              var text = isFinite(v) ? (Math.abs(v) < 0.005 ? 0 : v).toFixed(2).replace("-", "−") : "?";
+              return "<mtd><mn>" + text + "</mn></mtd>";
+            }).join("") + "</mtr>";
+          }).join("");
+          span.innerHTML = '<math><mrow><mo>[</mo><mtable>' + cells + '</mtable><mo>]</mo></mrow></math>';
+        }
+        helpers.forEach(function (row) {
+          row.forEach(function (h) { h.observe("numericValue", show); });
+        });
+        show();
+      });
+      dark.addEventListener("change", function (e) {
+        calc.updateSettings({ invertedColors: e.matches });
+      });
+      // expose this graph so the screenshot tool can find it
+      window.__desmosEmbeds = window.__desmosEmbeds || [];
+      window.__desmosEmbeds.push({ calc: calc, img: el.dataset.img || null, bounds: bounds });
+    });
+  }
+  // Without the API, say so in each graph rather than leave it empty.
+  function fail() {
+    document.querySelectorAll(".desmos-embed .desmos-graph").forEach(function (graph) {
+      graph.classList.add("desmos-failed");
+      graph.textContent = "The interactive graph could not be loaded.";
+    });
+  }
+
+  // The API loads asynchronously, so start once both the page and the API are
+  // there, in whichever order they arrive.
+  function start() {
+    if (window.Desmos) return boot();
+    if (window.__desmosFailed) return fail();
+    var api = document.getElementById("desmos-api");
+    api.addEventListener("load", boot);
+    api.addEventListener("error", fail);
+  }
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", start);
+  } else {
+    start();
+  }
+})();
+</script><p>We consider the general optimization problem</p><div class="numbered-equation"><math display="block"><munder><mo lspace="0em" rspace="0em">min</mo><mrow><mi>𝜃</mi><mo lspace="0em" rspace="0em">∈</mo><mi mathvariant="normal">Θ</mi></mrow></munder><mspace width="1em"/><mi>𝒥︀</mi><mrow><mo>(</mo><mi>𝜃</mi><mo>)</mo></mrow><mo rspace="0em">,</mo></math><p><span class="equation-number">(1)</span></p></div><p>where <math><mi mathvariant="normal">Θ</mi></math> is a vector space and <math><mi>𝒥︀</mi></math> is differentiable. First-order methods solve it iteratively: starting from <math><msub><mi>𝜃</mi><mn>0</mn></msub></math>, they take steps <math><msub><mi>𝜃</mi><mrow><mi>𝑡</mi><mo lspace="0em" rspace="0em">+</mo><mn>1</mn></mrow></msub><mo>=</mo><msub><mi>𝜃</mi><mi>𝑡</mi></msub><mo>+</mo><msub><mi>ℎ</mi><mi>𝑡</mi></msub></math>, where each step <math><msub><mi>ℎ</mi><mi>𝑡</mi></msub></math> is computed from the derivative <math><mi>𝐷</mi><mi>𝒥︀</mi><mrow><mo>(</mo><msub><mi>𝜃</mi><mi>𝑡</mi></msub><mo>)</mo></mrow></math>, and possibly from earlier ones. This post is about how to choose <math><msub><mi>ℎ</mi><mi>𝑡</mi></msub></math>, and in particular how the choice of a norm on <math><mi mathvariant="normal">Θ</mi></math> affects it.</p><h2 id="loc-1">1. Derivatives and gradients</h2><p>The derivative <math><mi>𝐷</mi><mi>𝒥︀</mi><mrow><mo>(</mo><mi>𝜃</mi><mo>)</mo></mrow></math> maps a direction <math><mi>ℎ</mi><mo>∈</mo><mi mathvariant="normal">Θ</mi></math> to a number, so it is an element of the <em>dual space</em> <math><msup><mi mathvariant="normal">Θ</mi><mo>∗</mo></msup></math> of linear maps <math><mi mathvariant="normal">Θ</mi><mo stretchy="false">→</mo><mi>ℝ</mi></math>, and we write its value at <math><mi>ℎ</mi></math> as the <em>pairing</em> <math><mo stretchy="false">⟨</mo><mi>𝐷</mi><mi>𝒥︀</mi><mrow><mo>(</mo><mi>𝜃</mi><mo>)</mo></mrow><mo>,</mo><mi>ℎ</mi><mo stretchy="false">⟩</mo></math>. Both <math><msup><mi mathvariant="normal">Θ</mi><mo>∗</mo></msup></math> and the pairing come with <math><mi mathvariant="normal">Θ</mi></math> itself, so nothing is chosen here. An inner product <math><mo stretchy="false">⟨</mo><mo lspace="0em" rspace="0em">⋅</mo><mo>,</mo><mo lspace="0em" rspace="0em">⋅</mo><msub><mo stretchy="false">⟩</mo><mi mathvariant="normal">Θ</mi></msub></math> on <math><mi mathvariant="normal">Θ</mi></math>, on the other hand, is a choice, for example the Frobenius inner product. With an inner product chosen, the linearization reads</p><div class="numbered-equation"><math display="block"><mi>𝒥︀</mi><mrow><mo>(</mo><mrow><mi>𝜃</mi><mo>+</mo><mi>ℎ</mi></mrow><mo>)</mo></mrow><mo>≈</mo><mi>𝒥︀</mi><mrow><mo>(</mo><mi>𝜃</mi><mo>)</mo></mrow><mo>+</mo><mo form="prefix" stretchy="false">⟨</mo><mi>𝐷</mi><mi>𝒥︀</mi><mrow><mo>(</mo><mi>𝜃</mi><mo>)</mo></mrow><mo>,</mo><mi>ℎ</mi><mo form="postfix" stretchy="false">⟩</mo><mo>=</mo><mi>𝒥︀</mi><mrow><mo>(</mo><mi>𝜃</mi><mo>)</mo></mrow><mo>+</mo><mo form="prefix" stretchy="false">⟨</mo><msub><mo form="prefix">∇</mo><mi>𝜃</mi></msub><mi>𝒥︀</mi><mrow><mo>(</mo><mi>𝜃</mi><mo>)</mo></mrow><mo>,</mo><mi>ℎ</mi><msub><mo form="postfix" stretchy="false">⟩</mo><mi mathvariant="normal">Θ</mi></msub><mi>.</mi></math><p><span class="equation-number">(2)</span></p></div><p>The second form holds because every linear map <math><mi mathvariant="normal">Θ</mi><mo stretchy="false">→</mo><mi>ℝ</mi></math> is <math><mi>ℎ</mi><mo stretchy="false">↦</mo><mo form="prefix" stretchy="false">⟨</mo><mi>𝑘</mi><mo>,</mo><mi>ℎ</mi><msub><mo stretchy="false">⟩</mo><mi mathvariant="normal">Θ</mi></msub></math> for exactly one <math><mi>𝑘</mi><mo>∈</mo><mi mathvariant="normal">Θ</mi></math>, its Riesz representative,<sup class="footnote-ref"><a class="footnote-ref-link" href="#fn-1" id="fnref-1">1</a></sup><span class="marginnote" id="fn-1"><sup><a class="footnote-ref-link" href="#fnref-1">1</a></sup> This is the Riesz representation theorem, as in <a href="https://mipals.github.io/blog/2026/10-07-batched-backpropagation/"><em>Batched Backpropagation as a Linear Solve</em></a>: <math><mi>𝑘</mi><mo stretchy="false">↦</mo><mo form="prefix" stretchy="false">⟨</mo><mi>𝑘</mi><mo>,</mo><mo lspace="0em" rspace="0em">⋅</mo><msub><mo stretchy="false">⟩</mo><mi mathvariant="normal">Θ</mi></msub></math> is linear and one-to-one, and <math><mi mathvariant="normal">Θ</mi></math> and <math><msup><mi mathvariant="normal">Θ</mi><mo>∗</mo></msup></math> have the same dimension.</span> and the gradient <math><msub><mo>∇</mo><mi>𝜃</mi></msub><mi>𝒥︀</mi><mrow><mo>(</mo><mi>𝜃</mi><mo>)</mo></mrow></math> is the representative of <math><mi>𝐷</mi><mi>𝒥︀</mi><mrow><mo>(</mo><mi>𝜃</mi><mo>)</mo></mrow></math>. Unlike the derivative, the gradient lies in <math><mi mathvariant="normal">Θ</mi></math>, but it depends on the inner product: another inner product gives another gradient of the same function. Only the gradient needs an inner product. The derivative and the steps below need none.</p><figure id="ex-two-inner-products"><p><span class="marginnote">Example 1: Two inner products, two gradients</span></p><div class="blog-example"><div style="background: #3d997026; border-radius: .4em; padding: 1em; width: 100%; box-sizing: border-box; margin-bottom: .5em;"><p><strong>Example 1 (Two inner products, two gradients)</strong>   Let <math><mi mathvariant="normal">Θ</mi><mo>=</mo><msup><mi>ℝ</mi><mn>2</mn></msup></math> and <math><mi>𝒥︀</mi><mrow><mo>(</mo><mi>𝜃</mi><mo>)</mo></mrow><mo>=</mo><msubsup><mi>𝜃</mi><mn>1</mn><mn>2</mn></msubsup><mo>+</mo><msub><mi>𝜃</mi><mn>2</mn></msub></math>, so that <math><mo stretchy="false">⟨</mo><mi>𝐷</mi><mi>𝒥︀</mi><mrow><mo>(</mo><mi>𝜃</mi><mo>)</mo></mrow><mo>,</mo><mi>ℎ</mi><mo form="postfix" stretchy="false">⟩</mo><mo>=</mo><mn>2</mn><msub><mi>𝜃</mi><mn>1</mn></msub><msub><mi>ℎ</mi><mn>1</mn></msub><mo>+</mo><msub><mi>ℎ</mi><mn>2</mn></msub></math>.<sup class="footnote-ref"><a class="footnote-ref-link" href="#fn-2" id="fnref-2">2</a></sup><span class="marginnote" id="fn-2"><sup><a class="footnote-ref-link" href="#fnref-2">2</a></sup> This follows from <math><mi>𝒥︀</mi></math> alone, as the directional derivative <math><mo lspace="0em" rspace="0em">d</mo><mi>/</mi><mrow><mo>(</mo><mrow><mo lspace="0em" rspace="0em">d</mo><mi>𝑡</mi></mrow><mo>)</mo></mrow><mi>𝒥︀</mi><mrow><mo>(</mo><mrow><mi>𝜃</mi><mo>+</mo><mi>𝑡</mi><mi>ℎ</mi></mrow><mo>)</mo></mrow><msub><mo lspace="0em" rspace="0em">|</mo><mrow><mi>𝑡</mi><mo lspace="0em" rspace="0em">=</mo><mn>0</mn></mrow></msub><mo>=</mo><mn>2</mn><msub><mi>𝜃</mi><mn>1</mn></msub><msub><mi>ℎ</mi><mn>1</mn></msub><mo>+</mo><msub><mi>ℎ</mi><mn>2</mn></msub></math>, with no inner product involved. Writing the derivative as the array <math><mrow><mo>(</mo><mrow><mn>2</mn><msub><mi>𝜃</mi><mn>1</mn></msub><mo>,</mo><mn>1</mn></mrow><mo>)</mo></mrow></math> uses the coordinates of <math><mi mathvariant="normal">Θ</mi><mo>=</mo><msup><mi>ℝ</mi><mn>2</mn></msup></math>, but the value of the pairing does not depend on them.</span> Then</p><div class="numbered-equation"><math display="block"><mtable class="multiline-equation aligned"><mtr><mtd><mo stretchy="false">⟨</mo><mi>ℎ</mi><mo>,</mo><mi>𝑘</mi><msub><mo form="postfix" stretchy="false">⟩</mo><mi mathvariant="normal">Θ</mi></msub><mo>=</mo><msub><mi>ℎ</mi><mn>1</mn></msub><msub><mi>𝑘</mi><mn>1</mn></msub><mo>+</mo><msub><mi>ℎ</mi><mn>2</mn></msub><msub><mi>𝑘</mi><mn>2</mn></msub><mspace width="1em"/></mtd><mtd><mo form="infix" lspace="0em" rspace="0em" stretchy="false">⇒</mo><mspace width="1em"/><msub><mo form="prefix">∇</mo><mi>𝜃</mi></msub><mi>𝒥︀</mi><mrow><mo>(</mo><mi>𝜃</mi><mo>)</mo></mrow><mo>=</mo><mrow><mo>(</mo><mrow><mn>2</mn><msub><mi>𝜃</mi><mn>1</mn></msub><mo>,</mo><mn>1</mn></mrow><mo>)</mo></mrow><mo rspace="0em">,</mo></mtd></mtr><mtr><mtd><mo stretchy="false">⟨</mo><mi>ℎ</mi><mo>,</mo><mi>𝑘</mi><msub><mo form="postfix" stretchy="false">⟩</mo><mi mathvariant="normal">Θ</mi></msub><mo>=</mo><msub><mi>ℎ</mi><mn>1</mn></msub><msub><mi>𝑘</mi><mn>1</mn></msub><mo>+</mo><mn>4</mn><msub><mi>ℎ</mi><mn>2</mn></msub><msub><mi>𝑘</mi><mn>2</mn></msub><mspace width="1em"/></mtd><mtd><mo form="infix" lspace="0em" rspace="0em" stretchy="false">⇒</mo><mspace width="1em"/><msub><mo form="prefix">∇</mo><mi>𝜃</mi></msub><mi>𝒥︀</mi><mrow><mo>(</mo><mi>𝜃</mi><mo>)</mo></mrow><mo>=</mo><mrow><mo>(</mo><mrow><mn>2</mn><msub><mi>𝜃</mi><mn>1</mn></msub><mo>,</mo><mn>1</mn><mi>/</mi><mn>4</mn></mrow><mo>)</mo></mrow><mo rspace="0em">,</mo></mtd></mtr></mtable></math><p><span class="equation-number">(3)</span></p></div><p>since both give <math><mo stretchy="false">⟨</mo><msub><mo form="prefix">∇</mo><mi>𝜃</mi></msub><mi>𝒥︀</mi><mrow><mo>(</mo><mi>𝜃</mi><mo>)</mo></mrow><mo>,</mo><mi>ℎ</mi><msub><mo form="postfix" stretchy="false">⟩</mo><mi mathvariant="normal">Θ</mi></msub><mo>=</mo><mn>2</mn><msub><mi>𝜃</mi><mn>1</mn></msub><msub><mi>ℎ</mi><mn>1</mn></msub><mo>+</mo><msub><mi>ℎ</mi><mn>2</mn></msub></math>.</p></div></div></figure><h2 id="loc-2">2. Two surrogates</h2><p>The linearization <math><mi>𝒥︀</mi><mrow><mo>(</mo><mi>𝜃</mi><mo>)</mo></mrow><mo>+</mo><mo form="prefix" stretchy="false">⟨</mo><mi>𝑔</mi><mo>,</mo><mi>ℎ</mi><mo stretchy="false">⟩</mo></math>, with <math><mi>𝑔</mi><mo>=</mo><mi>𝐷</mi><mi>𝒥︀</mi><mrow><mo>(</mo><mi>𝜃</mi><mo>)</mo></mrow></math>, is a good model of <math><mi>𝒥︀</mi><mrow><mo>(</mo><mrow><mi>𝜃</mi><mo>+</mo><mi>ℎ</mi></mrow><mo>)</mo></mrow></math> only for small <math><mi>ℎ</mi></math>, and on its own it has no minimizer: unless <math><mi>𝑔</mi><mo>=</mo><mn>0</mn></math>, it decreases without bound along any direction with <math><mo stretchy="false">⟨</mo><mi>𝑔</mi><mo>,</mo><mi>ℎ</mi><mo form="postfix" stretchy="false">⟩</mo><mo>&lt;</mo><mn>0</mn></math>. A step therefore needs a second ingredient that says how large <math><mi>ℎ</mi></math> we allow. The length of <math><mi>ℎ</mi><mo>∈</mo><mi mathvariant="normal">Θ</mi></math> is measured by a norm <math><mrow><mo>‖</mo><mo lspace="0em" rspace="0em">⋅</mo><mo>‖</mo></mrow></math>, which is something that we again have to choose. There are two natural ways to combine the norm with the linearization: as a constraint, or as a penalty,<sup class="footnote-ref"><a class="footnote-ref-link" href="#fn-3" id="fnref-3">3</a></sup><span class="marginnote" id="fn-3"><sup><a class="footnote-ref-link" href="#fnref-3">3</a></sup> The norm here can be <strong>any</strong> norm on <math><mi mathvariant="normal">Θ</mi></math>, not just the one induced by the inner product on <math><mi mathvariant="normal">Θ</mi></math>.</span></p><div id="loc-3" class="numbered-equation"><math display="block"><mtable class="multiline-equation aligned"><mtr><mtd><msub><mi>ℎ</mi><mi>𝐶</mi></msub></mtd><mtd><mo form="infix">=</mo><munder><mo form="prefix" lspace="0em" rspace="0em">arg min</mo><mrow><mrow><mo>‖</mo><mi>ℎ</mi><mo>‖</mo></mrow><mo lspace="0em" rspace="0em">≤</mo><mi>𝜂</mi></mrow></munder><mspace width="1em"/><mo form="prefix" stretchy="false">⟨</mo><mi>𝑔</mi><mo>,</mo><mi>ℎ</mi><mo form="postfix" stretchy="false">⟩</mo><mo rspace="0em">,</mo></mtd></mtr><mtr><mtd><msub><mi>ℎ</mi><mi>𝑃</mi></msub></mtd><mtd><mo form="infix">=</mo><munder><mo form="prefix" lspace="0em" rspace="0em">arg min</mo><mrow><mi>ℎ</mi><mo lspace="0em" rspace="0em">∈</mo><mi mathvariant="normal">Θ</mi></mrow></munder><mspace width="1em"/><mo form="prefix" stretchy="false">⟨</mo><mi>𝑔</mi><mo>,</mo><mi>ℎ</mi><mo form="postfix" stretchy="false">⟩</mo><mo>+</mo><mfrac><mi>𝜆</mi><mn>2</mn></mfrac><msup><mrow><mo>‖</mo><mi>ℎ</mi><mo>‖</mo></mrow><mn>2</mn></msup><mi>.</mi></mtd></mtr></mtable></math><p><span class="equation-number">(4)</span></p></div><p>The first is a trust-region model: it trusts the linearization only within a radius <math><mi>𝜂</mi></math>, which caps the length of the step. The second instead penalizes long steps, and as the penalty grows faster than the linearization can decrease, it always has a minimum.<sup class="footnote-ref"><a class="footnote-ref-link" href="#fn-4" id="fnref-4">4</a></sup><span class="marginnote" id="fn-4"><sup><a class="footnote-ref-link" href="#fnref-4">4</a></sup> If <math><mi>𝒥︀</mi></math> is <math><mi>𝐿</mi></math>-smooth with respect to <math><mrow><mo>‖</mo><mo lspace="0em" rspace="0em">⋅</mo><mo>‖</mo></mrow></math>, meaning that <math><mi>𝒥︀</mi><mrow><mo>(</mo><mrow><mi>𝜃</mi><mo>+</mo><mi>ℎ</mi></mrow><mo>)</mo></mrow><mo>≤</mo><mi>𝒥︀</mi><mrow><mo>(</mo><mi>𝜃</mi><mo>)</mo></mrow><mo>+</mo><mo form="prefix" stretchy="false">⟨</mo><mi>𝑔</mi><mo>,</mo><mi>ℎ</mi><mo form="postfix" stretchy="false">⟩</mo><mo>+</mo><mfrac><mi>𝐿</mi><mn>2</mn></mfrac><msup><mrow><mo>‖</mo><mi>ℎ</mi><mo>‖</mo></mrow><mn>2</mn></msup></math> for all <math><mi>ℎ</mi></math>, then for <math><mi>𝜆</mi><mo>≥</mo><mi>𝐿</mi></math> the second surrogate is an upper bound on <math><mi>𝒥︀</mi></math>, and <math><msub><mi>ℎ</mi><mi>𝑃</mi></msub></math> decreases <math><mi>𝒥︀</mi></math> by at least the decrease of the surrogate. Convergence analyses use this; in practice <math><mi>𝜆</mi></math> is often chosen smaller.</span></p><figure><p><span class="marginnote">Interactive figure 1: The two surrogates over many steps</span></p><div class="blog-interactive"><div style="background: #6042a626; border-radius: .4em; padding: 1em; width: 100%; box-sizing: border-box; margin-bottom: .5em;"><p><strong>Interactive figure 1 (The two surrogates over many steps)</strong>   The graph shows both steps for</p><div class="numbered-equation"><math display="block"><mi>𝒥︀</mi><mrow><mo>(</mo><mi>𝜃</mi><mo>)</mo></mrow><mo>=</mo><mn>3</mn><msup><mi>𝜃</mi><mn>2</mn></msup><mi>/</mi><mn>4</mn><mo>−</mo><mn>5</mn><mi>/</mi><mn>4</mn><mo form="prefix" lspace="0.16666666666666666em" rspace="0.16666666666666666em">log</mo><mo form="prefix" lspace="0em" rspace="0.16666666666666666em">cosh</mo><mi>𝜃</mi><mo rspace="0em">,</mo></math><p><span class="equation-number">(5)</span></p></div><p>with the norm <math><mrow><mo>|</mo><mi>ℎ</mi><mo>|</mo></mrow></math>. In one dimension every norm is a multiple of <math><mrow><mo>|</mo><mi>ℎ</mi><mo>|</mo></mrow></math>, so the choice of norm only matters from two dimensions on. The constrained step always has length <math><mi>𝜂</mi></math>, since the linearization has no minimum inside the trust region, so close to the minimum it jumps back and forth over it. The penalized step shrinks with the derivative, but with <math><mi>𝜆</mi><mo>=</mo><mi>𝐿</mi></math> set by the largest curvature it crawls where <math><mi>𝒥︀</mi></math> is flat. Constrained methods such as sign descent and Muon therefore let <math><mi>𝜂</mi></math> decrease over the iterations, while adaptive norms, later in the post, take longer steps where <math><mi>𝒥︀</mi></math> is flat.</p><div class="desmos-embed" data-state="[
+  {
+    &quot;id&quot;: &quot;n&quot;,
+    &quot;latex&quot;: &quot;n=1&quot;
+  },
+  {
+    &quot;id&quot;: &quot;l&quot;,
+    &quot;latex&quot;: &quot;l=1.5&quot;
+  },
+  {
+    &quot;id&quot;: &quot;k&quot;,
+    &quot;latex&quot;: &quot;k=0&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;v=2.8&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;J\\left(x\\right)=\\frac{3x^{2}}{4}-\\frac{5}{4}\\ln\\left(\\cosh\\left(x\\right)\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;D\\left(x\\right)=\\frac{3x}{2}-\\frac{5}{4}\\tanh\\left(x\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;y=J\\left(x\\right)&quot;,
+    &quot;color&quot;: &quot;#000000&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;c_{0}=v&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;q_{0}=v&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{1}=c_{0}-n\\operatorname{sign}\\left(D\\left(c_{0}\\right)\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{2}=c_{1}-n\\operatorname{sign}\\left(D\\left(c_{1}\\right)\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{3}=c_{2}-n\\operatorname{sign}\\left(D\\left(c_{2}\\right)\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{4}=c_{3}-n\\operatorname{sign}\\left(D\\left(c_{3}\\right)\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{5}=c_{4}-n\\operatorname{sign}\\left(D\\left(c_{4}\\right)\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{6}=c_{5}-n\\operatorname{sign}\\left(D\\left(c_{5}\\right)\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{7}=c_{6}-n\\operatorname{sign}\\left(D\\left(c_{6}\\right)\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{8}=c_{7}-n\\operatorname{sign}\\left(D\\left(c_{7}\\right)\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{9}=c_{8}-n\\operatorname{sign}\\left(D\\left(c_{8}\\right)\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;q_{1}=q_{0}-\\frac{D\\left(q_{0}\\right)}{l}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;q_{2}=q_{1}-\\frac{D\\left(q_{1}\\right)}{l}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;q_{3}=q_{2}-\\frac{D\\left(q_{2}\\right)}{l}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;q_{4}=q_{3}-\\frac{D\\left(q_{3}\\right)}{l}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;q_{5}=q_{4}-\\frac{D\\left(q_{4}\\right)}{l}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;q_{6}=q_{5}-\\frac{D\\left(q_{5}\\right)}{l}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;q_{7}=q_{6}-\\frac{D\\left(q_{6}\\right)}{l}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;q_{8}=q_{7}-\\frac{D\\left(q_{7}\\right)}{l}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;q_{9}=q_{8}-\\frac{D\\left(q_{8}\\right)}{l}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;C=\\left[c_{0},c_{1},c_{2},c_{3},c_{4},c_{5},c_{6},c_{7},c_{8},c_{9}\\right]&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;Q=\\left[q_{0},q_{1},q_{2},q_{3},q_{4},q_{5},q_{6},q_{7},q_{8},q_{9}\\right]&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;u_{C}=C\\left[k+1\\right]&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;u_{P}=Q\\left[k+1\\right]&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;w_{C}=C\\left[k+2\\right]&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;w_{P}=Q\\left[k+2\\right]&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;u_{C}-n\\le x\\le u_{C}+n&quot;,
+    &quot;color&quot;: &quot;#c74440&quot;,
+    &quot;fillOpacity&quot;: &quot;0.25&quot;,
+    &quot;lines&quot;: false
+  },
+  {
+    &quot;latex&quot;: &quot;y=J\\left(u_{C}\\right)+D\\left(u_{C}\\right)\\left(x-u_{C}\\right)&quot;,
+    &quot;color&quot;: &quot;#c74440&quot;,
+    &quot;lineStyle&quot;: &quot;DASHED&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;y=J\\left(u_{P}\\right)+D\\left(u_{P}\\right)\\left(x-u_{P}\\right)+\\frac{l}{2}\\left(x-u_{P}\\right)^{2}&quot;,
+    &quot;color&quot;: &quot;#6042a6&quot;,
+    &quot;lineStyle&quot;: &quot;DASHED&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;I=\\left[1,...,10\\right]&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;\\left(\\left\\{I\\le k:C\\left[I\\right]\\right\\},J\\left(C\\left[I\\right]\\right)\\right)&quot;,
+    &quot;color&quot;: &quot;#c74440&quot;,
+    &quot;pointSize&quot;: &quot;6&quot;,
+    &quot;pointOpacity&quot;: &quot;0.4&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;\\left(\\left\\{I\\le k:Q\\left[I\\right]\\right\\},J\\left(Q\\left[I\\right]\\right)\\right)&quot;,
+    &quot;color&quot;: &quot;#6042a6&quot;,
+    &quot;pointSize&quot;: &quot;6&quot;,
+    &quot;pointOpacity&quot;: &quot;0.4&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;M=J\\left(u_{P}\\right)-\\frac{D\\left(u_{P}\\right)^{2}}{2l}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;\\left(w_{P},M\\right)&quot;,
+    &quot;color&quot;: &quot;#6042a6&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;\\left(w_{P},M+t\\left(J\\left(w_{P}\\right)-M\\right)\\right)&quot;,
+    &quot;parametricDomain&quot;: {
+      &quot;min&quot;: &quot;0&quot;,
+      &quot;max&quot;: &quot;1&quot;
+    },
+    &quot;color&quot;: &quot;#6042a6&quot;,
+    &quot;lineStyle&quot;: &quot;DOTTED&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;\\left(w_{C},J\\left(w_{C}\\right)\\right)&quot;,
+    &quot;color&quot;: &quot;#c74440&quot;,
+    &quot;label&quot;: &quot;`\\theta_k+h_C`&quot;,
+    &quot;showLabel&quot;: true,
+    &quot;labelOrientation&quot;: &quot;above_left&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;\\left(w_{P},J\\left(w_{P}\\right)\\right)&quot;,
+    &quot;color&quot;: &quot;#6042a6&quot;,
+    &quot;label&quot;: &quot;`\\theta_k+h_P`&quot;,
+    &quot;showLabel&quot;: true,
+    &quot;labelOrientation&quot;: &quot;below_right&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;\\left(\\left\\{k>0:u_{C}\\right\\},J\\left(u_{C}\\right)\\right)&quot;,
+    &quot;color&quot;: &quot;#c74440&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;\\left(\\left\\{k>0:u_{P}\\right\\},J\\left(u_{P}\\right)\\right)&quot;,
+    &quot;color&quot;: &quot;#6042a6&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;\\left(v,J\\left(v\\right)\\right)&quot;,
+    &quot;color&quot;: &quot;#000000&quot;,
+    &quot;label&quot;: &quot;`\\theta_0`&quot;,
+    &quot;showLabel&quot;: true,
+    &quot;dragMode&quot;: &quot;X&quot;
+  }
+]" data-options="{
+  &quot;expressions&quot;: false,
+  &quot;settingsMenu&quot;: false,
+  &quot;zoomButtons&quot;: false,
+  &quot;keypad&quot;: false
+}" id="graph-surrogates" data-img="figures/surrogates.png" data-bounds="{
+  &quot;left&quot;: -1.4,
+  &quot;right&quot;: 3.9,
+  &quot;bottom&quot;: -0.4,
+  &quot;top&quot;: 3.9
+}"><div class="desmos-graph" style="height:400px;"></div><div class="desmos-controls"><label><span class="desmos-control-label"><math><mi>𝜂</mi></math></span><input type="range" data-name="n" value="1" min="0.05" max="2" step="0.01"><output>1</output></label><label><span class="desmos-control-label"><math><mi>𝜆</mi></math></span><input type="range" data-name="l" value="1.5" min="0.3" max="4" step="0.01"><output>1.5</output></label><label><span class="desmos-control-label"><math><mi>𝑘</mi></math></span><input type="range" data-name="k" value="0" min="0" max="8" step="1"><output>0</output></label></div></div><p>At iteration <math><mi>𝑘</mi></math>, the dashed line is the linearization at the constrained iterate <math><msub><mi>𝜃</mi><mi>𝑘</mi></msub></math>, with the trust region <math><mrow><mo>|</mo><mi>ℎ</mi><mo>|</mo></mrow><mo>≤</mo><mi>𝜂</mi></math> shaded, and the dashed parabola is the quadratic model at the penalized iterate <math><msub><mi>𝜃</mi><mi>𝑘</mi></msub></math>. Drag <math><msub><mi>𝜃</mi><mn>0</mn></msub></math>, change <math><mi>𝜂</mi></math> and <math><mi>𝜆</mi></math>, and step through the iterations with <math><mi>𝑘</mi></math>.</p></div></div></figure><h2 id="loc-4">3. The dual norm and the sharp operator</h2><p>To write the solutions of the constrained and penalized problems in <a href="#loc-3">(4)</a> explicitly, we need two things: the dual norm, which measures the size of a derivative in <math><msup><mi mathvariant="normal">Θ</mi><mo>∗</mo></msup></math>, and the sharp operator, which maps a derivative back to an element of <math><mi mathvariant="normal">Θ</mi></math>. In both cases it is important to note that they depend on the choice of a norm on <math><mi mathvariant="normal">Θ</mi></math>, rather than the inner product on <math><mi mathvariant="normal">Θ</mi></math>.</p><figure><p><span class="marginnote">Definition 1: Dual norm and sharp operator</span></p><div class="blog-definition"><div style="background: #0074d926; border-radius: .4em; padding: 1em; width: 100%; box-sizing: border-box; margin-bottom: .5em;"><p><strong>Definition 1 (Dual norm and sharp operator)</strong>   For a norm <math><mrow><mo>‖</mo><mo lspace="0em" rspace="0em">⋅</mo><mo>‖</mo></mrow></math> on <math><mi mathvariant="normal">Θ</mi></math>, the dual norm of <math><mi>𝑔</mi><mo>∈</mo><msup><mi mathvariant="normal">Θ</mi><mo>∗</mo></msup></math> and the <em>sharp</em> of <math><mi>𝑔</mi></math>, <math><msup><mi>𝑔</mi><mi>♯</mi></msup><mo>∈</mo><mi mathvariant="normal">Θ</mi></math>, are</p><div class="numbered-equation"><math display="block"><msub><mrow><mo>‖</mo><mi>𝑔</mi><mo>‖</mo></mrow><mo>∗</mo></msub><mo>=</mo><munder><mo form="prefix" lspace="0em" rspace="0em">max</mo><mrow><mrow><mo>‖</mo><mi>ℎ</mi><mo>‖</mo></mrow><mo lspace="0em" rspace="0em">≤</mo><mn>1</mn></mrow></munder><mspace width="1em"/><mo form="prefix" stretchy="false">⟨</mo><mi>𝑔</mi><mo>,</mo><mi>ℎ</mi><mo form="postfix" stretchy="false">⟩</mo><mo rspace="0em">,</mo><mspace width="1em"/><msup><mi>𝑔</mi><mi>♯</mi></msup><mo>=</mo><mo form="prefix">−</mo><munder><mo form="prefix" lspace="0.16666666666666666em" rspace="0em">arg min</mo><mrow><mi>ℎ</mi><mo lspace="0em" rspace="0em">∈</mo><mi mathvariant="normal">Θ</mi></mrow></munder><mspace width="1em"/><mo form="prefix" stretchy="false">⟨</mo><mi>𝑔</mi><mo>,</mo><mi>ℎ</mi><mo form="postfix" stretchy="false">⟩</mo><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><msup><mrow><mo>‖</mo><mi>ℎ</mi><mo>‖</mo></mrow><mn>2</mn></msup><mi>.</mi></math><p><span class="equation-number">(6)</span></p></div><p>The dual norm is the slope of the linearization in its steepest direction; that is, a step of unit length with respect to the chosen norm changes the linearization by at most <math><msub><mrow><mo>‖</mo><mi>𝑔</mi><mo>‖</mo></mrow><mo>∗</mo></msub></math>, so that <math><mrow><mo>|</mo><mrow><mo stretchy="false">⟨</mo><mi>𝑔</mi><mo>,</mo><mi>ℎ</mi><mo stretchy="false">⟩</mo></mrow><mo>|</mo></mrow><mo>≤</mo><msub><mrow><mo>‖</mo><mi>𝑔</mi><mo>‖</mo></mrow><mo>∗</mo></msub><mrow><mo>‖</mo><mi>ℎ</mi><mo>‖</mo></mrow></math> for all <math><mi>ℎ</mi><mo>∈</mo><mi mathvariant="normal">Θ</mi></math>. The <em>sharp operator</em>, the map <math><mi>𝑔</mi><mo stretchy="false">↦</mo><msup><mi>𝑔</mi><mi>♯</mi></msup></math>, takes <math><mi>𝑔</mi></math> back to <math><mi mathvariant="normal">Θ</mi></math>: <math><mo>−</mo><msup><mi>𝑔</mi><mi>♯</mi></msup></math> is the penalized step for <math><mi>𝜆</mi><mo>=</mo><mn>1</mn></math>, and its direction and length are set by the dual norm,<sup class="footnote-ref"><a class="footnote-ref-link" href="#fn-5" id="fnref-5">5</a></sup><span class="marginnote" id="fn-5"><sup><a class="footnote-ref-link" href="#fnref-5">5</a></sup> Write <math><mi>ℎ</mi><mo>=</mo><mi>𝑡</mi><mi>𝑢</mi></math> with <math><mi>𝑡</mi><mo>≥</mo><mn>0</mn></math> and <math><mrow><mo>‖</mo><mi>𝑢</mi><mo>‖</mo></mrow><mo>=</mo><mn>1</mn></math>. For a fixed <math><mi>𝑡</mi></math>, the best <math><mi>𝑢</mi></math> has <math><mo stretchy="false">⟨</mo><mi>𝑔</mi><mo>,</mo><mi>𝑢</mi><mo form="postfix" stretchy="false">⟩</mo><mo>=</mo><mo form="prefix">−</mo><msub><mrow><mo>‖</mo><mi>𝑔</mi><mo>‖</mo></mrow><mo>∗</mo></msub></math>, which leaves <math><mo>−</mo><mi>𝑡</mi><msub><mrow><mo>‖</mo><mi>𝑔</mi><mo>‖</mo></mrow><mo>∗</mo></msub><mo>+</mo><msup><mi>𝑡</mi><mn>2</mn></msup><mi>/</mi><mn>2</mn></math>, smallest at <math><mi>𝑡</mi><mo>=</mo><msub><mrow><mo>‖</mo><mi>𝑔</mi><mo>‖</mo></mrow><mo>∗</mo></msub></math>.</span></p><div class="numbered-equation"><math display="block"><mo stretchy="false">⟨</mo><mi>𝑔</mi><mo>,</mo><msup><mi>𝑔</mi><mi>♯</mi></msup><mo form="postfix" stretchy="false">⟩</mo><mo>=</mo><msubsup><mrow><mo>‖</mo><mi>𝑔</mi><mo>‖</mo></mrow><mo>∗</mo><mn>2</mn></msubsup><mspace width="1em"/><mtext>and</mtext><mspace width="1em"/><mrow><mo>‖</mo><msup><mi>𝑔</mi><mi>♯</mi></msup><mo>‖</mo></mrow><mo>=</mo><msub><mrow><mo>‖</mo><mi>𝑔</mi><mo>‖</mo></mrow><mo>∗</mo></msub><mi>.</mi></math><p><span class="equation-number">(7)</span></p></div><p>The minus sign is a convention. Like a gradient, <math><msup><mi>𝑔</mi><mi>♯</mi></msup></math> points where <math><mi>𝒥︀</mi></math> increases, and a step subtracts it. When the minimizer is not unique, <math><msup><mi>𝑔</mi><mi>♯</mi></msup></math> is any one of them.</p></div></div></figure><p>The sharp operator is the map from <math><msup><mi mathvariant="normal">Θ</mi><mo>∗</mo></msup></math> back to <math><mi mathvariant="normal">Θ</mi></math> that a norm provides, while the Riesz map is the one that an inner product provides.<sup class="footnote-ref"><a class="footnote-ref-link" href="#fn-6" id="fnref-6">6</a></sup><span class="marginnote" id="fn-6"><sup><a class="footnote-ref-link" href="#fnref-6">6</a></sup> The two coincide exactly when the norm comes from the inner product, <math><msup><mrow><mo>‖</mo><mi>ℎ</mi><mo>‖</mo></mrow><mn>2</mn></msup><mo>=</mo><mo form="prefix" stretchy="false">⟨</mo><mi>ℎ</mi><mo>,</mo><mi>ℎ</mi><msub><mo stretchy="false">⟩</mo><mi mathvariant="normal">Θ</mi></msub></math>.</span> The naming convention and notation <math><msup><mi>𝑔</mi><mi>♯</mi></msup></math> follow Kelner et al. <a id="loc-5" href="#loc-21" role="doc-biblioref">[1]</a>.<sup class="footnote-ref"><a class="footnote-ref-link" href="#fn-7" id="fnref-7">7</a></sup><span class="marginnote" id="fn-7"><sup><a class="footnote-ref-link" href="#fnref-7">7</a></sup> Bernstein and Newhouse <a id="loc-6" href="#loc-22" role="doc-biblioref">[2]</a> call <math><msup><mi>𝑔</mi><mi>♯</mi></msup><mi>/</mi><msub><mrow><mo>‖</mo><mi>𝑔</mi><mo>‖</mo></mrow><mo>∗</mo></msub></math> the duality map.</span> Both the constrained and the penalized steps can be written explicitly using the sharp operator. The constrained problem is bounded below by <math><mo stretchy="false">⟨</mo><mi>𝑔</mi><mo>,</mo><mi>ℎ</mi><mo form="postfix" stretchy="false">⟩</mo><mo>≥</mo><mo form="prefix">−</mo><msub><mrow><mo>‖</mo><mi>𝑔</mi><mo>‖</mo></mrow><mo>∗</mo></msub><mrow><mo>‖</mo><mi>ℎ</mi><mo>‖</mo></mrow><mo>≥</mo><mo form="prefix">−</mo><mi>𝜂</mi><msub><mrow><mo>‖</mo><mi>𝑔</mi><mo>‖</mo></mrow><mo>∗</mo></msub></math>,<sup class="footnote-ref"><a class="footnote-ref-link" href="#fn-8" id="fnref-8">8</a></sup><span class="marginnote" id="fn-8"><sup><a class="footnote-ref-link" href="#fnref-8">8</a></sup> The first inequality is the bound <math><mrow><mo>|</mo><mrow><mo stretchy="false">⟨</mo><mi>𝑔</mi><mo>,</mo><mi>ℎ</mi><mo stretchy="false">⟩</mo></mrow><mo>|</mo></mrow><mo>≤</mo><msub><mrow><mo>‖</mo><mi>𝑔</mi><mo>‖</mo></mrow><mo>∗</mo></msub><mrow><mo>‖</mo><mi>ℎ</mi><mo>‖</mo></mrow></math> from the definition of the dual norm. The second holds because the constraint gives <math><mrow><mo>‖</mo><mi>ℎ</mi><mo>‖</mo></mrow><mo>≤</mo><mi>𝜂</mi></math> and <math><msub><mrow><mo>‖</mo><mi>𝑔</mi><mo>‖</mo></mrow><mo>∗</mo></msub><mo>≥</mo><mn>0</mn></math>.</span> which the step below attains, and writing <math><mi>ℎ</mi><mo>=</mo><mi>𝑘</mi><mi>/</mi><mi>𝜆</mi></math> turns the penalized problem into the definition. For <math><mi>𝑔</mi><mo>≠</mo><mn>0</mn></math>,</p><div class="numbered-equation"><math display="block"><mtable class="multiline-equation aligned"><mtr><mtd><msub><mi>ℎ</mi><mi>𝐶</mi></msub></mtd><mtd><mo form="infix">=</mo><munder><mo form="prefix" lspace="0em" rspace="0em">arg min</mo><mrow><mrow><mo>‖</mo><mi>ℎ</mi><mo>‖</mo></mrow><mo lspace="0em" rspace="0em">≤</mo><mi>𝜂</mi></mrow></munder><mspace width="1em"/><mo form="prefix" stretchy="false">⟨</mo><mi>𝑔</mi><mo>,</mo><mi>ℎ</mi><mo form="postfix" stretchy="false">⟩</mo><mo>=</mo><mo form="prefix">−</mo><mi>𝜂</mi><mfrac><msup><mi>𝑔</mi><mi>♯</mi></msup><msub><mrow><mo>‖</mo><mi>𝑔</mi><mo>‖</mo></mrow><mo>∗</mo></msub></mfrac><mo rspace="0em">,</mo></mtd></mtr><mtr><mtd><msub><mi>ℎ</mi><mi>𝑃</mi></msub></mtd><mtd><mo form="infix">=</mo><mfrac><mn>1</mn><mi>𝜆</mi></mfrac><munder><mo form="prefix" lspace="0.16666666666666666em" rspace="0em">arg min</mo><mrow><mi>𝑘</mi><mo lspace="0em" rspace="0em">∈</mo><mi mathvariant="normal">Θ</mi></mrow></munder><mspace width="1em"/><mo form="prefix" stretchy="false">⟨</mo><mi>𝑔</mi><mo>,</mo><mi>𝑘</mi><mo form="postfix" stretchy="false">⟩</mo><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><msup><mrow><mo>‖</mo><mi>𝑘</mi><mo>‖</mo></mrow><mn>2</mn></msup><mo>=</mo><mo form="prefix">−</mo><mfrac><mn>1</mn><mi>𝜆</mi></mfrac><msup><mi>𝑔</mi><mi>♯</mi></msup><mi>.</mi></mtd></mtr></mtable></math><p><span class="equation-number">(8)</span></p></div><p>Here <math><msup><mi>𝑔</mi><mi>♯</mi></msup><mi>/</mi><msub><mrow><mo>‖</mo><mi>𝑔</mi><mo>‖</mo></mrow><mo>∗</mo></msub></math> is the unit vector, in the chosen norm, along <math><msup><mi>𝑔</mi><mi>♯</mi></msup></math>, so <math><msub><mi>ℎ</mi><mi>𝐶</mi></msub></math> goes straight to the border of the trust region. Both steps point along <math><mo>−</mo><msup><mi>𝑔</mi><mi>♯</mi></msup></math>, which depends on the chosen norm, and differ only in length: <math><mi>𝜂</mi></math> for <math><msub><mi>ℎ</mi><mi>𝐶</mi></msub></math> and <math><msub><mrow><mo>‖</mo><mi>𝑔</mi><mo>‖</mo></mrow><mo>∗</mo></msub><mi>/</mi><mi>𝜆</mi></math> for <math><msub><mi>ℎ</mi><mi>𝑃</mi></msub></math>, so they coincide for <math><mi>𝜆</mi><mo>=</mo><msub><mrow><mo>‖</mo><mi>𝑔</mi><mo>‖</mo></mrow><mo>∗</mo></msub><mi>/</mi><mi>𝜂</mi></math>.</p><figure><p><span class="marginnote">Example 2: The dual norm and the sharp operator in the plane</span></p><div class="blog-example"><div style="background: #3d997026; border-radius: .4em; padding: 1em; width: 100%; box-sizing: border-box; margin-bottom: .5em;"><p><strong>Example 2 (The dual norm and the sharp operator in the plane)</strong>   Let <math><mi mathvariant="normal">Θ</mi><mo>=</mo><msup><mi>ℝ</mi><mn>2</mn></msup></math> and <math><mo stretchy="false">⟨</mo><mi>𝑔</mi><mo>,</mo><mi>ℎ</mi><mo form="postfix" stretchy="false">⟩</mo><mo>=</mo><mn>3</mn><msub><mi>ℎ</mi><mn>1</mn></msub><mo>+</mo><mn>4</mn><msub><mi>ℎ</mi><mn>2</mn></msub></math>. For the Euclidean norm <math><msub><mrow><mo>‖</mo><mi>ℎ</mi><mo>‖</mo></mrow><mn>2</mn></msub><mo>=</mo><msqrt><msubsup><mi>ℎ</mi><mn>1</mn><mn>2</mn></msubsup><mo>+</mo><msubsup><mi>ℎ</mi><mn>2</mn><mn>2</mn></msubsup></msqrt></math>,</p><div class="numbered-equation"><math display="block"><mtable class="multiline-equation aligned"><mtr><mtd><msub><mrow><mo>‖</mo><mi>𝑔</mi><mo>‖</mo></mrow><mo>∗</mo></msub></mtd><mtd><mo form="infix">=</mo><munder><mo form="prefix" lspace="0em" rspace="0em">max</mo><mrow><msub><mrow><mo>‖</mo><mi>ℎ</mi><mo>‖</mo></mrow><mn>2</mn></msub><mo lspace="0em" rspace="0em">≤</mo><mn>1</mn></mrow></munder><mspace width="1em"/><mn>3</mn><msub><mi>ℎ</mi><mn>1</mn></msub><mo>+</mo><mn>4</mn><msub><mi>ℎ</mi><mn>2</mn></msub><mo>=</mo><mn>5</mn><mo rspace="0em">,</mo></mtd></mtr><mtr><mtd><msup><mi>𝑔</mi><mi>♯</mi></msup></mtd><mtd><mo form="infix">=</mo><mo form="prefix">−</mo><munder><mo form="prefix" lspace="0.16666666666666666em" rspace="0em">arg min</mo><mrow><mi>ℎ</mi><mo lspace="0em" rspace="0em">∈</mo><msup><mi>ℝ</mi><mn>2</mn></msup></mrow></munder><mspace width="1em"/><mn>3</mn><msub><mi>ℎ</mi><mn>1</mn></msub><mo>+</mo><mn>4</mn><msub><mi>ℎ</mi><mn>2</mn></msub><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mrow><mo>(</mo><mrow><msubsup><mi>ℎ</mi><mn>1</mn><mn>2</mn></msubsup><mo>+</mo><msubsup><mi>ℎ</mi><mn>2</mn><mn>2</mn></msubsup></mrow><mo>)</mo></mrow><mo>=</mo><mrow><mo>(</mo><mrow><mn>3</mn><mo>,</mo><mn>4</mn></mrow><mo>)</mo></mrow><mi>.</mi></mtd></mtr></mtable></math><p><span class="equation-number">(9)</span></p></div><p>By the Cauchy–Schwarz inequality, <math><mn>3</mn><msub><mi>ℎ</mi><mn>1</mn></msub><mo>+</mo><mn>4</mn><msub><mi>ℎ</mi><mn>2</mn></msub><mo>≤</mo><mn>5</mn><msub><mrow><mo>‖</mo><mi>ℎ</mi><mo>‖</mo></mrow><mn>2</mn></msub></math>, with equality at <math><mi>ℎ</mi><mo>=</mo><mrow><mo>(</mo><mrow><mn>3</mn><mo>,</mo><mn>4</mn></mrow><mo>)</mo></mrow><mi>/</mi><mn>5</mn></math>, and in the problem for <math><msup><mi>𝑔</mi><mi>♯</mi></msup></math>, setting the derivative <math><mrow><mo>(</mo><mrow><mn>3</mn><mo>+</mo><msub><mi>ℎ</mi><mn>1</mn></msub><mo>,</mo><mn>4</mn><mo>+</mo><msub><mi>ℎ</mi><mn>2</mn></msub></mrow><mo>)</mo></mrow></math> of the objective to zero gives the minimizer <math><mi>ℎ</mi><mo>=</mo><mrow><mo>(</mo><mrow><mo>−</mo><mn>3</mn><mo>,</mo><mo form="prefix">−</mo><mn>4</mn></mrow><mo>)</mo></mrow></math>, so <math><msup><mi>𝑔</mi><mi>♯</mi></msup><mo>=</mo><mrow><mo>(</mo><mrow><mn>3</mn><mo>,</mo><mn>4</mn></mrow><mo>)</mo></mrow></math>, the gradient for the Euclidean inner product. For the max-norm <math><msub><mrow><mo>‖</mo><mi>ℎ</mi><mo>‖</mo></mrow><mi>∞</mi></msub><mo>=</mo><mo form="prefix" lspace="0em" rspace="0em">max</mo><mrow><mo>(</mo><mrow><mrow><mo>|</mo><msub><mi>ℎ</mi><mn>1</mn></msub><mo>|</mo></mrow><mo>,</mo><mrow><mo>|</mo><msub><mi>ℎ</mi><mn>2</mn></msub><mo>|</mo></mrow></mrow><mo>)</mo></mrow></math>,</p><div class="numbered-equation"><math display="block"><mtable class="multiline-equation aligned"><mtr><mtd><msub><mrow><mo>‖</mo><mi>𝑔</mi><mo>‖</mo></mrow><mo>∗</mo></msub></mtd><mtd><mo form="infix">=</mo><munder><mo form="prefix" lspace="0em" rspace="0em">max</mo><mrow><msub><mrow><mo>‖</mo><mi>ℎ</mi><mo>‖</mo></mrow><mi>∞</mi></msub><mo lspace="0em" rspace="0em">≤</mo><mn>1</mn></mrow></munder><mspace width="1em"/><mn>3</mn><msub><mi>ℎ</mi><mn>1</mn></msub><mo>+</mo><mn>4</mn><msub><mi>ℎ</mi><mn>2</mn></msub><mo>=</mo><mn>7</mn><mo rspace="0em">,</mo></mtd></mtr><mtr><mtd><msup><mi>𝑔</mi><mi>♯</mi></msup></mtd><mtd><mo form="infix">=</mo><mo form="prefix">−</mo><munder><mo form="prefix" lspace="0.16666666666666666em" rspace="0em">arg min</mo><mrow><mi>ℎ</mi><mo lspace="0em" rspace="0em">∈</mo><msup><mi>ℝ</mi><mn>2</mn></msup></mrow></munder><mspace width="1em"/><mn>3</mn><msub><mi>ℎ</mi><mn>1</mn></msub><mo>+</mo><mn>4</mn><msub><mi>ℎ</mi><mn>2</mn></msub><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><msup><mrow><mo lspace="0em" rspace="0em">max</mo><mrow><mo>(</mo><mrow><mrow><mo>|</mo><msub><mi>ℎ</mi><mn>1</mn></msub><mo>|</mo></mrow><mo>,</mo><mrow><mo>|</mo><msub><mi>ℎ</mi><mn>2</mn></msub><mo>|</mo></mrow></mrow><mo>)</mo></mrow></mrow><mn>2</mn></msup><mo>=</mo><mrow><mo>(</mo><mrow><mn>7</mn><mo>,</mo><mn>7</mn></mrow><mo>)</mo></mrow><mi>.</mi></mtd></mtr></mtable></math><p><span class="equation-number">(10)</span></p></div><p>Both coordinates can be moved as far as allowed, so the maximum is <math><mn>3</mn><mo>+</mo><mn>4</mn></math> at <math><mi>ℎ</mi><mo>=</mo><mrow><mo>(</mo><mrow><mn>1</mn><mo>,</mo><mn>1</mn></mrow><mo>)</mo></mrow></math>. For the minimum, fix <math><mi>𝑡</mi><mo>=</mo><mo form="prefix" lspace="0em" rspace="0em">max</mo><mrow><mo>(</mo><mrow><mrow><mo>|</mo><msub><mi>ℎ</mi><mn>1</mn></msub><mo>|</mo></mrow><mo>,</mo><mrow><mo>|</mo><msub><mi>ℎ</mi><mn>2</mn></msub><mo>|</mo></mrow></mrow><mo>)</mo></mrow></math>: the linear part is then smallest at <math><mi>ℎ</mi><mo>=</mo><mrow><mo>(</mo><mrow><mo>−</mo><mi>𝑡</mi><mo>,</mo><mo form="prefix">−</mo><mi>𝑡</mi></mrow><mo>)</mo></mrow></math>, which leaves <math><mo>−</mo><mn>7</mn><mi>𝑡</mi><mo>+</mo><msup><mi>𝑡</mi><mn>2</mn></msup><mi>/</mi><mn>2</mn></math>, smallest at <math><mi>𝑡</mi><mo>=</mo><mn>7</mn></math>. In both cases <math><mo stretchy="false">⟨</mo><mi>𝑔</mi><mo>,</mo><msup><mi>𝑔</mi><mi>♯</mi></msup><mo form="postfix" stretchy="false">⟩</mo><mo>=</mo><msubsup><mrow><mo>‖</mo><mi>𝑔</mi><mo>‖</mo></mrow><mo>∗</mo><mn>2</mn></msubsup></math> and <math><mrow><mo>‖</mo><msup><mi>𝑔</mi><mi>♯</mi></msup><mo>‖</mo></mrow><mo>=</mo><msub><mrow><mo>‖</mo><mi>𝑔</mi><mo>‖</mo></mrow><mo>∗</mo></msub></math>. The same derivative gives different directions for different norms.<sup class="footnote-ref"><a class="footnote-ref-link" href="#fn-9" id="fnref-9">9</a></sup><span class="marginnote" id="fn-9"><sup><a class="footnote-ref-link" href="#fnref-9">9</a></sup> The same argument gives <math><msup><mi>𝑔</mi><mi>♯</mi></msup><mo>=</mo><msub><mrow><mo>‖</mo><mi>𝑔</mi><mo>‖</mo></mrow><mn>1</mn></msub><mspace width="0.2222em"/><mtext>sign</mtext><mrow><mo>(</mo><mi>𝑔</mi><mo>)</mo></mrow></math> for the max-norm, and this map is not linear: <math><msup><mrow><mo>(</mo><mrow><mn>3</mn><mo>,</mo><mn>4</mn></mrow><mo>)</mo></mrow><mi>♯</mi></msup><mo>+</mo><msup><mrow><mo>(</mo><mrow><mo>−</mo><mn>1</mn><mo>,</mo><mn>2</mn></mrow><mo>)</mo></mrow><mi>♯</mi></msup><mo>=</mo><mrow><mo>(</mo><mrow><mn>7</mn><mo>,</mo><mn>7</mn></mrow><mo>)</mo></mrow><mo>+</mo><mrow><mo>(</mo><mrow><mo>−</mo><mn>3</mn><mo>,</mo><mn>3</mn></mrow><mo>)</mo></mrow><mo>=</mo><mrow><mo>(</mo><mrow><mn>4</mn><mo>,</mo><mn>10</mn></mrow><mo>)</mo></mrow></math>, while <math><msup><mrow><mo>(</mo><mrow><mn>2</mn><mo>,</mo><mn>6</mn></mrow><mo>)</mo></mrow><mi>♯</mi></msup><mo>=</mo><mrow><mo>(</mo><mrow><mn>8</mn><mo>,</mo><mn>8</mn></mrow><mo>)</mo></mrow></math>. So the max-norm is not the norm of any inner product, whose sharp operator, the Riesz map, is linear.</span></p></div></div></figure><figure><p><span class="marginnote">Interactive figure 2: The sharp operator</span></p><div class="blog-interactive"><div style="background: #6042a626; border-radius: .4em; padding: 1em; width: 100%; box-sizing: border-box; margin-bottom: .5em;"><p><strong>Interactive figure 2 (The sharp operator)</strong>   The graph shows the definition for <math><mi>𝑔</mi><mo>=</mo><mrow><mo>(</mo><mrow><mn>3</mn><mo>,</mo><mn>4</mn></mrow><mo>)</mo></mrow></math> of the example above and the <math><msub><mi>ℓ</mi><mi>𝑝</mi></msub></math>-norms <math><msub><mrow><mo>‖</mo><mi>ℎ</mi><mo>‖</mo></mrow><mi>𝑝</mi></msub><mo>=</mo><msup><mrow><mo>(</mo><mrow><msup><mrow><mo>|</mo><msub><mi>ℎ</mi><mn>1</mn></msub><mo>|</mo></mrow><mi>𝑝</mi></msup><mo>+</mo><msup><mrow><mo>|</mo><msub><mi>ℎ</mi><mn>2</mn></msub><mo>|</mo></mrow><mi>𝑝</mi></msup></mrow><mo>)</mo></mrow><mrow><mn>1</mn><mi>/</mi><mi>𝑝</mi></mrow></msup></math>, which give the Euclidean norm for <math><mi>𝑝</mi><mo>=</mo><mn>2</mn></math> and the max-norm for <math><mi>𝑝</mi><mo>=</mo><mi>∞</mi></math>. Its contours are those of <math><mi>𝜑</mi><mrow><mo>(</mo><mi>ℎ</mi><mo>)</mo></mrow><mo>=</mo><mo form="prefix" stretchy="false">⟨</mo><mi>𝑔</mi><mo>,</mo><mi>ℎ</mi><mo form="postfix" stretchy="false">⟩</mo><mo>+</mo><mn>1</mn><mi>/</mi><mn>2</mn><msup><mrow><mo>‖</mo><mi>ℎ</mi><mo>‖</mo></mrow><mn>2</mn></msup></math>, which is smallest at <math><mo>−</mo><msup><mi>𝑔</mi><mi>♯</mi></msup></math>. The dual norm shows in two places: <math><mo>−</mo><msup><mi>𝑔</mi><mi>♯</mi></msup></math> lies on the border <math><mrow><mo>‖</mo><mi>ℎ</mi><mo>‖</mo></mrow><mo>=</mo><msub><mrow><mo>‖</mo><mi>𝑔</mi><mo>‖</mo></mrow><mo>∗</mo></msub></math> of the ball <math><mrow><mo>‖</mo><mi>ℎ</mi><mo>‖</mo></mrow><mo>≤</mo><msub><mrow><mo>‖</mo><mi>𝑔</mi><mo>‖</mo></mrow><mo>∗</mo></msub></math>, and the level set <math><mo stretchy="false">⟨</mo><mi>𝑔</mi><mo>,</mo><mi>ℎ</mi><mo form="postfix" stretchy="false">⟩</mo><mo>+</mo><msubsup><mrow><mo>‖</mo><mi>𝑔</mi><mo>‖</mo></mrow><mo>∗</mo><mn>2</mn></msubsup><mo>=</mo><mn>0</mn></math>, a line in the plane, touches the ball there. Only <math><mi>𝑝</mi><mo>=</mo><mn>2</mn></math> comes from an inner product. For every other <math><mi>𝑝</mi></math> the sharp operator is nonlinear, and for <math><mi>𝑝</mi></math> near <math><mn>1</mn></math> or <math><mi>∞</mi></math> it jumps between corners of the ball as <math><mi>𝑔</mi></math> is dragged, which no linear map can do.</p><div class="desmos-embed" data-state="[
+  {
+    &quot;id&quot;: &quot;s&quot;,
+    &quot;latex&quot;: &quot;s=0.5&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;a=3&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;b=4&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;R\\left(x,y\\right)=\\left\\{s>0:\\left(\\left|x\\right|^{\\frac{1}{s}}+\\left|y\\right|^{\\frac{1}{s}}\\right)^{s},\\max\\left(\\left|x\\right|,\\left|y\\right|\\right)\\right\\}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;k=\\frac{s}{1-s}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;N=\\left\\{s<1:\\left(\\left|a\\right|^{k+1}+\\left|b\\right|^{k+1}\\right)^{\\frac{1}{k+1}},\\max\\left(\\left|a\\right|,\\left|b\\right|\\right)\\right\\}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;u_{1}=\\left\\{s<1:\\frac{\\operatorname{sign}\\left(a\\right)\\left|a\\right|^{k}}{N^{k}},\\left|a\\right|\\ge\\left|b\\right|:\\operatorname{sign}\\left(a\\right),0\\right\\}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;u_{2}=\\left\\{s<1:\\frac{\\operatorname{sign}\\left(b\\right)\\left|b\\right|^{k}}{N^{k}},\\left|b\\right|>\\left|a\\right|:\\operatorname{sign}\\left(b\\right),0\\right\\}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;P\\left(x,y\\right)=ax+by+\\frac{1}{2}R\\left(x,y\\right)^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;ax+by+\\frac{1}{2}R\\left(x,y\\right)^{2}=-\\frac{N^{2}}{2}+N^{2}\\cdot\\left[0.05,0.2,0.45,0.8,1.25,1.8\\right]&quot;,
+    &quot;color&quot;: &quot;#6042a6&quot;,
+    &quot;lineOpacity&quot;: &quot;0.5&quot;,
+    &quot;lineWidth&quot;: &quot;1.5&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;R\\left(x,y\\right)\\le N&quot;,
+    &quot;color&quot;: &quot;#c74440&quot;,
+    &quot;fillOpacity&quot;: &quot;0.12&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;ax+by=-N^{2}&quot;,
+    &quot;color&quot;: &quot;#c74440&quot;,
+    &quot;lineStyle&quot;: &quot;DASHED&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;\\left(ta,tb\\right)&quot;,
+    &quot;parametricDomain&quot;: {
+      &quot;min&quot;: &quot;0&quot;,
+      &quot;max&quot;: &quot;1&quot;
+    },
+    &quot;color&quot;: &quot;#2d70b3&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;\\left(a,b\\right)&quot;,
+    &quot;color&quot;: &quot;#2d70b3&quot;,
+    &quot;label&quot;: &quot;g&quot;,
+    &quot;showLabel&quot;: true,
+    &quot;dragMode&quot;: &quot;XY&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;F_{s}=\\operatorname{round}\\left(-\\frac{N^{2}}{2},2\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;\\left(-tNu_{1},-tNu_{2}\\right)&quot;,
+    &quot;parametricDomain&quot;: {
+      &quot;min&quot;: &quot;0&quot;,
+      &quot;max&quot;: &quot;1&quot;
+    },
+    &quot;color&quot;: &quot;#c74440&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;\\left(-Nu_{1},-Nu_{2}\\right)&quot;,
+    &quot;color&quot;: &quot;#c74440&quot;,
+    &quot;label&quot;: &quot;φ(−g♯) = ${F_{s}}&quot;,
+    &quot;showLabel&quot;: true,
+    &quot;labelOrientation&quot;: &quot;below&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;v=1&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;w=-6&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;F_{h}=\\operatorname{round}\\left(P\\left(v,w\\right),2\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;\\left(v,w\\right)&quot;,
+    &quot;color&quot;: &quot;#000000&quot;,
+    &quot;label&quot;: &quot;φ(h) = ${F_{h}}&quot;,
+    &quot;showLabel&quot;: true,
+    &quot;labelOrientation&quot;: &quot;right&quot;,
+    &quot;dragMode&quot;: &quot;XY&quot;
+  }
+]" data-options="{
+  &quot;expressions&quot;: false,
+  &quot;settingsMenu&quot;: false,
+  &quot;zoomButtons&quot;: false,
+  &quot;keypad&quot;: false
+}" id="graph-sharp-operator" data-img="figures/sharp-operator.png" data-bounds="{
+  &quot;left&quot;: -10.5,
+  &quot;right&quot;: 7,
+  &quot;bottom&quot;: -10,
+  &quot;top&quot;: 7
+}"><div class="desmos-graph" style="height:500px;"></div><div class="desmos-controls"><label><span class="desmos-control-label"><math><mi>𝑝</mi></math></span><input type="range" data-name="s" value="0.5" min="0" max="1" step="any" data-reciprocal="true"><output>2</output></label></div></div><p>The ball is shaded and the line dashed, with <math><mo>−</mo><msup><mi>𝑔</mi><mi>♯</mi></msup></math> drawn from the origin. Drag <math><mi>𝑔</mi></math>, change <math><mi>𝑝</mi></math> from <math><mn>1</mn></math> to <math><mi>∞</mi></math>, and drag the point <math><mi>ℎ</mi></math> to check that no point has a smaller value <math><mi>𝜑</mi><mrow><mo>(</mo><mi>ℎ</mi><mo>)</mo></mrow></math> than <math><mo>−</mo><msup><mi>𝑔</mi><mi>♯</mi></msup></math>.</p></div></div></figure><h2 id="loc-7">4. The effect of the chosen norm</h2><p>Once the norm is chosen, the step is fixed. To write the steps down, we need coordinates. Let <math><mi mathvariant="normal">Θ</mi><mo>=</mo><msup><mi>ℝ</mi><mrow><mi>𝑚</mi><mo lspace="0em" rspace="0em">×</mo><mi>𝑛</mi></mrow></msup></math>, so that <math><mi>𝜃</mi></math> is a matrix, for example the weights of a layer in a neural network. The derivative is then represented by the matrix <math><mi>𝐺</mi></math> of partial derivatives <math><mi>𝜕</mi><mi>𝒥︀</mi><mi>/</mi><mi>𝜕</mi><msub><mi>𝜃</mi><mrow><mi>𝑎</mi><mi>𝑏</mi></mrow></msub></math>, with</p><div class="numbered-equation"><math display="block"><mo stretchy="false">⟨</mo><mi>𝑔</mi><mo>,</mo><mi>ℎ</mi><mo form="postfix" stretchy="false">⟩</mo><mo>=</mo><mo form="prefix" stretchy="false">⟨</mo><mi>𝐺</mi><mo>,</mo><mi>ℎ</mi><msub><mo form="postfix" stretchy="false">⟩</mo><mi>𝐹</mi></msub><mo>=</mo><mo form="prefix" lspace="0em" rspace="0em">tr</mo><mrow><mo>(</mo><mrow><msup><mi>𝐺</mi><mi>⊤</mi></msup><mi>ℎ</mi></mrow><mo>)</mo></mrow><mo rspace="0em">,</mo><mspace width="1em"/><mi>𝑔</mi><mo>=</mo><mi>𝐷</mi><mi>𝒥︀</mi><mrow><mo>(</mo><mi>𝜃</mi><mo>)</mo></mrow><mi>.</mi></math><p><span class="equation-number">(11)</span></p></div><p>This uses the Frobenius inner product, which makes <math><mi>𝐺</mi></math> the Riesz representative of <math><mi>𝑔</mi></math>: the gradient for the Frobenius inner product.<sup class="footnote-ref"><a class="footnote-ref-link" href="#fn-10" id="fnref-10">10</a></sup><span class="marginnote" id="fn-10"><sup><a class="footnote-ref-link" href="#fnref-10">10</a></sup> This might seem like a limitation, but as shown in <a href="#loc-9">Section 4.1</a> every inner product on <math><mi mathvariant="normal">Θ</mi></math> can be written using the Frobenius inner product.</span> Some norms on <math><mi mathvariant="normal">Θ</mi></math>, such as the max-norm, only look at the entries of <math><mi>ℎ</mi></math>, as if the matrix were one long vector of <math><mi>𝑚</mi><mi>𝑛</mi></math> numbers. Others, such as the spectral norm, use that <math><mi>𝜃</mi></math> is a matrix, a linear map from inputs to outputs, which is what the weights of a layer are. For matrices, <math><msub><mrow><mo>‖</mo><mo lspace="0em" rspace="0em">⋅</mo><mo>‖</mo></mrow><mn>1</mn></msub></math> and <math><msub><mrow><mo>‖</mo><mo lspace="0em" rspace="0em">⋅</mo><mo>‖</mo></mrow><mi>∞</mi></msub></math> act on the entries as for vectors, while <math><msub><mrow><mo>‖</mo><mo lspace="0em" rspace="0em">⋅</mo><mo>‖</mo></mrow><mn>2</mn></msub></math> is the spectral norm, the largest singular value. Each norm then gives a dual norm and a sharp operator in terms of <math><mi>𝐺</mi></math>, and with them a known method. Since both the constrained and the penalized steps follow from <math><msub><mrow><mo>‖</mo><mi>𝑔</mi><mo>‖</mo></mrow><mo>∗</mo></msub></math> and <math><msup><mi>𝑔</mi><mi>♯</mi></msup></math>, each example shows only the one that gives the known method. The other step is a rescaled version of it, for example normalized gradient descent in place of gradient descent. The table below collects the norms of this section.<sup class="footnote-ref"><a class="footnote-ref-link" href="#fn-11" id="fnref-11">11</a></sup><span class="marginnote" id="fn-11"><sup><a class="footnote-ref-link" href="#fnref-11">11</a></sup> The downloadable code computes <math><msup><mi>𝑔</mi><mi>♯</mi></msup></math> for the Frobenius norm, a diagonal inner product, the max-norm, and the spectral norm by solving the defining problem as a small conic program <a id="loc-8" href="#loc-23" role="doc-biblioref">[3]</a>, and prints it next to the closed form.</span></p><figure><p><span class="marginnote">Table 1: Three norms and the methods they give. For the first row the method is the penalized step <math><mo>−</mo><msup><mi>𝑔</mi><mi>♯</mi></msup><mi>/</mi><mi>𝜆</mi></math>, and for the last two it is the constrained step <math><mo>−</mo><mi>𝜂</mi><msup><mi>𝑔</mi><mi>♯</mi></msup><mi>/</mi><msub><mrow><mo>‖</mo><mi>𝑔</mi><mo>‖</mo></mrow><mo>∗</mo></msub></math>.</span></p><table><thead><tr><th>Norm on <math><mi mathvariant="normal">Θ</mi></math></th><th><math><msub><mrow><mo>‖</mo><mi>𝑔</mi><mo>‖</mo></mrow><mo>∗</mo></msub></math></th><th><math><msup><mi>𝑔</mi><mi>♯</mi></msup></math></th><th>Method</th></tr></thead><tbody><tr><td>Inner product</td><td><math><msub><mrow><mo>‖</mo><mrow><msup><mi>𝒜︀</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mrow><mo>(</mo><mi>𝐺</mi><mo>)</mo></mrow></mrow><mo>‖</mo></mrow><mi>𝒜︀</mi></msub></math></td><td><math><msup><mi>𝒜︀</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mrow><mo>(</mo><mi>𝐺</mi><mo>)</mo></mrow></math></td><td>Gradient descent</td></tr><tr><td>Max-norm</td><td><math><msub><mrow><mo>‖</mo><mi>𝐺</mi><mo>‖</mo></mrow><mn>1</mn></msub></math></td><td><math><msub><mrow><mo>‖</mo><mi>𝐺</mi><mo>‖</mo></mrow><mn>1</mn></msub><mspace width="0.2222em"/><mtext>sign</mtext><mrow><mo>(</mo><mi>𝐺</mi><mo>)</mo></mrow></math></td><td>Sign descent</td></tr><tr><td>Spectral</td><td><math><msub><mrow><mo>‖</mo><mi>𝐺</mi><mo>‖</mo></mrow><mtext>nuc</mtext></msub></math></td><td><math><msub><mrow><mo>‖</mo><mi>𝐺</mi><mo>‖</mo></mrow><mtext>nuc</mtext></msub><mi>𝑈</mi><msup><mi>𝑉</mi><mi>⊤</mi></msup></math></td><td>Muon</td></tr></tbody></table></figure><p>The norms fall into two families. A norm from an inner product has a linear sharp operator, the Riesz map, and its step is a preconditioned gradient step. Every other norm has a nonlinear sharp operator, and its step is not the gradient for any fixed inner product, one that does not depend on <math><mi>𝑔</mi></math>.</p><h3 id="loc-9">4.1. Norms from an inner product</h3><p>Every inner product on <math><mi mathvariant="normal">Θ</mi></math> can be written as</p><div class="numbered-equation"><math display="block"><mo stretchy="false">⟨</mo><mi>ℎ</mi><mo>,</mo><mi>𝑘</mi><msub><mo form="postfix" stretchy="false">⟩</mo><mi>𝒜︀</mi></msub><mo>=</mo><mo form="prefix" stretchy="false">⟨</mo><mi>𝒜︀</mi><mrow><mo>(</mo><mi>ℎ</mi><mo>)</mo></mrow><mo>,</mo><mi>𝑘</mi><msub><mo stretchy="false">⟩</mo><mi>𝐹</mi></msub></math><p><span class="equation-number">(12)</span></p></div><p>where the linear map <math><mi>𝒜︀</mi><mo lspace="0.2777777777777778em" rspace="0.2777777777777778em">:</mo><mi mathvariant="normal">Θ</mi><mo stretchy="false">→</mo><mi mathvariant="normal">Θ</mi></math> is symmetric and positive definite, i.e.,</p><div class="numbered-equation"><math display="block"><mo stretchy="false">⟨</mo><mi>𝒜︀</mi><mrow><mo>(</mo><mi>ℎ</mi><mo>)</mo></mrow><mo>,</mo><mi>𝑘</mi><msub><mo form="postfix" stretchy="false">⟩</mo><mi>𝐹</mi></msub><mo>=</mo><mo form="prefix" stretchy="false">⟨</mo><mi>ℎ</mi><mo>,</mo><mi>𝒜︀</mi><mrow><mo>(</mo><mi>𝑘</mi><mo>)</mo></mrow><msub><mo form="postfix" stretchy="false">⟩</mo><mi>𝐹</mi></msub><mspace width="1em"/><mtext>and</mtext><mspace width="1em"/><mo form="prefix" stretchy="false">⟨</mo><mi>𝒜︀</mi><mrow><mo>(</mo><mi>ℎ</mi><mo>)</mo></mrow><mo>,</mo><mi>ℎ</mi><msub><mo form="postfix" stretchy="false">⟩</mo><mi>𝐹</mi></msub><mo>></mo><mn>0</mn><mspace width="1em"/><mtext>for all</mtext><mspace width="0.2222em"/><mi>ℎ</mi><mo>≠</mo><mn>0</mn><mi>.</mi></math><p><span class="equation-number">(13)</span></p></div><p>Since <math><mo stretchy="false">⟨</mo><mi>𝑔</mi><mo>,</mo><mi>ℎ</mi><mo form="postfix" stretchy="false">⟩</mo><mo>=</mo><mo form="prefix" stretchy="false">⟨</mo><mi>𝐺</mi><mo>,</mo><mi>ℎ</mi><msub><mo form="postfix" stretchy="false">⟩</mo><mi>𝐹</mi></msub><mo>=</mo><mo form="prefix" stretchy="false">⟨</mo><msup><mi>𝒜︀</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mrow><mo>(</mo><mi>𝐺</mi><mo>)</mo></mrow><mo>,</mo><mi>ℎ</mi><msub><mo stretchy="false">⟩</mo><mi>𝒜︀</mi></msub></math>,<sup class="footnote-ref"><a class="footnote-ref-link" href="#fn-12" id="fnref-12">12</a></sup><span class="marginnote" id="fn-12"><sup><a class="footnote-ref-link" href="#fnref-12">12</a></sup> We look for the <math><mi>𝑘</mi><mo>∈</mo><mi mathvariant="normal">Θ</mi></math> with <math><mo stretchy="false">⟨</mo><mi>𝑘</mi><mo>,</mo><mi>ℎ</mi><msub><mo form="postfix" stretchy="false">⟩</mo><mi>𝒜︀</mi></msub><mo>=</mo><mo form="prefix" stretchy="false">⟨</mo><mi>𝐺</mi><mo>,</mo><mi>ℎ</mi><msub><mo stretchy="false">⟩</mo><mi>𝐹</mi></msub></math> for all <math><mi>ℎ</mi></math>. By the definition of <math><mo stretchy="false">⟨</mo><mo lspace="0em" rspace="0em">⋅</mo><mo>,</mo><mo lspace="0em" rspace="0em">⋅</mo><msub><mo stretchy="false">⟩</mo><mi>𝒜︀</mi></msub></math>, the left side is <math><mo stretchy="false">⟨</mo><mi>𝒜︀</mi><mrow><mo>(</mo><mi>𝑘</mi><mo>)</mo></mrow><mo>,</mo><mi>ℎ</mi><msub><mo stretchy="false">⟩</mo><mi>𝐹</mi></msub></math>, so <math><mo stretchy="false">⟨</mo><mi>𝒜︀</mi><mrow><mo>(</mo><mi>𝑘</mi><mo>)</mo></mrow><mo>−</mo><mi>𝐺</mi><mo>,</mo><mi>ℎ</mi><msub><mo form="postfix" stretchy="false">⟩</mo><mi>𝐹</mi></msub><mo>=</mo><mn>0</mn></math> for all <math><mi>ℎ</mi></math>, which gives <math><mi>𝒜︀</mi><mrow><mo>(</mo><mi>𝑘</mi><mo>)</mo></mrow><mo>=</mo><mi>𝐺</mi></math> and <math><mi>𝑘</mi><mo>=</mo><msup><mi>𝒜︀</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mrow><mo>(</mo><mi>𝐺</mi><mo>)</mo></mrow></math>. The inverse exists because <math><mi>𝒜︀</mi></math> is positive definite.</span> the gradient for <math><mo stretchy="false">⟨</mo><mo lspace="0em" rspace="0em">⋅</mo><mo>,</mo><mo lspace="0em" rspace="0em">⋅</mo><msub><mo stretchy="false">⟩</mo><mi>𝒜︀</mi></msub></math> is <math><msub><mo>∇</mo><mi>𝒜︀</mi></msub><mi>𝒥︀</mi><mo>=</mo><msup><mi>𝒜︀</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mrow><mo>(</mo><mi>𝐺</mi><mo>)</mo></mrow></math>.<sup class="footnote-ref"><a class="footnote-ref-link" href="#fn-13" id="fnref-13">13</a></sup><span class="marginnote" id="fn-13"><sup><a class="footnote-ref-link" href="#fnref-13">13</a></sup> In <a href="#ex-two-inner-products">Example 1</a>, the second inner product is <math><mi>𝒜︀</mi><mo>=</mo><mtext>diag</mtext><mrow><mo>(</mo><mrow><mn>1</mn><mo>,</mo><mn>4</mn></mrow><mo>)</mo></mrow></math>, and its gradient <math><mrow><mo>(</mo><mrow><mn>2</mn><msub><mi>𝜃</mi><mn>1</mn></msub><mo>,</mo><mn>1</mn><mi>/</mi><mn>4</mn></mrow><mo>)</mo></mrow></math> is <math><msup><mi>𝒜︀</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup></math> applied to the first.</span> The inverse <math><msup><mi>𝒜︀</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup></math> may look unusual, but it is the familiar preconditioner of scientific computing, where a problem is rescaled before it is solved: a gradient step with <math><msub><mo>∇</mo><mi>𝒜︀</mi></msub><mi>𝒥︀</mi></math> is plain gradient descent in the rescaled variables <math><mi>𝜉</mi><mo>=</mo><msup><mi>𝒜︀</mi><mrow><mn>1</mn><mi>/</mi><mn>2</mn></mrow></msup><mrow><mo>(</mo><mi>𝜃</mi><mo>)</mo></mrow></math>.<sup class="footnote-ref"><a class="footnote-ref-link" href="#fn-14" id="fnref-14">14</a></sup><span class="marginnote" id="fn-14"><sup><a class="footnote-ref-link" href="#fnref-14">14</a></sup> With <math><mi>𝜉</mi><mo>=</mo><msup><mi>𝒜︀</mi><mrow><mn>1</mn><mi>/</mi><mn>2</mn></mrow></msup><mrow><mo>(</mo><mi>𝜃</mi><mo>)</mo></mrow></math>, the derivative of <math><mi>𝒥︀</mi><mrow><mo>(</mo><mrow><msup><mi>𝒜︀</mi><mrow><mo>−</mo><mn>1</mn><mi>/</mi><mn>2</mn></mrow></msup><mrow><mo>(</mo><mi>𝜉</mi><mo>)</mo></mrow></mrow><mo>)</mo></mrow></math> is represented by <math><msup><mi>𝒜︀</mi><mrow><mo>−</mo><mn>1</mn><mi>/</mi><mn>2</mn></mrow></msup><mrow><mo>(</mo><mi>𝐺</mi><mo>)</mo></mrow></math>, so a gradient step in <math><mi>𝜉</mi></math> changes <math><mi>𝜉</mi></math> by <math><mo>−</mo><mfrac><mn>1</mn><mi>𝜆</mi></mfrac><msup><mi>𝒜︀</mi><mrow><mo>−</mo><mn>1</mn><mi>/</mi><mn>2</mn></mrow></msup><mrow><mo>(</mo><mi>𝐺</mi><mo>)</mo></mrow></math>, and <math><mi>𝜃</mi><mo>=</mo><msup><mi>𝒜︀</mi><mrow><mo>−</mo><mn>1</mn><mi>/</mi><mn>2</mn></mrow></msup><mrow><mo>(</mo><mi>𝜉</mi><mo>)</mo></mrow></math> by <math><mo>−</mo><mfrac><mn>1</mn><mi>𝜆</mi></mfrac><msup><mi>𝒜︀</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mrow><mo>(</mo><mi>𝐺</mi><mo>)</mo></mrow></math>.</span> With <math><mi>𝒜︀</mi></math> close to the curvature of <math><mi>𝒥︀</mi></math>, the rescaled problem is well conditioned, and the step comes close to Newton’s method.</p><figure id="ex-gd"><p><span class="marginnote">Example 3: Preconditioned gradient descent</span></p><div class="blog-example"><div style="background: #3d997026; border-radius: .4em; padding: 1em; width: 100%; box-sizing: border-box; margin-bottom: .5em;"><p><strong>Example 3 (Preconditioned gradient descent)</strong>   Let <math><msup><mrow><mo>‖</mo><mi>ℎ</mi><mo>‖</mo></mrow><mn>2</mn></msup><mo>=</mo><mo form="prefix" stretchy="false">⟨</mo><mi>ℎ</mi><mo>,</mo><mi>ℎ</mi><msub><mo stretchy="false">⟩</mo><mi>𝒜︀</mi></msub></math>, so that <math><mo stretchy="false">⟨</mo><mi>𝑔</mi><mo>,</mo><mi>ℎ</mi><mo form="postfix" stretchy="false">⟩</mo><mo>=</mo><mo form="prefix" stretchy="false">⟨</mo><msub><mo form="prefix">∇</mo><mi>𝒜︀</mi></msub><mi>𝒥︀</mi><mo>,</mo><mi>ℎ</mi><msub><mo stretchy="false">⟩</mo><mi>𝒜︀</mi></msub></math> with the gradient <math><msub><mo>∇</mo><mi>𝒜︀</mi></msub><mi>𝒥︀</mi><mo>=</mo><msup><mi>𝒜︀</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mrow><mo>(</mo><mi>𝐺</mi><mo>)</mo></mrow></math>. Then</p><div class="numbered-equation"><math display="block"><mtable class="multiline-equation aligned"><mtr><mtd><msub><mrow><mo>‖</mo><mi>𝑔</mi><mo>‖</mo></mrow><mo>∗</mo></msub></mtd><mtd><mo form="infix">=</mo><munder><mo form="prefix" lspace="0em" rspace="0em">max</mo><mrow><msub><mrow><mo>‖</mo><mi>ℎ</mi><mo>‖</mo></mrow><mi>𝒜︀</mi></msub><mo lspace="0em" rspace="0em">≤</mo><mn>1</mn></mrow></munder><mspace width="1em"/><mo form="prefix" stretchy="false">⟨</mo><msub><mo form="prefix">∇</mo><mi>𝒜︀</mi></msub><mi>𝒥︀</mi><mo>,</mo><mi>ℎ</mi><msub><mo form="postfix" stretchy="false">⟩</mo><mi>𝒜︀</mi></msub><mo>=</mo><msub><mrow><mo>‖</mo><mrow><msub><mo>∇</mo><mi>𝒜︀</mi></msub><mi>𝒥︀</mi></mrow><mo>‖</mo></mrow><mi>𝒜︀</mi></msub><mo>=</mo><mo form="prefix" stretchy="false">⟨</mo><mi>𝐺</mi><mo>,</mo><msup><mi>𝒜︀</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mrow><mo>(</mo><mi>𝐺</mi><mo>)</mo></mrow><msubsup><mo form="postfix" stretchy="false">⟩</mo><mi>𝐹</mi><mrow><mn>1</mn><mi>/</mi><mn>2</mn></mrow></msubsup><mo rspace="0em">,</mo></mtd></mtr><mtr><mtd><msup><mi>𝑔</mi><mi>♯</mi></msup></mtd><mtd><mo form="infix">=</mo><mo form="prefix">−</mo><munder><mo form="prefix" lspace="0.16666666666666666em" rspace="0em">arg min</mo><mrow><mi>ℎ</mi><mo lspace="0em" rspace="0em">∈</mo><mi mathvariant="normal">Θ</mi></mrow></munder><mspace width="1em"/><mo form="prefix" stretchy="false">⟨</mo><msub><mo form="prefix">∇</mo><mi>𝒜︀</mi></msub><mi>𝒥︀</mi><mo>,</mo><mi>ℎ</mi><msub><mo form="postfix" stretchy="false">⟩</mo><mi>𝒜︀</mi></msub><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><msubsup><mrow><mo>‖</mo><mi>ℎ</mi><mo>‖</mo></mrow><mi>𝒜︀</mi><mn>2</mn></msubsup><mo>=</mo><msub><mo form="prefix">∇</mo><mi>𝒜︀</mi></msub><mi>𝒥︀</mi><mi>.</mi></mtd></mtr></mtable></math><p><span class="equation-number">(14)</span></p></div><p>By the Cauchy–Schwarz inequality, <math><mo stretchy="false">⟨</mo><msub><mo form="prefix">∇</mo><mi>𝒜︀</mi></msub><mi>𝒥︀</mi><mo>,</mo><mi>ℎ</mi><msub><mo form="postfix" stretchy="false">⟩</mo><mi>𝒜︀</mi></msub><mo>≤</mo><msub><mrow><mo>‖</mo><mrow><msub><mo>∇</mo><mi>𝒜︀</mi></msub><mi>𝒥︀</mi></mrow><mo>‖</mo></mrow><mi>𝒜︀</mi></msub><msub><mrow><mo>‖</mo><mi>ℎ</mi><mo>‖</mo></mrow><mi>𝒜︀</mi></msub></math>, with equality at <math><mi>ℎ</mi><mo>=</mo><msub><mo form="prefix">∇</mo><mi>𝒜︀</mi></msub><mi>𝒥︀</mi><mi>/</mi><msub><mrow><mo>‖</mo><mrow><msub><mo>∇</mo><mi>𝒜︀</mi></msub><mi>𝒥︀</mi></mrow><mo>‖</mo></mrow><mi>𝒜︀</mi></msub></math>. In the problem for <math><msup><mi>𝑔</mi><mi>♯</mi></msup></math>, completing the square gives</p><div class="numbered-equation"><math display="block"><mo stretchy="false">⟨</mo><msub><mo form="prefix">∇</mo><mi>𝒜︀</mi></msub><mi>𝒥︀</mi><mo>,</mo><mi>ℎ</mi><msub><mo form="postfix" stretchy="false">⟩</mo><mi>𝒜︀</mi></msub><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><msubsup><mrow><mo>‖</mo><mi>ℎ</mi><mo>‖</mo></mrow><mi>𝒜︀</mi><mn>2</mn></msubsup><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><msubsup><mrow><mo>‖</mo><mrow><mi>ℎ</mi><mo>+</mo><msub><mo form="prefix">∇</mo><mi>𝒜︀</mi></msub><mi>𝒥︀</mi></mrow><mo>‖</mo></mrow><mi>𝒜︀</mi><mn>2</mn></msubsup><mo>−</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><msubsup><mrow><mo>‖</mo><mrow><msub><mo>∇</mo><mi>𝒜︀</mi></msub><mi>𝒥︀</mi></mrow><mo>‖</mo></mrow><mi>𝒜︀</mi><mn>2</mn></msubsup><mo rspace="0em">,</mo></math><p><span class="equation-number">(15)</span></p></div><p>which is smallest at <math><mi>ℎ</mi><mo>=</mo><mo form="prefix">−</mo><msub><mo form="prefix">∇</mo><mi>𝒜︀</mi></msub><mi>𝒥︀</mi></math>, so <math><msup><mi>𝑔</mi><mi>♯</mi></msup><mo>=</mo><msub><mo form="prefix">∇</mo><mi>𝒜︀</mi></msub><mi>𝒥︀</mi></math>. The sharp operator is the Riesz map, and the penalized step</p><div class="numbered-equation"><math display="block"><msub><mi>ℎ</mi><mi>𝑃</mi></msub><mo>=</mo><mo form="prefix">−</mo><mfrac><mn>1</mn><mi>𝜆</mi></mfrac><msup><mi>𝒜︀</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mrow><mo>(</mo><mi>𝐺</mi><mo>)</mo></mrow></math><p><span class="equation-number">(16)</span></p></div><p>is preconditioned gradient descent with the preconditioner <math><msup><mi>𝒜︀</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup></math>, and for the Frobenius norm, <math><mi>𝒜︀</mi><mo>=</mo><mi>ℐ︀</mi></math>, plain gradient descent.</p></div></div></figure><figure><p><span class="marginnote">Interactive figure 3: A norm from an inner product</span></p><div class="blog-interactive"><div style="background: #6042a626; border-radius: .4em; padding: 1em; width: 100%; box-sizing: border-box; margin-bottom: .5em;"><p><strong>Interactive figure 3 (A norm from an inner product)</strong>   The graph shows the constrained step for an inner product on <math><msup><mi>ℝ</mi><mn>2</mn></msup></math>, <math><mo stretchy="false">⟨</mo><mi>ℎ</mi><mo>,</mo><mi>𝑘</mi><msub><mo form="postfix" stretchy="false">⟩</mo><mi>𝒜︀</mi></msub><mo>=</mo><msup><mi>ℎ</mi><mi>⊤</mi></msup><mi>𝐴</mi><mi>𝑘</mi></math>, where</p><div class="numbered-equation"><math display="block"><mi>𝐴</mi><mo>=</mo><msub><mi>𝑅</mi><mi>𝜑</mi></msub><mrow><mo>[</mo><mtable><mtr><mtd><mn>1</mn></mtd><mtd><mn>0</mn></mtd></mtr><mtr><mtd><mn>0</mn></mtd><mtd><mi>𝜅</mi></mtd></mtr></mtable><mo>]</mo></mrow><msubsup><mi>𝑅</mi><mi>𝜑</mi><mi>⊤</mi></msubsup><mo rspace="0em">,</mo><mspace width="1em"/><msub><mi>𝑅</mi><mi>𝜑</mi></msub><mo>=</mo><mrow><mo>[</mo><mtable><mtr><mtd><mo lspace="0em" rspace="0.16666666666666666em">cos</mo><mi>𝜑</mi></mtd><mtd><mo>−</mo><mo form="prefix" lspace="0.16666666666666666em" rspace="0.16666666666666666em">sin</mo><mi>𝜑</mi></mtd></mtr><mtr><mtd><mo lspace="0em" rspace="0.16666666666666666em">sin</mo><mi>𝜑</mi></mtd><mtd><mo lspace="0em" rspace="0.16666666666666666em">cos</mo><mi>𝜑</mi></mtd></mtr></mtable><mo>]</mo></mrow><mo rspace="0em">,</mo></math><p><span class="equation-number">(17)</span></p></div><p>has the eigenvalues <math><mn>1</mn></math> and <math><mi>𝜅</mi></math>, with eigenvectors turned by the angle <math><mi>𝜑</mi></math>. The unit ball is an ellipse, and the step <math><msub><mi>ℎ</mi><mi>𝐶</mi></msub><mo>=</mo><mo form="prefix">−</mo><msup><mi>𝐴</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mi>𝑔</mi><mi>/</mi><msub><mrow><mo>‖</mo><mi>𝑔</mi><mo>‖</mo></mrow><mo>∗</mo></msub></math>, for <math><mi>𝜂</mi><mo>=</mo><mn>1</mn></math>, is where the line <math><mo stretchy="false">⟨</mo><mi>𝑔</mi><mo>,</mo><mi>ℎ</mi><mo form="postfix" stretchy="false">⟩</mo><mo>+</mo><msub><mrow><mo>‖</mo><mi>𝑔</mi><mo>‖</mo></mrow><mo>∗</mo></msub><mo>=</mo><mn>0</mn></math> touches it. Unlike the steps for <math><mi>𝑝</mi><mo>=</mo><mn>1</mn></math> and <math><mi>𝑝</mi><mo>=</mo><mi>∞</mi></math>, it never jumps between corners, and unlike the steps of the other <math><msub><mi>ℓ</mi><mi>𝑝</mi></msub></math>-norms, its direction depends linearly on <math><mi>𝑔</mi></math>, since the sharp operator <math><msup><mi>𝐴</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup></math> is linear.</p><div class="desmos-embed" data-state="[
+  {
+    &quot;id&quot;: &quot;c&quot;,
+    &quot;latex&quot;: &quot;c=4&quot;
+  },
+  {
+    &quot;id&quot;: &quot;w&quot;,
+    &quot;latex&quot;: &quot;w=30&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;a=0.6&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;b=0.8&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;m=\\frac{w\\pi}{180}&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;A_{11}=\\cos^{2}\\left(m\\right)+c\\sin^{2}\\left(m\\right)&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;A_{22}=\\sin^{2}\\left(m\\right)+c\\cos^{2}\\left(m\\right)&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;A_{12}=\\left(1-c\\right)\\cos\\left(m\\right)\\sin\\left(m\\right)&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;A_{11}x^{2}+2A_{12}xy+A_{22}y^{2}\\le1&quot;,
+    &quot;color&quot;: &quot;#c74440&quot;,
+    &quot;fillOpacity&quot;: &quot;0.12&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;x^{2}+y^{2}=1&quot;,
+    &quot;color&quot;: &quot;#000000&quot;,
+    &quot;lineStyle&quot;: &quot;DOTTED&quot;,
+    &quot;lineOpacity&quot;: &quot;0.5&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;u=\\left(\\frac{A_{22}a-A_{12}b}{c},\\frac{A_{11}b-A_{12}a}{c}\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;N=\\sqrt{a\\cdot u.x+b\\cdot u.y}&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;\\left(ta,tb\\right)&quot;,
+    &quot;parametricDomain&quot;: {
+      &quot;min&quot;: &quot;0&quot;,
+      &quot;max&quot;: &quot;1&quot;
+    },
+    &quot;color&quot;: &quot;#2d70b3&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;\\left(a,b\\right)&quot;,
+    &quot;color&quot;: &quot;#2d70b3&quot;,
+    &quot;label&quot;: &quot;g&quot;,
+    &quot;showLabel&quot;: true,
+    &quot;dragMode&quot;: &quot;XY&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;h=\\left(-\\frac{u.x}{N},-\\frac{u.y}{N}\\right)&quot;,
+    &quot;color&quot;: &quot;#c74440&quot;,
+    &quot;label&quot;: &quot;`h_C`&quot;,
+    &quot;showLabel&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;th&quot;,
+    &quot;parametricDomain&quot;: {
+      &quot;min&quot;: &quot;0&quot;,
+      &quot;max&quot;: &quot;1&quot;
+    },
+    &quot;color&quot;: &quot;#c74440&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;ax+by=-N&quot;,
+    &quot;color&quot;: &quot;#c74440&quot;,
+    &quot;lineStyle&quot;: &quot;DASHED&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;-\\frac{t\\left(a,b\\right)}{\\sqrt{a^{2}+b^{2}}}&quot;,
+    &quot;parametricDomain&quot;: {
+      &quot;min&quot;: &quot;0&quot;,
+      &quot;max&quot;: &quot;1&quot;
+    },
+    &quot;color&quot;: &quot;#000000&quot;,
+    &quot;lineStyle&quot;: &quot;DOTTED&quot;
+  }
+]" data-options="{
+  &quot;expressions&quot;: false,
+  &quot;settingsMenu&quot;: false,
+  &quot;zoomButtons&quot;: false,
+  &quot;keypad&quot;: false
+}" id="graph-inner-product-step" data-img="figures/inner-product-step.png" data-bounds="{
+  &quot;left&quot;: -1.6,
+  &quot;right&quot;: 1.6,
+  &quot;bottom&quot;: -1.6,
+  &quot;top&quot;: 1.6
+}"><div class="desmos-graph" style="height:500px;"></div><div class="desmos-controls"><label><span class="desmos-control-label"><math><mi>𝜅</mi></math></span><input type="range" data-name="c" value="4" min="1" max="10" step="0.01"><output>4</output></label><label><span class="desmos-control-label"><math><mi>𝜑</mi></math></span><input type="range" data-name="w" value="30" min="0" max="180" step="1"><output>30</output></label></div></div><p><span class="desmos-readout">Currently, <math><mi>𝐴</mi><mo form="infix" rspace="0em">=</mo></math><span data-entries="[
+  [
+    &quot;A_{11}&quot;,
+    &quot;A_{12}&quot;
+  ],
+  [
+    &quot;A_{12}&quot;,
+    &quot;A_{22}&quot;
+  ]
+]"></span></span></p><p>The Euclidean unit circle and the Euclidean step <math><mo>−</mo><mi>𝑔</mi><mi>/</mi><mrow><mo>‖</mo><mi>𝑔</mi><mo>‖</mo></mrow></math> are dotted.</p></div></div></figure><h3 id="loc-10">4.2. Norms not from inner products</h3><p>Recall that the norm need not come from an inner product. Every method still minimizes the same linearization <math><mo stretchy="false">⟨</mo><mi>𝑔</mi><mo>,</mo><mi>ℎ</mi><mo stretchy="false">⟩</mo></math>, with the derivative <math><mi>𝑔</mi><mo>=</mo><mi>𝐷</mi><mi>𝒥︀</mi><mrow><mo>(</mo><mi>𝜃</mi><mo>)</mo></mrow><mo>∈</mo><msup><mi mathvariant="normal">Θ</mi><mo>∗</mo></msup></math>. What changes is the norm that limits the step, and with it the sharp operator, the map from <math><msup><mi mathvariant="normal">Θ</mi><mo>∗</mo></msup></math> back to <math><mi mathvariant="normal">Θ</mi></math>. For a norm that does not come from an inner product, the sharp operator is nonlinear,<sup class="footnote-ref"><a class="footnote-ref-link" href="#fn-15" id="fnref-15">15</a></sup><span class="marginnote" id="fn-15"><sup><a class="footnote-ref-link" href="#fnref-15">15</a></sup> If <math><mi>𝑔</mi><mo stretchy="false">↦</mo><msup><mi>𝑔</mi><mi>♯</mi></msup></math> were linear, then <math><msubsup><mrow><mo>‖</mo><mi>𝑔</mi><mo>‖</mo></mrow><mo>∗</mo><mn>2</mn></msubsup><mo>=</mo><mo form="prefix" stretchy="false">⟨</mo><mi>𝑔</mi><mo>,</mo><msup><mi>𝑔</mi><mi>♯</mi></msup><mo stretchy="false">⟩</mo></math> would be a quadratic form in <math><mi>𝑔</mi></math>, so the dual norm would come from an inner product on <math><msup><mi mathvariant="normal">Θ</mi><mo>∗</mo></msup></math>, and then so would the norm on <math><mi mathvariant="normal">Θ</mi></math>, its dual.</span> so it is not the Riesz map of any fixed inner product, and the step is not a gradient for any inner product that does not depend on <math><mi>𝑔</mi></math>. The max-norm is one such norm: as in the plane, <math><msup><mi>𝑔</mi><mi>♯</mi></msup><mo>=</mo><msub><mrow><mo>‖</mo><mi>𝐺</mi><mo>‖</mo></mrow><mn>1</mn></msub><mspace width="0.2222em"/><mtext>sign</mtext><mrow><mo>(</mo><mi>𝐺</mi><mo>)</mo></mrow></math>, and its constrained step <math><msub><mi>ℎ</mi><mi>𝐶</mi></msub><mo>=</mo><mo form="prefix">−</mo><mi>𝜂</mi><mspace width="0.2222em"/><mtext>sign</mtext><mrow><mo>(</mo><mi>𝐺</mi><mo>)</mo></mrow></math> is sign descent. The example below shows the spectral norm, whose constrained step is Muon.</p><figure id="ex-muon"><p><span class="marginnote">Example 4: The spectral norm: Muon</span></p><div class="blog-example"><div style="background: #3d997026; border-radius: .4em; padding: 1em; width: 100%; box-sizing: border-box; margin-bottom: .5em;"><p><strong>Example 4 (The spectral norm: Muon)</strong>   The spectral norm of a matrix <math><mi>ℎ</mi></math> is its largest singular value, <math><msub><mrow><mo>‖</mo><mi>ℎ</mi><mo>‖</mo></mrow><mn>2</mn></msub><mo>=</mo><msub><mi>𝜎</mi><mtext>max</mtext></msub><mrow><mo>(</mo><mi>ℎ</mi><mo>)</mo></mrow></math>. Let <math><mi>𝜃</mi><mo>∈</mo><msup><mi>ℝ</mi><mrow><mi>𝑚</mi><mo lspace="0em" rspace="0em">×</mo><mi>𝑛</mi></mrow></msup></math> be the weights of a linear layer <math><mi>𝑍</mi><mo>=</mo><mi>𝜃</mi><mi>𝑋</mi></math>. A step <math><mi>ℎ</mi></math> changes the outputs by <math><mi>ℎ</mi><mi>𝑋</mi></math>, and the spectral norm is the largest such change relative to the inputs,</p><div class="numbered-equation"><math display="block"><msub><mrow><mo>‖</mo><mrow><mi>ℎ</mi><mi>𝑋</mi></mrow><mo>‖</mo></mrow><mi>𝐹</mi></msub><mo>≤</mo><msub><mrow><mo>‖</mo><mi>ℎ</mi><mo>‖</mo></mrow><mn>2</mn></msub><msub><mrow><mo>‖</mo><mi>𝑋</mi><mo>‖</mo></mrow><mi>𝐹</mi></msub><mspace width="1em"/><mtext>for all</mtext><mspace width="0.2222em"/><mi>𝑋</mi><mi>.</mi></math><p><span class="equation-number">(18)</span></p></div><p>As such, bounding the spectral norm effectively bounds the change of the outputs for every input. The dual norm and the sharp follow from the compact singular value decomposition <math><mi>𝐺</mi><mo>=</mo><mi>𝑈</mi><mi mathvariant="normal">Σ</mi><msup><mi>𝑉</mi><mi>⊤</mi></msup><mo>=</mo><msub><mo form="prefix" lspace="0em">∑</mo><mi>𝑘</mi></msub><msub><mi>𝜎</mi><mi>𝑘</mi></msub><msub><mi>𝑢</mi><mi>𝑘</mi></msub><msubsup><mi>𝑣</mi><mi>𝑘</mi><mi>⊤</mi></msubsup></math>, which keeps only the nonzero singular values,</p><div class="numbered-equation"><math display="block"><mtable class="multiline-equation aligned"><mtr><mtd><msub><mrow><mo>‖</mo><mi>𝑔</mi><mo>‖</mo></mrow><mo>∗</mo></msub></mtd><mtd><mo form="infix">=</mo><munder><mo form="prefix" lspace="0em" rspace="0em">max</mo><mrow><msub><mrow><mo>‖</mo><mi>ℎ</mi><mo>‖</mo></mrow><mn>2</mn></msub><mo lspace="0em" rspace="0em">≤</mo><mn>1</mn></mrow></munder><mspace width="1em"/><mo form="prefix" lspace="0em" rspace="0em">tr</mo><mrow><mo>(</mo><mrow><msup><mi>𝐺</mi><mi>⊤</mi></msup><mi>ℎ</mi></mrow><mo>)</mo></mrow><mo>=</mo><msub><mrow><mo>‖</mo><mi>𝐺</mi><mo>‖</mo></mrow><mtext>nuc</mtext></msub><mo rspace="0em">,</mo></mtd></mtr><mtr><mtd><msup><mi>𝑔</mi><mi>♯</mi></msup></mtd><mtd><mo form="infix">=</mo><mo form="prefix">−</mo><munder><mo form="prefix" lspace="0.16666666666666666em" rspace="0em">arg min</mo><mrow><mi>ℎ</mi><mo lspace="0em" rspace="0em">∈</mo><mi mathvariant="normal">Θ</mi></mrow></munder><mspace width="1em"/><mo form="prefix" lspace="0em" rspace="0em">tr</mo><mrow><mo>(</mo><mrow><msup><mi>𝐺</mi><mi>⊤</mi></msup><mi>ℎ</mi></mrow><mo>)</mo></mrow><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><msubsup><mrow><mo>‖</mo><mi>ℎ</mi><mo>‖</mo></mrow><mn>2</mn><mn>2</mn></msubsup><mo>=</mo><msub><mrow><mo>‖</mo><mi>𝐺</mi><mo>‖</mo></mrow><mtext>nuc</mtext></msub><mi>𝑈</mi><msup><mi>𝑉</mi><mi>⊤</mi></msup><mi>.</mi></mtd></mtr></mtable></math><p><span class="equation-number">(19)</span></p></div><p>By the cyclic property of the trace,</p><div class="numbered-equation"><math display="block"><mtable class="multiline-equation aligned"><mtr><mtd><mo lspace="0em" rspace="0em">tr</mo><mrow><mo>(</mo><mrow><msup><mi>𝐺</mi><mi>⊤</mi></msup><mi>ℎ</mi></mrow><mo>)</mo></mrow></mtd><mtd><mo form="infix">=</mo><mo form="prefix" lspace="0em" rspace="0em">tr</mo><mrow><mo>(</mo><mrow><mi>𝑉</mi><mi mathvariant="normal">Σ</mi><msup><mi>𝑈</mi><mi>⊤</mi></msup><mi>ℎ</mi></mrow><mo>)</mo></mrow><mo>=</mo><mo form="prefix" lspace="0em" rspace="0em">tr</mo><mrow><mo>(</mo><mrow><mi mathvariant="normal">Σ</mi><msup><mi>𝑈</mi><mi>⊤</mi></msup><mi>ℎ</mi><mi>𝑉</mi></mrow><mo>)</mo></mrow></mtd></mtr><mtr><mtd></mtd><mtd><mo form="infix">=</mo><munder><mo form="prefix" lspace="0em">∑</mo><mi>𝑘</mi></munder><msub><mi>𝜎</mi><mi>𝑘</mi></msub><msub><mrow><mo>(</mo><mrow><msup><mi>𝑈</mi><mi>⊤</mi></msup><mi>ℎ</mi><mi>𝑉</mi></mrow><mo>)</mo></mrow><mrow><mi>𝑘</mi><mi>𝑘</mi></mrow></msub><mo>≤</mo><munder><mo form="prefix" lspace="0em">∑</mo><mi>𝑘</mi></munder><msub><mi>𝜎</mi><mi>𝑘</mi></msub><mo>=</mo><msub><mrow><mo>‖</mo><mi>𝐺</mi><mo>‖</mo></mrow><mtext>nuc</mtext></msub><mo rspace="0em">,</mo></mtd></mtr></mtable></math><p><span class="equation-number">(20)</span></p></div><p>since each diagonal entry of <math><msup><mi>𝑈</mi><mi>⊤</mi></msup><mi>ℎ</mi><mi>𝑉</mi></math> is at most its spectral norm, <math><msub><mrow><mo>‖</mo><mrow><msup><mi>𝑈</mi><mi>⊤</mi></msup><mi>ℎ</mi><mi>𝑉</mi></mrow><mo>‖</mo></mrow><mn>2</mn></msub><mo>≤</mo><msub><mrow><mo>‖</mo><mi>ℎ</mi><mo>‖</mo></mrow><mn>2</mn></msub><mo>≤</mo><mn>1</mn></math>. Equality holds at <math><mi>ℎ</mi><mo>=</mo><mi>𝑈</mi><msup><mi>𝑉</mi><mi>⊤</mi></msup></math>, where <math><msup><mi>𝑈</mi><mi>⊤</mi></msup><mi>ℎ</mi><mi>𝑉</mi><mo>=</mo><mi>𝐼</mi></math>. For the minimum, fix <math><mi>𝑡</mi><mo>=</mo><msub><mrow><mo>‖</mo><mi>ℎ</mi><mo>‖</mo></mrow><mn>2</mn></msub></math>: the linear part is then smallest at <math><mi>ℎ</mi><mo>=</mo><mo form="prefix">−</mo><mi>𝑡</mi><mi>𝑈</mi><msup><mi>𝑉</mi><mi>⊤</mi></msup></math>, which leaves <math><mo>−</mo><mi>𝑡</mi><msub><mrow><mo>‖</mo><mi>𝐺</mi><mo>‖</mo></mrow><mtext>nuc</mtext></msub><mo>+</mo><msup><mi>𝑡</mi><mn>2</mn></msup><mi>/</mi><mn>2</mn></math>, smallest at <math><mi>𝑡</mi><mo>=</mo><msub><mrow><mo>‖</mo><mi>𝐺</mi><mo>‖</mo></mrow><mtext>nuc</mtext></msub></math>. The nuclear norm, the sum of the singular values, is therefore not chosen but appears as the dual of the spectral norm. The constrained step</p><div class="numbered-equation"><math display="block"><msub><mi>ℎ</mi><mi>𝐶</mi></msub><mo>=</mo><mo form="prefix">−</mo><mi>𝜂</mi><mi>𝑈</mi><msup><mi>𝑉</mi><mi>⊤</mi></msup></math><p><span class="equation-number">(21)</span></p></div><p>is minus the matrix with the singular vectors of <math><mi>𝐺</mi></math> and all its nonzero singular values set to <math><mi>𝜂</mi></math>, while the zero ones stay zero. It is the update of Muon <a id="loc-11" href="#loc-24" role="doc-biblioref">[4]</a>, applied to an averaged derivative as in the next section. In a network, the constraint is applied to each block.<sup class="footnote-ref"><a class="footnote-ref-link" href="#fn-16" id="fnref-16">16</a></sup><span class="marginnote" id="fn-16"><sup><a class="footnote-ref-link" href="#fnref-16">16</a></sup> That is, the norm is <math><msub><mo lspace="0em" rspace="0.16666666666666666em">max</mo><mi>𝑖</mi></msub><msub><mrow><mo>‖</mo><msub><mi>ℎ</mi><mi>𝑖</mi></msub><mo>‖</mo></mrow><mn>2</mn></msub></math>, as in Bernstein and Newhouse <a href="#loc-22" role="doc-biblioref">[2]</a>. Its dual norm is <math><msub><mo lspace="0em">∑</mo><mi>𝑖</mi></msub><msub><mrow><mo>‖</mo><msub><mi>𝐺</mi><mi>𝑖</mi></msub><mo>‖</mo></mrow><mtext>nuc</mtext></msub></math>, and each block takes the step <math><mo>−</mo><mi>𝜂</mi><msub><mi>𝑈</mi><mi>𝑖</mi></msub><msubsup><mi>𝑉</mi><mi>𝑖</mi><mi>⊤</mi></msubsup></math>.</span> In practice, Muon computes <math><mi>𝑈</mi><msup><mi>𝑉</mi><mi>⊤</mi></msup></math> with a few matrix products by a Newton–Schulz iteration, whose polynomials are improved by <a href="/blog/2026/01-03-polar-express/">The Polar Express Algorithm</a>, and uses <math><mi>𝑈</mi><msup><mi>𝑉</mi><mi>⊤</mi></msup></math> only for the weight matrices of the hidden layers. Avoiding the SVD is what makes Muon practical for large networks: an SVD runs poorly on GPUs and needs high precision, while matrix products are fast even in low precision.</p></div></div></figure><figure><p><span class="marginnote">Interactive figure 4: The Muon step</span></p><div class="blog-interactive"><div style="background: #6042a626; border-radius: .4em; padding: 1em; width: 100%; box-sizing: border-box; margin-bottom: .5em;"><p><strong>Interactive figure 4 (The Muon step)</strong>   Unlike the graphs above, this plane is not <math><mi mathvariant="normal">Θ</mi></math>, which here is four-dimensional: it holds the vectors a <math><mn>2</mn><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">×</mo><mn>2</mn></math> block acts on, and each matrix is shown through its image of the unit circle. The block <math><mi>𝐺</mi></math> maps the unit circle to an ellipse with the semi-axes <math><msub><mi>𝜎</mi><mn>1</mn></msub><msub><mi>𝑢</mi><mn>1</mn></msub></math> and <math><msub><mi>𝜎</mi><mn>2</mn></msub><msub><mi>𝑢</mi><mn>2</mn></msub></math>. The matrix <math><mi>𝑈</mi><msup><mi>𝑉</mi><mi>⊤</mi></msup></math> keeps the singular vectors and sets both singular values to <math><mn>1</mn></math>: it maps the circle to itself, and its columns <math><mi>𝑈</mi><msup><mi>𝑉</mi><mi>⊤</mi></msup><msub><mi>𝑒</mi><mn>1</mn></msub></math> and <math><mi>𝑈</mi><msup><mi>𝑉</mi><mi>⊤</mi></msup><msub><mi>𝑒</mi><mn>2</mn></msub></math>, which take the place of <math><mi>𝐺</mi><msub><mi>𝑒</mi><mn>1</mn></msub></math> and <math><mi>𝐺</mi><msub><mi>𝑒</mi><mn>2</mn></msub></math>, are orthonormal.</p><div class="desmos-embed" data-state="[
+  {
+    &quot;latex&quot;: &quot;a=1.2&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;b=0.9&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c=0.3&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;d=0.7&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;x^{2}+y^{2}=1&quot;,
+    &quot;color&quot;: &quot;#000000&quot;,
+    &quot;lineStyle&quot;: &quot;DOTTED&quot;,
+    &quot;lineOpacity&quot;: &quot;0.5&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;\\left(a\\cos t+b\\sin t,c\\cos t+d\\sin t\\right)&quot;,
+    &quot;parametricDomain&quot;: {
+      &quot;min&quot;: &quot;0&quot;,
+      &quot;max&quot;: &quot;2\\pi&quot;
+    },
+    &quot;color&quot;: &quot;#2d70b3&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;T=a^{2}+b^{2}+c^{2}+d^{2}&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;\\Delta=ad-bc&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;\\sigma_{1}=\\sqrt{\\frac{T+\\sqrt{T^{2}-4\\Delta^{2}}}{2}}&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;\\sigma_{2}=\\sqrt{\\frac{T-\\sqrt{T^{2}-4\\Delta^{2}}}{2}}&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;\\alpha=\\frac{1}{2}\\arctan\\left(2\\left(ac+bd\\right),a^{2}+b^{2}-c^{2}-d^{2}\\right)&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;\\left(t\\sigma_{1}\\cos\\left(\\alpha\\right),t\\sigma_{1}\\sin\\left(\\alpha\\right)\\right)&quot;,
+    &quot;parametricDomain&quot;: {
+      &quot;min&quot;: &quot;-1&quot;,
+      &quot;max&quot;: &quot;1&quot;
+    },
+    &quot;color&quot;: &quot;#2d70b3&quot;,
+    &quot;lineStyle&quot;: &quot;DASHED&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;\\left(-t\\sigma_{2}\\sin\\left(\\alpha\\right),t\\sigma_{2}\\cos\\left(\\alpha\\right)\\right)&quot;,
+    &quot;parametricDomain&quot;: {
+      &quot;min&quot;: &quot;-1&quot;,
+      &quot;max&quot;: &quot;1&quot;
+    },
+    &quot;color&quot;: &quot;#2d70b3&quot;,
+    &quot;lineStyle&quot;: &quot;DASHED&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;\\left(t\\cos\\left(\\alpha\\right),t\\sin\\left(\\alpha\\right)\\right)&quot;,
+    &quot;parametricDomain&quot;: {
+      &quot;min&quot;: &quot;-1&quot;,
+      &quot;max&quot;: &quot;1&quot;
+    },
+    &quot;color&quot;: &quot;#c74440&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;\\left(-t\\sin\\left(\\alpha\\right),t\\cos\\left(\\alpha\\right)\\right)&quot;,
+    &quot;parametricDomain&quot;: {
+      &quot;min&quot;: &quot;-1&quot;,
+      &quot;max&quot;: &quot;1&quot;
+    },
+    &quot;color&quot;: &quot;#c74440&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;s=\\operatorname{sign}\\left(\\Delta\\right)&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;\\left(\\frac{a+sd}{\\sigma_{1}+\\sigma_{2}},\\frac{c-sb}{\\sigma_{1}+\\sigma_{2}}\\right)&quot;,
+    &quot;color&quot;: &quot;#c74440&quot;,
+    &quot;label&quot;: &quot;`UV^T e_1`&quot;,
+    &quot;showLabel&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;\\left(\\frac{b-sc}{\\sigma_{1}+\\sigma_{2}},\\frac{d+sa}{\\sigma_{1}+\\sigma_{2}}\\right)&quot;,
+    &quot;color&quot;: &quot;#c74440&quot;,
+    &quot;label&quot;: &quot;`UV^T e_2`&quot;,
+    &quot;showLabel&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;\\left(a,c\\right)&quot;,
+    &quot;color&quot;: &quot;#2d70b3&quot;,
+    &quot;label&quot;: &quot;`Ge_1`&quot;,
+    &quot;showLabel&quot;: true,
+    &quot;dragMode&quot;: &quot;XY&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;\\left(b,d\\right)&quot;,
+    &quot;color&quot;: &quot;#2d70b3&quot;,
+    &quot;label&quot;: &quot;`Ge_2`&quot;,
+    &quot;showLabel&quot;: true,
+    &quot;dragMode&quot;: &quot;XY&quot;
+  }
+]" data-options="{
+  &quot;expressions&quot;: false,
+  &quot;settingsMenu&quot;: false,
+  &quot;zoomButtons&quot;: false,
+  &quot;keypad&quot;: false
+}" id="graph-muon" data-img="figures/muon.png" data-bounds="{
+  &quot;left&quot;: -1.8,
+  &quot;right&quot;: 1.8,
+  &quot;bottom&quot;: -1.6,
+  &quot;top&quot;: 1.6
+}"><div class="desmos-graph" style="height:500px;"></div></div></div></div></figure><h2 id="loc-12">5. Incorporating the past</h2><p>The surrogates above have no memory of the past. The linearization is created using only the current iterate <math><msub><mi>𝜃</mi><mi>𝑡</mi></msub></math> and its derivative <math><msub><mi>𝑔</mi><mi>𝑡</mi></msub><mo>=</mo><mi>𝐷</mi><mi>𝒥︀</mi><mrow><mo>(</mo><msub><mi>𝜃</mi><mi>𝑡</mi></msub><mo>)</mo></mrow></math>, and the norm is fixed. Methods with memory use past iterations in two ways: momentum methods change the linearization, and adaptive methods change the norm.</p><h3 id="loc-13">5.1. Momentum</h3><p>The idea behind momentum is to build the linearization from past derivatives as well. The surrogates keep their form, with a chosen derivative <math><msub><mover accent="true"><mi>𝑔</mi><mo>̂</mo></mover><mi>𝑡</mi></msub><mo>∈</mo><msup><mi mathvariant="normal">Θ</mi><mo>∗</mo></msup></math> in place of <math><msub><mi>𝑔</mi><mi>𝑡</mi></msub></math>,</p><div class="numbered-equation"><math display="block"><mtable class="multiline-equation aligned"><mtr><mtd><msub><mi>ℎ</mi><mi>𝐶</mi></msub></mtd><mtd><mo form="infix">=</mo><munder><mo form="prefix" lspace="0em" rspace="0em">arg min</mo><mrow><mrow><mo>‖</mo><mi>ℎ</mi><mo>‖</mo></mrow><mo lspace="0em" rspace="0em">≤</mo><mi>𝜂</mi></mrow></munder><mspace width="1em"/><mo form="prefix" stretchy="false">⟨</mo><msub><mover accent="true"><mi>𝑔</mi><mo>̂</mo></mover><mi>𝑡</mi></msub><mo>,</mo><mi>ℎ</mi><mo form="postfix" stretchy="false">⟩</mo><mo rspace="0em">,</mo></mtd></mtr><mtr><mtd><msub><mi>ℎ</mi><mi>𝑃</mi></msub></mtd><mtd><mo form="infix">=</mo><munder><mo form="prefix" lspace="0em" rspace="0em">arg min</mo><mrow><mi>ℎ</mi><mo lspace="0em" rspace="0em">∈</mo><mi mathvariant="normal">Θ</mi></mrow></munder><mspace width="1em"/><mo form="prefix" stretchy="false">⟨</mo><msub><mover accent="true"><mi>𝑔</mi><mo>̂</mo></mover><mi>𝑡</mi></msub><mo>,</mo><mi>ℎ</mi><mo form="postfix" stretchy="false">⟩</mo><mo>+</mo><mfrac><mi>𝜆</mi><mn>2</mn></mfrac><msup><mrow><mo>‖</mo><mi>ℎ</mi><mo>‖</mo></mrow><mn>2</mn></msup><mi>.</mi></mtd></mtr></mtable></math><p><span class="equation-number">(22)</span></p></div><p>The derivative <math><msub><mover accent="true"><mi>𝑔</mi><mo>̂</mo></mover><mi>𝑡</mi></msub></math> enters before the sharp operator, in <math><msup><mi mathvariant="normal">Θ</mi><mo>∗</mo></msup></math>. When the sharp operator is linear, as for a norm from an inner product, averaging the derivatives is the same as averaging the steps they give.<sup class="footnote-ref"><a class="footnote-ref-link" href="#fn-17" id="fnref-17">17</a></sup><span class="marginnote" id="fn-17"><sup><a class="footnote-ref-link" href="#fnref-17">17</a></sup> A linear sharp operator commutes with averaging, <math><msup><mrow><mo>(</mo><mrow><msub><mo lspace="0em">∑</mo><mi>𝑘</mi></msub><msub><mi>𝑤</mi><mi>𝑘</mi></msub><msub><mi>𝑔</mi><mi>𝑘</mi></msub></mrow><mo>)</mo></mrow><mi>♯</mi></msup><mo>=</mo><msub><mo form="prefix" lspace="0em">∑</mo><mi>𝑘</mi></msub><msub><mi>𝑤</mi><mi>𝑘</mi></msub><msubsup><mi>𝑔</mi><mi>𝑘</mi><mi>♯</mi></msubsup></math>. A nonlinear one does not: for Muon, the orthogonalized average of the derivatives is not the average of the orthogonalized derivatives.</span></p><figure><p><span class="marginnote">Example 5: Averaged linearizations: Adam and Muon</span></p><div class="blog-example"><div style="background: #3d997026; border-radius: .4em; padding: 1em; width: 100%; box-sizing: border-box; margin-bottom: .5em;"><p><strong>Example 5 (Averaged linearizations: Adam and Muon)</strong>   Average the past derivatives with weights <math><mrow><mo>(</mo><mrow><mn>1</mn><mo>−</mo><mi>𝛽</mi></mrow><mo>)</mo></mrow><msup><mi>𝛽</mi><mi>𝑘</mi></msup></math> for <math><mi>𝛽</mi><mo>∈</mo><mrow><mo>(</mo><mrow><mn>0</mn><mo>,</mo><mn>1</mn></mrow><mo>)</mo></mrow></math>, giving</p><div class="numbered-equation"><math display="block"><msub><mover accent="true"><mi>𝑔</mi><mo>̂</mo></mover><mi>𝑡</mi></msub><mo>=</mo><mrow><mo>(</mo><mrow><mn>1</mn><mo>−</mo><mi>𝛽</mi></mrow><mo>)</mo></mrow><munder><mo form="prefix">∑</mo><mrow><mi>𝑘</mi><mo lspace="0em" rspace="0em">≥</mo><mn>0</mn></mrow></munder><msup><mi>𝛽</mi><mi>𝑘</mi></msup><msub><mi>𝑔</mi><mrow><mi>𝑡</mi><mo lspace="0em" rspace="0em">−</mo><mi>𝑘</mi></mrow></msub><mi>.</mi></math><p><span class="equation-number">(23)</span></p></div><p>The pairing is linear in <math><mi>𝑔</mi></math> for any norm, so <math><mo stretchy="false">⟨</mo><msub><mover accent="true"><mi>𝑔</mi><mo>̂</mo></mover><mi>𝑡</mi></msub><mo>,</mo><mi>ℎ</mi><mo stretchy="false">⟩</mo></math> is the same weighted average of the past linearizations <math><mo stretchy="false">⟨</mo><msub><mi>𝑔</mi><mrow><mi>𝑡</mi><mo lspace="0em" rspace="0em">−</mo><mi>𝑘</mi></mrow></msub><mo>,</mo><mi>ℎ</mi><mo stretchy="false">⟩</mo></math>. Both steps keep their form with <math><msub><mover accent="true"><mi>𝑔</mi><mo>̂</mo></mover><mi>𝑡</mi></msub></math> in place of <math><msub><mi>𝑔</mi><mi>𝑡</mi></msub></math>,</p><div class="numbered-equation"><math display="block"><msub><mi>ℎ</mi><mi>𝐶</mi></msub><mo>=</mo><mo form="prefix">−</mo><mi>𝜂</mi><mfrac><msubsup><mover accent="true"><mi>𝑔</mi><mo>̂</mo></mover><mi>𝑡</mi><mi>♯</mi></msubsup><msub><mrow><mo>‖</mo><msub><mover accent="true"><mi>𝑔</mi><mo>̂</mo></mover><mi>𝑡</mi></msub><mo>‖</mo></mrow><mo>∗</mo></msub></mfrac><mo rspace="0em">,</mo><mspace width="1em"/><msub><mi>ℎ</mi><mi>𝑃</mi></msub><mo>=</mo><mo form="prefix">−</mo><mfrac><mn>1</mn><mi>𝜆</mi></mfrac><msubsup><mover accent="true"><mi>𝑔</mi><mo>̂</mo></mover><mi>𝑡</mi><mi>♯</mi></msubsup><mi>.</mi></math><p><span class="equation-number">(24)</span></p></div><p>The past derivatives were taken at earlier points, so as a model of <math><mi>𝒥︀</mi></math> near <math><msub><mi>𝜃</mi><mi>𝑡</mi></msub></math> this is worse than the linearization with <math><msub><mi>𝑔</mi><mi>𝑡</mi></msub></math>. But when each <math><msub><mi>𝑔</mi><mi>𝑡</mi></msub></math> is computed from a minibatch, <math><msub><mover accent="true"><mi>𝑔</mi><mo>̂</mo></mover><mi>𝑡</mi></msub></math> is a less noisy estimate of the expected derivative. In coordinates, <math><mover accent="true"><mi>𝐺</mi><mo>̂</mo></mover><mo stretchy="false">←</mo><mi>𝛽</mi><mover accent="true"><mi>𝐺</mi><mo>̂</mo></mover><mo>+</mo><mrow><mo>(</mo><mrow><mn>1</mn><mo>−</mo><mi>𝛽</mi></mrow><mo>)</mo></mrow><mi>𝐺</mi></math>. Muon takes the step of <a href="#ex-muon">Example 4</a> with <math><mover accent="true"><mi>𝐺</mi><mo>̂</mo></mover></math> in place of <math><mi>𝐺</mi></math>, and Adam does the same with the adaptive norm of <a href="#ex-adam">Example 6</a>.</p></div></div></figure><h3 id="loc-14">5.2. Adaptive norms</h3><p>Past information can also enter the norm. An adaptive method builds an inner product <math><mo stretchy="false">⟨</mo><mo lspace="0em" rspace="0em">⋅</mo><mo>,</mo><mo lspace="0em" rspace="0em">⋅</mo><msub><mo stretchy="false">⟩</mo><msub><mi>𝒜︀</mi><mi>𝑡</mi></msub></msub></math> from past derivatives, so that the norm changes at every step. Each step is still the one of <a href="#ex-gd">Example 3</a>, with <math><msub><mi>𝒜︀</mi><mi>𝑡</mi></msub></math> in place of <math><mi>𝒜︀</mi></math>,</p><div class="numbered-equation"><math display="block"><msub><mi>ℎ</mi><mi>𝑃</mi></msub><mo>=</mo><mo form="prefix">−</mo><mfrac><mn>1</mn><mi>𝜆</mi></mfrac><msubsup><mi>𝒜︀</mi><mi>𝑡</mi><mrow><mo>−</mo><mn>1</mn></mrow></msubsup><mrow><mo>(</mo><mi>𝐺</mi><mo>)</mo></mrow><mi>.</mi></math><p><span class="equation-number">(25)</span></p></div><p>Storing a general <math><msub><mi>𝒜︀</mi><mi>𝑡</mi></msub></math> is out of the question for a network, so two cheap structures are used: a diagonal one, which stores as many numbers as <math><mi>𝜃</mi></math>, and a Kronecker-factored one.</p><figure id="ex-adam"><p><span class="marginnote">Example 6: A diagonal norm: AdaGrad and Adam</span></p><div class="blog-example"><div style="background: #3d997026; border-radius: .4em; padding: 1em; width: 100%; box-sizing: border-box; margin-bottom: .5em;"><p><strong>Example 6 (A diagonal norm: AdaGrad and Adam)</strong>   AdaGrad <a id="loc-15" href="#loc-25" role="doc-biblioref">[5]</a> sums the squared partial derivatives of all past iterations, and Adam <a id="loc-16" href="#loc-26" role="doc-biblioref">[6]</a> takes a moving average of them instead,</p><div class="numbered-equation"><math display="block"><mi>𝑣</mi><mo stretchy="false">←</mo><mi>𝑣</mi><mo>+</mo><msup><mi>𝐺</mi><mn>2</mn></msup><mspace width="1em"/><mtext>(AdaGrad)</mtext><mo rspace="0em">,</mo><mspace width="1em"/><mi>𝑣</mi><mo stretchy="false">←</mo><msub><mi>𝛽</mi><mn>2</mn></msub><mi>𝑣</mi><mo>+</mo><mrow><mo>(</mo><mrow><mn>1</mn><mo>−</mo><msub><mi>𝛽</mi><mn>2</mn></msub></mrow><mo>)</mo></mrow><msup><mi>𝐺</mi><mn>2</mn></msup><mspace width="1em"/><mtext>(Adam)</mtext><mo rspace="0em">,</mo></math><p><span class="equation-number">(26)</span></p></div><p>where the square, like the square root below, acts entry by entry. So <math><mi>𝑣</mi></math> has the same shape as <math><mi>𝜃</mi></math>, one number per entry. Both measure the step with the weighted norm</p><div class="numbered-equation"><math display="block"><mtable class="multiline-equation aligned"><mtr><mtd><msubsup><mrow><mo>‖</mo><mi>ℎ</mi><mo>‖</mo></mrow><mi>𝑡</mi><mn>2</mn></msubsup></mtd><mtd><mo form="infix">=</mo><munder><mo form="prefix" lspace="0em" rspace="0em">∑</mo><mi>𝑎</mi></munder><mrow><mo>(</mo><mrow><msqrt><msub><mi>𝑣</mi><mi>𝑎</mi></msub></msqrt><mo>+</mo><mi>𝜀</mi></mrow><mo>)</mo></mrow><msubsup><mi>ℎ</mi><mi>𝑎</mi><mn>2</mn></msubsup><mo>=</mo><mo form="prefix" stretchy="false">⟨</mo><msub><mi>𝒜︀</mi><mi>𝑡</mi></msub><mrow><mo>(</mo><mi>ℎ</mi><mo>)</mo></mrow><mo>,</mo><mi>ℎ</mi><msub><mo form="postfix" stretchy="false">⟩</mo><mi>𝐹</mi></msub><mo>=</mo><mo form="prefix" stretchy="false">⟨</mo><mi>ℎ</mi><mo>,</mo><mi>ℎ</mi><msub><mo form="postfix" stretchy="false">⟩</mo><msub><mi>𝒜︀</mi><mi>𝑡</mi></msub></msub><mo rspace="0em">,</mo></mtd></mtr><mtr><mtd><msub><mi>𝒜︀</mi><mi>𝑡</mi></msub><mrow><mo>(</mo><mi>ℎ</mi><mo>)</mo></mrow></mtd><mtd><mo form="infix">=</mo><mrow><mo>(</mo><mrow><msqrt><mi>𝑣</mi></msqrt><mo>+</mo><mi>𝜀</mi></mrow><mo>)</mo></mrow><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">⊙</mo><mi>ℎ</mi><mo rspace="0em">,</mo></mtd></mtr></mtable></math><p><span class="equation-number">(27)</span></p></div><p>where <math><mi>𝑎</mi></math> runs over all entries of <math><mi>𝜃</mi></math>, and <math><mo lspace="0em" rspace="0em">⊙</mo></math> multiplies two elements of <math><mi mathvariant="normal">Θ</mi></math> entry by entry, so that <math><msub><mi>𝒜︀</mi><mi>𝑡</mi></msub></math> multiplies each <math><msub><mi>ℎ</mi><mi>𝑎</mi></msub></math> by <math><msqrt><msub><mi>𝑣</mi><mi>𝑎</mi></msub></msqrt><mo>+</mo><mi>𝜀</mi></math>. As <math><msub><mrow><mo>‖</mo><mo lspace="0em" rspace="0em">⋅</mo><mo>‖</mo></mrow><mi>𝑡</mi></msub></math> comes from an inner product, <a href="#ex-gd">Example 3</a> gives</p><div class="numbered-equation"><math display="block"><msup><mi>𝑔</mi><mi>♯</mi></msup><mo>=</mo><msubsup><mi>𝒜︀</mi><mi>𝑡</mi><mrow><mo>−</mo><mn>1</mn></mrow></msubsup><mrow><mo>(</mo><mi>𝐺</mi><mo>)</mo></mrow><mo rspace="0em">,</mo></math><p><span class="equation-number">(28)</span></p></div><p>which divides each <math><msub><mi>𝐺</mi><mi>𝑎</mi></msub></math> by <math><msqrt><msub><mi>𝑣</mi><mi>𝑎</mi></msub></msqrt><mo>+</mo><mi>𝜀</mi></math>, and the penalized step with <math><mi>𝜆</mi><mo>=</mo><mn>1</mn><mi>/</mi><mi>𝜂</mi></math> is <math><mo>−</mo><mi>𝜂</mi><msubsup><mi>𝒜︀</mi><mi>𝑡</mi><mrow><mo>−</mo><mn>1</mn></mrow></msubsup><mrow><mo>(</mo><mi>𝐺</mi><mo>)</mo></mrow></math>. Adam also uses the averaged derivative <math><mover accent="true"><mi>𝐺</mi><mo>̂</mo></mover></math> of <a href="#loc-13">Section 5.1</a> in place of <math><mi>𝐺</mi></math>, so it carries memory in both the linearization and the norm, and its step, without bias correction,<sup class="footnote-ref"><a class="footnote-ref-link" href="#fn-18" id="fnref-18">18</a></sup><span class="marginnote" id="fn-18"><sup><a class="footnote-ref-link" href="#fnref-18">18</a></sup> Adam starts both averages at zero, so after <math><mi>𝑡</mi></math> steps their weights sum to <math><mn>1</mn><mo>−</mo><msup><mi>𝛽</mi><mi>𝑡</mi></msup></math>, and early averages are too small. It divides <math><mover accent="true"><mi>𝐺</mi><mo>̂</mo></mover></math> by <math><mn>1</mn><mo>−</mo><msubsup><mi>𝛽</mi><mn>1</mn><mi>𝑡</mi></msubsup></math> and <math><mi>𝑣</mi></math> by <math><mn>1</mn><mo>−</mo><msubsup><mi>𝛽</mi><mn>2</mn><mi>𝑡</mi></msubsup></math>, which scales the step by <math><msqrt><mn>1</mn><mo>−</mo><msubsup><mi>𝛽</mi><mn>2</mn><mi>𝑡</mi></msubsup></msqrt><mi>/</mi><mrow><mo>(</mo><mrow><mn>1</mn><mo>−</mo><msubsup><mi>𝛽</mi><mn>1</mn><mi>𝑡</mi></msubsup></mrow><mo>)</mo></mrow></math> when <math><mi>𝜀</mi></math> is ignored. The factor approaches <math><mn>1</mn></math> on the time scale of <math><mn>1</mn><mi>/</mi><mrow><mo>(</mo><mrow><mn>1</mn><mo>−</mo><msub><mi>𝛽</mi><mn>2</mn></msub></mrow><mo>)</mo></mrow></math> steps.</span> is <math><mo>−</mo><mi>𝜂</mi><msubsup><mi>𝒜︀</mi><mi>𝑡</mi><mrow><mo>−</mo><mn>1</mn></mrow></msubsup><mrow><mo>(</mo><mover accent="true"><mi>𝐺</mi><mo>̂</mo></mover><mo>)</mo></mrow></math>.</p></div></div></figure><figure><p><span class="marginnote">Interactive figure 5: The adaptive norm of AdaGrad</span></p><div class="blog-interactive"><div style="background: #6042a626; border-radius: .4em; padding: 1em; width: 100%; box-sizing: border-box; margin-bottom: .5em;"><p><strong>Interactive figure 5 (The adaptive norm of AdaGrad)</strong>   The graph shows AdaGrad on the quadratic <math><mi>𝒥︀</mi><mrow><mo>(</mo><mi>𝜃</mi><mo>)</mo></mrow><mo>=</mo><mn>1</mn><mi>/</mi><mn>2</mn><mrow><mo>(</mo><mrow><msubsup><mi>𝜃</mi><mn>1</mn><mn>2</mn></msubsup><mo>+</mo><mi>𝜅</mi><msubsup><mi>𝜃</mi><mn>2</mn><mn>2</mn></msubsup></mrow><mo>)</mo></mrow></math>, next to gradient descent with <math><mi>𝜆</mi><mo>=</mo><mi>𝐿</mi><mo>=</mo><mi>𝜅</mi></math>. At each iterate, the ellipse is the ball of <math><msub><mrow><mo>‖</mo><mo lspace="0em" rspace="0em">⋅</mo><mo>‖</mo></mrow><mi>𝑡</mi></msub></math> through the next iterate, which the step reaches where a line of constant linearization touches the ball. Already the first derivative makes the ball narrow in the steep direction <math><msub><mi>𝜃</mi><mn>2</mn></msub></math>, where the derivatives are large, and wide along the flat coordinate <math><msub><mi>𝜃</mi><mn>1</mn></msub></math>. As <math><mi>𝑣</mi></math> accumulates, the ball, and with it the step, shrinks. AdaGrad thereby takes long steps where gradient descent crawls.</p><div class="desmos-embed" data-state="[
+  {
+    &quot;id&quot;: &quot;E&quot;,
+    &quot;latex&quot;: &quot;E=1&quot;
+  },
+  {
+    &quot;id&quot;: &quot;K&quot;,
+    &quot;latex&quot;: &quot;K=25&quot;
+  },
+  {
+    &quot;id&quot;: &quot;k&quot;,
+    &quot;latex&quot;: &quot;k=0&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;a=-4&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;b=1.5&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;J\\left(x,y\\right)=\\frac{1}{2}\\left(x^{2}+Ky^{2}\\right)&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;\\frac{1}{2}\\left(x^{2}+Ky^{2}\\right)=J\\left(a,b\\right)\\cdot\\left[1,0.5,0.25,0.12,0.06,0.03,0.015,0.008\\right]&quot;,
+    &quot;color&quot;: &quot;#888888&quot;,
+    &quot;lineOpacity&quot;: &quot;0.5&quot;,
+    &quot;lineWidth&quot;: &quot;1.5&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;p_{0}=a&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;q_{0}=b&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{0}=a&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;d_{0}=b&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;s_{0}=0&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;w_{0}=0&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;p_{1}=p_{0}-\\frac{p_{0}}{K}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;q_{1}=0&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;s_{1}=s_{0}+c_{0}^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;w_{1}=w_{0}+\\left(Kd_{0}\\right)^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{1}=c_{0}-\\frac{Ec_{0}}{\\sqrt{s_{1}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;d_{1}=d_{0}-\\frac{EKd_{0}}{\\sqrt{w_{1}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;p_{2}=p_{1}-\\frac{p_{1}}{K}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;q_{2}=0&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;s_{2}=s_{1}+c_{1}^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;w_{2}=w_{1}+\\left(Kd_{1}\\right)^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{2}=c_{1}-\\frac{Ec_{1}}{\\sqrt{s_{2}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;d_{2}=d_{1}-\\frac{EKd_{1}}{\\sqrt{w_{2}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;p_{3}=p_{2}-\\frac{p_{2}}{K}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;q_{3}=0&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;s_{3}=s_{2}+c_{2}^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;w_{3}=w_{2}+\\left(Kd_{2}\\right)^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{3}=c_{2}-\\frac{Ec_{2}}{\\sqrt{s_{3}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;d_{3}=d_{2}-\\frac{EKd_{2}}{\\sqrt{w_{3}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;p_{4}=p_{3}-\\frac{p_{3}}{K}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;q_{4}=0&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;s_{4}=s_{3}+c_{3}^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;w_{4}=w_{3}+\\left(Kd_{3}\\right)^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{4}=c_{3}-\\frac{Ec_{3}}{\\sqrt{s_{4}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;d_{4}=d_{3}-\\frac{EKd_{3}}{\\sqrt{w_{4}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;p_{5}=p_{4}-\\frac{p_{4}}{K}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;q_{5}=0&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;s_{5}=s_{4}+c_{4}^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;w_{5}=w_{4}+\\left(Kd_{4}\\right)^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{5}=c_{4}-\\frac{Ec_{4}}{\\sqrt{s_{5}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;d_{5}=d_{4}-\\frac{EKd_{4}}{\\sqrt{w_{5}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;p_{6}=p_{5}-\\frac{p_{5}}{K}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;q_{6}=0&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;s_{6}=s_{5}+c_{5}^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;w_{6}=w_{5}+\\left(Kd_{5}\\right)^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{6}=c_{5}-\\frac{Ec_{5}}{\\sqrt{s_{6}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;d_{6}=d_{5}-\\frac{EKd_{5}}{\\sqrt{w_{6}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;p_{7}=p_{6}-\\frac{p_{6}}{K}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;q_{7}=0&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;s_{7}=s_{6}+c_{6}^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;w_{7}=w_{6}+\\left(Kd_{6}\\right)^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{7}=c_{6}-\\frac{Ec_{6}}{\\sqrt{s_{7}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;d_{7}=d_{6}-\\frac{EKd_{6}}{\\sqrt{w_{7}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;p_{8}=p_{7}-\\frac{p_{7}}{K}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;q_{8}=0&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;s_{8}=s_{7}+c_{7}^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;w_{8}=w_{7}+\\left(Kd_{7}\\right)^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{8}=c_{7}-\\frac{Ec_{7}}{\\sqrt{s_{8}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;d_{8}=d_{7}-\\frac{EKd_{7}}{\\sqrt{w_{8}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;p_{9}=p_{8}-\\frac{p_{8}}{K}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;q_{9}=0&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;s_{9}=s_{8}+c_{8}^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;w_{9}=w_{8}+\\left(Kd_{8}\\right)^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{9}=c_{8}-\\frac{Ec_{8}}{\\sqrt{s_{9}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;d_{9}=d_{8}-\\frac{EKd_{8}}{\\sqrt{w_{9}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;p_{10}=p_{9}-\\frac{p_{9}}{K}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;q_{10}=0&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;s_{10}=s_{9}+c_{9}^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;w_{10}=w_{9}+\\left(Kd_{9}\\right)^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{10}=c_{9}-\\frac{Ec_{9}}{\\sqrt{s_{10}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;d_{10}=d_{9}-\\frac{EKd_{9}}{\\sqrt{w_{10}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;p_{11}=p_{10}-\\frac{p_{10}}{K}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;q_{11}=0&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;s_{11}=s_{10}+c_{10}^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;w_{11}=w_{10}+\\left(Kd_{10}\\right)^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{11}=c_{10}-\\frac{Ec_{10}}{\\sqrt{s_{11}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;d_{11}=d_{10}-\\frac{EKd_{10}}{\\sqrt{w_{11}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;p_{12}=p_{11}-\\frac{p_{11}}{K}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;q_{12}=0&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;s_{12}=s_{11}+c_{11}^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;w_{12}=w_{11}+\\left(Kd_{11}\\right)^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{12}=c_{11}-\\frac{Ec_{11}}{\\sqrt{s_{12}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;d_{12}=d_{11}-\\frac{EKd_{11}}{\\sqrt{w_{12}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;p_{13}=p_{12}-\\frac{p_{12}}{K}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;q_{13}=0&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;s_{13}=s_{12}+c_{12}^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;w_{13}=w_{12}+\\left(Kd_{12}\\right)^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{13}=c_{12}-\\frac{Ec_{12}}{\\sqrt{s_{13}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;d_{13}=d_{12}-\\frac{EKd_{12}}{\\sqrt{w_{13}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;p_{14}=p_{13}-\\frac{p_{13}}{K}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;q_{14}=0&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;s_{14}=s_{13}+c_{13}^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;w_{14}=w_{13}+\\left(Kd_{13}\\right)^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{14}=c_{13}-\\frac{Ec_{13}}{\\sqrt{s_{14}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;d_{14}=d_{13}-\\frac{EKd_{13}}{\\sqrt{w_{14}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;p_{15}=p_{14}-\\frac{p_{14}}{K}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;q_{15}=0&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;s_{15}=s_{14}+c_{14}^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;w_{15}=w_{14}+\\left(Kd_{14}\\right)^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{15}=c_{14}-\\frac{Ec_{14}}{\\sqrt{s_{15}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;d_{15}=d_{14}-\\frac{EKd_{14}}{\\sqrt{w_{15}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;p_{16}=p_{15}-\\frac{p_{15}}{K}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;q_{16}=0&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;s_{16}=s_{15}+c_{15}^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;w_{16}=w_{15}+\\left(Kd_{15}\\right)^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{16}=c_{15}-\\frac{Ec_{15}}{\\sqrt{s_{16}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;d_{16}=d_{15}-\\frac{EKd_{15}}{\\sqrt{w_{16}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;p_{17}=p_{16}-\\frac{p_{16}}{K}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;q_{17}=0&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;s_{17}=s_{16}+c_{16}^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;w_{17}=w_{16}+\\left(Kd_{16}\\right)^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{17}=c_{16}-\\frac{Ec_{16}}{\\sqrt{s_{17}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;d_{17}=d_{16}-\\frac{EKd_{16}}{\\sqrt{w_{17}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;p_{18}=p_{17}-\\frac{p_{17}}{K}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;q_{18}=0&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;s_{18}=s_{17}+c_{17}^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;w_{18}=w_{17}+\\left(Kd_{17}\\right)^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{18}=c_{17}-\\frac{Ec_{17}}{\\sqrt{s_{18}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;d_{18}=d_{17}-\\frac{EKd_{17}}{\\sqrt{w_{18}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;p_{19}=p_{18}-\\frac{p_{18}}{K}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;q_{19}=0&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;s_{19}=s_{18}+c_{18}^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;w_{19}=w_{18}+\\left(Kd_{18}\\right)^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{19}=c_{18}-\\frac{Ec_{18}}{\\sqrt{s_{19}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;d_{19}=d_{18}-\\frac{EKd_{18}}{\\sqrt{w_{19}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;p_{20}=p_{19}-\\frac{p_{19}}{K}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;q_{20}=0&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;s_{20}=s_{19}+c_{19}^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;w_{20}=w_{19}+\\left(Kd_{19}\\right)^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{20}=c_{19}-\\frac{Ec_{19}}{\\sqrt{s_{20}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;d_{20}=d_{19}-\\frac{EKd_{19}}{\\sqrt{w_{20}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;p_{21}=p_{20}-\\frac{p_{20}}{K}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;q_{21}=0&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;s_{21}=s_{20}+c_{20}^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;w_{21}=w_{20}+\\left(Kd_{20}\\right)^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{21}=c_{20}-\\frac{Ec_{20}}{\\sqrt{s_{21}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;d_{21}=d_{20}-\\frac{EKd_{20}}{\\sqrt{w_{21}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;p_{22}=p_{21}-\\frac{p_{21}}{K}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;q_{22}=0&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;s_{22}=s_{21}+c_{21}^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;w_{22}=w_{21}+\\left(Kd_{21}\\right)^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{22}=c_{21}-\\frac{Ec_{21}}{\\sqrt{s_{22}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;d_{22}=d_{21}-\\frac{EKd_{21}}{\\sqrt{w_{22}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;p_{23}=p_{22}-\\frac{p_{22}}{K}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;q_{23}=0&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;s_{23}=s_{22}+c_{22}^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;w_{23}=w_{22}+\\left(Kd_{22}\\right)^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{23}=c_{22}-\\frac{Ec_{22}}{\\sqrt{s_{23}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;d_{23}=d_{22}-\\frac{EKd_{22}}{\\sqrt{w_{23}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;p_{24}=p_{23}-\\frac{p_{23}}{K}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;q_{24}=0&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;s_{24}=s_{23}+c_{23}^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;w_{24}=w_{23}+\\left(Kd_{23}\\right)^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{24}=c_{23}-\\frac{Ec_{23}}{\\sqrt{s_{24}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;d_{24}=d_{23}-\\frac{EKd_{23}}{\\sqrt{w_{24}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;p_{25}=p_{24}-\\frac{p_{24}}{K}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;q_{25}=0&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;s_{25}=s_{24}+c_{24}^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;w_{25}=w_{24}+\\left(Kd_{24}\\right)^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{25}=c_{24}-\\frac{Ec_{24}}{\\sqrt{s_{25}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;d_{25}=d_{24}-\\frac{EKd_{24}}{\\sqrt{w_{25}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;p_{26}=p_{25}-\\frac{p_{25}}{K}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;q_{26}=0&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;s_{26}=s_{25}+c_{25}^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;w_{26}=w_{25}+\\left(Kd_{25}\\right)^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{26}=c_{25}-\\frac{Ec_{25}}{\\sqrt{s_{26}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;d_{26}=d_{25}-\\frac{EKd_{25}}{\\sqrt{w_{26}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;p_{27}=p_{26}-\\frac{p_{26}}{K}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;q_{27}=0&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;s_{27}=s_{26}+c_{26}^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;w_{27}=w_{26}+\\left(Kd_{26}\\right)^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{27}=c_{26}-\\frac{Ec_{26}}{\\sqrt{s_{27}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;d_{27}=d_{26}-\\frac{EKd_{26}}{\\sqrt{w_{27}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;p_{28}=p_{27}-\\frac{p_{27}}{K}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;q_{28}=0&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;s_{28}=s_{27}+c_{27}^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;w_{28}=w_{27}+\\left(Kd_{27}\\right)^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{28}=c_{27}-\\frac{Ec_{27}}{\\sqrt{s_{28}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;d_{28}=d_{27}-\\frac{EKd_{27}}{\\sqrt{w_{28}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;p_{29}=p_{28}-\\frac{p_{28}}{K}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;q_{29}=0&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;s_{29}=s_{28}+c_{28}^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;w_{29}=w_{28}+\\left(Kd_{28}\\right)^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{29}=c_{28}-\\frac{Ec_{28}}{\\sqrt{s_{29}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;d_{29}=d_{28}-\\frac{EKd_{28}}{\\sqrt{w_{29}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;p_{30}=p_{29}-\\frac{p_{29}}{K}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;q_{30}=0&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;s_{30}=s_{29}+c_{29}^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;w_{30}=w_{29}+\\left(Kd_{29}\\right)^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;c_{30}=c_{29}-\\frac{Ec_{29}}{\\sqrt{s_{30}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;d_{30}=d_{29}-\\frac{EKd_{29}}{\\sqrt{w_{30}}+10^{-8}}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;P=\\left[p_{0},p_{1},p_{2},p_{3},p_{4},p_{5},p_{6},p_{7},p_{8},p_{9},p_{10},p_{11},p_{12},p_{13},p_{14},p_{15},p_{16},p_{17},p_{18},p_{19},p_{20},p_{21},p_{22},p_{23},p_{24},p_{25},p_{26},p_{27},p_{28},p_{29},p_{30}\\right]&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;Q=\\left[q_{0},q_{1},q_{2},q_{3},q_{4},q_{5},q_{6},q_{7},q_{8},q_{9},q_{10},q_{11},q_{12},q_{13},q_{14},q_{15},q_{16},q_{17},q_{18},q_{19},q_{20},q_{21},q_{22},q_{23},q_{24},q_{25},q_{26},q_{27},q_{28},q_{29},q_{30}\\right]&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;C=\\left[c_{0},c_{1},c_{2},c_{3},c_{4},c_{5},c_{6},c_{7},c_{8},c_{9},c_{10},c_{11},c_{12},c_{13},c_{14},c_{15},c_{16},c_{17},c_{18},c_{19},c_{20},c_{21},c_{22},c_{23},c_{24},c_{25},c_{26},c_{27},c_{28},c_{29},c_{30}\\right]&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;D=\\left[d_{0},d_{1},d_{2},d_{3},d_{4},d_{5},d_{6},d_{7},d_{8},d_{9},d_{10},d_{11},d_{12},d_{13},d_{14},d_{15},d_{16},d_{17},d_{18},d_{19},d_{20},d_{21},d_{22},d_{23},d_{24},d_{25},d_{26},d_{27},d_{28},d_{29},d_{30}\\right]&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;S=\\left[s_{0},s_{1},s_{2},s_{3},s_{4},s_{5},s_{6},s_{7},s_{8},s_{9},s_{10},s_{11},s_{12},s_{13},s_{14},s_{15},s_{16},s_{17},s_{18},s_{19},s_{20},s_{21},s_{22},s_{23},s_{24},s_{25},s_{26},s_{27},s_{28},s_{29},s_{30}\\right]&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;W=\\left[w_{0},w_{1},w_{2},w_{3},w_{4},w_{5},w_{6},w_{7},w_{8},w_{9},w_{10},w_{11},w_{12},w_{13},w_{14},w_{15},w_{16},w_{17},w_{18},w_{19},w_{20},w_{21},w_{22},w_{23},w_{24},w_{25},w_{26},w_{27},w_{28},w_{29},w_{30}\\right]&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;u=C\\left[k+1\\right]&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;v=D\\left[k+1\\right]&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;h_{1}=C\\left[k+2\\right]-u&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;h_{2}=D\\left[k+2\\right]-v&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;\\omega_{1}=\\sqrt{S\\left[k+2\\right]}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;\\omega_{2}=\\sqrt{W\\left[k+2\\right]}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;T=\\omega_{1}h_{1}^{2}+\\omega_{2}h_{2}^{2}&quot;,
+    &quot;hidden&quot;: true
+  },
+  {
+    &quot;latex&quot;: &quot;\\omega_{1}\\left(x-u\\right)^{2}+\\omega_{2}\\left(y-v\\right)^{2}\\le T&quot;,
+    &quot;color&quot;: &quot;#c74440&quot;,
+    &quot;fillOpacity&quot;: &quot;0.15&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;u\\left(x-u\\right)+Kv\\left(y-v\\right)=uh_{1}+Kvh_{2}&quot;,
+    &quot;color&quot;: &quot;#c74440&quot;,
+    &quot;lineStyle&quot;: &quot;DASHED&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;\\left(P,Q\\right)&quot;,
+    &quot;color&quot;: &quot;#2d70b3&quot;,
+    &quot;lines&quot;: true,
+    &quot;lineStyle&quot;: &quot;DOTTED&quot;,
+    &quot;lineWidth&quot;: &quot;3&quot;,
+    &quot;pointSize&quot;: &quot;7&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;\\left(C,D\\right)&quot;,
+    &quot;color&quot;: &quot;#c74440&quot;,
+    &quot;lines&quot;: true,
+    &quot;lineStyle&quot;: &quot;SOLID&quot;,
+    &quot;lineWidth&quot;: &quot;2&quot;,
+    &quot;pointSize&quot;: &quot;6&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;\\left(\\left\\{k>0:u\\right\\},v\\right)&quot;,
+    &quot;color&quot;: &quot;#c74440&quot;,
+    &quot;pointSize&quot;: &quot;11&quot;,
+    &quot;label&quot;: &quot;`\\theta_k`&quot;,
+    &quot;showLabel&quot;: true,
+    &quot;labelOrientation&quot;: &quot;above_left&quot;
+  },
+  {
+    &quot;latex&quot;: &quot;\\left(a,b\\right)&quot;,
+    &quot;color&quot;: &quot;#000000&quot;,
+    &quot;label&quot;: &quot;`\\theta_0`&quot;,
+    &quot;showLabel&quot;: true,
+    &quot;dragMode&quot;: &quot;XY&quot;
+  }
+]" data-options="{
+  &quot;expressions&quot;: false,
+  &quot;settingsMenu&quot;: false,
+  &quot;zoomButtons&quot;: false,
+  &quot;keypad&quot;: false
+}" id="graph-adagrad" data-img="figures/adagrad.png" data-bounds="{
+  &quot;left&quot;: -4.6,
+  &quot;right&quot;: 1,
+  &quot;bottom&quot;: -1,
+  &quot;top&quot;: 2
+}"><div class="desmos-graph" style="height:400px;"></div><div class="desmos-controls"><label><span class="desmos-control-label"><math><mi>𝜂</mi></math></span><input type="range" data-name="E" value="1" min="0.1" max="2" step="0.01"><output>1</output></label><label><span class="desmos-control-label"><math><mi>𝜅</mi></math></span><input type="range" data-name="K" value="25" min="1" max="50" step="0.5"><output>25</output></label><label><span class="desmos-control-label"><math><mi>𝑘</mi></math></span><input type="range" data-name="k" value="0" min="0" max="29" step="1"><output>0</output></label></div></div><p>Gradient descent is dotted and AdaGrad solid, with thirty steps each. Drag <math><msub><mi>𝜃</mi><mn>0</mn></msub></math>, change <math><mi>𝜂</mi></math> and <math><mi>𝜅</mi></math>, and step through the iterations with <math><mi>𝑘</mi></math>.</p></div></div></figure><figure><p><span class="marginnote">Example 7: A Kronecker-factored norm: K-FAC and Shampoo</span></p><div class="blog-example"><div style="background: #3d997026; border-radius: .4em; padding: 1em; width: 100%; box-sizing: border-box; margin-bottom: .5em;"><p><strong>Example 7 (A Kronecker-factored norm: K-FAC and Shampoo)</strong>   Let <math><mi>𝜃</mi><mo>∈</mo><msup><mi>ℝ</mi><mrow><mi>𝑚</mi><mo lspace="0em" rspace="0em">×</mo><mi>𝑛</mi></mrow></msup></math> be the weights of a linear layer <math><mi>𝑍</mi><mo>=</mo><mi>𝜃</mi><mi>𝑋</mi></math> with inputs <math><mi>𝑋</mi><mo>∈</mo><msup><mi>ℝ</mi><mrow><mi>𝑛</mi><mo lspace="0em" rspace="0em">×</mo><mi>𝑏</mi></mrow></msup></math>. A step <math><mi>ℎ</mi></math> changes the outputs by <math><mi>ℎ</mi><mi>𝑋</mi></math>. Measuring this change, weighted on the output side by a symmetric positive definite <math><mi>𝐿</mi><mo>∈</mo><msup><mi>ℝ</mi><mrow><mi>𝑚</mi><mo lspace="0em" rspace="0em">×</mo><mi>𝑚</mi></mrow></msup></math>, gives<sup class="footnote-ref"><a class="footnote-ref-link" href="#fn-19" id="fnref-19">19</a></sup><span class="marginnote" id="fn-19"><sup><a class="footnote-ref-link" href="#fnref-19">19</a></sup> In a network, each layer has its own <math><mi>𝐿</mi></math> and <math><mi>𝑅</mi></math>.</span></p><div class="numbered-equation"><math display="block"><msubsup><mrow><mo>‖</mo><mrow><msup><mi>𝐿</mi><mrow><mn>1</mn><mi>/</mi><mn>2</mn></mrow></msup><mi>ℎ</mi><mi>𝑋</mi></mrow><mo>‖</mo></mrow><mi>𝐹</mi><mn>2</mn></msubsup><mo>=</mo><mo form="prefix" stretchy="false">⟨</mo><mi>𝒜︀</mi><mrow><mo>(</mo><mi>ℎ</mi><mo>)</mo></mrow><mo>,</mo><mi>ℎ</mi><msub><mo form="postfix" stretchy="false">⟩</mo><mi>𝐹</mi></msub><mo rspace="0em">,</mo><mspace width="1em"/><mi>𝑅</mi><mo>=</mo><mi>𝑋</mi><msup><mi>𝑋</mi><mi>⊤</mi></msup><mo rspace="0em">,</mo><mspace width="1em"/><mi>𝒜︀</mi><mrow><mo>(</mo><mi>ℎ</mi><mo>)</mo></mrow><mo>=</mo><mi>𝐿</mi><mi>ℎ</mi><mi>𝑅</mi><mo rspace="0em">,</mo></math><p><span class="equation-number">(29)</span></p></div><p>which is positive definite only if <math><mi>𝑋</mi><msup><mi>𝑋</mi><mi>⊤</mi></msup></math> is. Unlike the spectral norm of <a href="#ex-muon">Example 4</a>, which is the worst case over all inputs, this norm measures the change on the given inputs. Its inverse, <math><msup><mi>𝒜︀</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mrow><mo>(</mo><mi>𝐺</mi><mo>)</mo></mrow><mo>=</mo><msup><mi>𝐿</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mi>𝐺</mi><msup><mi>𝑅</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup></math>, needs only an <math><mi>𝑚</mi><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">×</mo><mi>𝑚</mi></math> and an <math><mi>𝑛</mi><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">×</mo><mi>𝑛</mi></math> matrix, not a general one of size <math><mi>𝑚</mi><mi>𝑛</mi><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">×</mo><mi>𝑚</mi><mi>𝑛</mi></math>.<sup class="footnote-ref"><a class="footnote-ref-link" href="#fn-20" id="fnref-20">20</a></sup><span class="marginnote" id="fn-20"><sup><a class="footnote-ref-link" href="#fnref-20">20</a></sup> Stacking the columns of <math><mi>ℎ</mi></math> into one long vector <math><mtext>vec</mtext><mrow><mo>(</mo><mi>ℎ</mi><mo>)</mo></mrow></math> gives <math><mtext>vec</mtext><mrow><mo>(</mo><mrow><mi>𝐿</mi><mi>ℎ</mi><mi>𝑅</mi></mrow><mo>)</mo></mrow><mo>=</mo><mrow><mo>(</mo><mrow><mi>𝑅</mi><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">⊗</mo><mi>𝐿</mi></mrow><mo>)</mo></mrow><mspace width="0.2222em"/><mtext>vec</mtext><mrow><mo>(</mo><mi>ℎ</mi><mo>)</mo></mrow></math>, so <math><mi>𝒜︀</mi></math> is the Kronecker product <math><mi>𝑅</mi><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">⊗</mo><mi>𝐿</mi></math>. This is why such norms and preconditioners are called <em>Kronecker-factored</em>, the KF in K-FAC.</span> Since the inputs change from batch to batch, K-FAC <a id="loc-17" href="#loc-27" role="doc-biblioref">[7]</a> takes moving averages over the iterations of <math><mi>𝑋</mi><msup><mi>𝑋</mi><mi>⊤</mi></msup></math> and of <math><mi mathvariant="normal">Δ</mi><msup><mi mathvariant="normal">Δ</mi><mi>⊤</mi></msup></math>, where <math><mi mathvariant="normal">Δ</mi></math> holds the derivatives of the loss with respect to the outputs <math><mi>𝑍</mi></math>,<sup class="footnote-ref"><a class="footnote-ref-link" href="#fn-21" id="fnref-21">21</a></sup><span class="marginnote" id="fn-21"><sup><a class="footnote-ref-link" href="#fnref-21">21</a></sup> In K-FAC, <math><mi>𝑋</mi></math> has an extra row of ones for the bias, and <math><mi mathvariant="normal">Δ</mi></math> is computed with targets sampled from the network’s own predictive distribution rather than taken from the data, so that <math><mi>𝑅</mi><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">⊗</mo><mi>𝐿</mi></math> approximates a block of the Fisher information matrix.</span></p><div class="numbered-equation"><math display="block"><mi>𝑅</mi><mo stretchy="false">←</mo><mi>𝜌</mi><mi>𝑅</mi><mo>+</mo><mrow><mo>(</mo><mrow><mn>1</mn><mo>−</mo><mi>𝜌</mi></mrow><mo>)</mo></mrow><mi>𝑋</mi><msup><mi>𝑋</mi><mi>⊤</mi></msup><mo rspace="0em">,</mo><mspace width="1em"/><mi>𝐿</mi><mo stretchy="false">←</mo><mi>𝜌</mi><mi>𝐿</mi><mo>+</mo><mrow><mo>(</mo><mrow><mn>1</mn><mo>−</mo><mi>𝜌</mi></mrow><mo>)</mo></mrow><mi mathvariant="normal">Δ</mi><msup><mi mathvariant="normal">Δ</mi><mi>⊤</mi></msup><mo rspace="0em">,</mo></math><p><span class="equation-number">(30)</span></p></div><p>and its basic step is <math><mo>−</mo><mi>𝜂</mi><msup><mi>𝐿</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mi>𝐺</mi><msup><mi>𝑅</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup></math>. K-FAC also adds damping to <math><mi>𝐿</mi></math> and <math><mi>𝑅</mi></math>, and takes the step <math><mi>𝛼</mi><msub><mi>𝑑</mi><mi>𝑡</mi></msub><mo>+</mo><mi>𝜇</mi><msub><mi>ℎ</mi><mrow><mi>𝑡</mi><mo lspace="0em" rspace="0em">−</mo><mn>1</mn></mrow></msub></math> with <math><msub><mi>𝑑</mi><mi>𝑡</mi></msub><mo>=</mo><mo form="prefix">−</mo><msup><mi>𝐿</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mi>𝐺</mi><msup><mi>𝑅</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup></math>, where <math><mi>𝛼</mi></math> and <math><mi>𝜇</mi></math> are chosen at every step by minimizing a quadratic model. This is a momentum term whose coefficients change from step to step. Shampoo <a id="loc-18" href="#loc-28" role="doc-biblioref">[8]</a> instead sums the products of the derivative with itself, starting from <math><mi>𝐿</mi><mo>=</mo><mi>𝜀</mi><mi>𝐼</mi></math> and <math><mi>𝑅</mi><mo>=</mo><mi>𝜀</mi><mi>𝐼</mi></math>,</p><div class="numbered-equation"><math display="block"><mi>𝐿</mi><mo stretchy="false">←</mo><mi>𝐿</mi><mo>+</mo><mi>𝐺</mi><msup><mi>𝐺</mi><mi>⊤</mi></msup><mo rspace="0em">,</mo><mspace width="1em"/><mi>𝑅</mi><mo stretchy="false">←</mo><mi>𝑅</mi><mo>+</mo><msup><mi>𝐺</mi><mi>⊤</mi></msup><mi>𝐺</mi><mo rspace="0em">,</mo></math><p><span class="equation-number">(31)</span></p></div><p>and takes the step <math><mo>−</mo><mi>𝜂</mi><msup><mi>𝐿</mi><mrow><mo>−</mo><mn>1</mn><mi>/</mi><mn>4</mn></mrow></msup><mi>𝐺</mi><msup><mi>𝑅</mi><mrow><mo>−</mo><mn>1</mn><mi>/</mi><mn>4</mn></mrow></msup></math>, so its norm uses the fourth roots of <math><mi>𝐿</mi></math> and <math><mi>𝑅</mi></math>.</p></div></div></figure><h2 id="loc-19">6. Summary</h2><p><a href="#tab-summary">Table 2</a> summarizes the methods of the post by their norm and by where past information enters.</p><figure id="tab-summary"><p><span class="marginnote">Table 2: The methods of the post as choices of the norm and of where past information enters: the linearization through <math><msub><mover accent="true"><mi>𝑔</mi><mo>̂</mo></mover><mi>𝑡</mi></msub></math>, and the norm. K-FAC also uses the previous step, and implementations of Shampoo often add momentum as well.</span></p><table><thead><tr><th>Method</th><th>Norm</th><th><math><msub><mover accent="true"><mi>𝑔</mi><mo>̂</mo></mover><mi>𝑡</mi></msub></math></th><th>Norm memory</th></tr></thead><tbody><tr><td>Gradient descent</td><td>Inner product</td><td><math><msub><mi>𝑔</mi><mi>𝑡</mi></msub></math></td><td>–</td></tr><tr><td>AdaGrad</td><td>Diagonal</td><td><math><msub><mi>𝑔</mi><mi>𝑡</mi></msub></math></td><td>Sum</td></tr><tr><td>Adam</td><td>Diagonal</td><td>Average</td><td>Average</td></tr><tr><td>K-FAC</td><td>Kronecker-factored</td><td><math><msub><mi>𝑔</mi><mi>𝑡</mi></msub></math></td><td>Average</td></tr><tr><td>Shampoo</td><td>Kronecker-factored</td><td><math><msub><mi>𝑔</mi><mi>𝑡</mi></msub></math></td><td>Sum</td></tr><tr><td>Sign descent</td><td>Max-norm</td><td><math><msub><mi>𝑔</mi><mi>𝑡</mi></msub></math></td><td>–</td></tr><tr><td>Muon</td><td>Spectral</td><td>Average</td><td>–</td></tr></tbody></table></figure><section class="post-citation"><h2>Cite this post</h2><div class="expressive-code" style="--ec-borderRad:0.34em;--ec-codePadBlk:0.34em;--ec-codePadInl:0.34em;--ec-codeFg:#000000;--ec-codeBg:#f5f5f5;--ec-langBg:#effbf9;--ec-langFg:#000000;--ec-copyBg:#f7f7f7;--ec-copyFg:#000000;--ec-gutterBg:#f5f5f5;--ec-gutterGap:0.25rem;--ec-gutterPadLeft:0.5rem;--ec-codeFontSize:0.85em;--ec-codeLineHeight:1.5;--ec-copyBgHover:#f8f8f8;--ec-copyBgFocus:#f8f8f8;--ec-copyFgHover:#000000;--ec-copyFgFocus:#000000;--ec-hlBg:#dff6f2;--ec-commentBg:#effbf9"><div class="code-lang" translate="no">bibtex</div><button type="button" class="copy-button" title="Copy code" data-state="idle" aria-label="Copy code"><span class="sr-only">Copy code</span><span class="copy-label" aria-hidden="true">Copy</span><span class="copy-feedback" aria-hidden="true">Copied!</span></button><pre data-language="bibtex"><code class="language-bibtex"><div class="ec-header ec-ext" style="background:#f5f5f5"></div><div class="ec-line"><div class="code" data-indent>@misc{paltorp2026steepestdescent,</div></div><div class="ec-line" style="--ecIndent:2ch"><div class="code" data-indent="  ">  author = {Paltorp, Mikkel},</div></div><div class="ec-line" style="--ecIndent:2ch"><div class="code" data-indent="  ">  title = {{Which Way Is Down? First-Order Optimizers as a Choice of Norm}},</div></div><div class="ec-line" style="--ecIndent:2ch"><div class="code" data-indent="  ">  year = {2026},</div></div><div class="ec-line" style="--ecIndent:2ch"><div class="code" data-indent="  ">  month = oct,</div></div><div class="ec-line" style="--ecIndent:2ch"><div class="code" data-indent="  ">  url = {https://mipals.github.io/pdf/2026/10-13-steepest-descent/steepest-descent.pdf},</div></div><div class="ec-line" style="--ecIndent:2ch"><div class="code" data-indent="  ">  note = {Blog post}</div></div><div class="ec-line"><div class="code" data-indent>}</div></div><div class="ec-footer ec-ext" style="background:#f5f5f5"></div></code></pre></div></section><section role="doc-bibliography"><h2 id="loc-20">Bibliography</h2><ul style="list-style-type: none"><li id="loc-21"><span class="prefix"><a href="#loc-5" role="doc-backlink">[1]</a></span> J. A. Kelner, Y. T. Lee, L. Orecchia, and A. Sidford, “An Almost-Linear-Time Algorithm for Approximate Max Flow in Undirected Graphs, and its Multicommodity Generalizations,” in <em>Proceedings of the Twenty-Fifth Annual ACM-SIAM Symposium on Discrete Algorithms (SODA)</em>,<span style="white-space: pre-wrap">&#x20;&#x20;</span>2014, pp. 217–226. doi: <a href="https://doi.org/10.1137/1.9781611973402.16">10.1137/1.9781611973402.16</a>.</li><li id="loc-22"><span class="prefix"><a href="#loc-6" role="doc-backlink">[2]</a></span> J. Bernstein and L. Newhouse, “Modular Duality in Deep Learning.” [Online]. Available: <a href="https://arxiv.org/abs/2410.21265">https://arxiv.org/abs/2410.21265</a></li><li id="loc-23"><span class="prefix"><a href="#loc-8" role="doc-backlink">[3]</a></span> P. J. Goulart and Y. Chen, “Clarabel: An interior-point solver for conic programs with quadratic objectives.” [Online]. Available: <a href="https://arxiv.org/abs/2405.12762">https://arxiv.org/abs/2405.12762</a></li><li id="loc-24"><span class="prefix"><a href="#loc-11" role="doc-backlink">[4]</a></span> K. Jordan <em>et al.</em>, “Muon: An optimizer for hidden layers in neural networks.” [Online]. Available: <a href="https://kellerjordan.github.io/posts/muon/">https://kellerjordan.github.io/posts/muon/</a></li><li id="loc-25"><span class="prefix"><a href="#loc-15" role="doc-backlink">[5]</a></span> J. Duchi, E. Hazan, and Y. Singer, “Adaptive Subgradient Methods for Online Learning and Stochastic Optimization,” <em>Journal of Machine Learning Research</em>, vol. 12, no. 61, pp. 2121–2159, 2011, [Online].<span style="white-space: pre-wrap">&#x20;&#x20;</span>Available: <a href="https://jmlr.org/papers/v12/duchi11a.html">https://jmlr.org/papers/v12/duchi11a.html</a></li><li id="loc-26"><span class="prefix"><a href="#loc-16" role="doc-backlink">[6]</a></span> D. P. Kingma and J. Ba, “Adam: A Method for Stochastic Optimization,” in <em>International Conference on Learning Representations (ICLR)</em>,<span style="white-space: pre-wrap">&#x20;&#x20;</span>2015. [Online].<span style="white-space: pre-wrap">&#x20;&#x20;</span>Available: <a href="https://arxiv.org/abs/1412.6980">https://arxiv.org/abs/1412.6980</a></li><li id="loc-27"><span class="prefix"><a href="#loc-17" role="doc-backlink">[7]</a></span> J. Martens and R. Grosse, “Optimizing Neural Networks with Kronecker-factored Approximate Curvature,” in <em>Proceedings of the 32nd International Conference on Machine Learning</em>, in Proceedings of Machine Learning Research, vol. 37.<span style="white-space: pre-wrap">&#x20;&#x20;</span>2015, pp. 2408–2417. [Online].<span style="white-space: pre-wrap">&#x20;&#x20;</span>Available: <a href="https://proceedings.mlr.press/v37/martens15.html">https://proceedings.mlr.press/v37/martens15.html</a></li><li id="loc-28"><span class="prefix"><a href="#loc-18" role="doc-backlink">[8]</a></span> V. Gupta, T. Koren, and Y. Singer, “Shampoo: Preconditioned Stochastic Tensor Optimization,” in <em>Proceedings of the 35th International Conference on Machine Learning</em>, in Proceedings of Machine Learning Research, vol. 80.<span style="white-space: pre-wrap">&#x20;&#x20;</span>2018, pp. 1842–1850. [Online].<span style="white-space: pre-wrap">&#x20;&#x20;</span>Available: <a href="https://proceedings.mlr.press/v80/gupta18a.html">https://proceedings.mlr.press/v80/gupta18a.html</a></li></ul></section><script>document.querySelectorAll('.ec-line .code[data-indent]').forEach((line) => line.removeAttribute('data-indent'));</script></section></article></body></html>

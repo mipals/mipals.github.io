@@ -1,0 +1,586 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>backpropagation is the adjoint method</title><link rel="icon" href="/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tufte-css/1.8.0/tufte.min.css"><link rel="stylesheet" href="/assets/tufted.css"><link rel="stylesheet" href="/assets/custom.css"><style>/* Alignment */
+mtable.right-align mtd,
+mtable mtd.right-align,
+mtable.left-align mtd.right-align,
+mtable.aligned mtd:nth-child(odd) {
+  justify-items: end;
+  text-align: right;
+}
+mtable.cases mtd,
+mtable.left-align mtd,
+mtable mtd.left-align,
+mtable.aligned mtd:nth-child(even),
+math:is(:not([display])) > mtable.multiline-equation mtd {
+  justify-items: start;
+  text-align: left;
+}
+mtable.cases mtd,
+mtable.aligned mtd,
+mtable mtd.flushed,
+mtable mtd.left-flush {
+  padding-left: 0;
+}
+mtable.cases mtd,
+mtable.aligned mtd,
+mtable mtd.flushed,
+mtable mtd.right-flush {
+  padding-right: 0;
+}
+
+/* Tables */
+mtable {
+  math-style: inherit;
+}
+mtd {
+  math-depth: auto-add;
+  math-style: compact;
+  math-shift: compact;
+}
+
+/* Equations */
+mtable.multiline-equation mtd {
+  math-depth: inherit;
+  math-style: inherit;
+  math-shift: inherit;
+  padding: 0;
+}
+math > mtable.multiline-equation mtr:not(:last-child) mtd {
+  padding-bottom: 0.5em;
+}
+
+/* Fractions */
+mfrac {
+  padding-inline: 0;
+  margin-inline: 0.1em;
+}
+
+/* Accents */
+mover[accent="true" i] > :first-child {
+  font-feature-settings: "dtls";
+}
+mover.dotted[accent="true" i] > :first-child {
+  font-feature-settings: "dtls" 0;
+}
+
+/* Other rules for scriptlevel, displaystyle and math-shift */
+munder > :nth-child(2),
+munderover > :nth-child(2) {
+  math-shift: compact
+}
+munder[accentunder="true" i] > :not(:first-child),
+mover[accent="true" i] > :not(:first-child) {
+  math-depth: inherit;
+  math-style: inherit;
+  math-shift: inherit;
+}</style></head><body><header><nav><a href="/">home</a><a href="/blog/">blog</a><a href="/publications/">publications</a><a href="/repositories/">repositories</a><a href="/about/">about</a><a href="/solver/">conic solver</a><a href="/marimo/">marimo</a></nav></header><article><section><style>@layer components {
+  .expressive-code {
+    position: relative;
+    font-family: var(
+      --ec-uiFontFamily,
+      ui-sans-serif,
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      sans-serif
+    );
+    font-size: var(--ec-uiFontSize, 0.9rem);
+    font-weight: var(--ec-uiFontWeight, 400);
+    line-height: var(--ec-uiLineHeight, 1.65);
+    text-size-adjust: none;
+    -webkit-text-size-adjust: none;
+  }
+
+  .expressive-code *:not(:is(svg, svg *)) {
+    box-sizing: border-box;
+  }
+
+  .expressive-code::selection {
+    background: var(--ec-uiSelBg, var(--ec-codeBg, #0d1117));
+    color: var(--ec-uiSelFg, currentColor);
+  }
+
+  .expressive-code pre {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    border: var(--ec-borderWd, 1.5px) solid
+      var(--ec-borderCol, rgba(148, 163, 184, 0.25));
+    border-radius: calc(
+      var(--ec-borderRad, 0.3rem) + var(--ec-borderWd, 1.5px)
+    );
+    background: var(--ec-codeBg, #0d1117);
+    color: var(--ec-codeFg, #c9d1d9);
+    overflow-x: auto;
+    position: relative;
+    z-index: 1;
+    container-type: inline-size;
+  }
+
+  .expressive-code pre:focus-visible {
+    outline: 3px solid var(--ec-focusBorder, #3b82f6);
+    outline-offset: -3px;
+  }
+
+  .expressive-code pre > code {
+    all: unset;
+    display: block;
+    flex: 1 0 100%;
+    padding: var(--ec-codePadBlk, 0.5rem) 0;
+    color: var(--ec-codeFg, #c9d1d9);
+    font-family: var(
+      --ec-codeFontFamily,
+      ui-monospace,
+      SFMono-Regular,
+      Menlo,
+      Monaco,
+      Consolas,
+      "Liberation Mono",
+      "Courier New",
+      monospace
+    );
+    font-size: var(--ec-codeFontSize, 0.85rem);
+    font-weight: var(--ec-codeFontWeight, 400);
+    line-height: var(--ec-codeLineHeight, 1.35);
+  }
+
+  .expressive-code pre > code::selection {
+    background: var(--ec-codeSelBg, rgba(56, 189, 248, 0.35));
+    color: inherit;
+  }
+
+  .expressive-code pre.wrap .ec-line .code {
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    min-width: min(20ch, var(--ecMaxLine, 20ch));
+  }
+
+  /* When lines are allowed to wrap, the absolute overlay can overlap
+     wrapped text. Disable the overlay in wrap mode and rely on per-slot
+     borders for guides (these are handled by .indent-slot). */
+  .expressive-code pre.wrap .ec-line .code .indent-overlay {
+    display: none;
+  }
+
+  .expressive-code pre.wrap .ec-line .code::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    /* use the code line-height times the element font-size to match one line */
+    height: calc(var(--ec-codeLineHeight, 1.65) * 1em);
+    width: max(0px, calc(var(--ecIndent, 0) - 2px));
+    pointer-events: none;
+    background-image: repeating-linear-gradient(
+      to right,
+      transparent 0,
+      transparent calc(var(--ec-indentStep, 4ch) - 1px),
+      var(--ec-indentGuideCol, rgba(148, 163, 184, 0.35))
+        calc(var(--ec-indentStep, 4ch) - 1px),
+      var(--ec-indentGuideCol, rgba(148, 163, 184, 0.35))
+        var(--ec-indentStep, 4ch)
+    );
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    mix-blend-mode: multiply;
+    opacity: 0.85;
+    z-index: 0;
+  }
+
+  .expressive-code pre.wrap .ec-line .code span.indent {
+    white-space: pre;
+  }
+
+  .expressive-code .ec-line .code .indent {
+    display: inline-flex;
+    white-space: pre;
+  }
+
+  .expressive-code .ec-line .code .indent-slot {
+    display: inline-flex;
+    white-space: pre;
+    position: relative;
+  }
+
+  .expressive-code.has-indent-guides .ec-line .code .indent-slot {
+    border-inline-end: 1px solid
+      var(--ec-indentGuideCol, rgba(148, 163, 184, 0.35));
+  }
+
+  .expressive-code.has-indent-guides
+    .ec-line
+    .code
+    .indent-slot.indent-slot-partial {
+    border-inline-end: none;
+  }
+
+  .expressive-code pre::-webkit-scrollbar,
+  .expressive-code pre::-webkit-scrollbar-track {
+    background-color: inherit;
+    border-radius: calc(
+      var(--ec-borderRad, 0.3rem) + var(--ec-borderWd, 1.5px)
+    );
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+
+  .expressive-code pre::-webkit-scrollbar-thumb {
+    background-color: var(--ec-scrollbarThumbCol, rgba(148, 163, 184, 0.4));
+    border: 4px solid transparent;
+    background-clip: content-box;
+    border-radius: 10px;
+  }
+
+  .expressive-code pre::-webkit-scrollbar-thumb:hover {
+    background-color: var(
+      --ec-scrollbarThumbHoverCol,
+      rgba(148, 163, 184, 0.55)
+    );
+  }
+
+  .expressive-code .code-lang {
+    position: absolute;
+    top: 0.25rem;
+    right: 0.6rem;
+    padding: 0;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.25rem;
+    background: none;
+    color: var(--ec-langFg, var(--ec-codeFg, currentColor));
+    font-size: 0.68em;
+    pointer-events: none;
+    opacity: 0.6;
+    transition: opacity 160ms ease, color 160ms ease;
+    z-index: 2;
+  }
+
+  .expressive-code:focus-within .code-lang,
+  .expressive-code:hover .code-lang {
+    opacity: 1;
+    color: var(--ec-langFg, var(--ec-codeFg, currentColor));
+  }
+
+  .expressive-code .copy-button {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.3rem;
+    height: 2.3rem;
+    border-radius: 0.45rem;
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    background-color: var(--ec-copyBg, rgba(15, 23, 42, 0.04));
+    color: var(--ec-copyFg, rgba(15, 23, 42, 0.7));
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: auto;
+    transition: opacity 160ms ease, transform 160ms ease,
+      background-color 140ms ease, color 140ms ease;
+    transform: translateY(-0.3rem);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns%3D%27http://www.w3.org/2000/svg%27 viewBox%3D%270 0 24 24%27 fill%3D%27none%27 stroke%3D%27currentColor%27 stroke-width%3D%271.75%27 stroke-linecap%3D%27round%27 stroke-linejoin%3D%27round%27%3E%3Cpath d%3D%27M3 19a2 2 0 0 1-1-2V3a2 2 0 0 1 1-1h13a2 2 0 0 1 2 1%27/%3E%3Crect x%3D%276%27 y%3D%275%27 width%3D%2716%27 height%3D%2718%27 rx%3D%271.6%27 ry%3D%271.6%27/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 60%;
+    z-index: 3;
+  }
+
+  .expressive-code .copy-button:is(:hover, :focus-visible, :active) {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .expressive-code .copy-button:focus-visible {
+    outline: 2px solid rgba(148, 163, 184, 0.55);
+    outline-offset: 2px;
+    background-color: var(--ec-copyBgFocus, rgba(15, 23, 42, 0.16));
+    color: var(--ec-copyFgFocus, rgba(15, 23, 42, 1));
+  }
+
+  .expressive-code .copy-button::before {
+    content: "";
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    background: transparent;
+    border: none;
+    pointer-events: none;
+  }
+
+  .expressive-code .copy-button::after {
+    content: none;
+    pointer-events: none;
+  }
+
+  .expressive-code .copy-button .copy-label,
+  .expressive-code .copy-button .copy-feedback {
+    display: none;
+  }
+
+  .expressive-code .copy-button:hover {
+    background-color: var(--ec-copyBgHover, rgba(15, 23, 42, 0.12));
+    color: var(--ec-copyFgHover, rgba(15, 23, 42, 0.9));
+  }
+
+  .expressive-code .copy-button span[aria-hidden="true"] {
+    font-family: var(--ec-uiFontFamily, inherit);
+  }
+
+  .expressive-code .ec-header,
+  .expressive-code .ec-footer {
+    display: block;
+    padding: 0.35rem var(--ec-codePadInl, 1.35rem);
+    color: var(--ec-uiFg, currentColor);
+  }
+
+  .expressive-code .ec-header.ec-ext,
+  .expressive-code .ec-footer.ec-ext {
+    padding: 0.25rem var(--ec-codePadInl, 1.35rem);
+  }
+
+  .expressive-code .ec-line {
+    direction: ltr;
+    unicode-bidi: isolate;
+    display: grid;
+    grid-template-areas: "gutter code";
+    grid-template-columns: auto 1fr;
+    column-gap: var(--ec-gutterGap, 0.25rem);
+    position: relative;
+    --lineBg: var(--ec-codeBg, #0d1117);
+    background: var(--lineBg);
+  }
+
+  .expressive-code:not(.has-gutter) .ec-line {
+    grid-template-columns: 1fr;
+  }
+
+  .expressive-code:not(.has-gutter) .ec-line .code {
+    padding-inline: var(--ec-codePadInl, 1.35rem);
+  }
+
+  .expressive-code .ec-line .gutter {
+    grid-area: gutter;
+    color: var(--ec-gtrFg, rgba(148, 163, 184, 0.8));
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: var(--lineBg, var(--ec-gutterBg, var(--ec-codeBg, #0d1117)));
+    box-shadow: 1px 0 0 var(--ec-gtrBrdCol, rgba(148, 163, 184, 0.2));
+  }
+
+  .expressive-code .ec-line .gutter > * {
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .expressive-code .ec-line .gutter ~ .code {
+    --ecLineBrdCol: var(--ec-gtrBrdCol, rgba(148, 163, 184, 0.2));
+  }
+
+  .expressive-code .ec-line.highlight .gutter {
+    color: var(--ec-gtrHighlightFg, rgba(226, 232, 240, 0.95));
+  }
+
+  .expressive-code .ec-line .gutter .ln {
+    display: inline-flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+    box-sizing: content-box;
+    min-width: var(--lnWidth, 2ch);
+    padding-inline-start: var(--ec-gutterPadLeft, 0.5rem);
+    padding-inline-end: var(--ec-codePadInl, 1.35rem);
+    font-size: var(--ec-codeFontSize, 0.85rem);
+    font-variant-numeric: tabular-nums;
+    color: inherit;
+  }
+
+  .expressive-code .ec-line .gutter .ln > span + span {
+    margin-inline-start: 0.25em;
+  }
+
+  .expressive-code .ec-line .code {
+    position: relative;
+    z-index: 1;
+  }
+
+  .expressive-code .ec-line .code .indent-overlay {
+    display: none;
+  }
+
+  .expressive-code.has-indent-guides .ec-line .code .indent-overlay {
+    position: absolute;
+    inset: 0 auto 0 0;
+    display: block;
+    /* Shrink overlay by 1px to avoid drawing a vertical guide at the very end of
+       the inline area (prevents an extra line appearing at each row end).
+       Use max(...) to avoid negative values when --ecIndent is small. */
+    width: max(0px, calc(var(--ecIndent, 0) - 2px));
+    pointer-events: none;
+    background-image: repeating-linear-gradient(
+      to right,
+      transparent 0,
+      transparent calc(var(--ec-indentStep, 4ch) - 1px),
+      var(--ec-indentGuideCol, rgba(148, 163, 184, 0.35))
+        calc(var(--ec-indentStep, 4ch) - 1px),
+      var(--ec-indentGuideCol, rgba(148, 163, 184, 0.35))
+        var(--ec-indentStep, 4ch)
+    );
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    mix-blend-mode: multiply;
+    opacity: 0.85;
+    z-index: 0;
+  }
+  .expressive-code .ec-comment {
+    grid-column: 1 / -1;
+    padding: 0.55rem calc(var(--ec-codePadInl, 1.35rem) + 0.25rem);
+    font-size: 0.85em;
+    background: var(--ec-commentBg, rgba(56, 189, 248, 0.18));
+    color: var(--ec-commentFg, currentColor);
+    box-shadow: inset 0 1px 0 rgba(15, 23, 42, 0.08),
+      inset 0 -1px 0 rgba(15, 23, 42, 0.06);
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    width: 100cqw;
+    box-sizing: border-box;
+  }
+
+  .expressive-code .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  code.expressive-code-inline {
+    display: inline-block;
+    padding: 0 var(--ec-inlinePadInl, 0.4rem);
+    border-radius: calc(var(--ec-borderRad, 0.3rem) / 1.2);
+    background: var(--ec-inlineBg, rgba(148, 163, 184, 0.2));
+    color: var(--ec-inlineFg, inherit);
+    font-family: var(
+      --ec-codeFontFamily,
+      ui-monospace,
+      SFMono-Regular,
+      Menlo,
+      Monaco,
+      Consolas,
+      "Liberation Mono",
+      "Courier New",
+      monospace
+    );
+    font-size: 0.95em;
+    line-height: 1.2;
+    white-space: pre;
+  }
+}
+</style><script>const CODE_BLOCK_SELECTOR = ".expressive-code";
+const COPY_BUTTON_SELECTOR = ".copy-button";
+
+const selectCodeBlocks = () =>
+  Array.from(document.querySelectorAll(CODE_BLOCK_SELECTOR));
+
+const extractCodeText = (codeBlock) =>
+  Array.from(codeBlock.querySelectorAll(".ec-line .code"))
+    .map((line) => {
+      const indent = line.dataset.indent ?? "";
+      const content = line.textContent
+        .replace(/\u00a0/g, " ")
+        .replace(/\u200b/gi, "");
+      return indent + content;
+    })
+    .join("\n");
+
+const fallbackCopy = (text) => {
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.setAttribute("readonly", "true");
+  textarea.style.position = "absolute";
+  textarea.style.left = "-9999px";
+  document.body.appendChild(textarea);
+  textarea.select();
+  /** @type {any} */ (document).execCommand("copy");
+  document.body.removeChild(textarea);
+};
+
+const setStateWithTimeout = (button, state, delay = 1600) => {
+  button.dataset.state = state;
+  if (state === "copied") {
+    setTimeout(() => {
+      if (button.dataset.state === "copied") {
+        button.dataset.state = "idle";
+      }
+    }, delay);
+  }
+};
+
+const bindCopyButton = (codeBlock) => {
+  if (!codeBlock || codeBlock.dataset.copyBound === "true") return;
+
+  const copyButton = codeBlock.querySelector(COPY_BUTTON_SELECTOR);
+  if (!copyButton) return;
+
+  codeBlock.dataset.copyBound = "true";
+
+  const copyHandler = async () => {
+    const code = extractCodeText(codeBlock);
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(code);
+      } else {
+        fallbackCopy(code);
+      }
+      setStateWithTimeout(copyButton, "copied");
+    } catch (error) {
+      try {
+        fallbackCopy(code);
+        setStateWithTimeout(copyButton, "copied");
+      } catch (fallbackError) {
+        setStateWithTimeout(copyButton, "error", 2200);
+      }
+    }
+  };
+
+  const resetHandler = () => {
+    if (copyButton.dataset.state === "copied") {
+      copyButton.dataset.state = "idle";
+    }
+  };
+
+  copyButton.addEventListener("click", copyHandler);
+  copyButton.addEventListener("blur", resetHandler);
+  copyButton.addEventListener("mouseleave", resetHandler);
+};
+
+selectCodeBlocks().forEach(bindCopyButton);
+
+const observer = new MutationObserver((mutations) => {
+  for (const mutation of mutations) {
+    mutation.addedNodes.forEach((node) => {
+      if (!(node instanceof HTMLElement)) return;
+      if (node.matches?.(CODE_BLOCK_SELECTOR)) {
+        bindCopyButton(node);
+      } else {
+        node
+          .querySelectorAll?.(CODE_BLOCK_SELECTOR)
+          .forEach((block) => bindCopyButton(block));
+      }
+    });
+  }
+});
+
+observer.observe(document.documentElement, {
+  childList: true,
+  subtree: true,
+});
+</script><h1>Backpropagation is the Adjoint Method</h1><p class="post-meta"><time datetime="2025-10-25">25 October 2025</time> · <a href="/pdf/2025/10-25-adjoint-method/adjoint-method.pdf">Download PDF</a> · <a href="julia-examples.zip">Download code</a></p><nav class="post-toc marginnote"><div class="post-toc-title">Contents</div><ol><li class="post-toc-section"><a href="#loc-1"><span class="post-toc-number">1.</span> The Adjoint Method</a></li><li class="post-toc-section"><a href="#loc-3"><span class="post-toc-number">2.</span> Backpropagation and the Adjoint Method</a></li><li class="post-toc-subsection"><a href="#loc-5"><span class="post-toc-number">2.1.</span> How to compute the elements of <math><mi>𝐿</mi></math> and <math><msup><mi>𝑀</mi><mi>⊤</mi></msup></math></a></li><li class="post-toc-section"><a href="#loc-6">Bibliography</a></li></ol></nav><p>Backpropagation is often introduced as something developed within the field of machine learning. However, the reality is that backpropagation is just a special case of the adjoint method where the inversion of the partial derivative <math><mfrac><mrow><mi>𝜕</mi><mi>𝑓</mi></mrow><mrow><mi>𝜕</mi><mi>𝑢</mi></mrow></mfrac></math> can be done efficiently due to its lower-triangular structure. This note is in two parts. In the first part we review the adjoint method while in the second part we describe how backpropagation is a special case of the adjoint method with a structure that results in scalable computational algorithms.</p><p>A key insight is that while the adjoint method is seemingly limited to equality constrained problems, it turns out that all computer programs are trivially equality constrained problems with equalities coming from each assignment<sup class="footnote-ref"><a class="footnote-ref-link" href="#fn-1" id="fnref-1">1</a></sup><span class="marginnote" id="fn-1"><sup><a class="footnote-ref-link" href="#fnref-1">1</a></sup> All lines of code are essentially “<math><mtext>variable</mtext><mo>=</mo><mtext>something</mtext></math>” which can be written as “<math><mtext>variable</mtext><mo>−</mo><mtext>something</mtext><mo>=</mo><mn>0</mn></math>”</span>. In this sense, as shown in a later section, optimizing a neural network is actually an equality constrained optimization problem with constraints coming from each layer of the network. This is opposed to how optimizing a neural network is usually presented as an unconstrained optimization problem.</p><h2 id="loc-1">1. The Adjoint Method</h2><p>In many engineering applications we are interested in solving equality constrained optimization problems where the optimization variable (<math><mi>𝜃</mi></math>) implicitly defines another variable (<math><mi>𝑢</mi></math>) that then appears in the objective function<sup class="footnote-ref"><a class="footnote-ref-link" href="#fn-2" id="fnref-2">2</a></sup><span class="marginnote" id="fn-2"><sup><a class="footnote-ref-link" href="#fnref-2">2</a></sup> A famous example of this is <a href="https://en.wikipedia.org/wiki/Topology_optimization">Topology Optimization</a></span>. Written out this means solving optimization problems of the following form</p><div class="numbered-equation"><math display="block"><mtable class="multiline-equation aligned"><mtr><mtd><munder><mo lspace="0em" rspace="0em">min</mo><mrow><mi>𝜃</mi><mo lspace="0em" rspace="0em">∈</mo><msup><mi>ℝ</mi><msub><mi>𝑛</mi><mi>𝜃</mi></msub></msup></mrow></munder><mspace width="1em"/></mtd><mtd><mi>𝐿</mi><mrow><mo>(</mo><mrow><mi>𝑢</mi><mo>,</mo><mi>𝜃</mi></mrow><mo>)</mo></mrow><mo rspace="0em">,</mo><mspace width="1em"/></mtd><mtd></mtd><mtd><mtext>(some objective function)</mtext></mtd></mtr><mtr><mtd><mtext>subject to </mtext><mspace width="1em"/></mtd><mtd><mi>𝑓</mi><mrow><mo>(</mo><mrow><mi>𝑢</mi><mo>,</mo><mi>𝜃</mi></mrow><mo>)</mo></mrow><mo>=</mo><mn>0</mn><mo rspace="0em">,</mo><mspace width="1em"/></mtd><mtd></mtd><mtd><mtext>(some equality constraint)</mtext></mtd></mtr><mtr><mtd></mtd><mtd><mi>𝑢</mi><mo>∈</mo><msup><mi>ℝ</mi><msub><mi>𝑛</mi><mi>𝑢</mi></msub></msup><mi>.</mi></mtd><mtd></mtd><mtd></mtd></mtr></mtable></math><p><span class="equation-number">(1)</span></p></div><p>Most methods for solving equality constrained optimization problems require the computation of the gradient of the objective function with respect to the optimization variable <math><mi>𝜃</mi></math>. This is where the problem comes in: Naively computing the gradient requires the computation of the sensitivities of the implicitly defined variable <math><mi>𝑢</mi></math> with respect to the optimization variable <math><mi>𝜃</mi></math> <math><mrow><mo>(</mo><mrow><mtext>i.e.</mtext><mspace width="0.2222em"/><mfrac><mrow><mo lspace="0em" rspace="0em">d</mo><mi>𝑢</mi></mrow><mrow><mo lspace="0em" rspace="0em">d</mo><mi>𝜃</mi></mrow></mfrac><mo>∈</mo><msup><mi>ℝ</mi><mrow><msub><mi>𝑛</mi><mi>𝑢</mi></msub><mo lspace="0em" rspace="0em">×</mo><msub><mi>𝑛</mi><mi>𝜃</mi></msub></mrow></msup></mrow><mo>)</mo></mrow></math>. This results in a computational bottleneck as forming the sensitivities scales as <math><mi>𝒪︀</mi><mrow><mo>(</mo><mrow><msub><mi>𝑛</mi><mi>𝑢</mi></msub><msub><mi>𝑛</mi><mi>𝜃</mi></msub></mrow><mo>)</mo></mrow></math>, meaning that adding a new parameter adds <math><msub><mi>𝑛</mi><mi>𝑢</mi></msub></math> additional sensitivities (and similarly adding one more variable would add <math><msub><mi>𝑛</mi><mi>𝜃</mi></msub></math> additional sensitivities).</p><p>To resolve this computational bottleneck the adjoint method was introduced. The first step in the derivation of the adjoint method is to introduce the Lagrangian of the objective function, i.e.</p><div class="numbered-equation"><math display="block"><mi>ℒ︀</mi><mrow><mo>(</mo><mrow><mi>𝑢</mi><mo>,</mo><mi>𝜃</mi><mo>,</mo><mi>𝜆</mi></mrow><mo>)</mo></mrow><mo>=</mo><mi>𝐿</mi><mrow><mo>(</mo><mrow><mi>𝑢</mi><mo>,</mo><mi>𝜃</mi></mrow><mo>)</mo></mrow><mo>+</mo><msup><mi>𝜆</mi><mi>⊤</mi></msup><mi>𝑓</mi><mrow><mo>(</mo><mrow><mi>𝑢</mi><mo>,</mo><mi>𝜃</mi></mrow><mo>)</mo></mrow><mi>.</mi></math><p><span class="equation-number">(2)</span></p></div><p>It is easy to see that whenever <math><mi>𝑢</mi></math> satisfies the equality constraint <math><mi>𝑓</mi><mrow><mo>(</mo><mrow><mi>𝑢</mi><mo>,</mo><mi>𝜃</mi></mrow><mo>)</mo></mrow><mo>=</mo><mn>0</mn></math>, then the Lagrangian is equal to the original objective function. The reason why the introduction of the additional term in the Lagrangian is useful is that <math><mi>𝜆</mi></math> can be set to be anything. In particular, we aim to set it in a way so that we can avoid computing the otherwise computationally expensive sensitivities <math><mfrac><mrow><mo lspace="0em" rspace="0em">d</mo><mi>𝑢</mi></mrow><mrow><mo lspace="0em" rspace="0em">d</mo><mi>𝜃</mi></mrow></mfrac></math>. We start by computing the total derivative of the Lagrangian with respect to <math><mi>𝜃</mi></math> <sup class="footnote-ref"><a class="footnote-ref-link" href="#fn-3" id="fnref-3">3</a></sup><span class="marginnote" id="fn-3"><sup><a class="footnote-ref-link" href="#fnref-3">3</a></sup> The total derivative is the transpose of the gradient i.e. <math><msup><mrow><mo>(</mo><mfrac><mrow><mo lspace="0em" rspace="0em">d</mo><mi>𝐿</mi></mrow><mrow><mo lspace="0em" rspace="0em">d</mo><mi>𝜃</mi></mrow></mfrac><mo>)</mo></mrow><mi>⊤</mi></msup><mo>=</mo><msub><mo form="prefix">∇</mo><mi>𝜃</mi></msub><mi>𝐿</mi></math>. That is multiplying the change in <math><mi>𝜃</mi></math> with the total derivative (rather than the transpose of the gradient) gives the change in the function <math><mi>𝐿</mi></math>.</span></p><div class="numbered-equation"><math display="block"><mfrac><mrow><mo lspace="0em" rspace="0em">d</mo><mi>ℒ︀</mi></mrow><mrow><mo lspace="0em" rspace="0em">d</mo><mi>𝜃</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝜃</mi></mrow></mfrac><mo>+</mo><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝑢</mi></mrow></mfrac><mfrac><mrow><mo lspace="0em" rspace="0em">d</mo><mi>𝑢</mi></mrow><mrow><mo lspace="0em" rspace="0em">d</mo><mi>𝜃</mi></mrow></mfrac><mo>+</mo><msup><mi>𝜆</mi><mi>⊤</mi></msup><mrow><mo>(</mo><mrow><mfrac><mrow><mi>𝜕</mi><mi>𝑓</mi></mrow><mrow><mi>𝜕</mi><mi>𝜃</mi></mrow></mfrac><mo>+</mo><mfrac><mrow><mi>𝜕</mi><mi>𝑓</mi></mrow><mrow><mi>𝜕</mi><mi>𝑢</mi></mrow></mfrac><mfrac><mrow><mo lspace="0em" rspace="0em">d</mo><mi>𝑢</mi></mrow><mrow><mo lspace="0em" rspace="0em">d</mo><mi>𝜃</mi></mrow></mfrac></mrow><mo>)</mo></mrow><mi>.</mi></math><p><span class="equation-number">(3)</span></p></div><p>Now we collect the terms that depend on the undesired <math><mfrac><mrow><mo lspace="0em" rspace="0em">d</mo><mi>𝑢</mi></mrow><mrow><mo lspace="0em" rspace="0em">d</mo><mi>𝜃</mi></mrow></mfrac></math>, resulting in</p><div class="numbered-equation"><math display="block"><mfrac><mrow><mo lspace="0em" rspace="0em">d</mo><mi>ℒ︀</mi></mrow><mrow><mo lspace="0em" rspace="0em">d</mo><mi>𝜃</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝜃</mi></mrow></mfrac><mo>+</mo><msup><mi>𝜆</mi><mi>⊤</mi></msup><mfrac><mrow><mi>𝜕</mi><mi>𝑓</mi></mrow><mrow><mi>𝜕</mi><mi>𝜃</mi></mrow></mfrac><mo>+</mo><mrow><mo>(</mo><mrow><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝑢</mi></mrow></mfrac><mo>+</mo><msup><mi>𝜆</mi><mi>⊤</mi></msup><mfrac><mrow><mi>𝜕</mi><mi>𝑓</mi></mrow><mrow><mi>𝜕</mi><mi>𝑢</mi></mrow></mfrac></mrow><mo>)</mo></mrow><mfrac><mrow><mo lspace="0em" rspace="0em">d</mo><mi>𝑢</mi></mrow><mrow><mo lspace="0em" rspace="0em">d</mo><mi>𝜃</mi></mrow></mfrac><mi>.</mi></math><p><span class="equation-number">(4)</span></p></div><p>As we can choose <math><mi>𝜆</mi></math> freely a natural idea is to set it in a way such that the term in front of the undesired term vanishes. This means that we can choose <math><mi>𝜆</mi></math> as the solution to the equation</p><div class="numbered-equation"><math display="block"><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝑢</mi></mrow></mfrac><mo>+</mo><msup><mi>𝜆</mi><mi>⊤</mi></msup><mfrac><mrow><mi>𝜕</mi><mi>𝑓</mi></mrow><mrow><mi>𝜕</mi><mi>𝑢</mi></mrow></mfrac><mo>=</mo><mn>0</mn><mspace width="1em"/><mo lspace="0em" rspace="0em" stretchy="false">⇒</mo><mspace width="1em"/><msup><mi>𝜆</mi><mi>⊤</mi></msup><mo>=</mo><mo form="prefix">−</mo><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝑢</mi></mrow></mfrac><msup><mrow><mo>(</mo><mfrac><mrow><mi>𝜕</mi><mi>𝑓</mi></mrow><mrow><mi>𝜕</mi><mi>𝑢</mi></mrow></mfrac><mo>)</mo></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msup><mi>.</mi></math><p><span class="equation-number">(5)</span></p></div><p>Inserting <math><msup><mi>𝜆</mi><mi>⊤</mi></msup></math> back into the equation we find that the gradient of the Lagrangian with respect to <math><mi>𝜃</mi></math> is given by</p><div class="numbered-equation"><math display="block"><mfrac><mrow><mo lspace="0em" rspace="0em">d</mo><mi>ℒ︀</mi></mrow><mrow><mo lspace="0em" rspace="0em">d</mo><mi>𝜃</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝜃</mi></mrow></mfrac><munder><munder accentunder="true"><mrow><mo>−</mo><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝑢</mi></mrow></mfrac><msup><mrow><mo>(</mo><mfrac><mrow><mi>𝜕</mi><mi>𝑓</mi></mrow><mrow><mi>𝜕</mi><mi>𝑢</mi></mrow></mfrac><mo>)</mo></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msup></mrow><mo>⏟</mo></munder><msup><mi>𝜆</mi><mi>⊤</mi></msup></munder><mfrac><mrow><mi>𝜕</mi><mi>𝑓</mi></mrow><mrow><mi>𝜕</mi><mi>𝜃</mi></mrow></mfrac><mi>.</mi></math><p><span class="equation-number">(6)</span></p></div><p>To conclude: The adjoint method is a simple way to avoid the computational bottleneck of computing the sensitivities <math><mfrac><mrow><mo lspace="0em" rspace="0em">d</mo><mi>𝑢</mi></mrow><mrow><mo lspace="0em" rspace="0em">d</mo><mi>𝜃</mi></mrow></mfrac></math> by cleverly computing the so-called adjoint variable <math><mi>𝜆</mi></math> in a way that eliminates the need to compute the problematic sensitivities.</p><figure><p><span class="marginnote">Example 1: Linearly constrained problem with structure</span></p><div class="blog-example"><div style="background: #3d997026; border-radius: .4em; padding: 1em; width: 100%; box-sizing: border-box; margin-bottom: .5em;"><p><strong>Example 1 (Linearly constrained problem with structure)</strong>   In order to illustrate the adjoint method we consider a simple linearly constrained problem of the form (inspiration from problem 38 in <a id="loc-2" href="#loc-7" role="doc-biblioref">[1]</a> )</p><div class="numbered-equation"><math display="block"><mtable class="multiline-equation aligned"><mtr><mtd><mi>𝐿</mi><mrow><mo>(</mo><mrow><mi>𝑢</mi><mo>,</mo><mi>𝜃</mi></mrow><mo>)</mo></mrow></mtd><mtd><mo form="infix">=</mo><msup><mrow><mo>(</mo><mrow><msup><mi>𝑐</mi><mi>⊤</mi></msup><mi>𝑢</mi><mrow><mo>(</mo><mi>𝜃</mi><mo>)</mo></mrow></mrow><mo>)</mo></mrow><mn>2</mn></msup><mo rspace="0em">,</mo></mtd></mtr><mtr><mtd><mi>𝑓</mi><mrow><mo>(</mo><mrow><mi>𝑢</mi><mo>,</mo><mi>𝜃</mi></mrow><mo>)</mo></mrow></mtd><mtd><mo form="infix">=</mo><mi>𝐴</mi><mrow><mo>(</mo><mi>𝜃</mi><mo>)</mo></mrow><mi>𝑢</mi><mo>−</mo><mi>𝑏</mi><mo>=</mo><mn>0</mn><mo rspace="0em">,</mo></mtd></mtr></mtable></math><p><span class="equation-number">(7)</span></p></div><p>where <math><mi>𝐴</mi><mrow><mo>(</mo><mi>𝜃</mi><mo>)</mo></mrow><mo>∈</mo><msup><mi>ℝ</mi><mrow><mi>𝑛</mi><mo lspace="0em" rspace="0em">×</mo><mi>𝑛</mi></mrow></msup></math> is a symmetric tridiagonal matrix that depends on the parameters <math><mi>𝜃</mi><mo>∈</mo><msup><mi>ℝ</mi><mrow><mn>2</mn><mi>𝑛</mi><mo lspace="0em" rspace="0em">−</mo><mn>1</mn></mrow></msup></math> as</p><div class="numbered-equation"><math display="block"><mi>𝐴</mi><mo>=</mo><mrow><mo>[</mo><mtable><mtr><mtd><msub><mi>𝜃</mi><mn>1</mn></msub></mtd><mtd><msub><mi>𝜃</mi><mrow><mi>𝑛</mi><mo lspace="0em" rspace="0em">+</mo><mn>1</mn></mrow></msub></mtd><mtd></mtd><mtd></mtd><mtd><mn>0</mn></mtd></mtr><mtr><mtd><msub><mi>𝜃</mi><mrow><mi>𝑛</mi><mo lspace="0em" rspace="0em">+</mo><mn>1</mn></mrow></msub></mtd><mtd><msub><mi>𝜃</mi><mn>2</mn></msub></mtd><mtd><mi>⋱</mi></mtd><mtd></mtd><mtd></mtd></mtr><mtr><mtd></mtd><mtd><mi>⋱</mi></mtd><mtd><mi>⋱</mi></mtd><mtd><mi>⋱</mi></mtd><mtd></mtd></mtr><mtr><mtd></mtd><mtd></mtd><mtd><mi>⋱</mi></mtd><mtd><msub><mi>𝜃</mi><mrow><mi>𝑛</mi><mo lspace="0em" rspace="0em">−</mo><mn>1</mn></mrow></msub></mtd><mtd><msub><mi>𝜃</mi><mrow><mn>2</mn><mi>𝑛</mi><mo lspace="0em" rspace="0em">−</mo><mn>1</mn></mrow></msub></mtd></mtr><mtr><mtd><mn>0</mn></mtd><mtd></mtd><mtd></mtd><mtd><msub><mi>𝜃</mi><mrow><mn>2</mn><mi>𝑛</mi><mo lspace="0em" rspace="0em">−</mo><mn>1</mn></mrow></msub></mtd><mtd><msub><mi>𝜃</mi><mi>𝑛</mi></msub></mtd></mtr></mtable><mo>]</mo></mrow><mi>.</mi></math><p><span class="equation-number">(8)</span></p></div><p>Now in order to compute the gradient of interest we start by computing the adjoint variable <math><mi>𝜆</mi></math> as</p><div class="numbered-equation"><math display="block"><msup><mi>𝜆</mi><mi>⊤</mi></msup><mo>=</mo><mo form="prefix">−</mo><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝑢</mi></mrow></mfrac><msup><mrow><mo>(</mo><mfrac><mrow><mi>𝜕</mi><mi>𝑓</mi></mrow><mrow><mi>𝜕</mi><mi>𝑢</mi></mrow></mfrac><mo>)</mo></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo>=</mo><mo form="prefix">−</mo><mn>2</mn><mrow><mo>(</mo><mrow><msup><mi>𝑐</mi><mi>⊤</mi></msup><mi>𝑢</mi></mrow><mo>)</mo></mrow><msup><mi>𝑐</mi><mi>⊤</mi></msup><msup><mrow><mi>𝐴</mi><mrow><mo>(</mo><mi>𝜃</mi><mo>)</mo></mrow></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msup><mi>.</mi></math><p><span class="equation-number">(9)</span></p></div><p>Note that in practice we do not form <math><msup><mrow><mi>𝐴</mi><mrow><mo>(</mo><mi>𝜃</mi><mo>)</mo></mrow></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msup></math> explicitly but rather compute <math><mi>𝜆</mi></math> by solving the linear system <math><msup><mrow><mi>𝐴</mi><mrow><mo>(</mo><mi>𝜃</mi><mo>)</mo></mrow></mrow><mi>⊤</mi></msup><mi>𝜆</mi><mo>=</mo><mo form="prefix">−</mo><mn>2</mn><mi>𝑐</mi><mrow><mo>(</mo><mrow><msup><mi>𝑐</mi><mi>⊤</mi></msup><mi>𝑢</mi></mrow><mo>)</mo></mrow></math>. Using the adjoint variable we can compute the gradient of <math><mi>𝐿</mi></math> with respect to <math><mi>𝜃</mi></math> as</p><div class="numbered-equation"><math display="block"><mfrac><mrow><mo lspace="0em" rspace="0em">d</mo><mi>𝐿</mi></mrow><mrow><mo lspace="0em" rspace="0em">d</mo><mi>𝜃</mi></mrow></mfrac><mo>=</mo><munder><munder accentunder="true"><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝜃</mi></mrow></mfrac><mo>⏟</mo></munder><mrow><mo form="infix" lspace="0em" rspace="0em">=</mo><mn>0</mn></mrow></munder><mo>+</mo><msup><mi>𝜆</mi><mi>⊤</mi></msup><mfrac><mrow><mi>𝜕</mi><mi>𝑓</mi></mrow><mrow><mi>𝜕</mi><mi>𝜃</mi></mrow></mfrac><mo>=</mo><msup><mi>𝜆</mi><mi>⊤</mi></msup><mfrac><mrow><mi>𝜕</mi><mi>𝐴</mi></mrow><mrow><mi>𝜕</mi><mi>𝜃</mi></mrow></mfrac><mi>𝑢</mi><mi>.</mi></math><p><span class="equation-number">(10)</span></p></div><p>In the concrete case of the derivatives of <math><mi>𝐴</mi></math> with respect to <math><msub><mi>𝜃</mi><mi>𝑖</mi></msub></math> we have that</p><div class="numbered-equation"><math display="block"><mfrac><mrow><mi>𝜕</mi><mi>𝐴</mi></mrow><mrow><mi>𝜕</mi><msub><mi>𝜃</mi><mi>𝑖</mi></msub></mrow></mfrac><mo>=</mo><mrow><mo>[</mo><mtable><mtr><mtd><msub><mi>𝛿</mi><mrow><mi>𝑖</mi><mo rspace="0em">,</mo><mn>1</mn></mrow></msub></mtd><mtd><msub><mi>𝛿</mi><mrow><mi>𝑖</mi><mo rspace="0em">,</mo><mi>𝑛</mi><mo lspace="0em" rspace="0em">+</mo><mn>1</mn></mrow></msub></mtd><mtd></mtd><mtd></mtd><mtd><mn>0</mn></mtd></mtr><mtr><mtd><msub><mi>𝛿</mi><mrow><mi>𝑖</mi><mo rspace="0em">,</mo><mi>𝑛</mi><mo lspace="0em" rspace="0em">+</mo><mn>1</mn></mrow></msub></mtd><mtd><msub><mi>𝛿</mi><mrow><mi>𝑖</mi><mo rspace="0em">,</mo><mn>2</mn></mrow></msub></mtd><mtd><mi>⋱</mi></mtd><mtd></mtd><mtd></mtd></mtr><mtr><mtd></mtd><mtd><mi>⋱</mi></mtd><mtd><mi>⋱</mi></mtd><mtd><mi>⋱</mi></mtd><mtd></mtd></mtr><mtr><mtd></mtd><mtd></mtd><mtd><mi>⋱</mi></mtd><mtd><msub><mi>𝛿</mi><mrow><mi>𝑖</mi><mo rspace="0em">,</mo><mi>𝑛</mi><mo lspace="0em" rspace="0em">−</mo><mn>1</mn></mrow></msub></mtd><mtd><msub><mi>𝛿</mi><mrow><mi>𝑖</mi><mo rspace="0em">,</mo><mn>2</mn><mi>𝑛</mi><mo lspace="0em" rspace="0em">−</mo><mn>1</mn></mrow></msub></mtd></mtr><mtr><mtd><mn>0</mn></mtd><mtd></mtd><mtd></mtd><mtd><msub><mi>𝛿</mi><mrow><mi>𝑖</mi><mo rspace="0em">,</mo><mn>2</mn><mi>𝑛</mi><mo lspace="0em" rspace="0em">−</mo><mn>1</mn></mrow></msub></mtd><mtd><msub><mi>𝛿</mi><mrow><mi>𝑖</mi><mo rspace="0em">,</mo><mi>𝑛</mi></mrow></msub></mtd></mtr></mtable><mo>]</mo></mrow><mi>.</mi></math><p><span class="equation-number">(11)</span></p></div><p>Using this it follows that the <math><mi>𝑖</mi></math>th component of the gradient can be computed as</p><div class="numbered-equation"><math display="block"><msup><mi>𝜆</mi><mi>⊤</mi></msup><mfrac><mrow><mi>𝜕</mi><mi>𝐴</mi></mrow><mrow><mi>𝜕</mi><msub><mi>𝜃</mi><mi>𝑖</mi></msub></mrow></mfrac><mi>𝑢</mi><mo>=</mo><mrow><mo>{</mo><mtable class="cases"><mtr><mtd><msub><mi>𝜆</mi><mi>𝑖</mi></msub><msub><mi>𝑢</mi><mi>𝑖</mi></msub><mo rspace="0em">,</mo><mspace width="1em"/></mtd><mtd><mi>𝑖</mi><mo>≤</mo><mi>𝑛</mi><mo rspace="0em">,</mo></mtd></mtr><mtr><mtd><msub><mi>𝜆</mi><mrow><mi>𝑖</mi><mo lspace="0em" rspace="0em">+</mo><mn>1</mn><mo lspace="0em" rspace="0em">−</mo><mi>𝑛</mi></mrow></msub><msub><mi>𝑢</mi><mrow><mi>𝑖</mi><mo lspace="0em" rspace="0em">−</mo><mi>𝑛</mi></mrow></msub><mo>+</mo><msub><mi>𝜆</mi><mrow><mi>𝑖</mi><mo lspace="0em" rspace="0em">−</mo><mi>𝑛</mi></mrow></msub><msub><mi>𝑢</mi><mrow><mi>𝑖</mi><mo lspace="0em" rspace="0em">+</mo><mn>1</mn><mo lspace="0em" rspace="0em">−</mo><mi>𝑛</mi></mrow></msub><mo rspace="0em">,</mo><mspace width="1em"/></mtd><mtd><mi>𝑖</mi><mo>></mo><mi>𝑛</mi><mi>.</mi></mtd></mtr></mtable></mrow></math><p><span class="equation-number">(12)</span></p></div><p>Below is a Julia implementation of the above example along with a test against ForwardDiff.jl to verify the correctness of the implementation.</p><div class="expressive-code has-gutter" style="--ec-borderRad:0.34em;--ec-codePadBlk:0.34em;--ec-codePadInl:0.34em;--ec-codeFg:#000000;--ec-codeBg:#f5f5f5;--ec-langBg:#effbf9;--ec-langFg:#000000;--ec-copyBg:#f7f7f7;--ec-copyFg:#000000;--ec-gutterBg:#f5f5f5;--ec-gutterGap:0.25rem;--ec-gutterPadLeft:0.5rem;--ec-codeFontSize:0.85em;--ec-codeLineHeight:1.5;--ec-copyBgHover:#f8f8f8;--ec-copyBgFocus:#f8f8f8;--ec-copyFgHover:#000000;--ec-copyFgFocus:#000000;--ec-hlBg:#dff6f2;--ec-commentBg:#effbf9;--ec-gtrFg:#999999;--ec-gtrHighlightFg:#737373;--ec-gtrBrdCol:#999999a6"><div class="code-lang" translate="no">julia</div><button type="button" class="copy-button" title="Copy code" data-state="idle" aria-label="Copy code"><span class="sr-only">Copy code</span><span class="copy-label" aria-hidden="true">Copy</span><span class="copy-feedback" aria-hidden="true">Copied!</span></button><pre data-language="julia" class="wrap" style="--lnWidth:2ch"><code class="language-julia"><div class="ec-header ec-ext" style="background:#f5f5f5"></div><div class="ec-line"><div class="gutter"><div class="ln">1</div></div><div class="code" data-indent><span style="color: #d73948">using</span> LinearAlgebra</div></div><div class="ec-line"><div class="gutter"><div class="ln">2</div></div><div class="code" data-indent><span style="color: #d73948">using</span> ForwardDiff</div></div><div class="ec-line"><div class="gutter"><div class="ln">3</div></div><div class="code" data-indent><span style="color: #d73948">using</span> Random</div></div><div class="ec-line"><div class="gutter"><div class="ln">4</div></div><div class="code" data-indent><span style="color: #d73948">using</span> Test</div></div><div class="ec-line"><div class="gutter"><div class="ln">5</div></div><div class="code" data-indent></div></div><div class="ec-line"><div class="gutter"><div class="ln">6</div></div><div class="code" data-indent>Random.seed!(<span style="color: #b60157">42</span>)</div></div><div class="ec-line"><div class="gutter"><div class="ln">7</div></div><div class="code" data-indent>n <span style="color: #d73948">=</span> <span style="color: #b60157">1000</span>        <span style="color: #74747c">#</span><span style="color: #74747c"> Number of linear constraints</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">8</div></div><div class="code" data-indent>c <span style="color: #d73948">=</span> rand(n)     <span style="color: #74747c">#</span><span style="color: #74747c"> Objective vector</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">9</div></div><div class="code" data-indent>b <span style="color: #d73948">=</span> rand(n)     <span style="color: #74747c">#</span><span style="color: #74747c"> Linear equality vector</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">10</div></div><div class="code" data-indent>θ <span style="color: #d73948">=</span> rand(<span style="color: #b60157">2</span>n<span style="color: #d73948">-</span><span style="color: #b60157">1</span>)  <span style="color: #74747c">#</span><span style="color: #74747c"> Parameters of the equality constraint</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">11</div></div><div class="code" data-indent></div></div><div class="ec-line"><div class="gutter"><div class="ln">12</div></div><div class="code" data-indent><span style="color: #74747c">#</span><span style="color: #74747c"> Parametrizing linear equality constraint matrix</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">13</div></div><div class="code" data-indent>A(θ) <span style="color: #d73948">=</span> SymTridiagonal(θ[<span style="color: #b60157">1</span><span style="color: #d73948">:</span>n], θ[n<span style="color: #d73948">+</span><span style="color: #b60157">1</span><span style="color: #d73948">:</span><span style="color: #d73948">end</span>])</div></div><div class="ec-line"><div class="gutter"><div class="ln">14</div></div><div class="code" data-indent></div></div><div class="ec-line"><div class="gutter"><div class="ln">15</div></div><div class="code" data-indent><span style="color: #74747c">#</span><span style="color: #74747c"> Objective function</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">16</div></div><div class="code" data-indent>f(θ) <span style="color: #d73948">=</span> (c<span style="color: #d73948">'</span> <span style="color: #d73948">*</span> (A(θ) <span style="color: #d73948">\</span> b))<span style="color: #d73948">^</span><span style="color: #b60157">2</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">17</div></div><div class="code" data-indent></div></div><div class="ec-line"><div class="gutter"><div class="ln">18</div></div><div class="code" data-indent><span style="color: #74747c">#</span><span style="color: #74747c"> Partial derivatives</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">19</div></div><div class="code" data-indent>partial(i,n,λ,u) <span style="color: #d73948">=</span> i <span style="color: #d73948">&lt;=</span> n <span style="color: #d73948">?</span> λ[i]<span style="color: #d73948">*</span>u[i] <span style="color: #d73948">:</span> λ[i<span style="color: #d73948">+</span><span style="color: #b60157">1</span><span style="color: #d73948">-</span>n]<span style="color: #d73948">*</span>u[i<span style="color: #d73948">-</span>n] <span style="color: #d73948">+</span> λ[i<span style="color: #d73948">-</span>n]<span style="color: #d73948">*</span>u[i<span style="color: #d73948">+</span><span style="color: #b60157">1</span><span style="color: #d73948">-</span>n]</div></div><div class="ec-line"><div class="gutter"><div class="ln">20</div></div><div class="code" data-indent></div></div><div class="ec-line"><div class="gutter"><div class="ln">21</div></div><div class="code" data-indent><span style="color: #74747c">#</span><span style="color: #74747c"> Gradient computation</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">22</div></div><div class="code" data-indent><span style="color: #d73948">function</span> <span style="color: #4b69c6">∇f</span>(θ)</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">23</div></div><div class="code" data-indent="    ">    n <span style="color: #d73948">=</span> length(b)</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">24</div></div><div class="code" data-indent="    ">    M <span style="color: #d73948">=</span> A(θ)                <span style="color: #74747c">#</span><span style="color: #74747c"> Defining constraint matrix</span></div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">25</div></div><div class="code" data-indent="    ">    u <span style="color: #d73948">=</span> M <span style="color: #d73948">\</span> b               <span style="color: #74747c">#</span><span style="color: #74747c"> Computing solution</span></div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">26</div></div><div class="code" data-indent="    ">    λ <span style="color: #d73948">=</span> M <span style="color: #d73948">\</span> (<span style="color: #d73948">-</span><span style="color: #b60157">2</span><span style="color: #d73948">*</span>c<span style="color: #d73948">*</span>(c<span style="color: #d73948">'</span><span style="color: #d73948">*</span>u))   <span style="color: #74747c">#</span><span style="color: #74747c"> Adjoint variables</span></div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">27</div></div><div class="code" data-indent="    ">    <span style="color: #d73948">return</span> [partial(i,n,λ,u) <span style="color: #d73948">for</span> i <span style="color: #d73948">=</span> <span style="color: #b60157">1</span><span style="color: #d73948">:</span><span style="color: #b60157">2</span>n<span style="color: #d73948">-</span><span style="color: #b60157">1</span>]</div></div><div class="ec-line"><div class="gutter"><div class="ln">28</div></div><div class="code" data-indent><span style="color: #d73948">end</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">29</div></div><div class="code" data-indent></div></div><div class="ec-line"><div class="gutter"><div class="ln">30</div></div><div class="code" data-indent><span style="color: #74747c">#</span><span style="color: #74747c"> Testing against ForwardDiff</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">31</div></div><div class="code" data-indent>@test ForwardDiff.gradient(f,θ) <span style="color: #d73948">≈</span> ∇f(θ)</div></div><div class="ec-footer ec-ext" style="background:#f5f5f5"></div></code></pre></div></div></div></figure><h2 id="loc-3">2. Backpropagation and the Adjoint Method</h2><p>Section 5.5 of <a id="loc-4" href="#loc-8" role="doc-biblioref">[2]</a> includes an example of how the adjoint method and backpropagation of neural networks are similar. In neural networks we are often interested in minimizing a loss function of the form</p><div class="numbered-equation"><math display="block"><mi>𝐿</mi><mrow><mo>(</mo><mrow><mi>𝜃</mi><mo>;</mo><msub><mi>𝑢</mi><mn>0</mn></msub></mrow><mo>)</mo></mrow><mo>=</mo><mo stretchy="false">‖</mo><mspace width="0.2222em"/><msub><mi mathvariant="normal">Φ</mi><mi>𝑁</mi></msub><mrow><mo>(</mo><mrow><mi>𝜃</mi><mo>;</mo><msub><mi>𝑢</mi><mn>0</mn></msub></mrow><mo>)</mo></mrow><mo>−</mo><mi>𝑦</mi><mspace width="0.2222em"/><msubsup><mo stretchy="false">‖</mo><mn>2</mn><mn>2</mn></msubsup><mo>+</mo><mi>𝜇</mi><mi>ℛ︀</mi><mrow><mo>(</mo><mi>𝜃</mi><mo>)</mo></mrow><mo rspace="0em">,</mo></math><p><span class="equation-number">(13)</span></p></div><p>with <math><mi>𝜃</mi><mo>∈</mo><msup><mi>ℝ</mi><mi>𝑘</mi></msup><mo>,</mo><msub><mi>𝑢</mi><mn>0</mn></msub><mo>∈</mo><msup><mi>ℝ</mi><mi>𝑚</mi></msup><mo>,</mo><mi>𝑦</mi><mo>∈</mo><msup><mi>ℝ</mi><mi>𝑛</mi></msup></math> and the notation “<math><mo>;</mo><msub><mi>𝑢</mi><mn>0</mn></msub></math>” is used in order to highlight that <math><msub><mi>𝑢</mi><mn>0</mn></msub></math> is a constant input (i.e. most often the “data”) and <math><mi>ℛ︀</mi><mrow><mo>(</mo><mi>𝜃</mi><mo>)</mo></mrow></math> is some regularization function (e.g. <math><mi>ℛ︀</mi><mrow><mo>(</mo><mi>𝜃</mi><mo>)</mo></mrow><mo>=</mo><mo stretchy="false">‖</mo><mspace width="0.2222em"/><mi>𝜃</mi><mspace width="0.2222em"/><msubsup><mo stretchy="false">‖</mo><mn>2</mn><mn>2</mn></msubsup></math>). Furthermore <math><msub><mi mathvariant="normal">Φ</mi><mi>𝑁</mi></msub><mrow><mo>(</mo><mrow><mi>𝜃</mi><mo>;</mo><msub><mi>𝑢</mi><mn>0</mn></msub></mrow><mo>)</mo></mrow><mo lspace="0.2777777777777778em" rspace="0.2777777777777778em">:</mo><msup><mi>ℝ</mi><mi>𝑘</mi></msup><mo stretchy="false">→</mo><msup><mi>ℝ</mi><mi>𝑛</mi></msup></math> is a neural network with <math><mi>𝑁</mi></math> layers that given a set of constant inputs <math><msub><mi>𝑢</mi><mn>0</mn></msub></math> maps the parameters <math><mi>𝜃</mi></math> to an output. Now, the above objective function does not include any equality constraints. However, one should realize that an <math><mi>𝑁</mi></math>-layer neural network is nothing more than a composition of <math><mi>𝑁</mi></math> functions</p><div class="numbered-equation"><math display="block"><msub><mi mathvariant="normal">Φ</mi><mi>𝑁</mi></msub><mrow><mo>(</mo><mrow><mi>𝜃</mi><mo>;</mo><msub><mi>𝑢</mi><mn>0</mn></msub></mrow><mo>)</mo></mrow><mo>=</mo><msub><mi mathvariant="normal">Φ</mi><mi>𝑁</mi></msub><mo form="prefix" stretchy="false">(</mo><msub><mi mathvariant="normal">Φ</mi><mrow><mi>𝑁</mi><mo lspace="0em" rspace="0em">−</mo><mn>1</mn></mrow></msub><mrow><mo>(</mo><mrow><mi>⋯</mi><mrow><mo>(</mo><mrow><msub><mi mathvariant="normal">Φ</mi><mn>1</mn></msub><mrow><mo>(</mo><mrow><mi>𝜃</mi><mo>;</mo><msub><mi>𝑢</mi><mn>0</mn></msub></mrow><mo>)</mo></mrow><mi>⋯</mi><mo>,</mo><mi>𝜃</mi><mo>;</mo><msub><mi>𝑢</mi><mn>0</mn></msub></mrow><mo>)</mo></mrow><mo>,</mo><mi>𝜃</mi><mo>;</mo><msub><mi>𝑢</mi><mn>0</mn></msub></mrow><mo>)</mo></mrow><mi>.</mi></math><p><span class="equation-number">(14)</span></p></div><p>Now using the notation that <math><msub><mi>𝑢</mi><mi>𝑖</mi></msub></math> is the output of the <math><mi>𝑖</mi></math>th layer of the network we can write the propagation through the network as a large nonlinear system of equations that have to be satisfied</p><div class="numbered-equation"><math display="block"><mtable class="multiline-equation aligned"><mtr><mtd><mi>𝑓</mi><mrow><mo>(</mo><mrow><mi>𝑢</mi><mo>,</mo><mi>𝜃</mi></mrow><mo>)</mo></mrow></mtd><mtd><mo form="infix">=</mo><mi>𝑢</mi><mo>−</mo><mi mathvariant="normal">Φ</mi><mrow><mo>(</mo><mrow><mi>𝑢</mi><mo>,</mo><mi>𝜃</mi></mrow><mo>)</mo></mrow></mtd></mtr><mtr><mtd></mtd><mtd><mo form="infix">=</mo><munder><munder accentunder="true"><mrow><mo>[</mo><mtable><mtr><mtd><msub><mi>𝑢</mi><mn>1</mn></msub></mtd></mtr><mtr><mtd><msub><mi>𝑢</mi><mn>2</mn></msub></mtd></mtr><mtr><mtd><mi>⋮</mi></mtd></mtr><mtr><mtd><msub><mi>𝑢</mi><mi>𝑁</mi></msub></mtd></mtr></mtable><mo>]</mo></mrow><mo>⏟</mo></munder><mi>𝑢</mi></munder><mo>−</mo><munder><munder accentunder="true"><mrow><mo>[</mo><mtable><mtr><mtd><msub><mi mathvariant="normal">Φ</mi><mn>1</mn></msub><mrow><mo>(</mo><mrow><mi>𝜃</mi><mo>;</mo><msub><mi>𝑢</mi><mn>0</mn></msub></mrow><mo>)</mo></mrow></mtd></mtr><mtr><mtd><msub><mi mathvariant="normal">Φ</mi><mn>2</mn></msub><mrow><mo>(</mo><mrow><msub><mi>𝑢</mi><mn>1</mn></msub><mo>,</mo><mi>𝜃</mi><mo>;</mo><msub><mi>𝑢</mi><mn>0</mn></msub></mrow><mo>)</mo></mrow></mtd></mtr><mtr><mtd><mi>⋮</mi></mtd></mtr><mtr><mtd><msub><mi mathvariant="normal">Φ</mi><mi>𝑁</mi></msub><mrow><mo>(</mo><mrow><msub><mi>𝑢</mi><mn>1</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>𝑢</mi><mrow><mi>𝑁</mi><mo lspace="0em" rspace="0em">−</mo><mn>1</mn></mrow></msub><mo>,</mo><mi>𝜃</mi><mo>;</mo><msub><mi>𝑢</mi><mn>0</mn></msub></mrow><mo>)</mo></mrow></mtd></mtr></mtable><mo>]</mo></mrow><mo>⏟</mo></munder><mrow><mi mathvariant="normal">Φ</mi><mrow><mo>(</mo><mrow><mi>𝑢</mi><mo rspace="0em">,</mo><mi>𝜃</mi></mrow><mo>)</mo></mrow></mrow></munder><mo>=</mo><mrow><mo>[</mo><mtable><mtr><mtd><mn>0</mn></mtd></mtr><mtr><mtd><mn>0</mn></mtd></mtr><mtr><mtd><mi>⋮</mi></mtd></mtr><mtr><mtd><mn>0</mn></mtd></mtr></mtable><mo>]</mo></mrow><mi>.</mi></mtd></mtr></mtable></math><p><span class="equation-number">(15)</span></p></div><p>Using this notation (and removing the explicit dependence on <math><msub><mi>𝑢</mi><mn>0</mn></msub></math>) we see that optimizing a neural network is really nothing more than solving the following equality constrained optimization problem</p><div class="numbered-equation"><math display="block"><mtable class="multiline-equation aligned"><mtr><mtd><munder><mo lspace="0em" rspace="0em">min</mo><mi>𝜃</mi></munder><mspace width="1em"/></mtd><mtd><mi>𝐿</mi><mrow><mo>(</mo><mrow><mi>𝑢</mi><mo>,</mo><mi>𝜃</mi></mrow><mo>)</mo></mrow><mo>=</mo><mo stretchy="false">‖</mo><mspace width="0.2222em"/><msub><mi>𝑢</mi><mi>𝑁</mi></msub><mo>−</mo><mi>𝑦</mi><mspace width="0.2222em"/><msubsup><mo stretchy="false">‖</mo><mn>2</mn><mn>2</mn></msubsup><mo>+</mo><mi>𝜇</mi><mi>ℛ︀</mi><mrow><mo>(</mo><mi>𝜃</mi><mo>)</mo></mrow><mo rspace="0em">,</mo></mtd></mtr><mtr><mtd><mtext>subject to </mtext><mspace width="1em"/></mtd><mtd><mi>𝑓</mi><mrow><mo>(</mo><mrow><mi>𝑢</mi><mo>,</mo><mi>𝜃</mi></mrow><mo>)</mo></mrow><mo>=</mo><mn>0</mn><mi>.</mi></mtd></mtr></mtable></math><p><span class="equation-number">(16)</span></p></div><p>We can now use the adjoint method to compute the gradient of <math><mi>𝐿</mi></math> with respect to <math><mi>𝜃</mi></math>. As a reminder this means that</p><div class="numbered-equation"><math display="block"><mfrac><mrow><mo lspace="0em" rspace="0em">d</mo><mi>𝐿</mi></mrow><mrow><mo lspace="0em" rspace="0em">d</mo><mi>𝜃</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝜃</mi></mrow></mfrac><munder><munder accentunder="true"><mrow><mo>−</mo><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝑢</mi></mrow></mfrac><msup><mrow><mo>(</mo><mfrac><mrow><mi>𝜕</mi><mi>𝑓</mi></mrow><mrow><mi>𝜕</mi><mi>𝑢</mi></mrow></mfrac><mo>)</mo></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msup></mrow><mo>⏟</mo></munder><msup><mi>𝜆</mi><mi>⊤</mi></msup></munder><mfrac><mrow><mi>𝜕</mi><mi>𝑓</mi></mrow><mrow><mi>𝜕</mi><mi>𝜃</mi></mrow></mfrac><mo rspace="0em">,</mo></math><p><span class="equation-number">(17)</span></p></div><p>where <math><mi>𝜆</mi></math> is referred to as the adjoint variable. Let <math><msub><mi>𝑛</mi><mi>𝑖</mi></msub></math> be the dimension of the output <math><msub><mi>𝑢</mi><mi>𝑖</mi></msub></math> of layer <math><mi>𝑖</mi></math>, so that the stacked state <math><mi>𝑢</mi></math> has dimension <math><mi>𝑑</mi><mo>=</mo><msubsup><mo form="prefix" lspace="0em">∑</mo><mrow><mi>𝑖</mi><mo lspace="0em" rspace="0em">=</mo><mn>1</mn></mrow><mi>𝑁</mi></msubsup><msub><mi>𝑛</mi><mi>𝑖</mi></msub></math>. For simplicity, we assume that the final output <math><msub><mi>𝑢</mi><mi>𝑁</mi></msub></math> is scalar, i.e. <math><msub><mi>𝑛</mi><mi>𝑁</mi></msub><mo>=</mo><mn>1</mn></math>. Then <math><msub><mi>𝑢</mi><mi>𝑁</mi></msub><mo>=</mo><msubsup><mi>𝑒</mi><mi>𝑑</mi><mi>⊤</mi></msubsup><mi>𝑢</mi></math>, where <math><msub><mi>𝑒</mi><mi>𝑑</mi></msub></math> is the last canonical basis vector in <math><msup><mi>ℝ</mi><mi>𝑑</mi></msup></math>. In this case we have that</p><div class="numbered-equation"><math display="block"><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝑢</mi></mrow></mfrac><mo>=</mo><mn>2</mn><mrow><mo>(</mo><mrow><msubsup><mi>𝑒</mi><mi>𝑑</mi><mi>⊤</mi></msubsup><mi>𝑢</mi><mo>−</mo><mi>𝑦</mi></mrow><mo>)</mo></mrow><msubsup><mi>𝑒</mi><mi>𝑑</mi><mi>⊤</mi></msubsup><mo>=</mo><mn>2</mn><mrow><mo>(</mo><mrow><msub><mi>𝑢</mi><mi>𝑁</mi></msub><mo>−</mo><mi>𝑦</mi></mrow><mo>)</mo></mrow><msubsup><mi>𝑒</mi><mi>𝑑</mi><mi>⊤</mi></msubsup><mo>=</mo><msubsup><mi>𝑔</mi><mi>𝑁</mi><mi>⊤</mi></msubsup><mi>.</mi></math><p><span class="equation-number">(18)</span></p></div><p>Now what is left to compute is <math><mfrac><mrow><mi>𝜕</mi><mi>𝑓</mi></mrow><mrow><mi>𝜕</mi><mi>𝑢</mi></mrow></mfrac></math> and <math><mfrac><mrow><mi>𝜕</mi><mi>𝑓</mi></mrow><mrow><mi>𝜕</mi><mi>𝜃</mi></mrow></mfrac></math>. Starting with <math><mfrac><mrow><mi>𝜕</mi><mi>𝑓</mi></mrow><mrow><mi>𝜕</mi><mi>𝑢</mi></mrow></mfrac></math> we note that because <math><mi>𝑓</mi></math> only propagates the <math><msub><mi>𝑢</mi><mi>𝑖</mi></msub></math>’s forwards the resulting partial derivative is a lower block triangular matrix of the form</p><div class="numbered-equation"><math display="block"><mfrac><mrow><mi>𝜕</mi><mi>𝑓</mi></mrow><mrow><mi>𝜕</mi><mi>𝑢</mi></mrow></mfrac><mo>=</mo><mrow><mo>[</mo><mtable><mtr><mtd><mi>𝐼</mi></mtd><mtd><mn>0</mn></mtd><mtd><mi>⋯</mi></mtd><mtd><mn>0</mn></mtd></mtr><mtr><mtd><mo>−</mo><mfrac><mrow><mi>𝜕</mi><msub><mi mathvariant="normal">Φ</mi><mn>2</mn></msub></mrow><mrow><mi>𝜕</mi><msub><mi>𝑢</mi><mn>1</mn></msub></mrow></mfrac></mtd><mtd><mi>𝐼</mi></mtd><mtd><mi>⋯</mi></mtd><mtd><mn>0</mn></mtd></mtr><mtr><mtd><mi>⋮</mi></mtd><mtd><mi>⋮</mi></mtd><mtd><mi>⋱</mi></mtd><mtd><mi>⋮</mi></mtd></mtr><mtr><mtd><mo>−</mo><mfrac><mrow><mi>𝜕</mi><msub><mi mathvariant="normal">Φ</mi><mi>𝑁</mi></msub></mrow><mrow><mi>𝜕</mi><msub><mi>𝑢</mi><mn>1</mn></msub></mrow></mfrac></mtd><mtd><mi>⋯</mi></mtd><mtd><mo>−</mo><mfrac><mrow><mi>𝜕</mi><msub><mi mathvariant="normal">Φ</mi><mi>𝑁</mi></msub></mrow><mrow><mi>𝜕</mi><msub><mi>𝑢</mi><mrow><mi>𝑁</mi><mo lspace="0em" rspace="0em">−</mo><mn>1</mn></mrow></msub></mrow></mfrac></mtd><mtd><mi>𝐼</mi></mtd></mtr></mtable><mo>]</mo></mrow><mo>=</mo><mi>𝐿</mi><mi>.</mi></math><p><span class="equation-number">(19)</span></p></div><p>Now is a good place to stop and think of a key concept of backpropagation: The resulting computational graph must be a Directed Acyclic Graph (DAG). This is indeed equivalent to stating that <math><mfrac><mrow><mi>𝜕</mi><mi>𝑓</mi></mrow><mrow><mi>𝜕</mi><mi>𝑢</mi></mrow></mfrac></math> should be a lower triangular matrix. This is an important property as the adjoint method requires us to invert <math><mfrac><mrow><mi>𝜕</mi><mi>𝑓</mi></mrow><mrow><mi>𝜕</mi><mi>𝑢</mi></mrow></mfrac></math>, which can be done cheaply for a lower triangular matrix. Even more important is that the diagonal blocks are the identity, meaning that forward/backward substitutions can be done without any matrix inversions at all.</p><p>What is left is to compute <math><mfrac><mrow><mi>𝜕</mi><mi>𝑓</mi></mrow><mrow><mi>𝜕</mi><mi>𝜃</mi></mrow></mfrac></math>, which standardly is done as</p><div class="numbered-equation"><math display="block"><mfrac><mrow><mi>𝜕</mi><mi>𝑓</mi></mrow><mrow><mi>𝜕</mi><mi>𝜃</mi></mrow></mfrac><mo>=</mo><mo form="prefix">−</mo><munder><munder accentunder="true"><mrow><mo>[</mo><mtable><mtr><mtd><mfrac><mrow><mi>𝜕</mi><msub><mi mathvariant="normal">Φ</mi><mn>1</mn></msub></mrow><mrow><mi>𝜕</mi><mi>𝜃</mi></mrow></mfrac></mtd></mtr><mtr><mtd><mi>⋮</mi></mtd></mtr><mtr><mtd><mfrac><mrow><mi>𝜕</mi><msub><mi mathvariant="normal">Φ</mi><mi>𝑁</mi></msub></mrow><mrow><mi>𝜕</mi><mi>𝜃</mi></mrow></mfrac></mtd></mtr></mtable><mo>]</mo></mrow><mo>⏟</mo></munder><msup><mi>𝑀</mi><mi>⊤</mi></msup></munder><mo>=</mo><mo form="prefix">−</mo><msup><mi>𝑀</mi><mi>⊤</mi></msup><mi>.</mi></math><p><span class="equation-number">(20)</span></p></div><p>Now, in case of the layers not sharing any parameters the matrix <math><msup><mi>𝑀</mi><mi>⊤</mi></msup></math> will have a block diagonal structure, i.e.</p><div class="numbered-equation"><math display="block"><msup><mi>𝑀</mi><mi>⊤</mi></msup><mo>=</mo><mtext>blkdiag</mtext><mspace width="0.2222em"/><mrow><mo>(</mo><mrow><mfrac><mrow><mi>𝜕</mi><msub><mi mathvariant="normal">Φ</mi><mn>1</mn></msub></mrow><mrow><mi>𝜕</mi><msub><mi>𝜃</mi><mn>1</mn></msub></mrow></mfrac><mo>,</mo><mi>…</mi><mo>,</mo><mfrac><mrow><mi>𝜕</mi><msub><mi mathvariant="normal">Φ</mi><mi>𝑁</mi></msub></mrow><mrow><mi>𝜕</mi><msub><mi>𝜃</mi><mi>𝑁</mi></msub></mrow></mfrac></mrow><mo>)</mo></mrow><mo rspace="0em">,</mo><mspace width="1em"/><mi>𝜃</mi><mo>=</mo><mrow><mo>[</mo><mtable><mtr><mtd><msub><mi>𝜃</mi><mn>1</mn></msub></mtd></mtr><mtr><mtd><mi>⋮</mi></mtd></mtr><mtr><mtd><msub><mi>𝜃</mi><mi>𝑁</mi></msub></mtd></mtr></mtable><mo>]</mo></mrow><mo rspace="0em">,</mo></math><p><span class="equation-number">(21)</span></p></div><p>where <math><msub><mi>𝜃</mi><mi>𝑖</mi></msub></math> are the parameters of layer <math><mi>𝑖</mi></math>.</p><p>Putting everything together we find that the gradient of <math><mi>𝐿</mi></math> with respect to <math><mi>𝜃</mi></math> is given by</p><div class="numbered-equation"><math display="block"><mtable class="multiline-equation aligned"><mtr><mtd><mfrac><mrow><mo lspace="0em" rspace="0em">d</mo><mi>ℒ︀</mi></mrow><mrow><mo lspace="0em" rspace="0em">d</mo><mi>𝜃</mi></mrow></mfrac></mtd><mtd><mo form="infix">=</mo><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝜃</mi></mrow></mfrac><mo>−</mo><mfrac><mrow><mi>𝜕</mi><mi>𝐿</mi></mrow><mrow><mi>𝜕</mi><mi>𝑢</mi></mrow></mfrac><msup><mrow><mo>(</mo><mfrac><mrow><mi>𝜕</mi><mi>𝑓</mi></mrow><mrow><mi>𝜕</mi><mi>𝑢</mi></mrow></mfrac><mo>)</mo></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msup><mfrac><mrow><mi>𝜕</mi><mi>𝑓</mi></mrow><mrow><mi>𝜕</mi><mi>𝜃</mi></mrow></mfrac></mtd></mtr><mtr><mtd></mtd><mtd><mo form="infix">=</mo><mi>𝜇</mi><mfrac><mrow><mi>𝜕</mi><mi>ℛ︀</mi></mrow><mrow><mi>𝜕</mi><mi>𝜃</mi></mrow></mfrac><mo>−</mo><mrow><mo>(</mo><mrow><msubsup><mi>𝑔</mi><mi>𝑁</mi><mi>⊤</mi></msubsup><msup><mi>𝐿</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mrow><mo>(</mo><mrow><mo>−</mo><msup><mi>𝑀</mi><mi>⊤</mi></msup></mrow><mo>)</mo></mrow></mrow><mo>)</mo></mrow></mtd></mtr><mtr><mtd></mtd><mtd><mo form="infix">=</mo><mi>𝜇</mi><mfrac><mrow><mi>𝜕</mi><mi>ℛ︀</mi></mrow><mrow><mi>𝜕</mi><mi>𝜃</mi></mrow></mfrac><mo>+</mo><mn>2</mn><mrow><mo>(</mo><mrow><msub><mi>𝑢</mi><mi>𝑁</mi></msub><mo>−</mo><mi>𝑦</mi></mrow><mo>)</mo></mrow><msubsup><mi>𝑒</mi><mi>𝑑</mi><mi>⊤</mi></msubsup><msup><mi>𝐿</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><msup><mi>𝑀</mi><mi>⊤</mi></msup><mi>.</mi></mtd></mtr></mtable></math><p><span class="equation-number">(22)</span></p></div><p>As noted previously both <math><msup><mi>𝐿</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup></math> and <math><msup><mi>𝑀</mi><mi>⊤</mi></msup></math> are structured, meaning that the above can be computed efficiently.</p><h3 id="loc-5">2.1. How to compute the elements of <math><mi>𝐿</mi></math> and <math><msup><mi>𝑀</mi><mi>⊤</mi></msup></math></h3><p>For a standard linear layer an activation function <math><mi>𝜎</mi></math> is usually applied element wise. In practice this means that we really should look at the rows of <math><msub><mi mathvariant="normal">Φ</mi><mi>𝑖</mi></msub></math> separately. For the <math><mi>𝑗</mi></math>th row the gradients are easily seen to be</p><div class="numbered-equation"><math display="block"><mtable class="multiline-equation aligned"><mtr><mtd><msub><mo>∇</mo><msub><mi>𝑢</mi><mrow><mi>𝑖</mi><mo lspace="0em" rspace="0em">−</mo><mn>1</mn></mrow></msub></msub><mi>𝜎</mi><mrow><mo>(</mo><mrow><msubsup><mi>𝑤</mi><mi>𝑗</mi><mi>⊤</mi></msubsup><msub><mi>𝑢</mi><mrow><mi>𝑖</mi><mo lspace="0em" rspace="0em">−</mo><mn>1</mn></mrow></msub><mo>+</mo><msub><mi>𝑏</mi><mi>𝑗</mi></msub></mrow><mo>)</mo></mrow></mtd><mtd><mo form="infix">=</mo><msup><mi>𝜎</mi><mo>′</mo></msup><mrow><mo>(</mo><mrow><msubsup><mi>𝑤</mi><mi>𝑗</mi><mi>⊤</mi></msubsup><msub><mi>𝑢</mi><mrow><mi>𝑖</mi><mo lspace="0em" rspace="0em">−</mo><mn>1</mn></mrow></msub><mo>+</mo><msub><mi>𝑏</mi><mi>𝑗</mi></msub></mrow><mo>)</mo></mrow><msub><mi>𝑤</mi><mi>𝑗</mi></msub><mo rspace="0em">,</mo><mspace width="1em"/><mspace width="0.2222em"/><mspace width="1em"/></mtd><mtd></mtd><mtd><mtext>Goes into </mtext><mspace width="0.2222em"/><mi>𝐿</mi></mtd></mtr><mtr><mtd><msub><mo>∇</mo><msub><mi>𝑤</mi><mi>𝑗</mi></msub></msub><mi>𝜎</mi><mrow><mo>(</mo><mrow><msubsup><mi>𝑤</mi><mi>𝑗</mi><mi>⊤</mi></msubsup><msub><mi>𝑢</mi><mrow><mi>𝑖</mi><mo lspace="0em" rspace="0em">−</mo><mn>1</mn></mrow></msub><mo>+</mo><msub><mi>𝑏</mi><mi>𝑗</mi></msub></mrow><mo>)</mo></mrow></mtd><mtd><mo form="infix">=</mo><msup><mi>𝜎</mi><mo>′</mo></msup><mrow><mo>(</mo><mrow><msubsup><mi>𝑤</mi><mi>𝑗</mi><mi>⊤</mi></msubsup><msub><mi>𝑢</mi><mrow><mi>𝑖</mi><mo lspace="0em" rspace="0em">−</mo><mn>1</mn></mrow></msub><mo>+</mo><msub><mi>𝑏</mi><mi>𝑗</mi></msub></mrow><mo>)</mo></mrow><msub><mi>𝑢</mi><mrow><mi>𝑖</mi><mo lspace="0em" rspace="0em">−</mo><mn>1</mn></mrow></msub><mo rspace="0em">,</mo><mspace width="1em"/></mtd><mtd></mtd><mtd><mtext>Goes into </mtext><mspace width="0.2222em"/><msup><mi>𝑀</mi><mi>⊤</mi></msup></mtd></mtr><mtr><mtd><msub><mo>∇</mo><msub><mi>𝑏</mi><mi>𝑗</mi></msub></msub><mi>𝜎</mi><mrow><mo>(</mo><mrow><msubsup><mi>𝑤</mi><mi>𝑗</mi><mi>⊤</mi></msubsup><msub><mi>𝑢</mi><mrow><mi>𝑖</mi><mo lspace="0em" rspace="0em">−</mo><mn>1</mn></mrow></msub><mo>+</mo><msub><mi>𝑏</mi><mi>𝑗</mi></msub></mrow><mo>)</mo></mrow></mtd><mtd><mo form="infix">=</mo><msup><mi>𝜎</mi><mo>′</mo></msup><mrow><mo>(</mo><mrow><msubsup><mi>𝑤</mi><mi>𝑗</mi><mi>⊤</mi></msubsup><msub><mi>𝑢</mi><mrow><mi>𝑖</mi><mo lspace="0em" rspace="0em">−</mo><mn>1</mn></mrow></msub><mo>+</mo><msub><mi>𝑏</mi><mi>𝑗</mi></msub></mrow><mo>)</mo></mrow><mo rspace="0em">,</mo><mspace width="1em"/><mspace width="0.2222em"/><mspace width="1em"/></mtd><mtd></mtd><mtd><mtext>Goes into </mtext><mspace width="0.2222em"/><msup><mi>𝑀</mi><mi>⊤</mi></msup></mtd></mtr></mtable></math><p><span class="equation-number">(23)</span></p></div><p>Using the above we see that</p><div class="numbered-equation"><math display="block"><mfrac><mrow><mi>𝜕</mi><msub><mi mathvariant="normal">Φ</mi><mi>𝑖</mi></msub></mrow><mrow><mi>𝜕</mi><msub><mi>𝑢</mi><mrow><mi>𝑖</mi><mo lspace="0em" rspace="0em">−</mo><mn>1</mn></mrow></msub></mrow></mfrac><mo>=</mo><mtext>diag</mtext><mspace width="0.2222em"/><mrow><mo>(</mo><mrow><msup><mi>𝜎</mi><mo>′</mo></msup><mrow><mo>(</mo><mrow><msub><mi>𝑊</mi><mi>𝑖</mi></msub><msub><mi>𝑢</mi><mrow><mi>𝑖</mi><mo lspace="0em" rspace="0em">−</mo><mn>1</mn></mrow></msub><mo>+</mo><msub><mi>𝑏</mi><mi>𝑖</mi></msub></mrow><mo>)</mo></mrow></mrow><mo>)</mo></mrow><msub><mi>𝑊</mi><mi>𝑖</mi></msub><mo rspace="0em">,</mo></math><p><span class="equation-number">(24)</span></p></div><p>where <math><msup><mi>𝜎</mi><mo>′</mo></msup><mrow><mo>(</mo><mo lspace="0em" rspace="0em">⋅</mo><mo>)</mo></mrow></math> is applied element wise. Now for <math><mfrac><mrow><mi>𝜕</mi><msub><mi mathvariant="normal">Φ</mi><mi>𝑖</mi></msub></mrow><mrow><mi>𝜕</mi><msub><mi>𝜃</mi><mi>𝑖</mi></msub></mrow></mfrac></math> we have to pick a way of how to vectorize the parameters. Here we choose</p><div class="numbered-equation"><math display="block"><msub><mi>𝜃</mi><mi>𝑖</mi></msub><mo>=</mo><mrow><mo>[</mo><mtable><mtr><mtd><mtext>vec</mtext><mspace width="0.2222em"/><mrow><mo>(</mo><msub><mi>𝑊</mi><mi>𝑖</mi></msub><mo>)</mo></mrow></mtd></mtr><mtr><mtd><msub><mi>𝑏</mi><mi>𝑖</mi></msub></mtd></mtr></mtable><mo>]</mo></mrow><mo rspace="0em">,</mo></math><p><span class="equation-number">(25)</span></p></div><p>where <math><mtext>vec</mtext><mrow><mo>(</mo><mi>𝑊</mi><mo>)</mo></mrow></math> vectorizes by stacking the columns of <math><mi>𝑊</mi></math>. Using the vectorization we can write the sought after sensitivity as</p><div class="numbered-equation"><math display="block"><mfrac><mrow><mi>𝜕</mi><msub><mi mathvariant="normal">Φ</mi><mi>𝑖</mi></msub></mrow><mrow><mi>𝜕</mi><msub><mi>𝜃</mi><mi>𝑖</mi></msub></mrow></mfrac><mo>=</mo><mtext>diag</mtext><mspace width="0.2222em"/><mrow><mo>(</mo><mrow><msup><mi>𝜎</mi><mo>′</mo></msup><mrow><mo>(</mo><mrow><msub><mi>𝑊</mi><mi>𝑖</mi></msub><msub><mi>𝑢</mi><mrow><mi>𝑖</mi><mo lspace="0em" rspace="0em">−</mo><mn>1</mn></mrow></msub><mo>+</mo><msub><mi>𝑏</mi><mi>𝑖</mi></msub></mrow><mo>)</mo></mrow></mrow><mo>)</mo></mrow><mrow><mo>(</mo><mrow><mrow><mo>[</mo><mtable><mtr><mtd><msubsup><mi>𝑢</mi><mrow><mi>𝑖</mi><mo lspace="0em" rspace="0em">−</mo><mn>1</mn></mrow><mi>⊤</mi></msubsup></mtd><mtd><mn>1</mn></mtd></mtr></mtable><mo>]</mo></mrow><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">⊗</mo><msub><mi>𝐼</mi><msub><mi>𝑛</mi><mi>𝑖</mi></msub></msub></mrow><mo>)</mo></mrow><mi>.</mi></math><p><span class="equation-number">(26)</span></p></div><p>While the Kronecker product above does result in a sparse matrix, it is even more structured. Using the standard property of Kronecker products, <math><mrow><mo>(</mo><mrow><mi>𝐴</mi><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">⊗</mo><mi>𝐵</mi></mrow><mo>)</mo></mrow><mi>𝑣</mi><mo>=</mo><mtext>vec</mtext><mspace width="0.2222em"/><mrow><mo>(</mo><mrow><mi>𝐵</mi><mspace width="0.2222em"/><mtext>mat</mtext><mspace width="0.2222em"/><mrow><mo>(</mo><mi>𝑣</mi><mo>)</mo></mrow><msup><mi>𝐴</mi><mi>⊤</mi></msup></mrow><mo>)</mo></mrow></math>, where <math><mtext>mat</mtext><mrow><mo>(</mo><mi>𝑣</mi><mo>)</mo></mrow></math> reverses the column-stacking operation <math><mtext>vec</mtext></math> with dimensions compatible with <math><mi>𝐴</mi></math> and <math><mi>𝐵</mi></math>, its products with vectors can be computed without forming it, e.g. <math><mrow><mo>(</mo><mrow><mrow><mo>[</mo><mtable><mtr><mtd><msubsup><mi>𝑢</mi><mrow><mi>𝑖</mi><mo lspace="0em" rspace="0em">−</mo><mn>1</mn></mrow><mi>⊤</mi></msubsup></mtd><mtd><mn>1</mn></mtd></mtr></mtable><mo>]</mo></mrow><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">⊗</mo><msub><mi>𝐼</mi><msub><mi>𝑛</mi><mi>𝑖</mi></msub></msub></mrow><mo>)</mo></mrow><msub><mi>𝜃</mi><mi>𝑖</mi></msub><mo>=</mo><msub><mi>𝑊</mi><mi>𝑖</mi></msub><msub><mi>𝑢</mi><mrow><mi>𝑖</mi><mo lspace="0em" rspace="0em">−</mo><mn>1</mn></mrow></msub><mo>+</mo><msub><mi>𝑏</mi><mi>𝑖</mi></msub></math>.</p><p>A final remark here is that the diagonal matrices that go into the elements of <math><mi>𝐿</mi></math> and <math><msup><mi>𝑀</mi><mi>⊤</mi></msup></math> are the same. That is if we define</p><div class="numbered-equation"><math display="block"><mtable class="multiline-equation aligned"><mtr><mtd><mi>𝐷</mi></mtd><mtd><mo form="infix">=</mo><mtext>diag</mtext><mspace width="0.2222em"/><mrow><mo>(</mo><mrow><msup><mi>𝜎</mi><mo>′</mo></msup><mrow><mo>(</mo><mrow><msub><mi>𝑊</mi><mn>1</mn></msub><msub><mi>𝑢</mi><mn>0</mn></msub><mo>+</mo><msub><mi>𝑏</mi><mn>1</mn></msub></mrow><mo>)</mo></mrow><mo>,</mo><mi>…</mi><mo>,</mo><msup><mi>𝜎</mi><mo>′</mo></msup><mrow><mo>(</mo><mrow><msub><mi>𝑊</mi><mi>𝑁</mi></msub><msub><mi>𝑢</mi><mrow><mi>𝑁</mi><mo lspace="0em" rspace="0em">−</mo><mn>1</mn></mrow></msub><mo>+</mo><msub><mi>𝑏</mi><mi>𝑁</mi></msub></mrow><mo>)</mo></mrow></mrow><mo>)</mo></mrow></mtd></mtr><mtr><mtd></mtd><mtd><mo form="infix">=</mo><mtext>blkdiag</mtext><mspace width="0.2222em"/><mrow><mo>(</mo><mrow><mtext>diag</mtext><mspace width="0.2222em"/><mrow><mo>(</mo><mrow><msup><mi>𝜎</mi><mo>′</mo></msup><mrow><mo>(</mo><mrow><msub><mi>𝑊</mi><mn>1</mn></msub><msub><mi>𝑢</mi><mn>0</mn></msub><mo>+</mo><msub><mi>𝑏</mi><mn>1</mn></msub></mrow><mo>)</mo></mrow></mrow><mo>)</mo></mrow><mo>,</mo><mi>…</mi><mo>,</mo><mtext>diag</mtext><mspace width="0.2222em"/><mrow><mo>(</mo><mrow><msup><mi>𝜎</mi><mo>′</mo></msup><mrow><mo>(</mo><mrow><msub><mi>𝑊</mi><mi>𝑁</mi></msub><msub><mi>𝑢</mi><mrow><mi>𝑁</mi><mo lspace="0em" rspace="0em">−</mo><mn>1</mn></mrow></msub><mo>+</mo><msub><mi>𝑏</mi><mi>𝑁</mi></msub></mrow><mo>)</mo></mrow></mrow><mo>)</mo></mrow></mrow><mo>)</mo></mrow><mo rspace="0em">,</mo></mtd></mtr></mtable></math><p><span class="equation-number">(27)</span></p></div><p>then it follows that</p><div class="numbered-equation"><math display="block"><mtable class="multiline-equation aligned"><mtr><mtd><mi>𝐿</mi></mtd><mtd><mo form="infix">=</mo><mi>𝐼</mi><mo>−</mo><mi>𝐷</mi><mspace width="0.2222em"/><mtext>blkdiag</mtext><mspace width="0.2222em"/><mrow><mo>(</mo><mrow><msub><mi>𝑊</mi><mn>2</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>𝑊</mi><mi>𝑁</mi></msub><mo>,</mo><mo form="prefix">−</mo><mn>1</mn></mrow><mo>)</mo></mrow><mo rspace="0em">,</mo><mspace width="1em"/></mtd></mtr><mtr><mtd><msup><mi>𝑀</mi><mi>⊤</mi></msup></mtd><mtd><mo form="infix">=</mo><mi>𝐷</mi><mspace width="0.2222em"/><mtext>blkdiag</mtext><mspace width="0.2222em"/><mrow><mo>(</mo><mrow><mrow><mo>[</mo><mtable><mtr><mtd><msubsup><mi>𝑢</mi><mn>0</mn><mi>⊤</mi></msubsup></mtd><mtd><mn>1</mn></mtd></mtr></mtable><mo>]</mo></mrow><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">⊗</mo><msub><mi>𝐼</mi><msub><mi>𝑛</mi><mn>1</mn></msub></msub><mo>,</mo><mi>…</mi><mo>,</mo><mrow><mo>[</mo><mtable><mtr><mtd><msubsup><mi>𝑢</mi><mrow><mi>𝑁</mi><mo lspace="0em" rspace="0em">−</mo><mn>1</mn></mrow><mi>⊤</mi></msubsup></mtd><mtd><mn>1</mn></mtd></mtr></mtable><mo>]</mo></mrow><mo lspace="0.2222222222222222em" rspace="0.2222222222222222em">⊗</mo><msub><mi>𝐼</mi><msub><mi>𝑛</mi><mi>𝑁</mi></msub></msub></mrow><mo>)</mo></mrow><mo rspace="0em">,</mo></mtd></mtr></mtable></math><p><span class="equation-number">(28)</span></p></div><p>with the slightly unusual notation that <math><mtext>blkdiag</mtext><mrow><mo>(</mo><mrow><mo form="infix" lspace="0em" rspace="0em">⋅</mo><mo>,</mo><mo form="prefix">−</mo><mn>1</mn></mrow><mo>)</mo></mrow></math> denotes the lower block diagonal matrix. Here its <math><mrow><mo>(</mo><mrow><mi>𝑖</mi><mo>,</mo><mi>𝑖</mi><mo>−</mo><mn>1</mn></mrow><mo>)</mo></mrow></math> block is <math><msub><mi>𝑊</mi><mi>𝑖</mi></msub></math> for <math><mi>𝑖</mi><mo>=</mo><mn>2</mn><mo>,</mo><mi>…</mi><mo>,</mo><mi>𝑁</mi></math>, with all other blocks zero and block row and column sizes <math><msub><mi>𝑛</mi><mn>1</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>𝑛</mi><mi>𝑁</mi></msub></math>. The weight <math><msub><mi>𝑊</mi><mn>1</mn></msub></math> acts on the fixed input <math><msub><mi>𝑢</mi><mn>0</mn></msub></math> and therefore does not appear in <math><mi>𝐿</mi></math>.</p><p>Below is a Julia implementation of the above backpropagation/adjoint method for a fully connected feedforward neural network with scalar output. In this example we set <math><mi>𝜇</mi><mo>=</mo><mn>0</mn></math>, so the objective contains only the squared error. The implementation uses BlockDiagonalMatrices.jl and Kronecker.jl in order to efficiently represent the involved matrices.</p><div class="expressive-code has-gutter" style="--ec-borderRad:0.34em;--ec-codePadBlk:0.34em;--ec-codePadInl:0.34em;--ec-codeFg:#000000;--ec-codeBg:#f5f5f5;--ec-langBg:#effbf9;--ec-langFg:#000000;--ec-copyBg:#f7f7f7;--ec-copyFg:#000000;--ec-gutterBg:#f5f5f5;--ec-gutterGap:0.25rem;--ec-gutterPadLeft:0.5rem;--ec-codeFontSize:0.85em;--ec-codeLineHeight:1.5;--ec-copyBgHover:#f8f8f8;--ec-copyBgFocus:#f8f8f8;--ec-copyFgHover:#000000;--ec-copyFgFocus:#000000;--ec-hlBg:#dff6f2;--ec-commentBg:#effbf9;--ec-gtrFg:#999999;--ec-gtrHighlightFg:#737373;--ec-gtrBrdCol:#999999a6"><div class="code-lang" translate="no">julia</div><button type="button" class="copy-button" title="Copy code" data-state="idle" aria-label="Copy code"><span class="sr-only">Copy code</span><span class="copy-label" aria-hidden="true">Copy</span><span class="copy-feedback" aria-hidden="true">Copied!</span></button><pre data-language="julia" class="wrap" style="--lnWidth:3ch"><code class="language-julia"><div class="ec-header ec-ext" style="background:#f5f5f5"></div><div class="ec-line"><div class="gutter"><div class="ln">1</div></div><div class="code" data-indent><span style="color: #d73948">using</span> BlockDiagonalMatrices</div></div><div class="ec-line"><div class="gutter"><div class="ln">2</div></div><div class="code" data-indent><span style="color: #d73948">using</span> LinearAlgebra</div></div><div class="ec-line"><div class="gutter"><div class="ln">3</div></div><div class="code" data-indent><span style="color: #d73948">using</span> Kronecker</div></div><div class="ec-line"><div class="gutter"><div class="ln">4</div></div><div class="code" data-indent><span style="color: #d73948">using</span> Random</div></div><div class="ec-line"><div class="gutter"><div class="ln">5</div></div><div class="code" data-indent><span style="color: #d73948">using</span> Test</div></div><div class="ec-line"><div class="gutter"><div class="ln">6</div></div><div class="code" data-indent></div></div><div class="ec-line"><div class="gutter"><div class="ln">7</div></div><div class="code" data-indent>Random.seed!(<span style="color: #b60157">42</span>)</div></div><div class="ec-line"><div class="gutter"><div class="ln">8</div></div><div class="code" data-indent></div></div><div class="ec-line"><div class="gutter"><div class="ln">9</div></div><div class="code" data-indent>h(x)  <span style="color: #d73948">=</span>  exp(<span style="color: #d73948">-</span>x) <span style="color: #74747c">#</span><span style="color: #74747c"> activation function</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">10</div></div><div class="code" data-indent>∇h(x) <span style="color: #d73948">=</span> <span style="color: #d73948">-</span>exp(<span style="color: #d73948">-</span>x) <span style="color: #74747c">#</span><span style="color: #74747c"> derivative of activation function</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">11</div></div><div class="code" data-indent></div></div><div class="ec-line"><div class="gutter"><div class="ln">12</div></div><div class="code" data-indent><span style="color: #74747c">#</span><span style="color: #74747c"> Forward pass including the derivatives</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">13</div></div><div class="code" data-indent><span style="color: #d73948">function</span> <span style="color: #4b69c6">forward_pass</span>(u0, layers)</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">14</div></div><div class="code" data-indent="    ">    u <span style="color: #d73948">=</span> u0</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">15</div></div><div class="code" data-indent="    ">    _, b1 <span style="color: #d73948">=</span> first(layers)</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">16</div></div><div class="code" data-indent="    ">    derivs <span style="color: #d73948">=</span> typeof(b1)[]</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">17</div></div><div class="code" data-indent="    ">    kron_blocks <span style="color: #d73948">=</span> typeof([u; <span style="color: #b60157">1</span>]<span style="color: #d73948">'</span> <span style="color: #d73948">⊗</span> I(length(b1)))[]</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">18</div></div><div class="code" data-indent="    ">    <span style="color: #d73948">for</span> (W, b) <span style="color: #d73948">in</span> layers</div></div><div class="ec-line" style="--ecIndent:8ch"><div class="gutter"><div class="ln">19</div></div><div class="code" data-indent="        ">        push!(kron_blocks,[u; <span style="color: #b60157">1</span>]<span style="color: #d73948">'</span> <span style="color: #d73948">⊗</span> I(length(b))) <span style="color: #74747c">#</span><span style="color: #74747c"> Lazy Kronecker product</span></div></div><div class="ec-line" style="--ecIndent:8ch"><div class="gutter"><div class="ln">20</div></div><div class="code" data-indent="        ">        z <span style="color: #d73948">=</span> W<span style="color: #d73948">*</span>u <span style="color: #d73948">+</span> b</div></div><div class="ec-line" style="--ecIndent:8ch"><div class="gutter"><div class="ln">21</div></div><div class="code" data-indent="        ">        u <span style="color: #d73948">=</span> h<span style="color: #d73948">.</span>(z)</div></div><div class="ec-line" style="--ecIndent:8ch"><div class="gutter"><div class="ln">22</div></div><div class="code" data-indent="        ">        push!(derivs, ∇h<span style="color: #d73948">.</span>(z))</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">23</div></div><div class="code" data-indent="    ">    <span style="color: #d73948">end</span></div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">24</div></div><div class="code" data-indent="    ">    <span style="color: #d73948">return</span> kron_blocks, derivs, u</div></div><div class="ec-line"><div class="gutter"><div class="ln">25</div></div><div class="code" data-indent><span style="color: #d73948">end</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">26</div></div><div class="code" data-indent><span style="color: #74747c">#</span><span style="color: #74747c"> Block back substitution: solves L^T y = b, i.e. y = L^(-T) b</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">27</div></div><div class="code" data-indent><span style="color: #d73948">function</span> <span style="color: #4b69c6">backsub</span>(derivs, weights, b)</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">28</div></div><div class="code" data-indent="    ">    y <span style="color: #d73948">=</span> <span style="color: #4b69c6">Matrix</span>(b)</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">29</div></div><div class="code" data-indent="    ">    stop <span style="color: #d73948">=</span> length(y)</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">30</div></div><div class="code" data-indent="    ">    @<span style="color: #4b69c6">views</span> <span style="color: #d73948">for</span> (d,Wt) <span style="color: #d73948">in</span> zip(reverse(derivs), reverse(transpose<span style="color: #d73948">.</span>(weights)))</div></div><div class="ec-line" style="--ecIndent:8ch"><div class="gutter"><div class="ln">31</div></div><div class="code" data-indent="        ">        nprev, n <span style="color: #d73948">=</span> size(Wt)</div></div><div class="ec-line" style="--ecIndent:8ch"><div class="gutter"><div class="ln">32</div></div><div class="code" data-indent="        ">        src <span style="color: #d73948">=</span> stop<span style="color: #d73948">-</span>n<span style="color: #d73948">+</span><span style="color: #b60157">1</span><span style="color: #d73948">:</span>stop</div></div><div class="ec-line" style="--ecIndent:8ch"><div class="gutter"><div class="ln">33</div></div><div class="code" data-indent="        ">        dst <span style="color: #d73948">=</span> stop<span style="color: #d73948">-</span>n<span style="color: #d73948">-</span>nprev<span style="color: #d73948">+</span><span style="color: #b60157">1</span><span style="color: #d73948">:</span>stop<span style="color: #d73948">-</span>n</div></div><div class="ec-line" style="--ecIndent:8ch"><div class="gutter"><div class="ln">34</div></div><div class="code" data-indent="        ">        tmp <span style="color: #d73948">=</span> d <span style="color: #d73948">.</span><span style="color: #d73948">*</span> y[src]</div></div><div class="ec-line" style="--ecIndent:8ch"><div class="gutter"><div class="ln">35</div></div><div class="code" data-indent="        ">        <span style="color: #74747c">#</span><span style="color: #74747c"> Equivalent to: y[dst] .+= Wt * (d .* y[src])</span></div></div><div class="ec-line" style="--ecIndent:8ch"><div class="gutter"><div class="ln">36</div></div><div class="code" data-indent="        ">        mul!(y[dst], Wt, tmp, <span style="color: #b60157">1</span>, <span style="color: #b60157">1</span>)</div></div><div class="ec-line" style="--ecIndent:8ch"><div class="gutter"><div class="ln">37</div></div><div class="code" data-indent="        ">        stop <span style="color: #d73948">-=</span> n</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">38</div></div><div class="code" data-indent="    ">    <span style="color: #d73948">end</span></div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">39</div></div><div class="code" data-indent="    ">    <span style="color: #d73948">return</span> y</div></div><div class="ec-line"><div class="gutter"><div class="ln">40</div></div><div class="code" data-indent><span style="color: #d73948">end</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">41</div></div><div class="code" data-indent><span style="color: #74747c">#</span><span style="color: #74747c"> Helper function that unpacks a vector θ into Ws and bs</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">42</div></div><div class="code" data-indent><span style="color: #d73948">function</span> <span style="color: #4b69c6">unpack_θ</span>(θ, layer_sizes)</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">43</div></div><div class="code" data-indent="    ">    Ws, bs <span style="color: #d73948">=</span> <span style="color: #4b69c6">Matrix</span>{eltype(θ)}[], <span style="color: #4b69c6">Vector</span>{eltype(θ)}[]</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">44</div></div><div class="code" data-indent="    ">    i <span style="color: #d73948">=</span> <span style="color: #b60157">1</span></div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">45</div></div><div class="code" data-indent="    ">    <span style="color: #d73948">for</span> (n_in,n_out) <span style="color: #d73948">in</span> zip(layer_sizes[<span style="color: #b60157">1</span><span style="color: #d73948">:</span><span style="color: #d73948">end</span><span style="color: #d73948">-</span><span style="color: #b60157">1</span>], layer_sizes[<span style="color: #b60157">2</span><span style="color: #d73948">:</span><span style="color: #d73948">end</span>])</div></div><div class="ec-line" style="--ecIndent:8ch"><div class="gutter"><div class="ln">46</div></div><div class="code" data-indent="        ">        j <span style="color: #d73948">=</span> i <span style="color: #d73948">+</span> n_out<span style="color: #d73948">*</span>n_in</div></div><div class="ec-line" style="--ecIndent:8ch"><div class="gutter"><div class="ln">47</div></div><div class="code" data-indent="        ">        push!(Ws, reshape(θ[i<span style="color: #d73948">:</span>j<span style="color: #d73948">-</span><span style="color: #b60157">1</span>], n_out, n_in))</div></div><div class="ec-line" style="--ecIndent:8ch"><div class="gutter"><div class="ln">48</div></div><div class="code" data-indent="        ">        i <span style="color: #d73948">=</span> j <span style="color: #d73948">+</span> n_out</div></div><div class="ec-line" style="--ecIndent:8ch"><div class="gutter"><div class="ln">49</div></div><div class="code" data-indent="        ">        push!(bs, θ[j<span style="color: #d73948">:</span>i<span style="color: #d73948">-</span><span style="color: #b60157">1</span>])</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">50</div></div><div class="code" data-indent="    ">    <span style="color: #d73948">end</span></div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">51</div></div><div class="code" data-indent="    ">    <span style="color: #d73948">return</span> Ws, bs</div></div><div class="ec-line"><div class="gutter"><div class="ln">52</div></div><div class="code" data-indent><span style="color: #d73948">end</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">53</div></div><div class="code" data-indent><span style="color: #74747c">#</span><span style="color: #74747c"> Evaluate the network output using the forward pass</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">54</div></div><div class="code" data-indent><span style="color: #d73948">function</span> <span style="color: #4b69c6">network_output</span>(θ, layer_sizes, u0)</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">55</div></div><div class="code" data-indent="    ">    Ws, bs <span style="color: #d73948">=</span> unpack_θ(θ, layer_sizes)</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">56</div></div><div class="code" data-indent="    ">    _, _, uN <span style="color: #d73948">=</span> forward_pass(u0, zip(Ws,bs))</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">57</div></div><div class="code" data-indent="    ">    <span style="color: #d73948">return</span> only(uN)</div></div><div class="ec-line"><div class="gutter"><div class="ln">58</div></div><div class="code" data-indent><span style="color: #d73948">end</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">59</div></div><div class="code" data-indent><span style="color: #74747c">#</span><span style="color: #74747c"> Gradient computation using the adjoint method</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">60</div></div><div class="code" data-indent><span style="color: #d73948">function</span> <span style="color: #4b69c6">∇L</span>(θ, layer_sizes, u0; y<span style="color: #d73948">=</span><span style="color: #b60157">0.0</span>)</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">61</div></div><div class="code" data-indent="    ">    <span style="color: #74747c">#</span><span style="color: #74747c"> First unpack the parameter vector</span></div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">62</div></div><div class="code" data-indent="    ">    Ws, bs <span style="color: #d73948">=</span> unpack_θ(θ, layer_sizes)</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">63</div></div><div class="code" data-indent="    ">    <span style="color: #74747c">#</span><span style="color: #74747c"> Forward pass includes derivative information</span></div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">64</div></div><div class="code" data-indent="    ">    kron_blocks, derivs, uN <span style="color: #d73948">=</span> forward_pass(u0, zip(Ws, bs))</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">65</div></div><div class="code" data-indent="    ">    <span style="color: #74747c">#</span><span style="color: #74747c"> S has subdiagonal blocks W_2,...,W_N; L = I - D*S and M^T = D*K</span></div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">66</div></div><div class="code" data-indent="    ">    D <span style="color: #d73948">=</span> Diagonal(vcat(derivs<span style="color: #d73948">...</span>))</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">67</div></div><div class="code" data-indent="    ">    K <span style="color: #d73948">=</span> BlockDiagonal(kron_blocks)</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">68</div></div><div class="code" data-indent="    ">    g <span style="color: #d73948">=</span> zeros(eltype(θ), sum(layer_sizes[<span style="color: #b60157">2</span><span style="color: #d73948">:</span><span style="color: #d73948">end</span>]))</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">69</div></div><div class="code" data-indent="    ">    g[<span style="color: #d73948">end</span>] <span style="color: #d73948">=</span> <span style="color: #b60157">2</span><span style="color: #d73948">*</span>(only(uN) <span style="color: #d73948">-</span> y)</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">70</div></div><div class="code" data-indent="    ">    <span style="color: #74747c">#</span><span style="color: #74747c"> The final step is to evaluate the gradient from the right</span></div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">71</div></div><div class="code" data-indent="    ">    grad_adjoint <span style="color: #d73948">=</span> (backsub(derivs[<span style="color: #b60157">2</span><span style="color: #d73948">:</span><span style="color: #d73948">end</span>],Ws[<span style="color: #b60157">2</span><span style="color: #d73948">:</span><span style="color: #d73948">end</span>],g<span style="color: #d73948">'</span>)<span style="color: #d73948">*</span>D)<span style="color: #d73948">*</span>K</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">72</div></div><div class="code" data-indent="    ">    <span style="color: #d73948">return</span> grad_adjoint<span style="color: #d73948">'</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">73</div></div><div class="code" data-indent><span style="color: #d73948">end</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">74</div></div><div class="code" data-indent><span style="color: #74747c">#</span><span style="color: #74747c"> Forward difference to test the adjoint gradient implementation</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">75</div></div><div class="code" data-indent><span style="color: #d73948">function</span> <span style="color: #4b69c6">fd</span>(θ, layer_sizes, u0, i; e<span style="color: #d73948">=</span><span style="color: #b60157">1e-6</span>, y<span style="color: #d73948">=</span><span style="color: #b60157">2.0</span>)</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">76</div></div><div class="code" data-indent="    ">    uN0 <span style="color: #d73948">=</span> network_output(θ, layer_sizes, u0)</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">77</div></div><div class="code" data-indent="    ">    θ[i] <span style="color: #d73948">+=</span> e</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">78</div></div><div class="code" data-indent="    ">    uN1 <span style="color: #d73948">=</span> network_output(θ, layer_sizes, u0)</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">79</div></div><div class="code" data-indent="    ">    θ[i] <span style="color: #d73948">-=</span> e</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">80</div></div><div class="code" data-indent="    ">    <span style="color: #d73948">return</span> ((uN1 <span style="color: #d73948">-</span> y)<span style="color: #d73948">^</span><span style="color: #b60157">2</span> <span style="color: #d73948">-</span> (uN0 <span style="color: #d73948">-</span> y)<span style="color: #d73948">^</span><span style="color: #b60157">2</span>)<span style="color: #d73948">/</span>e</div></div><div class="ec-line"><div class="gutter"><div class="ln">81</div></div><div class="code" data-indent><span style="color: #d73948">end</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">82</div></div><div class="code" data-indent></div></div><div class="ec-line"><div class="gutter"><div class="ln">83</div></div><div class="code" data-indent><span style="color: #74747c">#</span><span style="color: #74747c"> Setting up parameters</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">84</div></div><div class="code" data-indent></div></div><div class="ec-line"><div class="gutter"><div class="ln">85</div></div><div class="code" data-indent>layer_sizes <span style="color: #d73948">=</span> [<span style="color: #b60157">50</span>,<span style="color: #b60157">40</span>,<span style="color: #b60157">30</span>,<span style="color: #b60157">20</span>,<span style="color: #b60157">10</span>,<span style="color: #b60157">1</span>]</div></div><div class="ec-line"><div class="gutter"><div class="ln">86</div></div><div class="code" data-indent>N <span style="color: #d73948">=</span> length(layer_sizes) <span style="color: #d73948">-</span> <span style="color: #b60157">1</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">87</div></div><div class="code" data-indent>init(sizes<span style="color: #d73948">...</span>) <span style="color: #d73948">=</span> <span style="color: #b60157">0.01</span><span style="color: #d73948">*</span>randn(sizes<span style="color: #d73948">...</span>)</div></div><div class="ec-line"><div class="gutter"><div class="ln">88</div></div><div class="code" data-indent>Ws <span style="color: #d73948">=</span> [init(layer_sizes[i<span style="color: #d73948">+</span><span style="color: #b60157">1</span>], layer_sizes[i]) <span style="color: #d73948">for</span> i<span style="color: #d73948">=</span><span style="color: #b60157">1</span><span style="color: #d73948">:</span>N]</div></div><div class="ec-line"><div class="gutter"><div class="ln">89</div></div><div class="code" data-indent>bs <span style="color: #d73948">=</span> [init(layer_sizes[i<span style="color: #d73948">+</span><span style="color: #b60157">1</span>]) <span style="color: #d73948">for</span> i <span style="color: #d73948">=</span> <span style="color: #b60157">1</span><span style="color: #d73948">:</span>N]</div></div><div class="ec-line"><div class="gutter"><div class="ln">90</div></div><div class="code" data-indent>u0 <span style="color: #d73948">=</span> init(layer_sizes[<span style="color: #b60157">1</span>])</div></div><div class="ec-line"><div class="gutter"><div class="ln">91</div></div><div class="code" data-indent>layers <span style="color: #d73948">=</span> zip(Ws, bs)</div></div><div class="ec-line"><div class="gutter"><div class="ln">92</div></div><div class="code" data-indent></div></div><div class="ec-line"><div class="gutter"><div class="ln">93</div></div><div class="code" data-indent><span style="color: #74747c">#</span><span style="color: #74747c"> First we compute the forward pass</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">94</div></div><div class="code" data-indent>θvec <span style="color: #d73948">=</span> vcat([[W[<span style="color: #d73948">:</span>]; b] <span style="color: #d73948">for</span> (W, b) <span style="color: #d73948">in</span> layers]<span style="color: #d73948">...</span>)</div></div><div class="ec-line"><div class="gutter"><div class="ln">95</div></div><div class="code" data-indent></div></div><div class="ec-line"><div class="gutter"><div class="ln">96</div></div><div class="code" data-indent><span style="color: #74747c">##</span><span style="color: #74747c"> Testing the gradient</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">97</div></div><div class="code" data-indent>y <span style="color: #d73948">=</span> <span style="color: #b60157">3.0</span> <span style="color: #74747c">#</span><span style="color: #74747c"> We aim to have the final output be 3.0</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">98</div></div><div class="code" data-indent>grad_adjoint <span style="color: #d73948">=</span> ∇L(θvec, layer_sizes, u0; y<span style="color: #d73948">=</span>y)</div></div><div class="ec-line"><div class="gutter"><div class="ln">99</div></div><div class="code" data-indent>idx <span style="color: #d73948">=</span> <span style="color: #b60157">4000</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">100</div></div><div class="code" data-indent>grad_fd <span style="color: #d73948">=</span> fd(θvec, layer_sizes, u0, idx; e<span style="color: #d73948">=</span><span style="color: #b60157">1e-5</span>, y<span style="color: #d73948">=</span>y)</div></div><div class="ec-line"><div class="gutter"><div class="ln">101</div></div><div class="code" data-indent>@test grad_fd <span style="color: #d73948">≈</span> grad_adjoint[idx] atol<span style="color: #d73948">=</span><span style="color: #b60157">1e-6</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">102</div></div><div class="code" data-indent></div></div><div class="ec-line"><div class="gutter"><div class="ln">103</div></div><div class="code" data-indent><span style="color: #74747c">#</span><span style="color: #74747c"> Optimizing to get the desired output y</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">104</div></div><div class="code" data-indent><span style="color: #d73948">for</span> _ <span style="color: #d73948">=</span> <span style="color: #b60157">1</span><span style="color: #d73948">:</span><span style="color: #b60157">1000</span></div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">105</div></div><div class="code" data-indent="    ">    grad <span style="color: #d73948">=</span> ∇L(θvec, layer_sizes, u0; y<span style="color: #d73948">=</span>y)</div></div><div class="ec-line" style="--ecIndent:4ch"><div class="gutter"><div class="ln">106</div></div><div class="code" data-indent="    ">    θvec <span style="color: #d73948">.</span><span style="color: #d73948">-=</span> <span style="color: #b60157">0.001</span> <span style="color: #d73948">.</span><span style="color: #d73948">*</span> grad</div></div><div class="ec-line"><div class="gutter"><div class="ln">107</div></div><div class="code" data-indent><span style="color: #d73948">end</span></div></div><div class="ec-line"><div class="gutter"><div class="ln">108</div></div><div class="code" data-indent>@test network_output(θvec, layer_sizes, u0) <span style="color: #d73948">≈</span> y</div></div><div class="ec-line"><div class="gutter"><div class="ln">109</div></div><div class="code" data-indent>final_gradient <span style="color: #d73948">=</span> ∇L(θvec, layer_sizes, u0; y<span style="color: #d73948">=</span>y)</div></div><div class="ec-line"><div class="gutter"><div class="ln">110</div></div><div class="code" data-indent>@test final_gradient <span style="color: #d73948">≈</span> zeros(length(θvec)) atol<span style="color: #d73948">=</span><span style="color: #b60157">1e-10</span></div></div><div class="ec-footer ec-ext" style="background:#f5f5f5"></div></code></pre></div><section class="post-citation"><h2>Cite this post</h2><div class="expressive-code" style="--ec-borderRad:0.34em;--ec-codePadBlk:0.34em;--ec-codePadInl:0.34em;--ec-codeFg:#000000;--ec-codeBg:#f5f5f5;--ec-langBg:#effbf9;--ec-langFg:#000000;--ec-copyBg:#f7f7f7;--ec-copyFg:#000000;--ec-gutterBg:#f5f5f5;--ec-gutterGap:0.25rem;--ec-gutterPadLeft:0.5rem;--ec-codeFontSize:0.85em;--ec-codeLineHeight:1.5;--ec-copyBgHover:#f8f8f8;--ec-copyBgFocus:#f8f8f8;--ec-copyFgHover:#000000;--ec-copyFgFocus:#000000;--ec-hlBg:#dff6f2;--ec-commentBg:#effbf9"><div class="code-lang" translate="no">bibtex</div><button type="button" class="copy-button" title="Copy code" data-state="idle" aria-label="Copy code"><span class="sr-only">Copy code</span><span class="copy-label" aria-hidden="true">Copy</span><span class="copy-feedback" aria-hidden="true">Copied!</span></button><pre data-language="bibtex"><code class="language-bibtex"><div class="ec-header ec-ext" style="background:#f5f5f5"></div><div class="ec-line"><div class="code" data-indent>@misc{paltorp2025adjointmethod,</div></div><div class="ec-line" style="--ecIndent:2ch"><div class="code" data-indent="  ">  author = {Paltorp, Mikkel},</div></div><div class="ec-line" style="--ecIndent:2ch"><div class="code" data-indent="  ">  title = {{Backpropagation is the Adjoint Method}},</div></div><div class="ec-line" style="--ecIndent:2ch"><div class="code" data-indent="  ">  year = {2025},</div></div><div class="ec-line" style="--ecIndent:2ch"><div class="code" data-indent="  ">  month = oct,</div></div><div class="ec-line" style="--ecIndent:2ch"><div class="code" data-indent="  ">  url = {https://mipals.github.io/pdf/2025/10-25-adjoint-method/adjoint-method.pdf},</div></div><div class="ec-line" style="--ecIndent:2ch"><div class="code" data-indent="  ">  note = {Blog post}</div></div><div class="ec-line"><div class="code" data-indent>}</div></div><div class="ec-footer ec-ext" style="background:#f5f5f5"></div></code></pre></div></section><section role="doc-bibliography"><h2 id="loc-6">Bibliography</h2><ul style="list-style-type: none"><li id="loc-7"><span class="prefix"><a href="#loc-2" role="doc-backlink">[1]</a></span> P. Bright, A. Edelman, and S. G. Johnson, “Matrix Calculus (for Machine Learning and Beyond).” [Online]. Available: <a href="https://arxiv.org/abs/2501.14787">https://arxiv.org/abs/2501.14787</a></li><li id="loc-8"><span class="prefix"><a href="#loc-4" role="doc-backlink">[2]</a></span> A. Edelman, E. Akyürek, and Y. Wang, “Backpropagation through Back Substitution with a Backslash,” <em>SIAM Journal on Matrix Analysis and Applications</em>, vol. 45, no. 1, pp. 429–449, 2024, doi: <a href="https://doi.org/10.1137/22M1532871">10.1137/22M1532871</a>.</li></ul></section><script>document.querySelectorAll('.ec-line .code[data-indent]').forEach((line) => line.removeAttribute('data-indent'));</script></section></article></body></html>

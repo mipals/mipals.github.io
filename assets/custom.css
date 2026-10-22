@@ -1,21 +1,219 @@
 figure {
-  margin: 0.5em 0;
+    margin: 0.5em 0;
+}
+
+/* Allow light-dark() colors to follow the browser/site color mode. */
+:root {
+    color-scheme: light dark;
+}
+
+/* Examples are green, definitions blue, code grey, and interactive figures
+   purple, also in dark mode. */
+.blog-example > div {
+    background: light-dark(#3d997026, #2b5a46) !important;
+    box-shadow: inset 0 0 0 1px light-dark(transparent, #4f8f73);
+}
+
+.blog-definition > div {
+    background: light-dark(#0074d926, #294763) !important;
+    box-shadow: inset 0 0 0 1px light-dark(transparent, #52789c);
+}
+
+.blog-code > div {
+    background: light-dark(#aaaaaa26, #3a3a3a) !important;
+    box-shadow: inset 0 0 0 1px light-dark(transparent, #5c5c5c);
+}
+
+/* Interactive figures are purple, the color of the plots, around a graph that
+   is white in light mode and black in dark mode. */
+.blog-interactive > div {
+    background: light-dark(#6042a61f, #2e2742) !important;
+    box-shadow: inset 0 0 0 1px light-dark(transparent, #5d4f86);
+}
+
+/* A graph in an interactive figure or an example fills the panel. */
+.blog-interactive .desmos-embed,
+.blog-example .desmos-embed {
+    width: 100% !important;
+}
+
+/* Tufte CSS draws link underlines with a background and text shadow in the
+   page color, which shows as a dark or light shade on the colored panels.
+   Use a plain underline there instead. */
+.blog-example a:link,
+.blog-example a:visited,
+.blog-definition a:link,
+.blog-definition a:visited,
+.blog-code a:link,
+.blog-code a:visited,
+.blog-interactive a:link,
+.blog-interactive a:visited {
+    background: none;
+    text-shadow: none;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.15em;
+}
+
+/* Tufte CSS narrows code blocks to the text column, 52.5% plus a 2.5% margin.
+   Example, definition, and code panels already have that width, so a code
+   block inside one fills the panel. */
+.blog-example pre > code,
+.blog-definition pre > code,
+.blog-code pre > code,
+.blog-interactive pre > code {
+    width: 100%;
+    margin-left: 0;
+    box-sizing: border-box;
+}
+
+/* The panel padding already supplies the space above its title. */
+.blog-example > div > :first-child,
+.blog-definition > div > :first-child,
+.blog-code > div > :first-child,
+.blog-interactive > div > :first-child {
+    margin-top: 0;
+}
+
+/* Likewise below its last paragraph or equation. */
+.blog-example > div > :last-child,
+.blog-definition > div > :last-child,
+.blog-code > div > :last-child,
+.blog-interactive > div > :last-child {
+    margin-bottom: 0;
+}
+
+/* The outer example already has the article width. Do not narrow plots again. */
+.blog-example figure,
+.blog-definition figure,
+.blog-code figure,
+.blog-interactive figure {
+    width: 100%;
+    max-width: 100%;
+}
+
+.blog-example figure > p,
+.blog-definition figure > p,
+.blog-code figure > p,
+.blog-interactive figure > p {
+    width: 100%;
+}
+
+/* Keep captions and notes outside the example's background on wide screens. */
+.blog-example .marginnote,
+.blog-definition .marginnote,
+.blog-code .marginnote,
+.blog-interactive .marginnote {
+    width: 51.724%;
+    margin-right: -57.759%;
+}
+
+@media (max-width: 760px) {
+    .blog-example .marginnote,
+    .blog-definition .marginnote,
+    .blog-code .marginnote,
+    .blog-interactive .marginnote {
+        float: none;
+        width: 100%;
+        margin-right: 0;
+    }
+}
+
+/* Keep Zebraw blocks inside the article measure and follow the site theme. */
+article .expressive-code {
+    width: 46.5%;
+    max-width: 46.5%;
+    box-sizing: border-box;
+    --ec-codeFontSize: 0.9rem !important;
+    --ec-codeBg: light-dark(#f5f5f5, #252525) !important;
+    --ec-codeFg: light-dark(#222, #ddd) !important;
+    --ec-langFg: light-dark(#222, #fff) !important;
+    --ec-gutterBg: light-dark(#f5f5f5, #252525) !important;
+    --ec-gtrFg: light-dark(#777, #aaa) !important;
+    --ec-borderCol: light-dark(rgba(0, 0, 0, 0.15), rgba(255, 255, 255, 0.18)) !important;
+    overflow: hidden;
+}
+
+/* Example figures already use the article's text measure. */
+article figure .expressive-code {
+    width: 100%;
+    max-width: 100%;
+}
+
+/* Code inside an example follows the surrounding green panel. */
+article .blog-example .expressive-code {
+    --ec-codeBg: light-dark(#e7f2ed, #234b3b) !important;
+    --ec-gutterBg: light-dark(#e7f2ed, #234b3b) !important;
+    --ec-langBg: light-dark(#d7eae1, #346b56) !important;
+    --ec-copyBg: light-dark(#d7eae1, #346b56) !important;
+    --ec-copyFg: light-dark(#222, #fff) !important;
+    --ec-copyBgHover: light-dark(#c7e1d5, #437e67) !important;
+    --ec-copyBgFocus: light-dark(#c7e1d5, #437e67) !important;
+    --ec-copyFgHover: light-dark(#222, #fff) !important;
+    --ec-copyFgFocus: light-dark(#222, #fff) !important;
+}
+
+article .expressive-code pre {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    container-type: inline-size;
+}
+
+/* Do not reserve the full width for the code column in addition to the gutter.
+   Code is written to at most 78 characters per line, the width that fits the
+   PDF. As in the PDF, the font follows the width of the block, so that such a
+   line and the line numbers span it: a character is 0.6 of the font size wide,
+   and 78 of them with the gutter make about 50 times the font size. The limits
+   keep the code readable on narrow screens, where long lines then wrap. */
+article .expressive-code pre > code {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: clamp(0.7rem, 100cqi / 50, 1rem);
+}
+
+article .expressive-code .ec-line .code {
+    min-width: 0;
+}
+
+article .expressive-code .ec-footer {
+    background: var(--ec-codeBg) !important;
+}
+
+article .expressive-code .ec-header {
+    background: var(--ec-codeBg) !important;
+}
+
+@media (max-width: 760px) {
+    article .expressive-code,
+    article figure .expressive-code {
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
+/* Typst emits intrinsic width/height attributes alongside responsive widths.
+   Let the height follow the rendered width instead of reserving the full height. */
+article figure img,
+.marginnote img {
+  height: auto;
+  max-height: none;
 }
 
 h1 {
     font-weight: 400;
     margin-top: 4rem;
     margin-bottom: 1.5rem;
-    font-size: 3.2rem;
+    font-size: 2.38rem;
     line-height: 1;
 }
 
 h2 {
     font-style: normal;
     font-weight: 400;
-    margin-top: 4rem;
-    margin-bottom: 1.5rem;
-    font-size: 3.2rem;
+    margin-top: 2.1rem;
+    margin-bottom: 1.2rem;
+    font-size: 2.1rem;
     line-height: 1;
 }
 
@@ -24,16 +222,202 @@ h3 {
     font-weight: 400;
     margin-top: 2.1rem;
     margin-bottom: 1.4rem;
-    font-size: 2.2rem;
+    font-size: 1.4rem;
     line-height: 1;
 }
 
 h4 {
     font-style: italic;
     font-weight: 400;
-    font-size: 1.7rem;
+    font-size: 1.4rem;
     margin-top: 2rem;
     margin-bottom: 1.4rem;
     line-height: 1;
 }
 
+/* A Desmos graph has the width of the text, like a paragraph: 46.5% of the
+   section, or all of it on narrow screens. In a figure with a caption, the
+   figure has that width and the graph fills it. */
+.desmos-embed {
+  width: 46.5% !important;
+  /* A link to the graph from the PDF leaves the box title in view. */
+  scroll-margin-top: 8em;
+}
+
+figure > .desmos-embed {
+  width: 100% !important;
+}
+
+/* In place of a graph whose Desmos API could not be loaded. */
+.desmos-failed {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed currentColor;
+  font-style: italic;
+}
+
+/* Sliders below a graph: label, slider, and value on one line. */
+.desmos-controls label {
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8em;
+  margin-top: 0.6em;
+}
+
+.desmos-controls input {
+  flex: 1;
+  accent-color: #c74440;
+}
+
+.desmos-controls select {
+  font: inherit;
+  font-size: 0.9em;
+  color: inherit;
+  background: transparent;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  padding: 0.1em 0.3em;
+}
+
+/* A matrix of values from a graph, on a line of its own, in the size of
+   the caption it ends, or of the body text below a graph. */
+.desmos-readout {
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  margin-top: 0.6em;
+}
+
+.marginnote .desmos-readout {
+  font-size: inherit;
+}
+
+/* Browsers set the cells of an inline MathML table in a smaller size. */
+.desmos-readout mtd {
+  font-size: inherit;
+  math-depth: 0;
+}
+
+/* A reciprocal slider sets 1/value, so it runs right to left to make the
+   shown value grow to the right. */
+.desmos-controls input[data-reciprocal] {
+  direction: rtl;
+}
+
+.desmos-controls output {
+  min-width: 3em;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 760px) {
+  .desmos-embed,
+  figure:has(> .desmos-embed) {
+    width: 100% !important;
+    max-width: 100%;
+  }
+}
+
+/* Keep note paragraphs inside their inline HTML container. */
+.marginnote-par {
+    display: block;
+    margin-bottom: 0.6em;
+}
+
+.marginnote-par:last-child {
+    margin-bottom: 0;
+}
+
+.marginnote math[display="block"] {
+    width: 100%;
+    font-size: 1em;
+    margin: 0.7em 0;
+}
+
+.marginnote {
+    text-align: left;
+}
+
+/* Raise superscripts and subscripts without making their line taller, so a
+   line with a footnote number is spaced like the others. */
+sup,
+sub {
+    position: relative;
+    line-height: 0;
+    vertical-align: baseline;
+}
+
+sup {
+    top: -0.5em;
+}
+
+sub {
+    bottom: -0.25em;
+}
+
+/* A list item is already narrower than the text column; use its full width. */
+li math[display="block"],
+li .numbered-equation {
+    width: 100%;
+}
+
+/* Tables in figures: the size of the body text, centered in the text
+   column, with rules above, below the header, and below the table, as in
+   the PDF's booktabs style. */
+article figure table {
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 1.4rem;
+    line-height: 2rem;
+    border-collapse: collapse;
+    border-top: 1px solid currentColor;
+    border-bottom: 1px solid currentColor;
+}
+
+article figure table thead tr {
+    border-bottom: 1px solid currentColor;
+}
+
+article figure table th,
+article figure table td {
+    padding: 0.2em 0.8em;
+    text-align: left;
+}
+
+/* Typst's styles for multiline and aligned equations use descendant
+   selectors, so they also reach the cells of a matrix inside such an
+   equation: the cells lose their padding and every other column is
+   left-aligned. Restore the layout of a standalone matrix, but leave cases,
+   nested alignments, and explicitly aligned cells alone. */
+mtable.multiline-equation mtable:not(.cases, .left-align, .right-align, .aligned, .multiline-equation) mtd:not(.left-align, .right-align) {
+    padding: 0.5ex 0.4em;
+    justify-items: center;
+    text-align: center;
+    math-depth: auto-add;
+    math-style: compact;
+    math-shift: compact;
+}
+
+/* A figure with a light and a dark version (themed-image in commands.typ)
+   shows the one that matches the color mode. */
+.only-dark {
+  display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  .only-light {
+    display: none;
+  }
+
+  .only-dark {
+    display: block;
+  }
+}
+
+/* Display equations wrapped in `smaller` (content/blog/commands.typ), scaled
+   like the PDF by the factor --equation-scale. */
+.smaller-equation math[display="block"] {
+  font-size: calc(1.25em * var(--equation-scale, 0.88));
+}

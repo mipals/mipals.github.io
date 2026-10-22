@@ -1,0 +1,586 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>backprop by linsolve</title><link rel="icon" href="/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tufte-css/1.8.0/tufte.min.css"><link rel="stylesheet" href="/assets/tufted.css"><link rel="stylesheet" href="/assets/custom.css"><style>/* Alignment */
+mtable.right-align mtd,
+mtable mtd.right-align,
+mtable.left-align mtd.right-align,
+mtable.aligned mtd:nth-child(odd) {
+  justify-items: end;
+  text-align: right;
+}
+mtable.cases mtd,
+mtable.left-align mtd,
+mtable mtd.left-align,
+mtable.aligned mtd:nth-child(even),
+math:is(:not([display])) > mtable.multiline-equation mtd {
+  justify-items: start;
+  text-align: left;
+}
+mtable.cases mtd,
+mtable.aligned mtd,
+mtable mtd.flushed,
+mtable mtd.left-flush {
+  padding-left: 0;
+}
+mtable.cases mtd,
+mtable.aligned mtd,
+mtable mtd.flushed,
+mtable mtd.right-flush {
+  padding-right: 0;
+}
+
+/* Tables */
+mtable {
+  math-style: inherit;
+}
+mtd {
+  math-depth: auto-add;
+  math-style: compact;
+  math-shift: compact;
+}
+
+/* Equations */
+mtable.multiline-equation mtd {
+  math-depth: inherit;
+  math-style: inherit;
+  math-shift: inherit;
+  padding: 0;
+}
+math > mtable.multiline-equation mtr:not(:last-child) mtd {
+  padding-bottom: 0.5em;
+}
+
+/* Fractions */
+mfrac {
+  padding-inline: 0;
+  margin-inline: 0.1em;
+}
+
+/* Accents */
+mover[accent="true" i] > :first-child {
+  font-feature-settings: "dtls";
+}
+mover.dotted[accent="true" i] > :first-child {
+  font-feature-settings: "dtls" 0;
+}
+
+/* Other rules for scriptlevel, displaystyle and math-shift */
+munder > :nth-child(2),
+munderover > :nth-child(2) {
+  math-shift: compact
+}
+munder[accentunder="true" i] > :not(:first-child),
+mover[accent="true" i] > :not(:first-child) {
+  math-depth: inherit;
+  math-style: inherit;
+  math-shift: inherit;
+}</style></head><body><header><nav><a href="/">home</a><a href="/blog/">blog</a><a href="/publications/">publications</a><a href="/repositories/">repositories</a><a href="/about/">about</a><a href="/solver/">conic solver</a><a href="/marimo/">marimo</a></nav></header><article><section><style>@layer components {
+  .expressive-code {
+    position: relative;
+    font-family: var(
+      --ec-uiFontFamily,
+      ui-sans-serif,
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      sans-serif
+    );
+    font-size: var(--ec-uiFontSize, 0.9rem);
+    font-weight: var(--ec-uiFontWeight, 400);
+    line-height: var(--ec-uiLineHeight, 1.65);
+    text-size-adjust: none;
+    -webkit-text-size-adjust: none;
+  }
+
+  .expressive-code *:not(:is(svg, svg *)) {
+    box-sizing: border-box;
+  }
+
+  .expressive-code::selection {
+    background: var(--ec-uiSelBg, var(--ec-codeBg, #0d1117));
+    color: var(--ec-uiSelFg, currentColor);
+  }
+
+  .expressive-code pre {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    border: var(--ec-borderWd, 1.5px) solid
+      var(--ec-borderCol, rgba(148, 163, 184, 0.25));
+    border-radius: calc(
+      var(--ec-borderRad, 0.3rem) + var(--ec-borderWd, 1.5px)
+    );
+    background: var(--ec-codeBg, #0d1117);
+    color: var(--ec-codeFg, #c9d1d9);
+    overflow-x: auto;
+    position: relative;
+    z-index: 1;
+    container-type: inline-size;
+  }
+
+  .expressive-code pre:focus-visible {
+    outline: 3px solid var(--ec-focusBorder, #3b82f6);
+    outline-offset: -3px;
+  }
+
+  .expressive-code pre > code {
+    all: unset;
+    display: block;
+    flex: 1 0 100%;
+    padding: var(--ec-codePadBlk, 0.5rem) 0;
+    color: var(--ec-codeFg, #c9d1d9);
+    font-family: var(
+      --ec-codeFontFamily,
+      ui-monospace,
+      SFMono-Regular,
+      Menlo,
+      Monaco,
+      Consolas,
+      "Liberation Mono",
+      "Courier New",
+      monospace
+    );
+    font-size: var(--ec-codeFontSize, 0.85rem);
+    font-weight: var(--ec-codeFontWeight, 400);
+    line-height: var(--ec-codeLineHeight, 1.35);
+  }
+
+  .expressive-code pre > code::selection {
+    background: var(--ec-codeSelBg, rgba(56, 189, 248, 0.35));
+    color: inherit;
+  }
+
+  .expressive-code pre.wrap .ec-line .code {
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    min-width: min(20ch, var(--ecMaxLine, 20ch));
+  }
+
+  /* When lines are allowed to wrap, the absolute overlay can overlap
+     wrapped text. Disable the overlay in wrap mode and rely on per-slot
+     borders for guides (these are handled by .indent-slot). */
+  .expressive-code pre.wrap .ec-line .code .indent-overlay {
+    display: none;
+  }
+
+  .expressive-code pre.wrap .ec-line .code::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    /* use the code line-height times the element font-size to match one line */
+    height: calc(var(--ec-codeLineHeight, 1.65) * 1em);
+    width: max(0px, calc(var(--ecIndent, 0) - 2px));
+    pointer-events: none;
+    background-image: repeating-linear-gradient(
+      to right,
+      transparent 0,
+      transparent calc(var(--ec-indentStep, 4ch) - 1px),
+      var(--ec-indentGuideCol, rgba(148, 163, 184, 0.35))
+        calc(var(--ec-indentStep, 4ch) - 1px),
+      var(--ec-indentGuideCol, rgba(148, 163, 184, 0.35))
+        var(--ec-indentStep, 4ch)
+    );
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    mix-blend-mode: multiply;
+    opacity: 0.85;
+    z-index: 0;
+  }
+
+  .expressive-code pre.wrap .ec-line .code span.indent {
+    white-space: pre;
+  }
+
+  .expressive-code .ec-line .code .indent {
+    display: inline-flex;
+    white-space: pre;
+  }
+
+  .expressive-code .ec-line .code .indent-slot {
+    display: inline-flex;
+    white-space: pre;
+    position: relative;
+  }
+
+  .expressive-code.has-indent-guides .ec-line .code .indent-slot {
+    border-inline-end: 1px solid
+      var(--ec-indentGuideCol, rgba(148, 163, 184, 0.35));
+  }
+
+  .expressive-code.has-indent-guides
+    .ec-line
+    .code
+    .indent-slot.indent-slot-partial {
+    border-inline-end: none;
+  }
+
+  .expressive-code pre::-webkit-scrollbar,
+  .expressive-code pre::-webkit-scrollbar-track {
+    background-color: inherit;
+    border-radius: calc(
+      var(--ec-borderRad, 0.3rem) + var(--ec-borderWd, 1.5px)
+    );
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+
+  .expressive-code pre::-webkit-scrollbar-thumb {
+    background-color: var(--ec-scrollbarThumbCol, rgba(148, 163, 184, 0.4));
+    border: 4px solid transparent;
+    background-clip: content-box;
+    border-radius: 10px;
+  }
+
+  .expressive-code pre::-webkit-scrollbar-thumb:hover {
+    background-color: var(
+      --ec-scrollbarThumbHoverCol,
+      rgba(148, 163, 184, 0.55)
+    );
+  }
+
+  .expressive-code .code-lang {
+    position: absolute;
+    top: 0.25rem;
+    right: 0.6rem;
+    padding: 0;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.25rem;
+    background: none;
+    color: var(--ec-langFg, var(--ec-codeFg, currentColor));
+    font-size: 0.68em;
+    pointer-events: none;
+    opacity: 0.6;
+    transition: opacity 160ms ease, color 160ms ease;
+    z-index: 2;
+  }
+
+  .expressive-code:focus-within .code-lang,
+  .expressive-code:hover .code-lang {
+    opacity: 1;
+    color: var(--ec-langFg, var(--ec-codeFg, currentColor));
+  }
+
+  .expressive-code .copy-button {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.3rem;
+    height: 2.3rem;
+    border-radius: 0.45rem;
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    background-color: var(--ec-copyBg, rgba(15, 23, 42, 0.04));
+    color: var(--ec-copyFg, rgba(15, 23, 42, 0.7));
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: auto;
+    transition: opacity 160ms ease, transform 160ms ease,
+      background-color 140ms ease, color 140ms ease;
+    transform: translateY(-0.3rem);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns%3D%27http://www.w3.org/2000/svg%27 viewBox%3D%270 0 24 24%27 fill%3D%27none%27 stroke%3D%27currentColor%27 stroke-width%3D%271.75%27 stroke-linecap%3D%27round%27 stroke-linejoin%3D%27round%27%3E%3Cpath d%3D%27M3 19a2 2 0 0 1-1-2V3a2 2 0 0 1 1-1h13a2 2 0 0 1 2 1%27/%3E%3Crect x%3D%276%27 y%3D%275%27 width%3D%2716%27 height%3D%2718%27 rx%3D%271.6%27 ry%3D%271.6%27/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 60%;
+    z-index: 3;
+  }
+
+  .expressive-code .copy-button:is(:hover, :focus-visible, :active) {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .expressive-code .copy-button:focus-visible {
+    outline: 2px solid rgba(148, 163, 184, 0.55);
+    outline-offset: 2px;
+    background-color: var(--ec-copyBgFocus, rgba(15, 23, 42, 0.16));
+    color: var(--ec-copyFgFocus, rgba(15, 23, 42, 1));
+  }
+
+  .expressive-code .copy-button::before {
+    content: "";
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    background: transparent;
+    border: none;
+    pointer-events: none;
+  }
+
+  .expressive-code .copy-button::after {
+    content: none;
+    pointer-events: none;
+  }
+
+  .expressive-code .copy-button .copy-label,
+  .expressive-code .copy-button .copy-feedback {
+    display: none;
+  }
+
+  .expressive-code .copy-button:hover {
+    background-color: var(--ec-copyBgHover, rgba(15, 23, 42, 0.12));
+    color: var(--ec-copyFgHover, rgba(15, 23, 42, 0.9));
+  }
+
+  .expressive-code .copy-button span[aria-hidden="true"] {
+    font-family: var(--ec-uiFontFamily, inherit);
+  }
+
+  .expressive-code .ec-header,
+  .expressive-code .ec-footer {
+    display: block;
+    padding: 0.35rem var(--ec-codePadInl, 1.35rem);
+    color: var(--ec-uiFg, currentColor);
+  }
+
+  .expressive-code .ec-header.ec-ext,
+  .expressive-code .ec-footer.ec-ext {
+    padding: 0.25rem var(--ec-codePadInl, 1.35rem);
+  }
+
+  .expressive-code .ec-line {
+    direction: ltr;
+    unicode-bidi: isolate;
+    display: grid;
+    grid-template-areas: "gutter code";
+    grid-template-columns: auto 1fr;
+    column-gap: var(--ec-gutterGap, 0.25rem);
+    position: relative;
+    --lineBg: var(--ec-codeBg, #0d1117);
+    background: var(--lineBg);
+  }
+
+  .expressive-code:not(.has-gutter) .ec-line {
+    grid-template-columns: 1fr;
+  }
+
+  .expressive-code:not(.has-gutter) .ec-line .code {
+    padding-inline: var(--ec-codePadInl, 1.35rem);
+  }
+
+  .expressive-code .ec-line .gutter {
+    grid-area: gutter;
+    color: var(--ec-gtrFg, rgba(148, 163, 184, 0.8));
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: var(--lineBg, var(--ec-gutterBg, var(--ec-codeBg, #0d1117)));
+    box-shadow: 1px 0 0 var(--ec-gtrBrdCol, rgba(148, 163, 184, 0.2));
+  }
+
+  .expressive-code .ec-line .gutter > * {
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .expressive-code .ec-line .gutter ~ .code {
+    --ecLineBrdCol: var(--ec-gtrBrdCol, rgba(148, 163, 184, 0.2));
+  }
+
+  .expressive-code .ec-line.highlight .gutter {
+    color: var(--ec-gtrHighlightFg, rgba(226, 232, 240, 0.95));
+  }
+
+  .expressive-code .ec-line .gutter .ln {
+    display: inline-flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+    box-sizing: content-box;
+    min-width: var(--lnWidth, 2ch);
+    padding-inline-start: var(--ec-gutterPadLeft, 0.5rem);
+    padding-inline-end: var(--ec-codePadInl, 1.35rem);
+    font-size: var(--ec-codeFontSize, 0.85rem);
+    font-variant-numeric: tabular-nums;
+    color: inherit;
+  }
+
+  .expressive-code .ec-line .gutter .ln > span + span {
+    margin-inline-start: 0.25em;
+  }
+
+  .expressive-code .ec-line .code {
+    position: relative;
+    z-index: 1;
+  }
+
+  .expressive-code .ec-line .code .indent-overlay {
+    display: none;
+  }
+
+  .expressive-code.has-indent-guides .ec-line .code .indent-overlay {
+    position: absolute;
+    inset: 0 auto 0 0;
+    display: block;
+    /* Shrink overlay by 1px to avoid drawing a vertical guide at the very end of
+       the inline area (prevents an extra line appearing at each row end).
+       Use max(...) to avoid negative values when --ecIndent is small. */
+    width: max(0px, calc(var(--ecIndent, 0) - 2px));
+    pointer-events: none;
+    background-image: repeating-linear-gradient(
+      to right,
+      transparent 0,
+      transparent calc(var(--ec-indentStep, 4ch) - 1px),
+      var(--ec-indentGuideCol, rgba(148, 163, 184, 0.35))
+        calc(var(--ec-indentStep, 4ch) - 1px),
+      var(--ec-indentGuideCol, rgba(148, 163, 184, 0.35))
+        var(--ec-indentStep, 4ch)
+    );
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    mix-blend-mode: multiply;
+    opacity: 0.85;
+    z-index: 0;
+  }
+  .expressive-code .ec-comment {
+    grid-column: 1 / -1;
+    padding: 0.55rem calc(var(--ec-codePadInl, 1.35rem) + 0.25rem);
+    font-size: 0.85em;
+    background: var(--ec-commentBg, rgba(56, 189, 248, 0.18));
+    color: var(--ec-commentFg, currentColor);
+    box-shadow: inset 0 1px 0 rgba(15, 23, 42, 0.08),
+      inset 0 -1px 0 rgba(15, 23, 42, 0.06);
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    width: 100cqw;
+    box-sizing: border-box;
+  }
+
+  .expressive-code .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  code.expressive-code-inline {
+    display: inline-block;
+    padding: 0 var(--ec-inlinePadInl, 0.4rem);
+    border-radius: calc(var(--ec-borderRad, 0.3rem) / 1.2);
+    background: var(--ec-inlineBg, rgba(148, 163, 184, 0.2));
+    color: var(--ec-inlineFg, inherit);
+    font-family: var(
+      --ec-codeFontFamily,
+      ui-monospace,
+      SFMono-Regular,
+      Menlo,
+      Monaco,
+      Consolas,
+      "Liberation Mono",
+      "Courier New",
+      monospace
+    );
+    font-size: 0.95em;
+    line-height: 1.2;
+    white-space: pre;
+  }
+}
+</style><script>const CODE_BLOCK_SELECTOR = ".expressive-code";
+const COPY_BUTTON_SELECTOR = ".copy-button";
+
+const selectCodeBlocks = () =>
+  Array.from(document.querySelectorAll(CODE_BLOCK_SELECTOR));
+
+const extractCodeText = (codeBlock) =>
+  Array.from(codeBlock.querySelectorAll(".ec-line .code"))
+    .map((line) => {
+      const indent = line.dataset.indent ?? "";
+      const content = line.textContent
+        .replace(/\u00a0/g, " ")
+        .replace(/\u200b/gi, "");
+      return indent + content;
+    })
+    .join("\n");
+
+const fallbackCopy = (text) => {
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.setAttribute("readonly", "true");
+  textarea.style.position = "absolute";
+  textarea.style.left = "-9999px";
+  document.body.appendChild(textarea);
+  textarea.select();
+  /** @type {any} */ (document).execCommand("copy");
+  document.body.removeChild(textarea);
+};
+
+const setStateWithTimeout = (button, state, delay = 1600) => {
+  button.dataset.state = state;
+  if (state === "copied") {
+    setTimeout(() => {
+      if (button.dataset.state === "copied") {
+        button.dataset.state = "idle";
+      }
+    }, delay);
+  }
+};
+
+const bindCopyButton = (codeBlock) => {
+  if (!codeBlock || codeBlock.dataset.copyBound === "true") return;
+
+  const copyButton = codeBlock.querySelector(COPY_BUTTON_SELECTOR);
+  if (!copyButton) return;
+
+  codeBlock.dataset.copyBound = "true";
+
+  const copyHandler = async () => {
+    const code = extractCodeText(codeBlock);
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(code);
+      } else {
+        fallbackCopy(code);
+      }
+      setStateWithTimeout(copyButton, "copied");
+    } catch (error) {
+      try {
+        fallbackCopy(code);
+        setStateWithTimeout(copyButton, "copied");
+      } catch (fallbackError) {
+        setStateWithTimeout(copyButton, "error", 2200);
+      }
+    }
+  };
+
+  const resetHandler = () => {
+    if (copyButton.dataset.state === "copied") {
+      copyButton.dataset.state = "idle";
+    }
+  };
+
+  copyButton.addEventListener("click", copyHandler);
+  copyButton.addEventListener("blur", resetHandler);
+  copyButton.addEventListener("mouseleave", resetHandler);
+};
+
+selectCodeBlocks().forEach(bindCopyButton);
+
+const observer = new MutationObserver((mutations) => {
+  for (const mutation of mutations) {
+    mutation.addedNodes.forEach((node) => {
+      if (!(node instanceof HTMLElement)) return;
+      if (node.matches?.(CODE_BLOCK_SELECTOR)) {
+        bindCopyButton(node);
+      } else {
+        node
+          .querySelectorAll?.(CODE_BLOCK_SELECTOR)
+          .forEach((block) => bindCopyButton(block));
+      }
+    });
+  }
+});
+
+observer.observe(document.documentElement, {
+  childList: true,
+  subtree: true,
+});
+</script><h1>Backpropagation as a Linear Solve</h1><p class="post-meta"><time datetime="2026-10-05">5 October 2026</time> · <a href="/pdf/2026/10-05-backpropagation-linear-solve/backpropagation-linear-solve.pdf">Download PDF</a></p><nav class="post-toc marginnote"><div class="post-toc-title">Contents</div><ol><li class="post-toc-section"><a href="#loc-1"><span class="post-toc-number">1.</span> The forward relation</a></li><li class="post-toc-section"><a href="#loc-2"><span class="post-toc-number">2.</span> Differentiating the network</a></li><li class="post-toc-section"><a href="#loc-3"><span class="post-toc-number">3.</span> A scalar loss</a></li></ol></nav><p>In <a href="/blog/2025/10-25-adjoint-method/">the previous post on backpropagation</a>, we showed that backpropagation is a special case of the adjoint method. In this post we skip the adjoint description and instead derive the same result directly from the chain rule.</p><h2 id="loc-1">1. The forward relation</h2><p>We denote the data by <math><msub><mi>𝑢</mi><mn>0</mn></msub></math> and the parameters by <math><mi>𝜃</mi><mo>∈</mo><msup><mi>ℝ</mi><mi>𝑝</mi></msup></math>. The network has <math><mi>𝑁</mi></math> layers, each of which is a function <math><msub><mi mathvariant="normal">Φ</mi><mi>𝑖</mi></msub></math> that takes as input outputs from previous layers (<math><msub><mi>𝑢</mi><mrow><mi>𝑖</mi><mo lspace="0em" rspace="0em">−</mo><mn>1</mn></mrow></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>𝑢</mi><mn>0</mn></msub></math>) as well as the parameters (<math><mi>𝜃</mi></math>), and produces the next layer output <math><msub><mi>𝑢</mi><mi>𝑖</mi></msub></math>. The full forward pass, including all layer outputs, can be expressed as</p><div id="forward-relation" class="numbered-equation"><math display="block"><munder><munder accentunder="true"><mrow><mo>[</mo><mtable><mtr><mtd><msub><mi>𝑢</mi><mn>1</mn></msub></mtd></mtr><mtr><mtd><msub><mi>𝑢</mi><mn>2</mn></msub></mtd></mtr><mtr><mtd><mi>⋮</mi></mtd></mtr><mtr><mtd><msub><mi>𝑢</mi><mi>𝑁</mi></msub></mtd></mtr></mtable><mo>]</mo></mrow><mo>⏟</mo></munder><mrow><mi>𝑢</mi><mrow><mo>(</mo><mi>𝜃</mi><mo>)</mo></mrow></mrow></munder><mo>=</mo><munder><munder accentunder="true"><mrow><mo>[</mo><mtable><mtr><mtd><msub><mi mathvariant="normal">Φ</mi><mn>1</mn></msub><mrow><mo>(</mo><mrow><msub><mi>𝑢</mi><mn>0</mn></msub><mo>,</mo><mi>𝜃</mi></mrow><mo>)</mo></mrow></mtd></mtr><mtr><mtd><msub><mi mathvariant="normal">Φ</mi><mn>2</mn></msub><mrow><mo>(</mo><mrow><msub><mi>𝑢</mi><mn>1</mn></msub><mo>,</mo><msub><mi>𝑢</mi><mn>0</mn></msub><mo>,</mo><mi>𝜃</mi></mrow><mo>)</mo></mrow></mtd></mtr><mtr><mtd><mi>⋮</mi></mtd></mtr><mtr><mtd><msub><mi mathvariant="normal">Φ</mi><mi>𝑁</mi></msub><mrow><mo>(</mo><mrow><msub><mi>𝑢</mi><mrow><mi>𝑁</mi><mo lspace="0em" rspace="0em">−</mo><mn>1</mn></mrow></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>𝑢</mi><mn>0</mn></msub><mo>,</mo><mi>𝜃</mi></mrow><mo>)</mo></mrow></mtd></mtr></mtable><mo>]</mo></mrow><mo>⏟</mo></munder><mrow><mi mathvariant="normal">Φ</mi><mrow><mo>(</mo><mrow><mi>𝑢</mi><mrow><mo>(</mo><mi>𝜃</mi><mo>)</mo></mrow><mo rspace="0em">,</mo><mi>𝜃</mi></mrow><mo>)</mo></mrow></mrow></munder><mo>∈</mo><msup><mi>ℝ</mi><mi>𝑑</mi></msup><mo rspace="0em">,</mo></math><p><span class="equation-number">(1)</span></p></div><p>where <math><mi>𝑑</mi><mo>=</mo><msubsup><mo form="prefix" lspace="0em">∑</mo><mrow><mi>𝑖</mi><mo lspace="0em" rspace="0em">=</mo><mn>1</mn></mrow><mi>𝑁</mi></msubsup><msub><mi>𝑛</mi><mi>𝑖</mi></msub></math> and <math><msub><mi>𝑛</mi><mi>𝑖</mi></msub></math> is the size of <math><msub><mi>𝑢</mi><mi>𝑖</mi></msub></math>.</p><p>We introduce the projection <math><mi>𝑃</mi><mo>∈</mo><msup><mi>ℝ</mi><mrow><mi>𝑟</mi><mo lspace="0em" rspace="0em">×</mo><mi>𝑑</mi></mrow></msup></math> that takes out relevant layer-outputs, i.e.<sup class="footnote-ref"><a class="footnote-ref-link" href="#fn-1" id="fnref-1">1</a></sup><span class="marginnote" id="fn-1"><sup><a class="footnote-ref-link" href="#fnref-1">1</a></sup> Often <math><mi>𝑃</mi></math> just picks out the last layer, i.e. <math><msub><mi>𝑢</mi><mi>𝑃</mi></msub><mo>=</mo><msub><mi>𝑢</mi><mi>𝑁</mi></msub><mo>=</mo><mi>𝑃</mi><mi>𝑢</mi><mrow><mo>(</mo><mi>𝜃</mi><mo>)</mo></mrow><mo rspace="0em">,</mo><mspace width="1em"/><mi>𝑃</mi><mo>=</mo><mrow><mo>(</mo><mtable><mtr><mtd><mn>0</mn></mtd><mtd><mi>…</mi></mtd><mtd><mn>0</mn></mtd><mtd><msub><mi>𝐼</mi><mi>𝑟</mi></msub></mtd></mtr></mtable><mo>)</mo></mrow><mi>.</mi></math></span></p><div class="numbered-equation"><math display="block"><msub><mi>𝑢</mi><mi>𝑃</mi></msub><mrow><mo>(</mo><mi>𝜃</mi><mo>)</mo></mrow><mo>=</mo><mi>𝑃</mi><mi>𝑢</mi><mrow><mo>(</mo><mi>𝜃</mi><mo>)</mo></mrow><mi>.</mi></math><p><span class="equation-number">(2)</span></p></div><p>Using this the loss function can be written as</p><div id="scalar-loss" class="numbered-equation"><math display="block"><mi>𝒥︀</mi><mrow><mo>(</mo><mi>𝜃</mi><mo>)</mo></mrow><mo>=</mo><mi>ℓ</mi><mrow><mo>(</mo><mrow><msub><mi>𝑢</mi><mi>𝑃</mi></msub><mrow><mo>(</mo><mi>𝜃</mi><mo>)</mo></mrow></mrow><mo>)</mo></mrow><mo>+</mo><mi>𝜇</mi><mi>ℛ︀</mi><mrow><mo>(</mo><mi>𝜃</mi><mo>)</mo></mrow><mo rspace="0em">,</mo></math><p><span class="equation-number">(3)</span></p></div><p>where <math><mi>ℓ</mi></math> is the data loss and <math><mi>ℛ︀</mi></math> is a regularization term.</p><h2 id="loc-2">2. Differentiating the network</h2><p>Applying the chain rule to <a href="#forward-relation">(1)</a>, we have</p><div class="numbered-equation"><math display="block"><mfrac><mrow><mo lspace="0em" rspace="0em">d</mo><mi>𝑢</mi></mrow><mrow><mo lspace="0em" rspace="0em">d</mo><mi>𝜃</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><mi>𝜕</mi><mi mathvariant="normal">Φ</mi></mrow><mrow><mi>𝜕</mi><mi>𝑢</mi></mrow></mfrac><mfrac><mrow><mo lspace="0em" rspace="0em">d</mo><mi>𝑢</mi></mrow><mrow><mo lspace="0em" rspace="0em">d</mo><mi>𝜃</mi></mrow></mfrac><mo>+</mo><mfrac><mrow><mi>𝜕</mi><mi mathvariant="normal">Φ</mi></mrow><mrow><mi>𝜕</mi><mi>𝜃</mi></mrow></mfrac><mo rspace="0em">,</mo><mspace width="1em"/><mtext>hence</mtext><mspace width="1em"/><mfrac><mrow><mo lspace="0em" rspace="0em">d</mo><mi>𝑢</mi></mrow><mrow><mo lspace="0em" rspace="0em">d</mo><mi>𝜃</mi></mrow></mfrac><mo>=</mo><msup><mrow><mo>(</mo><munder><munder accentunder="true"><mrow><mi>𝐼</mi><mo>−</mo><mfrac><mrow><mi>𝜕</mi><mi mathvariant="normal">Φ</mi></mrow><mrow><mi>𝜕</mi><mi>𝑢</mi></mrow></mfrac></mrow><mo>⏟</mo></munder><mi>𝐿</mi></munder><mo>)</mo></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msup><munder><munder accentunder="true"><mfrac><mrow><mi>𝜕</mi><mi mathvariant="normal">Φ</mi></mrow><mrow><mi>𝜕</mi><mi>𝜃</mi></mrow></mfrac><mo>⏟</mo></munder><msup><mi>𝑀</mi><mi>⊤</mi></msup></munder><mi>.</mi></math><p><span class="equation-number">(4)</span></p></div><p>Applying the projection <math><mi>𝑃</mi></math>, it further follows that</p><div class="numbered-equation"><math display="block"><mfrac><mrow><mo lspace="0em" rspace="0em">d</mo><msub><mi>𝑢</mi><mi>𝑃</mi></msub></mrow><mrow><mo lspace="0em" rspace="0em">d</mo><mi>𝜃</mi></mrow></mfrac><mo>=</mo><mi>𝑃</mi><msup><mi>𝐿</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><msup><mi>𝑀</mi><mi>⊤</mi></msup><mi>.</mi></math><p><span class="equation-number">(5)</span></p></div><p>At this point it is worth looking at the structure of the matrices. As the <math><mi>𝑖</mi></math>th layer depends only on previous outputs, the matrix <math><mi>𝐿</mi></math> is block lower-triangular with identity blocks on the diagonal<sup class="footnote-ref"><a class="footnote-ref-link" href="#fn-2" id="fnref-2">2</a></sup><span class="marginnote" id="fn-2"><sup><a class="footnote-ref-link" href="#fnref-2">2</a></sup> The sparsity pattern of the strictly lower/upper part of a (block) triangular matrix is a directed acyclic graph (DAG), which is often how backpropagation is introduced.</span>. The triangular structure makes it efficient to solve the linear system</p><div class="numbered-equation"><math display="block"><msup><mi>𝐿</mi><mi>⊤</mi></msup><mi mathvariant="normal">Λ</mi><mo>=</mo><msup><mi>𝑃</mi><mi>⊤</mi></msup><mo rspace="0em">,</mo><mspace width="1em"/><mi mathvariant="normal">Λ</mi><mo>∈</mo><msup><mi>ℝ</mi><mrow><mi>𝑑</mi><mo lspace="0em" rspace="0em">×</mo><mi>𝑟</mi></mrow></msup><mi>.</mi></math><p><span class="equation-number">(6)</span></p></div><p>Using <math><mi mathvariant="normal">Λ</mi></math> it follows that</p><div class="numbered-equation"><math display="block"><mfrac><mrow><mo lspace="0em" rspace="0em">d</mo><msub><mi>𝑢</mi><mi>𝑃</mi></msub></mrow><mrow><mo lspace="0em" rspace="0em">d</mo><mi>𝜃</mi></mrow></mfrac><mo>=</mo><msup><mi mathvariant="normal">Λ</mi><mi>⊤</mi></msup><msup><mi>𝑀</mi><mi>⊤</mi></msup><mi>.</mi></math><p><span class="equation-number">(7)</span></p></div><p>In practice, as seen in the next section, one rarely needs to form <math><mfrac><mrow><mo lspace="0em" rspace="0em">d</mo><msub><mi>𝑢</mi><mi>𝑃</mi></msub></mrow><mrow><mo lspace="0em" rspace="0em">d</mo><mi>𝜃</mi></mrow></mfrac></math> as a full matrix; it suffices to define products with it.</p><h2 id="loc-3">3. A scalar loss</h2><p>Applying the chain rule to <a href="#scalar-loss">(3)</a>, we have</p><div class="numbered-equation"><math display="block"><msub><mo>∇</mo><mi>𝜃</mi></msub><mi>𝒥︀</mi><mo>=</mo><msup><mrow><mo>(</mo><mfrac><mrow><mo lspace="0em" rspace="0em">d</mo><msub><mi>𝑢</mi><mi>𝑃</mi></msub></mrow><mrow><mo lspace="0em" rspace="0em">d</mo><mi>𝜃</mi></mrow></mfrac><mo>)</mo></mrow><mi>⊤</mi></msup><msub><mo form="prefix">∇</mo><msub><mi>𝑢</mi><mi>𝑃</mi></msub></msub><mi>ℓ</mi><mo>+</mo><mi>𝜇</mi><msub><mo form="prefix">∇</mo><mi>𝜃</mi></msub><mi>ℛ︀</mi><mo>=</mo><mi>𝑀</mi><msup><mi>𝐿</mi><mrow><mo>−</mo><mi>⊤</mi></mrow></msup><msup><mi>𝑃</mi><mi>⊤</mi></msup><msub><mo form="prefix">∇</mo><msub><mi>𝑢</mi><mi>𝑃</mi></msub></msub><mi>ℓ</mi><mo>+</mo><mi>𝜇</mi><msub><mo form="prefix">∇</mo><mi>𝜃</mi></msub><mi>ℛ︀</mi><mi>.</mi></math><p><span class="equation-number">(8)</span></p></div><p>Given that <math><msub><mo>∇</mo><msub><mi>𝑢</mi><mi>𝑃</mi></msub></msub><mi>ℓ</mi></math> is a vector of length <math><mi>𝑟</mi></math> we have that the product <math><msup><mi>𝑃</mi><mi>⊤</mi></msup><msub><mo form="prefix">∇</mo><msub><mi>𝑢</mi><mi>𝑃</mi></msub></msub><mi>ℓ</mi></math> is a vector of length <math><mi>𝑑</mi></math>. It is therefore of interest to first form <math><msup><mi>𝑃</mi><mi>⊤</mi></msup><msub><mo form="prefix">∇</mo><msub><mi>𝑢</mi><mi>𝑃</mi></msub></msub><mi>ℓ</mi></math> and then solve <math><msup><mi>𝐿</mi><mi>⊤</mi></msup><mi>𝜆</mi><mo>=</mo><msup><mi>𝑃</mi><mi>⊤</mi></msup><msub><mo form="prefix">∇</mo><msub><mi>𝑢</mi><mi>𝑃</mi></msub></msub><mi>ℓ</mi></math>, so that</p><div class="numbered-equation"><math display="block"><msub><mo>∇</mo><mi>𝜃</mi></msub><mi>𝒥︀</mi><mo>=</mo><mi>𝑀</mi><mi>𝜆</mi><mo>+</mo><mi>𝜇</mi><msub><mo form="prefix">∇</mo><mi>𝜃</mi></msub><mi>ℛ︀</mi><mo rspace="0em">,</mo></math><p><span class="equation-number">(9)</span></p></div><p>which is equivalent to the final result of the adjoint method (see <a href="/blog/2025/10-25-adjoint-method/">the previous post on backpropagation</a>). Note that <math><mi>𝜆</mi></math> here is the negative of the adjoint variable of the previous post, which absorbs the sign of <math><mfrac><mrow><mi>𝜕</mi><mi>𝑓</mi></mrow><mrow><mi>𝜕</mi><mi>𝜃</mi></mrow></mfrac><mo>=</mo><mo form="prefix">−</mo><msup><mi>𝑀</mi><mi>⊤</mi></msup></math> there.</p><section class="post-citation"><h2>Cite this post</h2><div class="expressive-code lineno-sep" style="--ec-borderRad:0.34em;--ec-codePadBlk:0.34em;--ec-codePadInl:0.34em;--ec-codeFg:#000000;--ec-codeBg:#f5f5f5;--ec-langBg:#effbf9;--ec-langFg:#000000;--ec-copyBg:#f7f7f7;--ec-copyFg:#000000;--ec-gutterBg:#f5f5f5;--ec-gutterGap:0.25rem;--ec-gutterPadLeft:0.5rem;--ec-codeFontSize:0.85em;--ec-codeLineHeight:1.5;--ec-copyBgHover:#f8f8f8;--ec-copyBgFocus:#f8f8f8;--ec-copyFgHover:#000000;--ec-copyFgFocus:#000000;--ec-hlBg:#dff6f2;--ec-commentBg:#effbf9"><div class="code-lang" translate="no">bibtex</div><button type="button" class="copy-button" title="Copy code" data-state="idle" aria-label="Copy code"><span class="sr-only">Copy code</span><span class="copy-label" aria-hidden="true">Copy</span><span class="copy-feedback" aria-hidden="true">Copied!</span></button><pre data-language="bibtex"><code class="language-bibtex"><div class="ec-header ec-ext" style="background:#f5f5f5"></div><div class="ec-line"><div class="code" data-indent>@misc{paltorp2026backpropagationlinearsolve,</div></div><div class="ec-line" style="--ecIndent:2ch"><div class="code" data-indent="  ">  author = {Paltorp, Mikkel},</div></div><div class="ec-line" style="--ecIndent:2ch"><div class="code" data-indent="  ">  title = {{Backpropagation as a Linear Solve}},</div></div><div class="ec-line" style="--ecIndent:2ch"><div class="code" data-indent="  ">  year = {2026},</div></div><div class="ec-line" style="--ecIndent:2ch"><div class="code" data-indent="  ">  month = oct,</div></div><div class="ec-line" style="--ecIndent:2ch"><div class="code" data-indent="  ">  url = {https://mipals.github.io/pdf/2026/10-05-backpropagation-linear-solve/backpropagation-linear-solve.pdf},</div></div><div class="ec-line" style="--ecIndent:2ch"><div class="code" data-indent="  ">  note = {Blog post}</div></div><div class="ec-line"><div class="code" data-indent>}</div></div><div class="ec-footer ec-ext" style="background:#f5f5f5"></div></code></pre></div></section><script>document.querySelectorAll('.ec-line .code[data-indent]').forEach((line) => line.removeAttribute('data-indent'));</script></section></article></body></html>
