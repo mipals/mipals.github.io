@@ -5,7 +5,7 @@ K,M = assembly3(Me,Ke,nnt,ne)
 ## Setup
 ρ₀ = 1.2   # Fluid density
 c₀ = 342.2 # Speed of sound
-U_L = 1     # Piston displacement
+U_L = 1    # Piston displacement
 D = 0.1    # Diameter of Impedance Tube
 s = 0.5*D  # Microphone spacing
 d = D/2    # Distance between mic 2 and sample
@@ -19,7 +19,7 @@ Z₀ = ρ₀ * c₀
 thickness = 0.02  # thickness of the material
 σ = 10000 # flow resistivity
 X = ρ₀*freq/σ
-Zc = Z₀*(1 .+ 0.057*X.^(-0.754) - im*0.087.*X.^(-0.732))
+Zc = Z₀  *(1 .+ 0.0570*X.^(-0.754) - im*0.087.*X.^(-0.732))
 kc = k₀ .*(1 .+ 0.0978*X.^(-0.700) - im*0.189.*X.^(-0.595))
 Z = -im.*Zc.*cot.(kc*thickness) / Z₀
 beta = 1.0 ./ Z   # convert to admittance

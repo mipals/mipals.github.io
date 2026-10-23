@@ -7,7 +7,7 @@ figure {
     color-scheme: light dark;
 }
 
-/* Examples are green, definitions blue, code grey, and interactive figures
+/* Examples are green, definitions blue, recaps amber, code grey, and interactive figures
    purple, also in dark mode. */
 .blog-example > div {
     background: light-dark(#3d997026, #2b5a46) !important;
@@ -17,6 +17,11 @@ figure {
 .blog-definition > div {
     background: light-dark(#0074d926, #294763) !important;
     box-shadow: inset 0 0 0 1px light-dark(transparent, #52789c);
+}
+
+.blog-recap > div {
+    background: light-dark(#c08a1e26, #5a4520) !important;
+    box-shadow: inset 0 0 0 1px light-dark(transparent, #9c7a3c);
 }
 
 .blog-code > div {
@@ -43,7 +48,9 @@ figure {
 .blog-example a:link,
 .blog-example a:visited,
 .blog-definition a:link,
+.blog-recap a:link,
 .blog-definition a:visited,
+.blog-recap a:visited,
 .blog-code a:link,
 .blog-code a:visited,
 .blog-interactive a:link,
@@ -60,6 +67,7 @@ figure {
    block inside one fills the panel. */
 .blog-example pre > code,
 .blog-definition pre > code,
+.blog-recap pre > code,
 .blog-code pre > code,
 .blog-interactive pre > code {
     width: 100%;
@@ -70,6 +78,7 @@ figure {
 /* The panel padding already supplies the space above its title. */
 .blog-example > div > :first-child,
 .blog-definition > div > :first-child,
+.blog-recap > div > :first-child,
 .blog-code > div > :first-child,
 .blog-interactive > div > :first-child {
     margin-top: 0;
@@ -78,6 +87,7 @@ figure {
 /* Likewise below its last paragraph or equation. */
 .blog-example > div > :last-child,
 .blog-definition > div > :last-child,
+.blog-recap > div > :last-child,
 .blog-code > div > :last-child,
 .blog-interactive > div > :last-child {
     margin-bottom: 0;
@@ -86,6 +96,7 @@ figure {
 /* The outer example already has the article width. Do not narrow plots again. */
 .blog-example figure,
 .blog-definition figure,
+.blog-recap figure,
 .blog-code figure,
 .blog-interactive figure {
     width: 100%;
@@ -94,6 +105,7 @@ figure {
 
 .blog-example figure > p,
 .blog-definition figure > p,
+.blog-recap figure > p,
 .blog-code figure > p,
 .blog-interactive figure > p {
     width: 100%;
@@ -102,6 +114,7 @@ figure {
 /* Keep captions and notes outside the example's background on wide screens. */
 .blog-example .marginnote,
 .blog-definition .marginnote,
+.blog-recap .marginnote,
 .blog-code .marginnote,
 .blog-interactive .marginnote {
     width: 51.724%;
@@ -111,6 +124,7 @@ figure {
 @media (max-width: 760px) {
     .blog-example .marginnote,
     .blog-definition .marginnote,
+    .blog-recap .marginnote,
     .blog-code .marginnote,
     .blog-interactive .marginnote {
         float: none;
@@ -404,6 +418,12 @@ mtable.multiline-equation mtable:not(.cases, .left-align, .right-align, .aligned
    shows the one that matches the color mode. */
 .only-dark {
   display: none;
+}
+
+/* Center a themed image narrower than its figure, as in the PDF. */
+figure .only-light > img,
+figure .only-dark > img {
+  margin-inline: auto;
 }
 
 @media (prefers-color-scheme: dark) {
