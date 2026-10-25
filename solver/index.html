@@ -297,14 +297,14 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
         }
       }
     </style>
-  <link rel="modulepreload" href="/solver/clarabel-claude-db73efa53ee41b8.js" crossorigin="anonymous" integrity="sha384-0jWrrLXDZtbCR1w/+p26pUPI7qp3Q8fz5I++Hnk5mwt+wI77LCWgDS6F8t9QKtYM"><link rel="preload" href="/solver/clarabel-claude-db73efa53ee41b8_bg.wasm" crossorigin="anonymous" integrity="sha384-gRVp1+vPu+UC2lFMSJ4KPdoS7mjsPigPg1HmVvEY1Y2OALqexfV2o5qTc3uwPZ1G" as="fetch" type="application/wasm"></head>
+  <link rel="modulepreload" href="/solver/clarabel-claude-db73efa53ee41b8.js" crossorigin="anonymous" integrity="sha384-0jWrrLXDZtbCR1w/+p26pUPI7qp3Q8fz5I++Hnk5mwt+wI77LCWgDS6F8t9QKtYM"><link rel="preload" href="/solver/clarabel-claude-db73efa53ee41b8_bg.wasm" crossorigin="anonymous" integrity="sha384-gRVp1+vPu+UC2lFMSJ4KPdoS7mjsPigPg1HmVvEY1Y2OALqexfV2o5qTc3uwPZ1G" as="fetch" type="application/wasm"><script src="/assets/snail.js" defer></script></head>
   <body>
     <header>
       <!-- BEGIN GENERATED SITE NAV -->
 <nav><a href="/">home</a><a href="/blog/">blog</a><a href="/publications/">publications</a><a href="/repositories/">repositories</a><a href="/about/">about</a><a href="/solver/">conic solver</a><a href="/marimo/">marimo</a></nav>
 <!-- END GENERATED SITE NAV -->
-    </header>
-    <article>
+    <div class="forest"><img src="/assets/forest.svg" alt></div></header>
+    <article><div class="snail-says" hidden><p>This is Clarabel, compiled to WebAssembly and running in your browser.</p> <p>The theory is in the <a href="/blog/2026/01-04-conic-optimization/">conic optimization post</a>.</p> <p>Stay inside the cone, like me inside my shell.</p> <p>Interior-point methods stay strictly inside the cone. I stay strictly inside my shell.</p> <p>Spatulas or forks? Clarabel will tell you. I’d make chanterelles.</p> <p>Portfolio advice from a snail: diversify. Mine is all chanterelles.</p> <p>Positive semidefinite: no negative eigenvalues, and no negative thoughts.</p> <p>Box constraints keep the variables in their box. I keep to my shell.</p> <p>Try a tighter tolerance in the solver settings. More iterations, more fun.</p></div>
       <section id="math-intro">
         <p><span class="marginnote"><sup>1</sup> The code is running in the browser using <a href="https://rust-lang.org/what/wasm/">WebAssembly</a>.</span></p>
         <h1>Solving Conic Problems using <a href="https://clarabel.org/stable/">Clarabel</a><sup>1</sup></h1>
