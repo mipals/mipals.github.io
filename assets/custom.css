@@ -441,3 +441,99 @@ figure .only-dark > img {
 .smaller-equation math[display="block"] {
   font-size: calc(1.25em * var(--equation-scale, 0.88));
 }
+
+/* The animated avatar of the about page (assets/pixel-avatar.js), a canvas
+   that replaces the image and is laid out like it */
+.pixel-avatar canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+@media (max-width: 760px) {
+  .pixel-avatar canvas {
+    max-width: calc(760px / 3);
+    margin: 0 auto;
+  }
+}
+
+/* The drawing of a snail by some chanterelles in the bottom right corner of
+   the window on every page (assets/forest.svg, animated by assets/snail.js).
+   It sits in the band right of the margin notes, about a fifth of the window
+   wide, on screens wide enough for it */
+.forest {
+  display: none;
+}
+
+@media (min-width: 1200px) {
+  .forest {
+    display: block;
+    position: fixed;
+    bottom: 0.5rem;
+    right: 1.5vw;
+    width: min(280px, 20vw);
+  }
+
+  .forest img,
+  .forest svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  #forest-snail {
+    cursor: pointer;
+  }
+
+  /* What the snail says when clicked: a speech bubble above the drawing, in
+     the ink of the drawing, with a line from its bottom edge down to the
+     snail's eyes (placed by assets/snail.js) */
+  .snail-bubble,
+  .snail-tail {
+    --bubble-ink: #3d3d3d;
+    --bubble-paper: #fffff8;
+  }
+
+  .snail-bubble {
+    position: absolute;
+    width: max-content;
+    max-width: 220px;
+    padding: 0.4em 0.7em;
+    font-size: 1.05rem;
+    line-height: 1.3;
+    color: var(--bubble-ink);
+    background: var(--bubble-paper);
+    border: 1.4px solid var(--bubble-ink);
+    border-radius: 16px 14px 15px 4px;
+    transform: rotate(-1deg) translateY(6px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 250ms ease, transform 250ms ease;
+  }
+
+  .snail-bubble.shown {
+    opacity: 1;
+    transform: rotate(-1deg);
+    pointer-events: auto;
+  }
+
+  .snail-tail {
+    position: absolute;
+    border-left: 1px solid var(--bubble-ink);
+    opacity: 0;
+    transition: opacity 250ms ease;
+  }
+
+  .snail-tail.shown {
+    opacity: 1;
+  }
+
+}
+
+@media (min-width: 1200px) and (prefers-color-scheme: dark) {
+  .snail-bubble,
+  .snail-tail {
+    --bubble-ink: #c9c9c9;
+    --bubble-paper: #151515;
+  }
+}
