@@ -7,8 +7,8 @@
     <link rel="icon" href="/favicon.ico" />
     
 <script type="module">
-import init, * as bindings from '/solver/clarabel-claude-7fcc0f1cb1c84b3c.js';
-const wasm = await init({ module_or_path: '/solver/clarabel-claude-7fcc0f1cb1c84b3c_bg.wasm' });
+import init, * as bindings from '/solver/clarabel-claude-19b215e0204ed729.js';
+const wasm = await init({ module_or_path: '/solver/clarabel-claude-19b215e0204ed729_bg.wasm' });
 
 
 window.wasmBindings = bindings;
@@ -96,15 +96,14 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
         align-items: center;
         gap: 1rem;
       }
-      /* The problem, indented, and wide enough for the notes on the right of
-         its lines to reach into the margin */
-      .problem-formulation {
-        width: 85%;
-      }
-      /* KaTeX sets math at 1.21 times the text; the problem, a block of
-         several lines, is set like the text */
-      .problem-formulation .katex {
+      /* KaTeX sets math at 1.21 times the text; the problem and its data,
+         blocks of several lines, are set like the text */
+      .problem-formulation .katex,
+      .problem-data .katex {
         font-size: 1em;
+      }
+      .problem-formulation .katex-display > .katex {
+        padding-left: 1em;
       }
       .problem-formulation .katex-display {
         margin: 0.8rem 0;
@@ -130,7 +129,7 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
       }
       pre.iteration-log {
         font-family: "Menlo", "Consolas", "Monaco", monospace;
-        font-size: 0.85rem;
+        font-size: 0.8rem;
         line-height: 1.4;
         margin: 0;
         padding: 0.8rem 0;
@@ -138,6 +137,7 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
         white-space: pre;
       }
       pre.iteration-log code {
+        margin-left: 0;   /* level with the text, not indented as in tufte.css */
         font-family: inherit;
         font-size: inherit;
         white-space: pre;
@@ -146,13 +146,73 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
         padding-top: 0;
         margin-top: -0.8rem;
       }
+      /* The app in the text column, with the settings of the solver and the
+         solution as notes in the margin */
+      .solver {
+        width: 46.5%;   /* the width of the text column, as in tufted.css */
+      }
+      .solver .sliders {
+        width: 100%;
+      }
+      .solver .marginnote label {
+        display: flex;
+        align-items: center;
+        gap: 0.4em;
+        margin: 0.15em 0;
+      }
+      .solver .marginnote label.setting {
+        display: grid;
+        grid-template-columns: 7.5em 6em;
+      }
+      .solver .marginnote select,
+      .solver .marginnote input[type="text"] {
+        font-size: inherit;
+        width: 6em;
+        padding: 0 0.3em;
+      }
+      .solver .marginnote p {
+        font-size: inherit;
+        margin: 0 0 0.3em;
+      }
+      /* A heading above each note, on a thin rule */
+      .solver .marginnote p.note-heading {
+        border-bottom: 1px solid currentColor;
+        font-variant: small-caps;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.4em;
+      }
+      .solution .katex {
+        font-size: 1em;
+      }
+      .solution .katex-display {
+        margin: 0.3em 0;
+      }
+      /* The problem data, its terms side by side */
+      .problem-data {
+        font-size: 1.4rem;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        column-gap: 1.5rem;
+      }
+      .problem-data .katex-display {
+        margin: 0.3em 0;
+      }
+      .problem-data .katex-display > .katex {
+        padding-left: 0;
+      }
+      @media (max-width: 760px) {
+        .solver {
+          width: 100%;
+        }
+      }
       /* Room below the app at least a window high, so that the page does not
          get shorter, and scroll, when another problem clears the results */
       #app {
         min-height: 100vh;
       }
     </style>
-  <link rel="modulepreload" href="/solver/clarabel-claude-7fcc0f1cb1c84b3c.js" crossorigin="anonymous" integrity="sha384-7try4k1K274fRuHolK20IOByHmulKozPA/uZsbmZnhYhxfQszN3lhTzlhkXH+2qd"><link rel="preload" href="/solver/clarabel-claude-7fcc0f1cb1c84b3c_bg.wasm" crossorigin="anonymous" integrity="sha384-TkCI919zpdR4f6S7w+I+OeOw037hetUjec+xijwL4SS9s5UlGQg7rjj5hWutUc0s" as="fetch" type="application/wasm"><script src="/assets/snail.js" defer></script></head>
+  <link rel="modulepreload" href="/solver/clarabel-claude-19b215e0204ed729.js" crossorigin="anonymous" integrity="sha384-ycKOJGRkMu2NwjRpfvJM+OrmJWixpOe6Uh5qo7Cc+c8qR1GumGzptMuBeeQclRGs"><link rel="preload" href="/solver/clarabel-claude-19b215e0204ed729_bg.wasm" crossorigin="anonymous" integrity="sha384-VEoxym5LLN02iA4KaDwWD9qck1fc/oCjwW0n5ONQfLvTPE3GX2zPPKogF4A7klOj" as="fetch" type="application/wasm"><script src="/assets/snail.js" defer></script></head>
   <body>
     <header>
       <!-- BEGIN GENERATED SITE NAV -->
@@ -163,9 +223,9 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
       <section id="math-intro">
         <p><span class="marginnote"><sup>1</sup> The code is running in the browser using <a href="https://rust-lang.org/what/wasm/">WebAssembly</a>.</span></p>
         <h1>Solving Conic Problems using <a href="https://clarabel.org/stable/">Clarabel</a><sup>1</sup></h1>
-        <p>Clarabel can be used to solve conic problems on the form<sup>2</sup> <span class="marginnote"><sup>2</sup> Linear, Quadratic, Semidefinite, Second-order cone, Power cone, and Exponential cone programs are all examples of conic programs.</span></p>
+        <p>Clarabel can be used to solve conic problems on the form<sup>2</sup> <span class="marginnote"><sup>2</sup> Linear, Quadratic, Semidefinite, Second-order cone, Power cone, and Exponential cone programs are all examples of conic programs. To read more about cones and the interior point method behind Clarabel <a href="/blog/2026/01-04-conic-optimization/">look here.</a></span></p>
         <p>$$\begin{array}{rl} \text{minimize} & \frac{1}{2}x^\top P x + q^\top x\\[2ex] \text{subject to} & Ax + s = b, \quad s \in \mathcal{K} \end{array}$$</p>
-        <p>where $\mathcal{K}$ is a composition of convex cones<sup>3</sup>. <span class="marginnote"><sup>3</sup>To read more about cones and the interior point method behind Clarabel <a href="/blog/2026/01-04-conic-optimization/">look here.</a> </span> Below you can choose an example problem to solve. </p>
+        <p>where $\mathcal{K}$ is a composition of convex cones. Try the examples below.</p>
       </section>
       <div id="app"></div>
     </article>
