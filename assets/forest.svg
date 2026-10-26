@@ -90,9 +90,8 @@
         <path class="ink bold" d="M 18 153 C 38 155 74 155 92 153 C 100 152 103 147 100 142 C 97 137 88 136 84 140 C 82 142 80 140 78.1 135.5 L 41.9 135.5 C 34 140 24 148 18 153 Z"/>
         <path class="ink hair" d="M 23 151 C 45 152.6 75 152.6 93 151"/>
         <path class="ink hair" d="M 26 148 q 3 -2 6 -1 M 34 145 q 3 -2 5 -1 M 30 150 q 2 -1 4 0 M 44 148 q 3 -1 5 0 M 76 146 q 3 -2 6 -1 M 80 149 q 3 -1 5 0"/>
-        <!-- A smile, and the lower tentacles -->
-        <path class="ink mid" d="M 88.5 143 Q 92 146.6 95.5 142.6"/>
-        <path class="ink mid" d="M 100 144 q 4 0 7 2 M 99 147 q 3 1 6 3"/>
+        <!-- A smile -->
+        <path class="ink mid" d="M 94.5 147 Q 97 149.2 99.5 146.8"/>
       </g>
       <!-- The shell: round on top, resting in the body below, with its whorls
            winding in from the opening in front, where the body comes out -->
@@ -108,10 +107,10 @@
       </g>
       <!-- The eye stalks, which assets/snail.js turns toward the cursor -->
       <g id="forest-head">
-        <path id="forest-stalk-1" class="ink mid" d="M 86 139 Q 86 129 88 122"/>
-        <path id="forest-stalk-2" class="ink mid" d="M 92 138 Q 93 129 97 123"/>
-        <circle id="forest-eye-1" class="eye" cx="88" cy="122" r="1.8"/>
-        <circle id="forest-eye-2" class="eye" cx="97" cy="123" r="1.8"/>
+        <path id="forest-stalk-1" class="ink mid" d="M 89 138.5 Q 89.5 129 92 122"/>
+        <path id="forest-stalk-2" class="ink mid" d="M 95 139 Q 96.5 130 100.5 123.5"/>
+        <circle id="forest-eye-1" class="eye" cx="92" cy="122" r="1.8"/>
+        <circle id="forest-eye-2" class="eye" cx="100.5" cy="123.5" r="1.8"/>
       </g>
     </g>
   </g>

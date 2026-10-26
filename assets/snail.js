@@ -36,15 +36,16 @@
   ];
   const shuffled = (list) => list.map((x) => [Math.random(), x]).sort((a, b) => a[0] - b[0]).map((p) => p[1]);
 
-  // The page's own lines: its snail-says lines, the posts on the blog index,
-  // or else its title
+  // The page's own lines: its snail-says lines, the posts on the blog index
+  // and its feed, or else its title
   const ownLines = () => {
     const own = [...document.querySelectorAll(".snail-says p")].map((p) => p.innerHTML);
     if (own.length) return own;
     if (location.pathname === "/blog/") {
       const posts = [...document.querySelectorAll("article li > a")];
       const phrases = ["Have you read <a>?", "I liked <a>.", "Try <a> next."];
-      return posts.map((a, i) => phrases[i % phrases.length].replace("<a>", a.outerHTML));
+      const feed = 'New posts arrive at snail pace. Follow them in the <a class="feed-link" href="/feed.xml">RSS</a> feed.';
+      return [...posts.map((a, i) => phrases[i % phrases.length].replace("<a>", a.outerHTML)), feed];
     }
     const title = document.querySelector("article h1");
     return [title ? `Enjoying <i>${title.textContent}</i>?` : "hej!"];

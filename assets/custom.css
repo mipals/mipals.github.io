@@ -271,6 +271,166 @@ figure > .desmos-embed {
   font-style: italic;
 }
 
+/* The fill-in of a Cholesky factorization, step by step (the sparse post):
+   the pattern of the matrix, beside it its graph or elimination tree, a line
+   on the step, and the controls. Sizes in the drawings are in cells. */
+.fill-in-panels {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.fill-in-panels svg {
+  flex: 1 1 14rem;
+  max-width: 24rem;
+}
+.fill-in-index,
+.fill-in-label {
+  font-size: 0.5px;
+  text-anchor: middle;
+  dominant-baseline: central;
+  fill: currentColor;
+}
+.fill-in-index {
+  opacity: 0.6;
+}
+.fill-in-label {
+  font-size: 0.42px;
+}
+.fill-in-frame {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 0.04;
+}
+.fill-in-pivot {
+  fill: #6042a6;
+  opacity: 0.3;
+}
+.fill-in-nonzero {
+  fill: currentColor;
+}
+/* The symbolic view: the children's first rows, the rows they bring
+   along, and the column that takes them, as in the equations */
+.fill-in-row {
+  fill: #3a9a5b;
+  opacity: 0.55;
+}
+.fill-in-brought {
+  fill: #6042a6;
+  opacity: 0.5;
+}
+.fill-in-target {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 0.06;
+}
+.fill-in-fill {
+  fill: #c74440;
+}
+.fill-in-update {
+  fill: none;
+  stroke: #6042a6;
+  stroke-width: 0.08;
+}
+.fill-in-allocated {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 0.05;
+  opacity: 0.5;
+}
+.fill-in-eliminated {
+  opacity: 0.25;
+}
+.fill-in-edge,
+.fill-in-edge-fill {
+  stroke: currentColor;
+  stroke-width: 0.05;
+}
+.fill-in-edge-fill {
+  stroke: #c74440;
+  stroke-width: 0.08;
+}
+.fill-in-edge-subtree {
+  stroke: #6042a6;
+  stroke-width: 0.12;
+}
+.fill-in-edge-update {
+  stroke-dasharray: 0.15 0.1;
+}
+.fill-in-node {
+  fill: light-dark(#fffff8, #151515);
+  stroke: currentColor;
+  stroke-width: 0.05;
+}
+.fill-in-node-pivot {
+  fill: #6042a6;
+  stroke: #6042a6;
+}
+.fill-in-node-pivot + .fill-in-label {
+  fill: #fff;
+}
+.fill-in-node-neighbor,
+.fill-in-node-parent {
+  stroke: #6042a6;
+  stroke-width: 0.1;
+}
+.fill-in-node-parent {
+  stroke: #c74440;
+}
+.fill-in-node-waiting {
+  stroke-dasharray: 0.12 0.08;
+}
+.fill-in-caption {
+  font-size: 1.4rem;
+  min-height: 3em;
+  margin: 0.6em 0 0;
+}
+.fill-in-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.8em;
+  font-size: 1.4rem;
+}
+.fill-in-controls select {
+  font: inherit;
+  font-size: 0.9em;
+  color: inherit;
+  background: transparent;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  padding: 0.1em 0.3em;
+}
+.fill-in-controls input {
+  flex: 1;
+  min-width: 10rem;
+  accent-color: #c74440;
+}
+
+/* Two blocks side by side (the sparse post), each with a label, stacked
+   on narrow screens. */
+.side-by-side {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1.5rem;
+  width: 46.5%;   /* the width of the paragraphs in tufted.css */
+}
+.side-by-side > div {
+  flex: 1 1 14rem;
+  min-width: 0;
+}
+.side-by-side pre > code {
+  width: 100%;
+  margin-left: 0;
+  box-sizing: border-box;
+}
+@media (max-width: 760px) {
+  .side-by-side {
+    width: 100%;
+  }
+}
+
 /* Sliders below a graph: label, slider, and value on one line. */
 .desmos-controls label {
   font-size: 1.4rem;
@@ -457,83 +617,182 @@ figure .only-dark > img {
   }
 }
 
-/* The drawing of a snail by some chanterelles in the bottom right corner of
-   the window on every page (assets/forest.svg, animated by assets/snail.js).
-   It sits in the band right of the margin notes, about a fifth of the window
-   wide, on screens wide enough for it */
-.forest {
-  display: none;
+/* The drawing of the snail under the chanterelles on the page for addresses
+   with nothing at them (content/404/index.typ), on screens too narrow for the
+   drawing in the corner */
+.lost-snail {
+  display: block;
+  width: min(100%, 420px);
+  margin: 3rem 0;
 }
 
 @media (min-width: 1200px) {
-  .forest {
-    display: block;
-    position: fixed;
-    bottom: 0.5rem;
-    right: 1.5vw;
-    width: min(280px, 20vw);
+  .lost-snail {
+    display: none;
   }
-
-  .forest img,
-  .forest svg {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
-
-  #forest-snail {
-    cursor: pointer;
-  }
-
-  /* What the snail says when clicked: a speech bubble above the drawing, in
-     the ink of the drawing, with a line from its bottom edge down to the
-     snail's eyes (placed by assets/snail.js) */
-  .snail-bubble,
-  .snail-tail {
-    --bubble-ink: #3d3d3d;
-    --bubble-paper: #fffff8;
-  }
-
-  .snail-bubble {
-    position: absolute;
-    width: max-content;
-    max-width: 220px;
-    padding: 0.4em 0.7em;
-    font-size: 1.05rem;
-    line-height: 1.3;
-    color: var(--bubble-ink);
-    background: var(--bubble-paper);
-    border: 1.4px solid var(--bubble-ink);
-    border-radius: 16px 14px 15px 4px;
-    transform: rotate(-1deg) translateY(6px);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 250ms ease, transform 250ms ease;
-  }
-
-  .snail-bubble.shown {
-    opacity: 1;
-    transform: rotate(-1deg);
-    pointer-events: auto;
-  }
-
-  .snail-tail {
-    position: absolute;
-    border-left: 1px solid var(--bubble-ink);
-    opacity: 0;
-    transition: opacity 250ms ease;
-  }
-
-  .snail-tail.shown {
-    opacity: 1;
-  }
-
 }
 
-@media (min-width: 1200px) and (prefers-color-scheme: dark) {
-  .snail-bubble,
-  .snail-tail {
-    --bubble-ink: #c9c9c9;
-    --bubble-paper: #151515;
+/* The small snail at the top of the window of a blog post, which crawls from
+   left to right as the reader scrolls, with its trail behind it and a faint
+   dotted line ahead (assets/reading-snail.js), in the ink of the drawing in
+   the corner */
+.reading-snail {
+  --ink: light-dark(#3d3d3d, #c9c9c9);
+  --paper: light-dark(#fffff8, #151515);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 20px;
+  pointer-events: none;
+  z-index: 10;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  /* The dotted line ahead, on a strip of the page, so that the text scrolls
+     away under it */
+  background:
+    linear-gradient(to right, color-mix(in srgb, var(--ink) 35%, transparent) 40%, transparent 0) left 16.5px / 6px 1px repeat-x,
+    var(--paper);
+}
+
+/* Above the title of the post, it slides up out of the window */
+.reading-snail.away {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+
+.reading-snail-trail {
+  position: absolute;
+  left: 0;
+  top: 16px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--ink);
+  opacity: 0.5;
+}
+
+.reading-snail svg {
+  position: absolute;
+  left: 0;
+  top: 2px;
+  overflow: visible;
+}
+
+.reading-snail .body,
+.reading-snail .shell {
+  fill: var(--paper);
+  stroke: var(--ink);
+  stroke-width: 1.1;
+  stroke-linejoin: round;
+}
+
+.reading-snail .shell {
+  fill: color-mix(in srgb, var(--ink) 16%, var(--paper));
+}
+
+.reading-snail .line {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1;
+  stroke-linecap: round;
+}
+
+.reading-snail .eye {
+  fill: var(--ink);
+}
+
+@media print {
+  .reading-snail {
+    display: none;
   }
+}
+
+/* The link to the feed of new posts, which the snail mentions on the blog
+   index (assets/snail.js), after the feed icon, drawn in the color of the link */
+.feed-link::before {
+  content: "";
+  display: inline-block;
+  width: 0.8em;
+  height: 0.8em;
+  margin-right: 0.3em;
+  vertical-align: -0.05em;
+  background: currentColor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Ccircle cx='1.1' cy='6.9' r='1.1'/%3E%3Cpath d='M0 3a5 5 0 0 1 5 5H3.6A3.6 3.6 0 0 0 0 4.4zM0 0a8 8 0 0 1 8 8H6.6A6.6 6.6 0 0 0 0 1.4z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+/* The snail that wanders about the window of the page for addresses with
+   nothing at them (assets/wandering-snail.js), on a canvas behind the text
+   of the page, which is lifted above it */
+.wandering-snail {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.has-wandering-snail header,
+.has-wandering-snail article {
+  position: relative;
+  z-index: 1;
+}
+
+/* The snail of the drawing in the corner, once it has crawled out of it,
+   above the trails and behind the text; with it gone from the corner, the
+   speech bubble there would point at nothing */
+.wandering-big {
+  position: fixed;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.big-snail-wandering .snail-bubble,
+.big-snail-wandering .snail-tail {
+  display: none;
+}
+
+/* A shaded row of a matrix in an equation, as in the sparse post */
+mtd:has(> .shaded-green) {
+  background: light-dark(#3a9a5b33, #3a9a5b40);
+}
+mtd:has(> .shaded-purple) {
+  background: light-dark(#6042a626, #6042a633);
+}
+
+/* A small elimination tree in the text of the sparse post */
+.small-tree {
+  display: block;
+  width: 9rem;
+  /* centered in the text column, 46.5% wide */
+  margin: 1rem 0 1rem calc(23.25% - 4.5rem);
+}
+@media (max-width: 760px) {
+  .small-tree {
+    margin: 1rem auto;
+  }
+}
+.fill-in-node-round {
+  fill: #3a9a5b;
+  stroke: #3a9a5b;
+}
+.fill-in-node-round + .fill-in-label {
+  fill: #fff;
+}
+.fill-in-edge-new {
+  stroke: #3a9a5b;
+  stroke-width: 0.12;
+}
+.fill-in-count {
+  font-size: 0.42px;
+  text-anchor: middle;
+  dominant-baseline: central;
+  fill: currentColor;
+  opacity: 0.8;
+}
+.fill-in-count-new {
+  fill: #3a9a5b;
+  font-weight: bold;
+  opacity: 1;
 }

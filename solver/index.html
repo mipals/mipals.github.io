@@ -7,8 +7,8 @@
     <link rel="icon" href="/favicon.ico" />
     
 <script type="module">
-import init, * as bindings from '/solver/clarabel-claude-7074e516bd298c66.js';
-const wasm = await init({ module_or_path: '/solver/clarabel-claude-7074e516bd298c66_bg.wasm' });
+import init, * as bindings from '/solver/clarabel-claude-4a6318b55a71ceb7.js';
+const wasm = await init({ module_or_path: '/solver/clarabel-claude-4a6318b55a71ceb7_bg.wasm' });
 
 
 window.wasmBindings = bindings;
@@ -43,6 +43,35 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
         border: 1px solid currentColor;
         border-radius: 4px;
         padding: 0.2rem 0.4rem;
+      }
+      /* The menu of examples: their names spread over a line, like links,
+         the chosen one in the color of the sliders, below a thin rule that
+         sets the examples apart from the introduction */
+      .problem-menu {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        column-gap: 1em;
+        border-top: 1px solid currentColor;
+        padding-top: 0.6rem;
+        margin-top: 1.4rem;
+        white-space: normal;
+      }
+      .problem-menu button {
+        font: inherit;
+        color: inherit;
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        text-decoration: underline;
+        text-decoration-thickness: 1px;
+        text-underline-offset: 0.15em;
+      }
+      .problem-menu button.chosen {
+        color: #c74440;
+        text-decoration: none;
+        cursor: default;
       }
       select option {
         color: initial;
@@ -90,11 +119,6 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
         display: inline-flex;
         align-items: center;
         gap: 0.2rem;
-      }
-      .problem-row {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
       }
       /* KaTeX sets math at 1.21 times the text; the problem and its data,
          blocks of several lines, are set like the text */
@@ -212,7 +236,7 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
         min-height: 100vh;
       }
     </style>
-  <link rel="modulepreload" href="/solver/clarabel-claude-7074e516bd298c66.js" crossorigin="anonymous" integrity="sha384-vbD/84wy99Ex/kDeSyVF0RY9Neu+dYTqIgbhdpZc9vsvHtOoc/JIQ9tuXZ3ehWOz"><link rel="preload" href="/solver/clarabel-claude-7074e516bd298c66_bg.wasm" crossorigin="anonymous" integrity="sha384-VYRl7oJXq3buHIA2uV2S+ocVpHlC/doh75mhIVCp6Pc7duRgqwe+aQ3YowF2RFxr" as="fetch" type="application/wasm"><script src="/assets/snail.js" defer></script></head>
+  <link rel="modulepreload" href="/solver/clarabel-claude-4a6318b55a71ceb7.js" crossorigin="anonymous" integrity="sha384-Jw8ksIbX+cxcWNM0o7zfro4SCsAtyXHkPdhUOCoZG9QBrRVtpJjxlddGCT0G3BPb"><link rel="preload" href="/solver/clarabel-claude-4a6318b55a71ceb7_bg.wasm" crossorigin="anonymous" integrity="sha384-6dDu5mHffL7oYpm03SvR6nRRUjBaTMkIASfYZjewdSNYXJL4vATZT+/zJjCY1AZ7" as="fetch" type="application/wasm"><link rel="stylesheet" href="/assets/snail.css" /><script src="/assets/snail.js" defer></script></head>
   <body>
     <header>
       <!-- BEGIN GENERATED SITE NAV -->

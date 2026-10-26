@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Mikkel Paltorp</title>
+  <subtitle>Notes on scientific computing</subtitle>
+  <link href="https://mipals.github.io/"/>
+  <link rel="self" href="https://mipals.github.io/feed.xml"/>
+  <id>https://mipals.github.io/</id>
+  <updated>2026-10-23T00:00:00Z</updated>
+  <author><name>Mikkel Paltorp</name></author>
+  <entry>
+    <title>When the Jacobian Is Dense but the Program Is Not</title>
+    <link href="https://mipals.github.io/blog/2026/10-23-sparse-jacobians/"/>
+    <id>https://mipals.github.io/blog/2026/10-23-sparse-jacobians/</id>
+    <published>2026-10-23T00:00:00Z</published>
+    <updated>2026-10-23T00:00:00Z</updated>
+    <summary>How automatic differentiation computes large, sparse Jacobians at a fraction of the cost of dense ones, starting from the factored Jacobian of any program.</summary>
+  </entry>
+  <entry>
+    <title>Which Way Is Down? First-Order Optimizers as a Choice of Norm</title>
+    <link href="https://mipals.github.io/blog/2026/10-13-steepest-descent/"/>
+    <id>https://mipals.github.io/blog/2026/10-13-steepest-descent/</id>
+    <published>2026-10-13T00:00:00Z</published>
+    <updated>2026-10-13T00:00:00Z</updated>
+    <summary>First-order optimizers as steepest descent under a choice of norm, and how that choice determines the step.</summary>
+  </entry>
+  <entry>
+    <title>The Polar Express Algorithm</title>
+    <link href="https://mipals.github.io/blog/2026/01-03-polar-express/"/>
+    <id>https://mipals.github.io/blog/2026/01-03-polar-express/</id>
+    <published>2026-10-10T00:00:00Z</published>
+    <updated>2026-10-10T00:00:00Z</updated>
+    <summary>Approximating the sign function by compositions of polynomials, which gives the polar factor of a matrix with only matrix products, as in the Muon optimizer.</summary>
+  </entry>
+  <entry>
+    <title>Batched Backpropagation as a Linear Solve</title>
+    <link href="https://mipals.github.io/blog/2026/10-07-batched-backpropagation/"/>
+    <id>https://mipals.github.io/blog/2026/10-07-batched-backpropagation/</id>
+    <published>2026-10-07T00:00:00Z</published>
+    <updated>2026-10-07T00:00:00Z</updated>
+    <summary>Backpropagation as a linear solve, extended to batches of inputs with sparse matrices whose entries are linear maps.</summary>
+  </entry>
+  <entry>
+    <title>Backpropagation as a Linear Solve</title>
+    <link href="https://mipals.github.io/blog/2026/10-05-backpropagation-linear-solve/"/>
+    <id>https://mipals.github.io/blog/2026/10-05-backpropagation-linear-solve/</id>
+    <published>2026-10-05T00:00:00Z</published>
+    <updated>2026-10-05T00:00:00Z</updated>
+    <summary>Backpropagation derived directly from the chain rule, as the solution of a sparse, lower-triangular linear system.</summary>
+  </entry>
+  <entry>
+    <title>Dual Numbers for Automatic Differentiation</title>
+    <link href="https://mipals.github.io/blog/2026/09-25-dual-numbers/"/>
+    <id>https://mipals.github.io/blog/2026/09-25-dual-numbers/</id>
+    <published>2026-09-25T00:00:00Z</published>
+    <updated>2026-09-25T00:00:00Z</updated>
+    <summary>Dual numbers for forward-mode automatic differentiation, introduced as a number type that tracks the value of a function and its derivative at the same time.</summary>
+  </entry>
+  <entry>
+    <title>The Boundary Element Method</title>
+    <link href="https://mipals.github.io/blog/2026/05-12-bem-introduction/"/>
+    <id>https://mipals.github.io/blog/2026/05-12-bem-introduction/</id>
+    <published>2026-05-12T00:00:00Z</published>
+    <updated>2026-05-12T00:00:00Z</updated>
+    <summary>The boundary element method rewrites the Helmholtz equation as an integral equation on the boundary, so that only the boundary has to be divided into elements.</summary>
+  </entry>
+  <entry>
+    <title>The Finite Element Method</title>
+    <link href="https://mipals.github.io/blog/2026/05-11-fem-introduction/"/>
+    <id>https://mipals.github.io/blog/2026/05-11-fem-introduction/</id>
+    <published>2026-05-11T00:00:00Z</published>
+    <updated>2026-05-11T00:00:00Z</updated>
+    <summary>An introduction to the finite element method: how a partial differential equation, here the Helmholtz equation, becomes a linear system of equations.</summary>
+  </entry>
+  <entry>
+    <title>Conic Optimization</title>
+    <link href="https://mipals.github.io/blog/2026/01-04-conic-optimization/"/>
+    <id>https://mipals.github.io/blog/2026/01-04-conic-optimization/</id>
+    <published>2026-01-04T00:00:00Z</published>
+    <updated>2026-01-04T00:00:00Z</updated>
+    <summary>The central ideas behind efficient interior-point methods for conic programs, with the implementation details that the papers on Clarabel and CVXOPT leave out.</summary>
+  </entry>
+  <entry>
+    <title>Backpropagation is the Adjoint Method</title>
+    <link href="https://mipals.github.io/blog/2025/10-25-adjoint-method/"/>
+    <id>https://mipals.github.io/blog/2025/10-25-adjoint-method/</id>
+    <published>2025-10-25T00:00:00Z</published>
+    <updated>2025-10-25T00:00:00Z</updated>
+    <summary>Backpropagation is a special case of the adjoint method, one where the lower-triangular structure of the problem makes the solve cheap.</summary>
+  </entry>
+  <entry>
+    <title>Associative Scan</title>
+    <link href="https://mipals.github.io/blog/2025/07-30-associative-scan/"/>
+    <id>https://mipals.github.io/blog/2025/07-30-associative-scan/</id>
+    <published>2025-07-30T00:00:00Z</published>
+    <updated>2025-07-30T00:00:00Z</updated>
+    <summary>How the associative scan parallelizes the state computation of state-space models such as S5 and Mamba on the GPU.</summary>
+  </entry>
+  <entry>
+    <title>Structured Masked Attention (SMA)</title>
+    <link href="https://mipals.github.io/blog/2025/07-28-structured-masked-attention/"/>
+    <id>https://mipals.github.io/blog/2025/07-28-structured-masked-attention/</id>
+    <published>2025-07-28T00:00:00Z</published>
+    <updated>2025-07-28T00:00:00Z</updated>
+    <summary>Masked attention with a structured mask, and how low-rank structure turns it into a semiseparable matrix that can be multiplied with in linear time.</summary>
+  </entry>
+</feed>
